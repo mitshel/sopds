@@ -1,0 +1,108 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import sys
+import sopdscfg
+import sopdsdb
+import cgi
+import codecs
+import os
+import urllib.parse
+
+def enc_print(string='', encoding='utf8'):
+    sys.stdout.buffer.write(string.encode(encoding) + b'\n')
+def enc_print_no_ln(string='', encoding='utf8'):
+    sys.stdout.buffer.write(string.encode(encoding))
+
+def header(charset='utf-8'):
+   enc_print('Content-Type: text/xml; charset='+charset)
+   enc_print()
+   enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
+#   enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/">')
+   enc_print('<feed xmlns:app="http://www.w3.org/2007/app" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:opds="http://opds-spec.org/" xml:lang="fr" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:thr="http://purl.org/syndication/thread/1.0" xmlns="http://www.w3.org/2005/Atom">')
+   enc_print('<id>'+sopdscfg.SITE_ID+'</id>')
+   enc_print('<title>'+sopdscfg.SITE_TITLE+'</title>')
+   enc_print('<updated>2013-10-20T02:41:33Z</updated>')
+   enc_print('<icon>'+sopdscfg.SITE_ICON+'</icon>')
+   enc_print('<author><name>'+sopdscfg.SITE_AUTOR+'</name><uri>'+sopdscfg.SITE_URL+'</uri><email>'+sopdscfg.SITE_EMAIL+'</email></author>')
+
+def footer():
+   enc_print('</feed>')
+
+def main_menu():
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="/"/>')
+   enc_print('<entry>')
+   enc_print('<title>По каталогам</title>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?type=1"/>')
+   enc_print('<id>http://bookserver.revues.org/OA</id>    </entry>')
+
+###########################################################################
+# Основной код программы
+#
+
+type_value=0
+slice_value=0
+form = cgi.FieldStorage()
+if 'type' in form:
+   type_value = int(form.getvalue("type", "0"))
+if 'slice' in form:
+   slice_value = int(form.getvalue("slice", "0"))
+
+if type_value==0:
+   header()
+   main_menu()
+   footer()
+elif type_value==1:
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+   opdsdb.openDB()
+   header()
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?type=0"/>')
+   for (cat_id,cat_name) in opdsdb.getcatinparent(slice_value):
+       enc_print('<entry>')
+       enc_print('<title>'+cat_name+'</title>')
+       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?type=1&amp;slice='+str(cat_id)+'"/>')
+       enc_print('<id>cid='+str(cat_id)+'</id>    </entry>')
+   for (book_id,book_name,book_path) in opdsdb.getbooksincat(slice_value):
+       enc_print('<entry>')
+       enc_print('<title>'+book_name+'</title>')
+       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?type=2&amp;slice='+str(book_id)+'"/>')
+       enc_print('<id>bid='+str(book_id)+'</id>    </entry>')
+   footer()
+   opdsdb.closeDB()
+elif type_value==2:
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+   opdsdb.openDB()
+   header()
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="sopds.cgi?type=0" title="'+sopdscfg.SITE_MAINTITLE+'"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?type=2&amp;slice='+str(slice_value)+'"/>')
+   (book_name,book_path)=opdsdb.getbook(slice_value)
+   enc_print('<entry>')
+   enc_print('<title>Книга:'+book_name+'</title>')
+   enc_print('<link type="application/pdf" href="sopds.cgi?type=3&amp;slice='+str(slice_value)+'" rel="http://opds-spec.org/acquisition" />')
+   enc_print('<id>bid='+str(slice_value)+'</id>')
+   enc_print('</entry>')
+   footer()
+   opdsdb.closeDB()   
+elif type_value==3:
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+   opdsdb.openDB()
+   (book_name,book_path)=opdsdb.getbook(slice_value)
+   book_size=os.path.getsize(book_path.encode('utf-8'))
+#   quote_name=urllib.parse.quote(book_name)
+#   quote_name=book_name.encode('utf-8').decode('cp1251','replace')
+   # HTTP Header
+   enc_print('Content-Type:application/octet-stream; name="'+book_name+'"')
+   enc_print_no_ln("Content-Disposition: attachment; filename=")
+   enc_print_no_ln(book_name,'utf-8')
+   enc_print()
+   enc_print('Content-Transfer-Encoding: binary')
+   enc_print('Content-Length: '+str(book_size))
+   enc_print()
+   # Actual File Content will go hear.
+   fo=codecs.open(book_path.encode("utf-8"), "rb")
+   str=fo.read()
+   sys.stdout.buffer.write(str)
+   # Close opend file
+   fo.close()
+   opdsdb.closeDB()
+
