@@ -75,7 +75,7 @@ if type_value==0:
    footer()
 
 elif type_value==1:
-   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
@@ -104,7 +104,7 @@ elif type_value==1:
 
 elif type_value==2:
    id='2'+str(slice_value)
-   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="sopds.cgi?id=0" title="'+sopdscfg.SITE_MAINTITLE+'"/>')
@@ -124,7 +124,7 @@ elif type_value==2:
    opdsdb.closeDB()   
 
 elif type_value==3:
-   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
    (book_name,book_path,reg_date,format)=opdsdb.getbook(slice_value)
    book_size=os.path.getsize(book_path.encode('utf-8'))
@@ -141,7 +141,7 @@ elif type_value==3:
    opdsdb.closeDB()
 
 elif type_value==4:
-   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
    (book_name,book_path,reg_date,format)=opdsdb.getbook(slice_value)
    # HTTP Header

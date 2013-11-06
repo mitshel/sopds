@@ -20,7 +20,7 @@ TBL_CATALOGS=DB_PREFIX+"catalogs"
 #
 
 class opdsDatabase:
-  def __init__(self,iname,iuser,ipass,ihost):
+  def __init__(self,iname,iuser,ipass,ihost,iroot_lib):
     self.db_name=iname
     self.db_user=iuser
     self.db_pass=ipass
@@ -29,6 +29,7 @@ class opdsDatabase:
     self.err=""
     self.isopen=False
     self.next_page=False
+    self.root_lib=iroot_lib
 
   def openDB(self):
     if not self.isopen:
@@ -155,14 +156,14 @@ class opdsDatabase:
     cursor.close()
     return cat_id
 
-  def addcattree(self, catalog, root):
+  def addcattree(self, catalog):
     cat_id=self.findcat(catalog)
     if cat_id!=0:
        return cat_id 
-    if catalog==root:
+    if catalog==self.root_lib:
        return 0
     (head,tail)=os.path.split(catalog)
-    parent_id=self.addcattree(head,root)
+    parent_id=self.addcattree(head)
     sql_addcat=("insert into "+TBL_CATALOGS+"(parent_id,cat_name,full_path) VALUES(%s, %s, %s)")
     data_addcat=(parent_id,tail,catalog)
     cursor=self.cnx.cursor()

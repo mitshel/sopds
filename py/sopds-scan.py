@@ -37,7 +37,7 @@ if VERBOSE:
 # Основной код программы
 #
 
-opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST)
+opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
 opdsdb.openDB()
 opdsdb.printDBerr()
 
@@ -49,8 +49,9 @@ for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
   for name in files:
     (n,e)=os.path.splitext(name)
     if e.lower() in extensions_set:
-       head=full_path
-       cat_id=opdsdb.addcattree(full_path, sopdscfg.ROOT_LIB)
+#       head=full_path
+#       rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
+       cat_id=opdsdb.addcattree(full_path)
        book_id=opdsdb.addbook(name,full_path,cat_id,e)
        if VERBOSE:
           print("Added book: ",full_path," - ",name)

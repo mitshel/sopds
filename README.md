@@ -6,7 +6,9 @@ Author Dmitry V.Shelepnev
 1. Установка:
 Для работы скрипта sopds-scan.py необходимо установить следующие зависимости:
 yum install mysql
+yum install python3
 yum install mysql-connector-python3
+yum install python3-lxml
 
 2. Конфигурационный файл:
 Перед началом работы необходимо внести необходимые настройки в файл конфигурации ./conf/sopds.conf
