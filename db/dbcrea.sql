@@ -8,7 +8,6 @@ use sopds;
 create table books (
 book_id INT not null AUTO_INCREMENT,
 filename VARCHAR(256),
-fullpath VARCHAR(1024),
 path VARCHAR(1024),
 filesize INT not null DEFAULT 0,
 format VARCHAR(8),
@@ -26,7 +25,6 @@ create table catalogs (
 cat_id INT not null AUTO_INCREMENT,
 parent_id INT null,
 cat_name VARCHAR(64),
-full_path VARCHAR(1024),
 path VARCHAR(1024),
 PRIMARY KEY(cat_id),
 KEY(cat_name,path));

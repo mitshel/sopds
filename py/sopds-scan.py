@@ -50,11 +50,11 @@ for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
     (n,e)=os.path.splitext(name)
     if e.lower() in extensions_set:
 #       head=full_path
-#       rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
-       cat_id=opdsdb.addcattree(full_path)
-       book_id=opdsdb.addbook(name,full_path,cat_id,e)
+       rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
+       cat_id=opdsdb.addcattree(rel_path)
+       book_id=opdsdb.addbook(name,rel_path,cat_id,e)
        if VERBOSE:
-          print("Added book: ",full_path," - ",name)
+          print("Added book: ",rel_path," - ",name)
 
 opdsdb.closeDB()
 

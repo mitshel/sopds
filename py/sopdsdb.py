@@ -83,7 +83,7 @@ class opdsDatabase:
     return tag_id
 
   def findbook(self, name, path):
-    sql_findbook=("select book_id from "+TBL_BOOKS+" where filename=%s and fullpath=%s")
+    sql_findbook=("select book_id from "+TBL_BOOKS+" where filename=%s and path=%s")
     data_findbook=(name,path)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findbook,data_findbook)
@@ -110,7 +110,7 @@ class opdsDatabase:
     if book_id!=0:
        return book_id
     format=exten[1:]
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,fullpath,cat_id,filesize,format) VALUES(%s, %s, %s, %s, %s)")
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format) VALUES(%s, %s, %s, %s, %s)")
     data_addbook=(name,path,cat_id,size,format)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
@@ -144,7 +144,7 @@ class opdsDatabase:
 
   def findcat(self, catalog):
     (head,tail)=os.path.split(catalog)
-    sql_findcat=("select cat_id from "+TBL_CATALOGS+" where cat_name=%s and full_path=%s")
+    sql_findcat=("select cat_id from "+TBL_CATALOGS+" where cat_name=%s and path=%s")
     data_findcat=(tail,catalog)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findcat,data_findcat)
@@ -160,11 +160,11 @@ class opdsDatabase:
     cat_id=self.findcat(catalog)
     if cat_id!=0:
        return cat_id 
-    if catalog==self.root_lib:
+    if catalog=="":
        return 0
     (head,tail)=os.path.split(catalog)
     parent_id=self.addcattree(head)
-    sql_addcat=("insert into "+TBL_CATALOGS+"(parent_id,cat_name,full_path) VALUES(%s, %s, %s)")
+    sql_addcat=("insert into "+TBL_CATALOGS+"(parent_id,cat_name,path) VALUES(%s, %s, %s)")
     data_addcat=(parent_id,tail,catalog)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addcat,data_addcat)
@@ -190,7 +190,7 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql_findbooks=("select book_id,filename, fullpath, registerdate from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by filename "+limitstr)
+    sql_findbooks=("select book_id,filename, path, registerdate from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by filename "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findbooks)
     rows=cursor.fetchall()
@@ -202,8 +202,8 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,full_path,now() from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
-    "select 2,book_id,filename,fullpath,registerdate from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,3 "+limitstr)
+    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now() from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
+    "select 2,book_id,filename,path,registerdate from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,3 "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_finditems)
     rows=cursor.fetchall()
@@ -219,7 +219,7 @@ class opdsDatabase:
     return rows
 
   def getbook(self,book_id):
-    sql_getbook=("select filename, fullpath, registerdate, format from "+TBL_BOOKS+" where book_id="+str(book_id))
+    sql_getbook=("select filename, path, registerdate, format from "+TBL_BOOKS+" where book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql_getbook)
     row=cursor.fetchone()
