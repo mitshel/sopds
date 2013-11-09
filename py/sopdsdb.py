@@ -14,6 +14,8 @@ TBL_BOOKS=DB_PREFIX+"books"
 TBL_TAGS=DB_PREFIX+"tags"
 TBL_BTAGS=DB_PREFIX+"btags"
 TBL_CATALOGS=DB_PREFIX+"catalogs"
+TBL_AUTHORS=DB_PREFIX+"authors"
+TBL_BAUTHORS=DB_PREFIX+"bauthors"
 
 ###########################################################################
 # Класс доступа к  MYSQL
@@ -105,13 +107,13 @@ class opdsDatabase:
     cursor.close()
     return result
  
-  def addbook(self, name, path, cat_id, exten, size=0):
+  def addbook(self, name, path, cat_id, exten, title, genre, lang, size=0):
     book_id=self.findbook(name,path)
     if book_id!=0:
        return book_id
     format=exten[1:]
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format) VALUES(%s, %s, %s, %s, %s)")
-    data_addbook=(name,path,cat_id,size,format)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,genre,lang) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)")
+    data_addbook=(name,path,cat_id,size,format,title,genre,lang)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
@@ -138,7 +140,51 @@ class opdsDatabase:
        data_addbtag=(book_id,tag_id)
        cursor=self.cnx.cursor()
        cursor.execute(sql_addbtag,data_addbtag)
-       btag_id=cursor.lastrowid
+       self.cnx.commit()
+       cursor.close()
+
+  def findauthor(self,first_name,last_name):
+    sql_findauthor=("select author_id from "+TBL_AUTHORS+" where LOWER(first_name)=%s and LOWER(last_name)=%s")
+    data_findauthor=(first_name.lower(),last_name.lower())
+    cursor=self.cnx.cursor()
+    cursor.execute(sql_findauthor,data_findauthor)
+    row=cursor.fetchone()
+    if row==None:
+       author_id=0
+    else:
+       author_id=row[0]
+    cursor.close()
+    return author_id
+
+  def findbauthor(self, book_id, author_id):
+    sql_findbauthor=("select book_id from "+TBL_BAUTHORS+" where book_id=%s and author_id=%s")
+    data_findbauthor=(book_id,author_id)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql_findbauthor,data_findbauthor)
+    row=cursor.fetchone()
+    result=(row!=None)
+    cursor.close()
+    return result
+
+  def addauthor(self, first_name, last_name):
+    author_id=self.findauthor(first_name,last_name)
+    if author_id!=0:
+       return author_id
+    sql_addauthor=("insert into "+TBL_AUTHORS+"(first_name,last_name) VALUES(%s,%s)")
+    data_addauthor=(first_name,last_name)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql_addauthor,data_addauthor)
+    author_id=cursor.lastrowid
+    self.cnx.commit()
+    cursor.close()
+    return author_id
+
+  def addbauthor(self, book_id, author_id):
+    if not self.findbauthor(book_id,author_id):
+       sql_addbauthor=("insert into "+TBL_BAUTHORS+"(book_id,author_id) VALUES(%s,%s)")
+       data_addbauthor=(book_id,author_id)
+       cursor=self.cnx.cursor()
+       cursor.execute(sql_addbauthor,data_addbauthor)
        self.cnx.commit()
        cursor.close()
 

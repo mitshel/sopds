@@ -4,6 +4,7 @@
 import os
 import sopdsdb
 import sopdscfg
+import sopdsparse
 
 ##########################################################################
 # Считываем параметры командной строки
@@ -40,21 +41,46 @@ if VERBOSE:
 opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
 opdsdb.openDB()
 opdsdb.printDBerr()
+fb2=sopdsparse.fb2parser()
 
 extensions_set={x for x in sopdscfg.EXT_LIST}
 if VERBOSE:
    print(extensions_set)
 
+
 for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
   for name in files:
     (n,e)=os.path.splitext(name)
     if e.lower() in extensions_set:
-#       head=full_path
        rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
-       cat_id=opdsdb.addcattree(rel_path)
-       book_id=opdsdb.addbook(name,rel_path,cat_id,e)
+
        if VERBOSE:
-          print("Added book: ",rel_path," - ",name)
+          print("Attempt to add book: ",rel_path," - ",name)
+
+       if opdsdb.findbook(name,rel_path)==0:
+          cat_id=opdsdb.addcattree(rel_path)
+          title=''
+          genre=''
+          lang=''
+          if e.lower()=='.fb2' and sopdscfg.FB2PARSE:
+             f=open(os.path.join(full_path,name),'rb')
+             fb2.parse(f)
+             f.close()
+             if len(fb2.genre.getvalue())>0:
+                genre=fb2.genre.getvalue()[0].strip(' \'\"')
+             if len(fb2.lang.getvalue())>0:
+                lang=fb2.lang.getvalue()[0].strip(' \'\"')
+             if len(fb2.book_title.getvalue())>0:
+                title=fb2.book_title.getvalue()[0].strip(' \'\"')
+
+          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang)
+          idx=0
+#          print('Adding authors:',fb2.author_last.getvalue(),fb2.author_first.getvalue())
+          for l in fb2.author_last.getvalue():
+              last_name=l.strip(' \'\"')
+              first_name=fb2.author_first.getvalue()[idx].strip(' \'\"')
+              author_id=opdsdb.addauthor(first_name,last_name)
+              opdsdb.addbauthor(book_id,author_id)
+              idx+=1
 
 opdsdb.closeDB()
-

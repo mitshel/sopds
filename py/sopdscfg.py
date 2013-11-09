@@ -33,6 +33,7 @@ DB_CHARSET=config.get(CFG_S_GLOBAL,'db_charset')
 ROOT_LIB=os.path.abspath(config.get(CFG_S_GLOBAL,'root_lib'))
 FORMATS=config.get(CFG_S_GLOBAL,'formats')
 DUBLICATES=config.getboolean(CFG_S_GLOBAL,'dublicates')
+FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
 maxitems=config.get(CFG_S_GLOBAL,'maxitems')
 if maxitems.isdigit():
    MAXITEMS=int(maxitems)

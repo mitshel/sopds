@@ -13,13 +13,17 @@ filesize INT not null DEFAULT 0,
 format VARCHAR(8),
 cat_id INT not null,
 cat_tree VARCHAR(512),
-autor_id INT not null DEFAULT 1,
 registerdate TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP,
 favorite INT not null DEFAULT 0,
+genre VARCHAR(32),
+lang  VARCHAR(16),
+title VARCHAR(256),
+doublicat INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
 KEY(cat_tree),
-KEY(favorite));
+KEY(genre),
+KEY(title));
 
 create table catalogs (
 cat_id INT not null AUTO_INCREMENT,
@@ -41,13 +45,19 @@ tag_id INT not null,
 book_id INT not null,
 PRIMARY KEY(book_id,tag_id));
 
-create table autors (
-autor_id INT not null AUTO_INCREMENT,
-autor_name VARCHAR(120) not NULL,
-PRIMARY KEY(autor_id),
-KEY(autor_name));
+create table authors (
+author_id INT not null AUTO_INCREMENT,
+first_name VARCHAR(64),
+last_name VARCHAR(64),
+PRIMARY KEY(author_id),
+KEY(last_name,first_name));
 
-insert into autors(autor_id,autor_name) values(1,"Неизвестный Автор");
+create table bauthors (
+author_id INT not NULL,
+book_id INT not NULL,
+PRIMARY KEY(book_id,author_id));
+
+insert into authors(author_id,last_name) values(1,"Неизвестный Автор");
 
 commit;
 
