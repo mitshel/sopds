@@ -248,7 +248,7 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title, "" as genre from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
+    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title, '' as genre from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
     "select 2,book_id,filename,path,registerdate,title,genre from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,6 "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_finditems)
@@ -265,14 +265,22 @@ class opdsDatabase:
     return rows
 
   def getbook(self,book_id):
-    sql_getbook=("select filename, path, registerdate, format from "+TBL_BOOKS+" where book_id="+str(book_id))
+    sql_getbook=("select filename, path, registerdate, format, title from "+TBL_BOOKS+" where book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql_getbook)
     row=cursor.fetchone()
     cursor.close
-    (file_name,file_path,reg_date,format)=row
+    (file_name,file_path,reg_date,format,title)=row
     book_path=os.path.join(file_path, file_name)
-    return (file_name,book_path,reg_date,format)
+    return (file_name,book_path,reg_date,format,title)
+
+  def getauthors(self,book_id):
+    sql=("select first_name,last_name from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b where b.author_id=a.author_id and b.book_id="+str(book_id))
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
 
   def __del__(self):
     self.closeDB()

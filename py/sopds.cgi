@@ -79,7 +79,7 @@ elif type_value==1:
    opdsdb.openDB()
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
-   for (item_type,item_id,item_name,item_path,reg_date) in opdsdb.getitemsincat(slice_value,sopdscfg.MAXITEMS,page_value):
+   for (item_type,item_id,item_name,item_path,reg_date,item_title,item_genre) in opdsdb.getitemsincat(slice_value,sopdscfg.MAXITEMS,page_value):
        if item_type==1:
           id='1'+str(item_id)
        elif item_type==2:
@@ -87,11 +87,20 @@ elif type_value==1:
        else:
           id='0'
        enc_print('<entry>')
-       enc_print('<title>'+item_name+'</title>')
+       enc_print('<title>'+item_title+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id='+id+'</id>')
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
+       if item_type==2:
+          authors=""
+          enc_print('<genre>'+item_genre+'</genre>')
+          for (first_name,last_name) in opdsdb.getauthors(item_id):
+              enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
+              if len(authors)>0:
+                 authors+=', '
+              authors+=last_name+' '+first_name
+          enc_print('<content type="text">'+authors+'</content>') 
        enc_print('</entry>')
    if page_value>0:
       prev_href="sopds.cgi?id="+id_value+"&amp;page="+str(page_value-1)
@@ -109,14 +118,22 @@ elif type_value==2:
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="sopds.cgi?id=0" title="'+sopdscfg.SITE_MAINTITLE+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
-   (book_name,book_path,reg_date,format)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title)=opdsdb.getbook(slice_value)
    id='3'+str(slice_value)
    idzip='4'+str(slice_value)
    enc_print('<entry>')
-   enc_print('<title>Книга:'+book_name+'</title>')
+   enc_print('<title>Файл: '+book_name+'</title>')
    enc_print('<link type="application/'+format+'" rel="alternate" href="sopds.cgi?id='+id+'"/>')
    enc_print('<link type="application/'+format+'" href="sopds.cgi?id='+id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'+zip" href="sopds.cgi?id='+idzip+'" rel="http://opds-spec.org/acquisition" />')
+   authors=""
+   for (first_name,last_name) in opdsdb.getauthors(slice_value):
+       enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
+       if len(authors)>0:
+             authors+=', '
+       authors+=last_name+' '+first_name
+   enc_print('<content type="text">'+title+' Автор(ы): '+authors+'</content>')
+   
    enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<id>tag:book:'+id+'</id>')
    enc_print('</entry>')
@@ -126,7 +143,7 @@ elif type_value==2:
 elif type_value==3:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title)=opdsdb.getbook(slice_value)
    full_path=os.path.join(sopdscfg.ROOT_LIB,book_path)
    book_size=os.path.getsize(full_path.encode('utf-8'))
    # HTTP Header
@@ -144,7 +161,7 @@ elif type_value==3:
 elif type_value==4:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title)=opdsdb.getbook(slice_value)
    full_path=os.path.join(sopdscfg.ROOT_LIB,book_path)
    # HTTP Header
    enc_print('Content-Type:application/zip; name="'+book_name+'"')
