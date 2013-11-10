@@ -55,7 +55,7 @@ for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
        rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
 
        if VERBOSE:
-          print("Attempt to add book: ",rel_path," - ",name)
+          print("Attempt to add book: ",rel_path," - ",name,"...",end=" ")
 
        if opdsdb.findbook(name,rel_path)==0:
           cat_id=opdsdb.addcattree(rel_path)
@@ -72,15 +72,24 @@ for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
                 lang=fb2.lang.getvalue()[0].strip(' \'\"')
              if len(fb2.book_title.getvalue())>0:
                 title=fb2.book_title.getvalue()[0].strip(' \'\"')
+             if VERBOSE:
+                if fb2.parse_error!=0:
+                   print('with fb2 parse warning...',end=" ")
 
           book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang)
+          if VERBOSE:
+             print("Added ok.")
+
           idx=0
-#          print('Adding authors:',fb2.author_last.getvalue(),fb2.author_first.getvalue())
           for l in fb2.author_last.getvalue():
               last_name=l.strip(' \'\"')
               first_name=fb2.author_first.getvalue()[idx].strip(' \'\"')
               author_id=opdsdb.addauthor(first_name,last_name)
               opdsdb.addbauthor(book_id,author_id)
               idx+=1
+       else:
+          if VERBOSE:
+             print("Already in DB.")
+
 
 opdsdb.closeDB()

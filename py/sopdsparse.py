@@ -39,6 +39,7 @@ class fb2parser:
        self.genre=fb2tag(('description','title-info','genre'))
        self.lang=fb2tag(('description','title-info','lang'))
        self.book_title=fb2tag(('description','title-info','book-title'))
+       self.parse_error=0
 
    def xmldecl(self,version, encoding, standalone):
 #       print('xml version ',version,', encoding ',encoding)
@@ -80,6 +81,7 @@ class fb2parser:
        self.book_title.setvalue(value)
 
    def parse(self,f):
+       self.parse_error=0
        self.author_first.reset()
        self.author_last.reset()
        self.genre.reset()
@@ -93,5 +95,6 @@ class fb2parser:
        try:
          parser.Parse(f.read(), True)
        except StopIteration:
-#         print("Stop Parsing")      
          pass
+       except:
+         parse_error=1
