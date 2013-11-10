@@ -282,6 +282,54 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getauthor_letters(self):
+    sql="select UPPER(substring(last_name,1,1)) as letter, count(*) as cnt from "+TBL_AUTHORS+" group by 1 order by 1"
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
+
+  def getauthorsbyl(self,letter,limit=0,page=0):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit*page)+","+str(limit)
+    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and UPPER(substring(a.last_name,1,1))='"+letter+"' group by 1,2,3 order by 3,2 "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getbooksforautor(self,author_id,limit=0,page=0):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit*page)+","+str(limit)
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.genre from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+" order by a.title "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
   def __del__(self):
     self.closeDB()
 
