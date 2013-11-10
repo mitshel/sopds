@@ -80,7 +80,7 @@ class fb2parser:
        self.lang.setvalue(value)
        self.book_title.setvalue(value)
 
-   def parse(self,f):
+   def parse(self,f,hsize):
        self.parse_error=0
        self.author_first.reset()
        self.author_last.reset()
@@ -93,7 +93,10 @@ class fb2parser:
        parser.EndElementHandler = self.end_element
        parser.CharacterDataHandler = self.char_data 
        try:
-         parser.Parse(f.read(), True)
+         if hsize==0:
+            parser.Parse(f.read(), True)
+         else:
+            parser.Parse(f.read(hsize), True)
        except StopIteration:
          pass
        except:

@@ -64,7 +64,7 @@ for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
           lang=''
           if e.lower()=='.fb2' and sopdscfg.FB2PARSE:
              f=open(os.path.join(full_path,name),'rb')
-             fb2.parse(f)
+             fb2.parse(f,sopdscfg.FB2HSIZE)
              f.close()
              if len(fb2.genre.getvalue())>0:
                 genre=fb2.genre.getvalue()[0].strip(' \'\"')
