@@ -5,6 +5,66 @@ import os
 import sopdsdb
 import sopdscfg
 import sopdsparse
+import zipfile
+
+def processfile(db,fb2,name,full_path,file,archive=0):
+    (n,e)=os.path.splitext(name)
+    if e.lower() in extensions_set:
+       rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
+
+       if VERBOSE:
+          print("Attempt to add book: ",rel_path," - ",name,"...",end=" ")
+
+       if db.findbook(name,rel_path)==0:
+          cat_id=db.addcattree(rel_path,archive)
+          title=''
+          genre=''
+          lang=''
+          if e.lower()=='.fb2' and sopdscfg.FB2PARSE:
+             if isinstance(file, str):
+                f=open(file,'rb')
+             else:
+                f=file
+             fb2.parse(f,sopdscfg.FB2HSIZE)
+             f.close()
+             if len(fb2.genre.getvalue())>0:
+                genre=fb2.genre.getvalue()[0].strip(' \'\"')
+             if len(fb2.lang.getvalue())>0:
+                lang=fb2.lang.getvalue()[0].strip(' \'\"')
+             if len(fb2.book_title.getvalue())>0:
+                title=fb2.book_title.getvalue()[0].strip(' \'\"')
+             if VERBOSE:
+                if fb2.parse_error!=0:
+                   print('with fb2 parse warning...',end=" ")
+
+          if title=='':
+             title=n
+
+          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,0,archive)
+          if VERBOSE:
+             print("Added ok.")
+
+          idx=0
+          for l in fb2.author_last.getvalue():
+              last_name=l.strip(' \'\"')
+              first_name=fb2.author_first.getvalue()[idx].strip(' \'\"')
+              author_id=opdsdb.addauthor(first_name,last_name)
+              opdsdb.addbauthor(book_id,author_id)
+              idx+=1
+       else:
+          if VERBOSE:
+             print("Already in DB.")
+
+def processzip(db,fb2,name,full_path,file):
+    z = zipfile.ZipFile(file, 'r')
+    filelist = z.namelist()
+    for n in filelist:
+        try:
+            print('Process ZIP file: ',file,' file: ',n)
+            processfile(db,fb2,n,file,z.open(n),1)
+        except:
+            print('Error processing zip atchive:',file,' file: ',n)
+    z.close()
 
 ##########################################################################
 # Считываем параметры командной строки
@@ -37,11 +97,10 @@ if VERBOSE:
 ###########################################################################
 # Основной код программы
 #
-
 opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
 opdsdb.openDB()
 opdsdb.printDBerr()
-fb2=sopdsparse.fb2parser()
+fb2parser=sopdsparse.fb2parser()
 
 extensions_set={x for x in sopdscfg.EXT_LIST}
 if VERBOSE:
@@ -50,49 +109,12 @@ if VERBOSE:
 
 for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
   for name in files:
+    file=os.path.join(full_path,name)
     (n,e)=os.path.splitext(name)
-    if e.lower() in extensions_set:
-       rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
-
-       if VERBOSE:
-          print("Attempt to add book: ",rel_path," - ",name,"...",end=" ")
-
-       if opdsdb.findbook(name,rel_path)==0:
-          cat_id=opdsdb.addcattree(rel_path)
-          title=''
-          genre=''
-          lang=''
-          if e.lower()=='.fb2' and sopdscfg.FB2PARSE:
-             f=open(os.path.join(full_path,name),'rb')
-             fb2.parse(f,sopdscfg.FB2HSIZE)
-             f.close()
-             if len(fb2.genre.getvalue())>0:
-                genre=fb2.genre.getvalue()[0].strip(' \'\"')
-             if len(fb2.lang.getvalue())>0:
-                lang=fb2.lang.getvalue()[0].strip(' \'\"')
-             if len(fb2.book_title.getvalue())>0:
-                title=fb2.book_title.getvalue()[0].strip(' \'\"')
-             if VERBOSE:
-                if fb2.parse_error!=0:
-                   print('with fb2 parse warning...',end=" ")
-
-          if title=='':
-             title=n
-
-          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang)
-          if VERBOSE:
-             print("Added ok.")
-
-          idx=0
-          for l in fb2.author_last.getvalue():
-              last_name=l.strip(' \'\"')
-              first_name=fb2.author_first.getvalue()[idx].strip(' \'\"')
-              author_id=opdsdb.addauthor(first_name,last_name)
-              opdsdb.addbauthor(book_id,author_id)
-              idx+=1
-       else:
-          if VERBOSE:
-             print("Already in DB.")
-
+    if (e.lower() == '.zip'):
+       if sopdscfg.ZIPSCAN:
+          processzip(opdsdb,fb2parser,name,full_path,file)
+    else:
+       processfile(opdsdb,fb2parser,name,full_path,file)
 
 opdsdb.closeDB()

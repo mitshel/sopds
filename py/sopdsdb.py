@@ -17,6 +17,13 @@ TBL_CATALOGS=DB_PREFIX+"catalogs"
 TBL_AUTHORS=DB_PREFIX+"authors"
 TBL_BAUTHORS=DB_PREFIX+"bauthors"
 
+##########################################################################
+# типы каталогов (cat_type)
+#
+CAT_NORMAL=0
+CAT_ZIP=1
+CAT_GZ=2
+
 ###########################################################################
 # Класс доступа к  MYSQL
 #
@@ -107,13 +114,13 @@ class opdsDatabase:
     cursor.close()
     return result
  
-  def addbook(self, name, path, cat_id, exten, title, genre, lang, size=0):
+  def addbook(self, name, path, cat_id, exten, title, genre, lang, size=0, archive=0):
     book_id=self.findbook(name,path)
     if book_id!=0:
        return book_id
     format=exten[1:]
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,genre,lang) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)")
-    data_addbook=(name,path,cat_id,size,format,title,genre,lang)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,genre,lang,cat_type) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data_addbook=(name,path,cat_id,size,format,title,genre,lang,archive)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
@@ -202,7 +209,7 @@ class opdsDatabase:
     cursor.close()
     return cat_id
 
-  def addcattree(self, catalog):
+  def addcattree(self, catalog, archive=0):
     cat_id=self.findcat(catalog)
     if cat_id!=0:
        return cat_id 
@@ -210,8 +217,8 @@ class opdsDatabase:
        return 0
     (head,tail)=os.path.split(catalog)
     parent_id=self.addcattree(head)
-    sql_addcat=("insert into "+TBL_CATALOGS+"(parent_id,cat_name,path) VALUES(%s, %s, %s)")
-    data_addcat=(parent_id,tail,catalog)
+    sql_addcat=("insert into "+TBL_CATALOGS+"(parent_id,cat_name,path,cat_type) VALUES(%s, %s, %s, %s)")
+    data_addcat=(parent_id,tail,catalog,archive)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addcat,data_addcat)
     cat_id=cursor.lastrowid
@@ -265,14 +272,15 @@ class opdsDatabase:
     return rows
 
   def getbook(self,book_id):
-    sql_getbook=("select filename, path, registerdate, format, title from "+TBL_BOOKS+" where book_id="+str(book_id))
+    sql_getbook=("select filename, path, registerdate, format, title, cat_type from "+TBL_BOOKS+" where book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql_getbook)
     row=cursor.fetchone()
     cursor.close
-    (file_name,file_path,reg_date,format,title)=row
-    book_path=os.path.join(file_path, file_name)
-    return (file_name,book_path,reg_date,format,title)
+ #   (file_name,file_path,reg_date,format,title,cat_type)=row
+ #   book_path=os.path.join(file_path, file_name)
+ #   return (file_name,book_path,reg_date,format,title,cat_type)
+    return row
 
   def getauthors(self,book_id):
     sql=("select first_name,last_name from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b where b.author_id=a.author_id and b.book_id="+str(book_id))
@@ -328,6 +336,13 @@ class opdsDatabase:
        self.next_page=False
 
     cursor.close
+    return rows
+
+  def getdbinfo(self):
+    sql="select count(*) from %s union select count(*) from %s union select count(*) from %s"%(TBL_BOOKS,TBL_AUTHORS,TBL_CATALOGS)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
     return rows
 
   def __del__(self):

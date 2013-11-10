@@ -34,6 +34,7 @@ ROOT_LIB=os.path.abspath(config.get(CFG_S_GLOBAL,'root_lib'))
 FORMATS=config.get(CFG_S_GLOBAL,'formats')
 DUBLICATES=config.getboolean(CFG_S_GLOBAL,'dublicates')
 FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
+ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
 fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
 maxitems=config.get(CFG_S_GLOBAL,'maxitems')
 if maxitems.isdigit():

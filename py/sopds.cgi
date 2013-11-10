@@ -11,6 +11,7 @@ import urllib.parse
 import zipfile
 import io
 import locale
+import time
 
 
 def translit(s):
@@ -33,7 +34,7 @@ def header(charset='utf-8'):
    enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/">')
    enc_print('<id>'+sopdscfg.SITE_ID+'</id>')
    enc_print('<title>'+sopdscfg.SITE_TITLE+'</title>')
-   enc_print('<updated>2013-10-20T02:41:33Z</updated>')
+   enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<icon>'+sopdscfg.SITE_ICON+'</icon>')
    enc_print('<author><name>'+sopdscfg.SITE_AUTOR+'</name><uri>'+sopdscfg.SITE_URL+'</uri><email>'+sopdscfg.SITE_EMAIL+'</email></author>')
 
@@ -41,15 +42,22 @@ def footer():
    enc_print('</feed>')
 
 def main_menu():
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
+   opdsdb.openDB()
+   dbinfo=opdsdb.getdbinfo()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="/"/>')
    enc_print('<entry>')
    enc_print('<title>По каталогам</title>')
+   enc_print('<content type="text">Каталогов: %s, книг: %s.</content>'%(dbinfo[2][0],dbinfo[0][0]))
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=1"/>')
    enc_print('<id>sopds.cgi?id=1</id></entry>')
    enc_print('<entry>')
    enc_print('<title>По авторам</title>')
+   enc_print('<content type="text">Авторов: %s, книг: %s.</content>'%(dbinfo[1][0],dbinfo[0][0]))
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=2"/>')
    enc_print('<id>sopds.cgi?id=2</id></entry>')
+
+   opdsdb.closeDB()
 
 
 ###########################################################################
@@ -212,7 +220,7 @@ elif type_value==7:
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="sopds.cgi?id=0" title="'+sopdscfg.SITE_MAINTITLE+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
-   (book_name,book_path,reg_date,format,title)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type)=opdsdb.getbook(slice_value)
    id='8'+str(slice_value)
    idzip='9'+str(slice_value)
    enc_print('<entry>')
@@ -240,19 +248,34 @@ elif type_value==7:
 elif type_value==8:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format,title)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type)=opdsdb.getbook(slice_value)
    full_path=os.path.join(sopdscfg.ROOT_LIB,book_path)
-   book_size=os.path.getsize(full_path.encode('utf-8'))
+   transname=translit(book_name)
    # HTTP Header
    enc_print('Content-Type:application/octet-stream; name="'+book_name+'"')
-   enc_print("Content-Disposition: attachment; filename="+translit(book_name))
+   enc_print("Content-Disposition: attachment; filename="+transname)
    enc_print('Content-Transfer-Encoding: binary')
-   enc_print('Content-Length: '+str(book_size))
-   enc_print()
-   fo=codecs.open(full_path.encode("utf-8"), "rb")
-   str=fo.read()
-   sys.stdout.buffer.write(str)
-   fo.close()
+   if cat_type==sopdsdb.CAT_NORMAL:
+      file_path=os.path.join(full_path,book_name)
+      book_size=os.path.getsize(file_path.encode('utf-8'))
+      enc_print('Content-Length: '+str(book_size))
+      enc_print()
+      fo=codecs.open(file_path.encode("utf-8"), "rb")
+      str=fo.read()
+      sys.stdout.buffer.write(str)
+      fo.close()
+   elif cat_type==sopdsdb.CAT_ZIP:
+      fz=codecs.open(full_path.encode("utf-8"), "rb")
+      z = zipfile.ZipFile(fz, 'r')
+      book_size=z.getinfo(book_name).file_size
+      enc_print('Content-Length: '+str(book_size))
+      enc_print()
+      fo= z.open(book_name)
+      str=fo.read()
+      sys.stdout.buffer.write(str)
+      fo.close()
+      z.close()
+      fz.close()
    opdsdb.closeDB()
 
 #########################################################
@@ -261,20 +284,42 @@ elif type_value==8:
 elif type_value==9:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format,title)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type)=opdsdb.getbook(slice_value)
    full_path=os.path.join(sopdscfg.ROOT_LIB,book_path)
+   transname=translit(book_name)
    # HTTP Header
    enc_print('Content-Type:application/zip; name="'+book_name+'"')
-   enc_print("Content-Disposition: attachment; filename="+translit(book_name)+'.zip')
+   enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
    enc_print('Content-Transfer-Encoding: binary')
-   dio = io.BytesIO()
-   z = zipfile.ZipFile(dio, 'w', zipfile.ZIP_DEFLATED)
-   z.write(full_path.encode('utf-8'),translit(book_name))
-   z.close()
-   buf = dio.getvalue()
-   enc_print('Content-Length: '+str(len(buf)))
-   enc_print()
-   sys.stdout.buffer.write(buf)
+   if cat_type==sopdsdb.CAT_NORMAL:
+      file_path=os.path.join(full_path,book_name)
+      dio = io.BytesIO()
+      z = zipfile.ZipFile(dio, 'w', zipfile.ZIP_DEFLATED)
+      z.write(file_path.encode('utf-8'),transname)
+      z.close()
+      buf = dio.getvalue()
+      enc_print('Content-Length: %s'%len(buf))
+      enc_print()
+      sys.stdout.buffer.write(buf)
+   elif cat_type==sopdsdb.CAT_ZIP:
+      fz=codecs.open(full_path.encode("utf-8"), "rb")
+      zi = zipfile.ZipFile(fz, 'r', allowZip64=True)
+      fo= zi.open(book_name)
+      str=fo.read()
+      fo.close()
+      zi.close()
+      fz.close()
+
+      dio = io.BytesIO()
+      zo = zipfile.ZipFile(dio, 'w', zipfile.ZIP_DEFLATED)
+      zo.writestr(transname,str)
+      zo.close()
+
+      buf = dio.getvalue()
+      enc_print('Content-Length: %s'%len(buf))
+      enc_print()
+      sys.stdout.buffer.write(buf)
+
    opdsdb.closeDB()
 
 
