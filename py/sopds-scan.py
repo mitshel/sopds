@@ -76,6 +76,9 @@ for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
                 if fb2.parse_error!=0:
                    print('with fb2 parse warning...',end=" ")
 
+          if title=='':
+             title=n
+
           book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang)
           if VERBOSE:
              print("Added ok.")

@@ -248,8 +248,8 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now() from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
-    "select 2,book_id,filename,path,registerdate from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,3 "+limitstr)
+    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title, "" as genre from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
+    "select 2,book_id,filename,path,registerdate,title,genre from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,6 "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_finditems)
     rows=cursor.fetchall()
