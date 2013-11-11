@@ -346,6 +346,15 @@ class opdsDatabase:
     cursor.close
     return rows
 
+
+  def getgenres(self):
+    sql="select lower(genre), count(*) from "+TBL_BOOKS+" group by 1 order by 1"
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
+
   def getdbinfo(self):
     sql="select count(*) from %s union select count(*) from %s union select count(*) from %s"%(TBL_BOOKS,TBL_AUTHORS,TBL_CATALOGS)
     cursor=self.cnx.cursor()

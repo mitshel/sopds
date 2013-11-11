@@ -55,9 +55,12 @@ def main_menu():
    enc_print('<content type="text">Авторов: %s, книг: %s.</content>'%(dbinfo[1][0],dbinfo[0][0]))
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=2"/>')
    enc_print('<id>sopds.cgi?id=2</id></entry>')
-
+   enc_print('<entry>')
+#   enc_print('<title>По жанрам</title>')
+#   enc_print('<content type="text">Секция в разработке!!! Книг: %s.</content>'%(dbinfo[0][0]))
+#   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=4"/>')
+#   enc_print('<id>sopds.cgi?id=4</id></entry>')
    opdsdb.closeDB()
-
 
 ###########################################################################
 # Основной код программы
@@ -181,6 +184,26 @@ elif type_value==3:
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        enc_print('<content type="text"> Всего: '+str(cnt)+' автора(ов).</content>')
+       enc_print('</entry>')
+   footer()
+   opdsdb.closeDB()
+
+#########################################################
+# Выбрана сортировка "По Жанрам"
+#
+elif type_value==4:
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
+   opdsdb.openDB()
+   header()
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
+   id='4'
+   for (genre,cnt) in opdsdb.getgenres():
+       enc_print('<entry>')
+       enc_print('<title>-= '+genre+' =-</title>')
+       enc_print('<id>sopds.cgi?id=4</id>')
+#       enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
+#       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
+       enc_print('<content type="text">Всего: '+str(cnt)+' книг(и).</content>')
        enc_print('</entry>')
    footer()
    opdsdb.closeDB()
