@@ -13,7 +13,6 @@ import io
 import locale
 import time
 
-
 def translit(s):
    """Russian translit: converts 'привет'->'privet'"""
    assert s is not str, "Error: argument MUST be string"
@@ -69,7 +68,7 @@ locale.setlocale(locale.LC_ALL,'ru_RU.UTF-8')
 type_value=0
 slice_value=0
 page_value=0
-letter=""
+
 form = cgi.FieldStorage()
 if 'id' in form:
    id_value=form.getvalue("id", "0")
@@ -82,9 +81,6 @@ if 'page' in form:
    page=form.getvalue("page","0")
    if page.isdigit():
          page_value=int(page)
-
-if 'letter' in form:
-   letter=form.getvalue("letter","А")
 
 if type_value==0:
    header()
@@ -140,11 +136,17 @@ elif type_value==2:
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
    for (letter,cnt) in opdsdb.getauthor_letters():
+       if len(letter)==0:
+         id='50'
+       else:
+         id='5'+str(ord(letter))
+       if letter=='&':
+          letter='&amp;'
        enc_print('<entry>')
        enc_print('<title>-= '+letter+' =-</title>')
        enc_print('<id>sopds.cgi?id=2</id>')
-       enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id=5&amp;letter='+letter+'"/>')
-       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id=5&amp;letter='+letter+'"/>')
+       enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
+       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        enc_print('<content type="text"> Всего: '+str(cnt)+' автора(ов).</content>')
        enc_print('</entry>')
    footer()
@@ -156,22 +158,26 @@ elif type_value==2:
 if type_value==5:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
+   if slice_value==0:
+      letter=""
+   else:
+      letter=chr(slice_value)
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
    for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,sopdscfg.MAXITEMS,page_value):
        id='6'+str(author_id)
        enc_print('<entry>')
        enc_print('<title>'+last_name+' '+first_name+'</title>')
-       enc_print('<id>sopds.cgi?id=5&amp;letter='+letter+'</id>')
+       enc_print('<id>sopds.cgi?id='+id_value+'</id>')
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        enc_print('<content type="text"> Всего: '+str(cnt)+' книг.</content>')
        enc_print('</entry>')
    if page_value>0:
-      prev_href="sopds.cgi?id=5&amp;letter="+letter+"&amp;page="+str(page_value-1)
+      prev_href="sopds.cgi?id="+id_value+"&amp;page="+str(page_value-1)
       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="prev" title="Previous Page" href="'+prev_href+'" />')
    if opdsdb.next_page:
-      next_href="sopds.cgi?id=5&amp;letter="+letter+"&amp;page="+str(page_value+1)
+      next_href="sopds.cgi?id="+id_value+"&amp;page="+str(page_value+1)
       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="next" title="Next Page" href="'+next_href+'" />')
    footer()
    opdsdb.closeDB()
