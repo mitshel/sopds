@@ -170,7 +170,9 @@ elif type_value==3:
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
    for (letters,cnt) in opdsdb.getauthor_2letters(letter):
        if len(letters)==0:
-         id='500000000'
+         id='50000'
+       elif len(letters)==1:
+         id='5%04d'%(ord(letters))
        else:
          id='5%04d%04d'%(ord(letters[0]),ord(letters[1]))
        enc_print('<entry>')
@@ -182,7 +184,6 @@ elif type_value==3:
        enc_print('</entry>')
    footer()
    opdsdb.closeDB()
-
 
 #########################################################
 # Выдача списка авторов
