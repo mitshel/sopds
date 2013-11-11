@@ -14,7 +14,8 @@ def processfile(db,fb2,name,full_path,file,archive=0):
 
        if VERBOSE:
           print("Attempt to add book: ",rel_path," - ",name,"...",end=" ")
-
+       
+       fb2.reset()
        if db.findbook(name,rel_path)==0:
           cat_id=db.addcattree(rel_path,archive)
           title=''
@@ -32,7 +33,7 @@ def processfile(db,fb2,name,full_path,file,archive=0):
              if len(fb2.lang.getvalue())>0:
                 lang=fb2.lang.getvalue()[0].strip(' \'\"')
              if len(fb2.book_title.getvalue())>0:
-                title=fb2.book_title.getvalue()[0].strip(' \'\"')
+                title=fb2.book_title.getvalue()[0].strip(' \'\"\&()-.#[]\\\`')
              if VERBOSE:
                 if fb2.parse_error!=0:
                    print('with fb2 parse warning...',end=" ")
