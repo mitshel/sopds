@@ -47,8 +47,8 @@ def processfile(db,fb2,name,full_path,file,archive=0):
 
           idx=0
           for l in fb2.author_last.getvalue():
-              last_name=l.strip(' \'\"')
-              first_name=fb2.author_first.getvalue()[idx].strip(' \'\"')
+              last_name=l.strip(' \'\"\&()-.#[]\\\`')
+              first_name=fb2.author_first.getvalue()[idx].strip(' \'\"\&()-.#[]\\\`')
               author_id=opdsdb.addauthor(first_name,last_name)
               opdsdb.addbauthor(book_id,author_id)
               idx+=1
@@ -101,13 +101,14 @@ if VERBOSE:
 #
 opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
 opdsdb.openDB()
-opdsdb.printDBerr()
+if VERBOSE:
+   opdsdb.printDBerr()
+
 fb2parser=sopdsparse.fb2parser()
 
 extensions_set={x for x in sopdscfg.EXT_LIST}
 if VERBOSE:
    print(extensions_set)
-
 
 for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
   for name in files:
