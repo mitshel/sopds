@@ -55,7 +55,7 @@ def main_menu():
    enc_print('<content type="text">Авторов: %s, книг: %s.</content>'%(dbinfo[1][0],dbinfo[0][0]))
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=2"/>')
    enc_print('<id>sopds.cgi?id=2</id></entry>')
-   enc_print('<entry>')
+#   enc_print('<entry>')
 #   enc_print('<title>По жанрам</title>')
 #   enc_print('<content type="text">Секция в разработке!!! Книг: %s.</content>'%(dbinfo[0][0]))
 #   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=4"/>')
