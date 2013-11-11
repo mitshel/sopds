@@ -128,7 +128,7 @@ elif type_value==1:
    opdsdb.closeDB()
 
 #########################################################
-# Выбрана сортировка "По авторам"
+# Выбрана сортировка "По авторам" - выбор по первой букве автора
 #
 elif type_value==2:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
@@ -136,10 +136,14 @@ elif type_value==2:
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
    for (letter,cnt) in opdsdb.getauthor_letters():
-       if len(letter)==0:
-         id='50'
+       if sopdscfg.SPLITAUTHORS==0 or cnt<=sopdscfg.SPLITAUTHORS:
+          id='5'
        else:
-         id='5'+str(ord(letter))
+          id='3'
+       if len(letter)==0:
+          id+='0000'
+       else:
+          id+='%04d'%ord(letter)
        if letter=='&':
           letter='&amp;'
        enc_print('<entry>')
@@ -153,9 +157,9 @@ elif type_value==2:
    opdsdb.closeDB()
 
 #########################################################
-# Выдача списка авторов
+# Выбрана сортировка "По авторам" - выбор по двум первым буквам автора
 #
-if type_value==5:
+elif type_value==3:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
    if slice_value==0:
@@ -164,7 +168,37 @@ if type_value==5:
       letter=chr(slice_value)
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
-   for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,sopdscfg.MAXITEMS,page_value):
+   for (letters,cnt) in opdsdb.getauthor_2letters(letter):
+       if len(letters)==0:
+         id='500000000'
+       else:
+         id='5%04d%04d'%(ord(letters[0]),ord(letters[1]))
+       enc_print('<entry>')
+       enc_print('<title>-= '+letters+' =-</title>')
+       enc_print('<id>sopds.cgi?id='+id_value+'</id>')
+       enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
+       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
+       enc_print('<content type="text"> Всего: '+str(cnt)+' автора(ов).</content>')
+       enc_print('</entry>')
+   footer()
+   opdsdb.closeDB()
+
+
+#########################################################
+# Выдача списка авторов
+#
+if type_value==5:
+   opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
+   opdsdb.openDB()
+   if slice_value==0:
+      letters=""
+   elif slice_value>=10000:
+      letters=chr(slice_value//10000)+chr(slice_value%10000)
+   else:
+      letters=chr(slice_value)
+   header()
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
+   for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letters,sopdscfg.MAXITEMS,page_value):
        id='6'+str(author_id)
        enc_print('<entry>')
        enc_print('<title>'+last_name+' '+first_name+'</title>')

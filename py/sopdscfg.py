@@ -37,6 +37,7 @@ FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
 ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
 fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
 maxitems=config.get(CFG_S_GLOBAL,'maxitems')
+splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
 if maxitems.isdigit():
    MAXITEMS=int(maxitems)
 else:
@@ -45,6 +46,10 @@ if fb2hsize.isdigit():
    FB2HSIZE=int(fb2hsize)
 else:
    FB2HSIZE=0
+if splitauthors.isdigit():
+   SPLITAUTHORS=int(splitauthors)
+else:
+   SPLITAUTHORS=0
 
 EXT_LIST=FORMATS.lower().split()
 
