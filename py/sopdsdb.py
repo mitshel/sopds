@@ -277,9 +277,6 @@ class opdsDatabase:
     cursor.execute(sql_getbook)
     row=cursor.fetchone()
     cursor.close
- #   (file_name,file_path,reg_date,format,title,cat_type)=row
- #   book_path=os.path.join(file_path, file_name)
- #   return (file_name,book_path,reg_date,format,title,cat_type)
     return row
 
   def getauthors(self,book_id):
@@ -361,6 +358,17 @@ class opdsDatabase:
     cursor.execute(sql)
     rows=cursor.fetchall()
     return rows
+  
+  def zipisscanned(self,zipname):
+    sql='select cat_id from '+TBL_CATALOGS+' where path="'+zipname+'" limit 1'
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    row=cursor.fetchone()
+    if row==None:
+       cat_id=0
+    else:
+       cat_id=row[0]
+    return cat_id
 
   def __del__(self):
     self.closeDB()
