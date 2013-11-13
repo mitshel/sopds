@@ -8,13 +8,12 @@ Author Dmitry V.Shelepnev
 yum install mysql
 yum install python3
 yum install mysql-connector-python3
-yum install python3-lxml
 
 2. Конфигурационный файл:
 Перед началом работы необходимо внести необходимые настройки в файл конфигурации ./conf/sopds.conf
 
 3. Инициализация базы данных
-Для работы каталога необходимо создать базу данны sopds при помощи скрипта:
+Для работы каталога необходимо создать базу данных sopds при помощи скрипта:
 mysql mysql < ./db/dbcrea.sql
 
 4. Сканирование каталога с книгами
@@ -28,4 +27,4 @@ Options ExecCGI
 Options +ExecCGI
 
 6. Использование OPDS каталога с устройств поддерживающих OPDS
-Ввести ОПТС каталог и следующий URL: your_domain_name/opds/py/sopds.cgi
+Ввести OPDS каталог и следующий URL: your_domain_name/opds/py/sopds.cgi

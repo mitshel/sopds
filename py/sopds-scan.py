@@ -62,7 +62,7 @@ def processzip(db,fb2,name,full_path,file):
     for n in filelist:
         try:
             if VERBOSE:
-               print('Start process ZIP file: ',file,' file: ',n)
+               print('Start process ZIPped file: ',file,' file: ',n)
             processfile(db,fb2,n,file,z.open(n),1)
         except:
             print('Error processing zip atchive:',file,' file: ',n)
