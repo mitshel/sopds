@@ -48,17 +48,17 @@ def main_menu():
    enc_print('<entry>')
    enc_print('<title>По каталогам</title>')
    enc_print('<content type="text">Каталогов: %s, книг: %s.</content>'%(dbinfo[2][0],dbinfo[0][0]))
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=1"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=01"/>')
    enc_print('<id>sopds.cgi?id=1</id></entry>')
    enc_print('<entry>')
    enc_print('<title>По авторам</title>')
    enc_print('<content type="text">Авторов: %s, книг: %s.</content>'%(dbinfo[1][0],dbinfo[0][0]))
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=2"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=02"/>')
    enc_print('<id>sopds.cgi?id=2</id></entry>')
 #   enc_print('<entry>')
 #   enc_print('<title>По жанрам</title>')
 #   enc_print('<content type="text">Секция в разработке!!! Книг: %s.</content>'%(dbinfo[0][0]))
-#   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=4"/>')
+#   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=04"/>')
 #   enc_print('<id>sopds.cgi?id=4</id></entry>')
    opdsdb.closeDB()
 
@@ -76,10 +76,10 @@ form = cgi.FieldStorage()
 if 'id' in form:
    id_value=form.getvalue("id", "0")
    if id_value.isdigit():
-      if len(id_value)>0:
-         type_value = int(id_value[0])
       if len(id_value)>1:
-         slice_value = int(id_value[1:])
+         type_value = int(id_value[0:2])
+      if len(id_value)>2:
+         slice_value = int(id_value[2:])
 if 'page' in form:
    page=form.getvalue("page","0")
    if page.isdigit():
@@ -100,15 +100,15 @@ elif type_value==1:
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
    for (item_type,item_id,item_name,item_path,reg_date,item_title,item_genre) in opdsdb.getitemsincat(slice_value,sopdscfg.MAXITEMS,page_value):
        if item_type==1:
-          id='1'+str(item_id)
+          id='01'+str(item_id)
        elif item_type==2:
-          id='7'+str(item_id)
+          id='07'+str(item_id)
        else:
-          id='0'
+          id='00'
        enc_print('<entry>')
        enc_print('<title>'+item_title+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
-       enc_print('<id>sopds.cgi?id='+id+'</id>')
+       enc_print('<id>sopds.cgi?id=00</id>')
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        if item_type==2:
@@ -140,9 +140,9 @@ elif type_value==2:
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
    for (letter,cnt) in opdsdb.getauthor_letters():
        if sopdscfg.SPLITAUTHORS==0 or cnt<=sopdscfg.SPLITAUTHORS:
-          id='5'
+          id='05'
        else:
-          id='3'
+          id='03'
        if len(letter)==0:
           id+='0000'
        else:
@@ -151,7 +151,7 @@ elif type_value==2:
           letter='&amp;'
        enc_print('<entry>')
        enc_print('<title>-= '+letter+' =-</title>')
-       enc_print('<id>sopds.cgi?id=2</id>')
+       enc_print('<id>sopds.cgi?id=02</id>')
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        enc_print('<content type="text"> Всего: '+str(cnt)+' автора(ов).</content>')
@@ -170,14 +170,14 @@ elif type_value==3:
    else:
       letter=chr(slice_value)
    header()
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
    for (letters,cnt) in opdsdb.getauthor_2letters(letter):
        if len(letters)==0:
-         id='50000'
+         id='050000'
        elif len(letters)==1:
-         id='5%04d'%(ord(letters))
+         id='05%04d'%(ord(letters))
        else:
-         id='5%04d%04d'%(ord(letters[0]),ord(letters[1]))
+         id='05%04d%04d'%(ord(letters[0]),ord(letters[1]))
        enc_print('<entry>')
        enc_print('<title>-= '+letters+' =-</title>')
        enc_print('<id>sopds.cgi?id='+id_value+'</id>')
@@ -195,12 +195,12 @@ elif type_value==4:
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
    header()
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
-   id='4'
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
+   id='04'
    for (genre,cnt) in opdsdb.getgenres():
        enc_print('<entry>')
        enc_print('<title>-= '+genre+' =-</title>')
-       enc_print('<id>sopds.cgi?id=4</id>')
+       enc_print('<id>sopds.cgi?id=04</id>')
 #       enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
 #       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        enc_print('<content type="text">Всего: '+str(cnt)+' книг(и).</content>')
@@ -221,9 +221,9 @@ if type_value==5:
    else:
       letters=chr(slice_value)
    header()
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+sopdscfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
    for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letters,sopdscfg.MAXITEMS,page_value):
-       id='6'+str(author_id)
+       id='06'+str(author_id)
        enc_print('<entry>')
        enc_print('<title>'+last_name+' '+first_name+'</title>')
        enc_print('<id>sopds.cgi?id='+id_value+'</id>')
@@ -248,7 +248,7 @@ if type_value==6:
    opdsdb.openDB()
    header()
    for (book_id,book_name,book_path,reg_date,book_title,book_genre) in opdsdb.getbooksforautor(slice_value,sopdscfg.MAXITEMS,page_value):
-       id='7'+str(book_id)
+       id='07'+str(book_id)
        enc_print('<entry>')
        enc_print('<title>'+book_title+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
@@ -278,15 +278,15 @@ if type_value==6:
 # Выдача ссылок на книгу
 #
 elif type_value==7:
-   id='7'+str(slice_value)
+   id='07'+str(slice_value)
    opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
    opdsdb.openDB()
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="sopds.cgi?id=0" title="'+sopdscfg.SITE_MAINTITLE+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
    (book_name,book_path,reg_date,format,title,cat_type)=opdsdb.getbook(slice_value)
-   id='8'+str(slice_value)
-   idzip='9'+str(slice_value)
+   id='08'+str(slice_value)
+   idzip='09'+str(slice_value)
    enc_print('<entry>')
    enc_print('<title>Файл: '+book_name+'</title>')
    enc_print('<link type="application/'+format+'" rel="alternate" href="sopds.cgi?id='+id+'"/>')

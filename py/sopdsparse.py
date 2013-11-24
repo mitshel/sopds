@@ -50,11 +50,9 @@ class fb2parser:
        self.book_title.reset()
 
    def xmldecl(self,version, encoding, standalone):
-#       print('xml version ',version,', encoding ',encoding)
        pass
 
    def start_element(self,name,attrs):
-#       print('Start element:', name, attrs)
        self.author_first.tagopen(name)
        self.author_last.tagopen(name)
        self.genre.tagopen(name)
@@ -62,7 +60,6 @@ class fb2parser:
        self.book_title.tagopen(name)
 
    def end_element(self,name):
-#       print('End element:', name)
        self.author_first.tagclose(name)
        self.author_last.tagclose(name)
        self.genre.tagclose(name)
@@ -80,7 +77,6 @@ class fb2parser:
           raise StopIteration
   
    def char_data(self,data):
-#       print('Character data:', repr(data))
        value=repr(data)
        self.author_first.setvalue(value)
        self.author_last.setvalue(value)
