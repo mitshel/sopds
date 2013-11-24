@@ -3,18 +3,61 @@
 
 import os
 import sopdsdb
-import sopdscfg
 import sopdsparse
 import zipfile
 import time
 import datetime
+import sopdscfg
 
+
+##########################################################################
+# Считываем параметры командной строки
+# пример возможных параметров
+# sopds-scan.py <--scanfull | --scanlast | --scan | -s> [ [-c <configfile>]
+#
+# -s, --scan, --scanfull  - Полное пересканирование всех файлов библиотеки (по умолчанию)
+# --scanlast              - Обрабатываются только файлы с датой поздней, чем дата последнего сканирования (не сделано)
+# -v, --verbose           - Включить вывод отладочной информации
+# -c <configfile>         - Указывается путь к файлу конфигурации
+
+from optparse import OptionParser
+from sys import argv
+
+t1=datetime.timedelta(seconds=time.time())
+
+parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version 0.01a", add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
+parser.add_option('-s','--scan','--scanfull', action='store_true', dest='scanfull', default=True, help='Full rescan all stored files.')
+parser.add_option('-l','--scanlast', action='store_false', dest='scanfull', default=True, help='Scan files from date after last scan.')
+parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
+parser.add_option('-c','--config',dest='configfile',default='',help='Config file pargh')
+(options,arguments)=parser.parse_args()
+
+SCAN_FULL=options.scanfull
+VERBOSE=options.verbose
+CFG_FILE=options.configfile
+
+if CFG_FILE=='':
+   cfg=sopdscfg.cfgreader()
+else:
+   cfg=sopdscfg.cfgreader(CFG_FILE)
+
+if VERBOSE:
+        print('Options set: scanfull =',SCAN_FULL,', verbose =',VERBOSE,', configfile =',cfg.CONFIGFILE)
+
+#############################################################################
+#
+# Переменные для сбора статистики
+#
 books_added   = 0
 books_skipped = 0
 arch_scanned = 0
 arch_skipped = 0
 books_in_archives = 0
 
+#############################################################################
+#
+# Вспомогательные функции
+#
 def processfile(db,fb2,name,full_path,file,archive=0):
     global books_added
     global books_skipped
@@ -22,7 +65,7 @@ def processfile(db,fb2,name,full_path,file,archive=0):
 
     (n,e)=os.path.splitext(name)
     if e.lower() in extensions_set:
-       rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
+       rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
 
        if VERBOSE:
           print("Attempt to add book: ",rel_path," - ",name,"...",end=" ")
@@ -33,12 +76,12 @@ def processfile(db,fb2,name,full_path,file,archive=0):
           title=''
           genre=''
           lang=''
-          if e.lower()=='.fb2' and sopdscfg.FB2PARSE:
+          if e.lower()=='.fb2' and cfg.FB2PARSE:
              if isinstance(file, str):
                 f=open(file,'rb')
              else:
                 f=file
-             fb2.parse(f,sopdscfg.FB2HSIZE)
+             fb2.parse(f,cfg.FB2HSIZE)
              f.close()
              if len(fb2.genre.getvalue())>0:
                 genre=fb2.genre.getvalue()[0].strip(' \'\"')
@@ -76,7 +119,7 @@ def processzip(db,fb2,name,full_path,file):
     global arch_scanned
     global arch_skipped
 
-    rel_path=os.path.relpath(full_path,sopdscfg.ROOT_LIB)
+    rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
     if sopdscfg.ZIPRESCAN or db.zipisscanned(rel_path)==0:
        z = zipfile.ZipFile(file, 'r')
        filelist = z.namelist()
@@ -94,53 +137,27 @@ def processzip(db,fb2,name,full_path,file):
        if VERBOSE:
           print('Skip ZIP archive: ',full_path,'. Already scanned.')
 
-##########################################################################
-# Считываем параметры командной строки
-# пример возможных параметров
-# sopds-scan.py <--scanfull | --scanlast | --scan | -s> [ [-c <configfile>]
-#
-# -s, --scan, --scanfull  - Полное пересканирование всех файлов библиотеки
-# --scanlast              - Обрабатываются только файлы с датой поздней, чем дата последнего сканирования
-# -v, --verbose           - Включить вывод отладочной информации
-# -c <configfile>         - Указывается путь к файлу конфигурации
-
-from optparse import OptionParser
-from sys import argv
-
-t1=datetime.timedelta(seconds=time.time())
-
-parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version 0.01a", add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your books directory and store data to MYSQL database.')
-parser.add_option('-s','--scan','--scanfull', action='store_true', dest='scanfull', default=True, help='Full rescan all stored files.')
-parser.add_option('-l','--scanlast', action='store_false', dest='scanfull', default=True, help='Scan files from date after last scan.')
-parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
-(options,arguments)=parser.parse_args()
-
-SCAN_FULL=options.scanfull
-VERBOSE=options.verbose
-
-if VERBOSE:
-        print('Options set: scanfull =',SCAN_FULL,', verbose =',VERBOSE,', configfile =',sopdscfg.CFG_PATH)
 
 ###########################################################################
 # Основной код программы
 #
-opdsdb=sopdsdb.opdsDatabase(sopdscfg.DB_NAME,sopdscfg.DB_USER,sopdscfg.DB_PASS,sopdscfg.DB_HOST,sopdscfg.ROOT_LIB)
+opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
 opdsdb.openDB()
 if VERBOSE:
    opdsdb.printDBerr()
 
 fb2parser=sopdsparse.fb2parser()
 
-extensions_set={x for x in sopdscfg.EXT_LIST}
+extensions_set={x for x in cfg.EXT_LIST}
 if VERBOSE:
    print(extensions_set)
 
-for full_path, dirs, files in os.walk(sopdscfg.ROOT_LIB):
+for full_path, dirs, files in os.walk(cfg.ROOT_LIB):
   for name in files:
     file=os.path.join(full_path,name)
     (n,e)=os.path.splitext(name)
     if (e.lower() == '.zip'):
-       if sopdscfg.ZIPSCAN:
+       if cfg.ZIPSCAN:
           processzip(opdsdb,fb2parser,name,full_path,file)
     else:
        processfile(opdsdb,fb2parser,name,full_path,file)

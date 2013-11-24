@@ -16,50 +16,53 @@ CFG_PATH=CFG_PATH_DEFAULT
 ###########################################################################
 # Считываем конфигурацию из конфигурационного файла
 # используем модуль configparser
-
 import configparser
-config=configparser.ConfigParser()
-#config.read(CFG_PATH)
-config.readfp(codecs.open(CFG_PATH,"r","utf-8"))
 
-CFG_S_GLOBAL='global'
-NAME=config.get(CFG_S_GLOBAL,'name')
-ROOT_URL=config.get(CFG_S_GLOBAL,'root_url')
-DB_NAME=config.get(CFG_S_GLOBAL,'db_name')
-DB_USER=config.get(CFG_S_GLOBAL,'db_user')
-DB_PASS=config.get(CFG_S_GLOBAL,'db_pass')
-DB_HOST=config.get(CFG_S_GLOBAL,'db_host')
-DB_CHARSET=config.get(CFG_S_GLOBAL,'db_charset')
-ROOT_LIB=os.path.abspath(config.get(CFG_S_GLOBAL,'root_lib'))
-FORMATS=config.get(CFG_S_GLOBAL,'formats')
-DUBLICATES=config.getboolean(CFG_S_GLOBAL,'dublicates')
-FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
-ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
-ZIPRESCAN=config.getboolean(CFG_S_GLOBAL,'ziprescan')
-fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
-maxitems=config.get(CFG_S_GLOBAL,'maxitems')
-splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
-if maxitems.isdigit():
-   MAXITEMS=int(maxitems)
-else:
-   MAXITEMS=50
-if fb2hsize.isdigit():
-   FB2HSIZE=int(fb2hsize)
-else:
-   FB2HSIZE=0
-if splitauthors.isdigit():
-   SPLITAUTHORS=int(splitauthors)
-else:
-   SPLITAUTHORS=0
+class cfgreader:
+   def __init__(self,configfile=CFG_PATH):
+       config=configparser.ConfigParser()
+       #config.read(CFG_PATH)
+       self.CONFIGFILE=configfile
+       config.readfp(codecs.open(self.CONFIGFILE,"r","utf-8"))
 
-EXT_LIST=FORMATS.lower().split()
+       CFG_S_GLOBAL='global'
+       self.NAME=config.get(CFG_S_GLOBAL,'name')
+       self.ROOT_URL=config.get(CFG_S_GLOBAL,'root_url')
+       self.DB_NAME=config.get(CFG_S_GLOBAL,'db_name')
+       self.DB_USER=config.get(CFG_S_GLOBAL,'db_user')
+       self.DB_PASS=config.get(CFG_S_GLOBAL,'db_pass')
+       self.DB_HOST=config.get(CFG_S_GLOBAL,'db_host')
+       self.DB_CHARSET=config.get(CFG_S_GLOBAL,'db_charset')
+       self.ROOT_LIB=os.path.abspath(config.get(CFG_S_GLOBAL,'root_lib'))
+       self.FORMATS=config.get(CFG_S_GLOBAL,'formats')
+       self.DUBLICATES=config.getboolean(CFG_S_GLOBAL,'dublicates')
+       self.FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
+       self.ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
+       self.ZIPRESCAN=config.getboolean(CFG_S_GLOBAL,'ziprescan')
+       fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
+       maxitems=config.get(CFG_S_GLOBAL,'maxitems')
+       splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
+       if maxitems.isdigit():
+          self.MAXITEMS=int(maxitems)
+       else:
+          self.MAXITEMS=50
+       if fb2hsize.isdigit():
+          self.FB2HSIZE=int(fb2hsize)
+       else:
+          FB2HSIZE=0
+       if splitauthors.isdigit():
+          self.SPLITAUTHORS=int(splitauthors)
+       else:
+          self.SPLITAUTHORS=0
 
-CFG_S_SITE='site'
-SITE_ID=config.get(CFG_S_SITE,'id')
-SITE_TITLE=config.get(CFG_S_SITE,'title')
-SITE_ICON=config.get(CFG_S_SITE,'icon')
-SITE_AUTOR=config.get(CFG_S_SITE,'autor')
-SITE_URL=config.get(CFG_S_SITE,'url')
-SITE_EMAIL=config.get(CFG_S_SITE,'email')
-SITE_MAINTITLE=config.get(CFG_S_SITE,'main_title')
+       self.EXT_LIST=self.FORMATS.lower().split()
+
+       CFG_S_SITE='site'
+       self.SITE_ID=config.get(CFG_S_SITE,'id')
+       self.SITE_TITLE=config.get(CFG_S_SITE,'title')
+       self.SITE_ICON=config.get(CFG_S_SITE,'icon')
+       self.SITE_AUTOR=config.get(CFG_S_SITE,'autor')
+       self.SITE_URL=config.get(CFG_S_SITE,'url')
+       self.SITE_EMAIL=config.get(CFG_S_SITE,'email')
+       self.SITE_MAINTITLE=config.get(CFG_S_SITE,'main_title')
 
