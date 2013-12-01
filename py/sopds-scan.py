@@ -120,7 +120,7 @@ def processzip(db,fb2,name,full_path,file):
     global arch_skipped
 
     rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
-    if sopdscfg.ZIPRESCAN or db.zipisscanned(rel_path)==0:
+    if cfg.ZIPRESCAN or db.zipisscanned(rel_path)==0:
        z = zipfile.ZipFile(file, 'r')
        filelist = z.namelist()
        for n in filelist:

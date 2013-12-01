@@ -343,6 +343,17 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getlastbooks(self,limit=0):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit)
+    sql="select book_id,filename,path,registerdate,title from "+TBL_BOOKS+" order by registerdate desc "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
 
   def getgenres(self):
     sql="select lower(genre), count(*) from "+TBL_BOOKS+" group by 1 order by 1"

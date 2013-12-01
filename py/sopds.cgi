@@ -65,11 +65,11 @@ def main_menu():
    enc_print('<content type="text">Авторов: %s, книг: %s.</content>'%(dbinfo[1][0],dbinfo[0][0]))
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=02"/>')
    enc_print('<id>sopds.cgi?id=2</id></entry>')
-#   enc_print('<entry>')
-#   enc_print('<title>По жанрам</title>')
-#   enc_print('<content type="text">Секция в разработке!!! Книг: %s.</content>'%(dbinfo[0][0]))
-#   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=04"/>')
-#   enc_print('<id>sopds.cgi?id=4</id></entry>')
+   enc_print('<entry>')
+   enc_print('<title>Последние добавленные</title>')
+   enc_print('<content type="text">Книг: %s.</content>'%(cfg.MAXITEMS))
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="sopds.cgi?id=04"/>')
+   enc_print('<id>sopds.cgi?id=4</id></entry>')
    opdsdb.closeDB()
 
 ###########################################################################
@@ -199,21 +199,27 @@ elif type_value==3:
    opdsdb.closeDB()
 
 #########################################################
-# Выбрана сортировка "По Жанрам"
+# Выбрана сортировка "Последние поступления"
 #
 elif type_value==4:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
    header()
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
-   id='04'
-   for (genre,cnt) in opdsdb.getgenres():
+   for (book_id,book_name,book_path,reg_date,book_title) in opdsdb.getlastbooks(cfg.MAXITEMS):
+       id='07'+str(book_id)
        enc_print('<entry>')
-       enc_print('<title>-= '+genre+' =-</title>')
+       enc_print('<title>'+book_title+'</title>')
+       enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id=04</id>')
-#       enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
-#       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
-       enc_print('<content type="text">Всего: '+str(cnt)+' книг(и).</content>')
+       enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
+       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
+       authors=""
+       for (first_name,last_name) in opdsdb.getauthors(book_id):
+           enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
+           if len(authors)>0:
+              authors+=', '
+           authors+=last_name+' '+first_name
+       enc_print('<content type="text">'+authors+'</content>')
        enc_print('</entry>')
    footer()
    opdsdb.closeDB()
