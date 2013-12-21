@@ -67,16 +67,17 @@ def create_cover(book_id,fb2,opdsdb):
        ictype=''
     else:
        ictype=ictype.lower()
-       if ictype=='image/jpeg':
+       if ictype=='image/jpeg' or ictype=='image/jpg':
           fn=str(book_id)+'.jpg'
-       if ictype=='image/png':
-          fn=str(book_id)+'.png'
-       if ictype=='application/octet-stream':
-          if coverid!=None:
-             (f,e)=os.path.splitext(coverid)
-          else: 
-             e='.img'
-          fn=str(book_id)+e
+       else:
+          if ictype=='image/png':
+             fn=str(book_id)+'.png'
+          else:
+             if coverid!=None:
+                (f,e)=os.path.splitext(coverid)
+             else: 
+                e='.img'
+             fn=str(book_id)+e
          
        fp=os.path.join(sopdscfg.COVER_PATH,fn)
        if len(fb2.cover_image.cover_data)>0:
