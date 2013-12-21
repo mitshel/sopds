@@ -22,9 +22,17 @@ mysql mysql < ./db/dbcrea.sql
 5. Доступ к OPDS каталогу через WWW
 Для сервера Apache необходимо разрешить запуск cgi-скрипта ./py/sopds.cgi
 при помощи директивы, помещенной в .htacess:
-Options ExecCGI
+  Options ExecCGI
 или
-Options +ExecCGI
+  Options +ExecCGI
+
+Для ограничения доступа добавьте в .htaccess
+  AuthType Basic
+  AuthName "SOPDS Library"
+  AuthUserFile /home/www/.htpasswd
+  require valid-user
+Ну и конечно добавить пользователя и пароль в файл /home/www/.htpasswd при помощи утилиты htpasswd
+
 
 6. Использование OPDS каталога с устройств поддерживающих OPDS
 Ввести OPDS каталог и следующий URL: your_domain_name/opds/py/sopds.cgi
