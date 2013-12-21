@@ -12,6 +12,7 @@ PY_PATH=os.path.dirname(os.path.abspath(__file__))
 CFG_FILENAME='sopds.conf'
 CFG_PATH_DEFAULT=ROOT_PATH+os.path.sep+'conf'+os.path.sep+CFG_FILENAME
 CFG_PATH=CFG_PATH_DEFAULT
+COVER_PATH=os.path.join(ROOT_PATH,'covers')
 
 ###########################################################################
 # Считываем конфигурацию из конфигурационного файла
@@ -39,6 +40,7 @@ class cfgreader:
        self.FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
        self.ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
        self.ZIPRESCAN=config.getboolean(CFG_S_GLOBAL,'ziprescan')
+       self.COVER_ENABLE=config.getboolean(CFG_S_GLOBAL,'cover_enable')
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')

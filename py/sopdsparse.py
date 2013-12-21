@@ -6,6 +6,7 @@ import xml.parsers.expat
 class fb2tag:
    def __init__(self,tags):
        self.tags=tags
+       self.attrs=[]
        self.index=-1
        self.size=len(self.tags)
        self.values=[]
@@ -13,11 +14,18 @@ class fb2tag:
    def reset(self):
        self.index=-1
        self.values=[]
+       self.attrs=[]
 
-   def tagopen(self,tag):
+   def tagopen(self,tag,attrs=[]):
+       result=False
        if self.index<self.size:
           if self.tags[self.index+1].lower()==tag.lower():
              self.index+=1
+       if (self.index+1)==self.size:
+          self.attrs=attrs
+          result=True
+       # Возвращаем True если дошли до последнего значения дерева тэга
+       return result
 
    def tagclose(self,tag):
        if self.index>=0:
@@ -29,8 +37,48 @@ class fb2tag:
           self.values.append(value)
 
    def getvalue(self): 
-       return self.values 
+       return self.values
 
+   def getattr(self, attr):
+       if len(self.attrs)>0:
+          val=self.attrs.get(attr)
+       else:
+          val=None
+       return val
+
+class fb2cover(fb2tag):
+   def __init__(self,tags):
+       self.iscover=False
+       self.cover_name='cover.jpg'
+       self.cover_data='';
+       fb2tag.__init__(self,tags)
+
+   def reset(self):
+       self.iscover=False
+       self.cover_data='';
+       fb2tag.reset(self)
+
+   def tagopen(self,tag,attrs=[],cover_name=None):
+       if cover_name!=None and cover_name!='':
+          self.cover_name=cover_name
+       result=fb2tag.tagopen(self,tag,attrs)
+       if result:
+          idvalue=self.getattr('id')
+          if idvalue!=None:
+             idvalue=idvalue.lower()
+             if idvalue==self.cover_name:
+                self.iscover=True
+       return result
+
+   def tagclose(self,tag):
+       self.iscover=False
+       fb2tag.tagclose(self,tag)
+
+   def add_data(self,data):
+       if self.iscover:
+          new_data=data.strip("'")
+          if new_data!='\\n':
+             self.cover_data+=new_data
 
 class fb2parser:
    def __init__(self, readcover=0):
@@ -41,9 +89,9 @@ class fb2parser:
        self.lang=fb2tag(('description','title-info','lang'))
        self.book_title=fb2tag(('description','title-info','book-title'))
        if self.rc!=0:
-          self.book_cover = fb2tag (('binary'));
+          self.cover_name = fb2tag (('description','coverpage','image'))
+          self.cover_image = fb2cover (('fictionbook','binary'));
           self.stoptag='fictionbook'
-          self.iscover=False
        else:
           self.stoptag='description'
        self.parse_error=0
@@ -56,7 +104,8 @@ class fb2parser:
        self.lang.reset()
        self.book_title.reset()
        if self.rc!=0:
-          self.book_cover.reset()
+          self.cover_name.reset()
+          self.cover_image.reset()
 
    def xmldecl(self,version, encoding, standalone):
        pass
@@ -67,14 +116,18 @@ class fb2parser:
        self.genre.tagopen(name)
        self.lang.tagopen(name)
        self.book_title.tagopen(name)
-       if self.rc!=0 and name.lower()=='binary':
-          self.book_cover.tagopen(name)
-          idvalue=attrs.get('id')
-          if idvalue!=None:
-             idvalue=idvalue.lower()
-          if idvalue=='cover.jpg':
-             self.iscover=True
-             print(name, idvalue)
+       if self.rc!=0:
+          cover_name=''
+          if self.cover_name.tagopen(name,attrs):
+             cover_name=self.cover_name.getattr('l:href')
+             if cover_name=='' or cover_name==None:
+                cover_name=self.cover_name.getattr('xlink:href')
+             # Если имя файла не начинается с # то значит данных локально в файле fb2 - нет
+             if len(cover_name)>0 and cover_name[0]=='#':
+                cover_name=cover_name.strip('#')
+             else:
+                cover_name=None
+          self.cover_image.tagopen(name,attrs,cover_name)
 
    def end_element(self,name):
        self.author_first.tagclose(name)
@@ -82,9 +135,9 @@ class fb2parser:
        self.genre.tagclose(name)
        self.lang.tagclose(name)
        self.book_title.tagclose(name)
-       if self.rc!=0 and name.lower()=='binary':
-          self.book_cover.tagclose(name)
-          self.iscover=False
+       if self.rc!=0:
+          self.cover_name.tagclose(name)
+          self.cover_image.tagclose(name)
 
        #Выравниваем количество last_name и first_name
        if name.lower()=='author': 
@@ -103,9 +156,8 @@ class fb2parser:
        self.genre.setvalue(value)
        self.lang.setvalue(value)
        self.book_title.setvalue(value)
-       if self.rc!=0 and self.iscover:
-          self.book_cover.setvalue(value)
-          print(value, end='')
+       if self.rc!=0:
+          self.cover_image.add_data(value)
 
    def parse(self,f,hsize=0):
        self.reset()
@@ -121,5 +173,5 @@ class fb2parser:
             parser.Parse(f.read(hsize), True)
        except StopIteration:
          pass
-#       except:
-#         parse_error=1
+       except:
+         parse_error=1
