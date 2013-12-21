@@ -127,6 +127,14 @@ class opdsDatabase:
     self.cnx.commit()
     cursor.close()
     return book_id
+
+  def addcover(self,book_id,fn,cover_type):
+    sql=("update "+TBL_BOOKS+" set cover=%s, cover_type=%s where book_id=%s")
+    data=(fn,cover_type,book_id)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    self.cnx.commit()
+    cursor.close()
     
   def addtag(self, tag, tag_type=0):
     tag_id=self.findtag(tag)
@@ -272,7 +280,7 @@ class opdsDatabase:
     return rows
 
   def getbook(self,book_id):
-    sql_getbook=("select filename, path, registerdate, format, title, cat_type from "+TBL_BOOKS+" where book_id="+str(book_id))
+    sql_getbook=("select filename, path, registerdate, format, title, cat_type, cover, cover_type from "+TBL_BOOKS+" where book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql_getbook)
     row=cursor.fetchone()
@@ -328,7 +336,7 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.genre from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+" order by a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.genre,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+" order by a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

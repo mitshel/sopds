@@ -72,6 +72,13 @@ def main_menu():
    enc_print('<id>sopds.cgi?id=4</id></entry>')
    opdsdb.closeDB()
 
+def covers(cover,cover_type):
+   if cover!=None and cover!='':
+      enc_print( '<link href="../covers/%s" rel="http://opds-spec.org/image" type="%s" />'%(cover,cover_type) )
+      enc_print( '<link href="../covers/%s" rel="x-stanza-cover-image" type="%s" />'%(cover,cover_type) )
+      enc_print( '<link href="../covers/%s" rel="http://opds-spec.org/thumbnail" type="%s" />'%(cover,cover_type) )
+      enc_print( '<link href="../covers/%s" rel="x-stanza-cover-image-thumbnail" type="%s" />'%(cover,cover_type) )
+
 ###########################################################################
 # Основной код программы
 #
@@ -263,12 +270,13 @@ if type_value==6:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,book_genre) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value):
+   for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value):
        id='07'+str(book_id)
        enc_print('<entry>')
        enc_print('<title>'+book_title+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id='+id+'</id>')
+       covers(cover,cover_type)
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        authors=""
@@ -300,11 +308,12 @@ elif type_value==7:
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="sopds.cgi?id=0" title="'+cfg.SITE_MAINTITLE+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
-   (book_name,book_path,reg_date,format,title,cat_type)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
    id='08'+str(slice_value)
    idzip='09'+str(slice_value)
    enc_print('<entry>')
    enc_print('<title>Файл: '+book_name+'</title>')
+   covers(cover,cover_type)
    enc_print('<link type="application/'+format+'" rel="alternate" href="sopds.cgi?id='+id+'"/>')
    enc_print('<link type="application/'+format+'" href="sopds.cgi?id='+id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'+zip" href="sopds.cgi?id='+idzip+'" rel="http://opds-spec.org/acquisition" />')
@@ -328,7 +337,7 @@ elif type_value==7:
 elif type_value==8:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format,title,cat_type)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    transname=translit(book_name)
    # HTTP Header
@@ -364,7 +373,7 @@ elif type_value==8:
 elif type_value==9:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format,title,cat_type)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    transname=translit(book_name)
    # HTTP Header

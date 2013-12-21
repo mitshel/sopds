@@ -59,21 +59,33 @@ books_in_archives = 0
 #
 # Вспомогательные функции
 #
-def create_cover(book_id,fb2):
+def create_cover(book_id,fb2,opdsdb):
     ictype=fb2.cover_image.getattr('content-type')
-    f_ext=''
-    if ictype!=None:
-       if ictype.lower()=='image/jpeg':
-          f_ext='.jpg'
-       if ictype.lower()=='image/png':
-          f_ext='.png'
-    fn=os.path.join(sopdscfg.COVER_PATH,str(book_id)+f_ext)
-    if len(fb2.cover_image.cover_data)>0:
-       img=open(fn,'wb')
-       s=fb2.cover_image.cover_data
-       dstr=base64.b64decode(s)
-       img.write(dstr)
-       img.close()
+    coverid=fb2.cover_image.getattr('id')
+    fn=''
+    if ictype==None:
+       ictype=''
+    else:
+       ictype=ictype.lower()
+       if ictype=='image/jpeg':
+          fn=str(book_id)+'.jpg'
+       if ictype=='image/png':
+          fn=str(book_id)+'.png'
+       if ictype=='application/octet-stream':
+          if coverid!=None:
+             (f,e)=os.path.splitext(coverid)
+          else: 
+             e='.img'
+          fn=str(book_id)+e
+         
+       fp=os.path.join(sopdscfg.COVER_PATH,fn)
+       if len(fb2.cover_image.cover_data)>0:
+          img=open(fp,'wb')
+          s=fb2.cover_image.cover_data
+          dstr=base64.b64decode(s)
+          img.write(dstr)
+          img.close()
+    opdsdb.addcover(book_id,fn,ictype)
 
 def processfile(db,fb2,name,full_path,file,archive=0):
     global books_added
@@ -118,7 +130,7 @@ def processfile(db,fb2,name,full_path,file,archive=0):
           books_added+=1
           
           if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_ENABLE:
-             create_cover(book_id,fb2)
+             create_cover(book_id,fb2,opdsdb)
           
           if archive==1:
              books_in_archives+=1
