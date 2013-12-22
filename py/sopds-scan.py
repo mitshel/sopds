@@ -155,7 +155,8 @@ def processzip(db,fb2,name,full_path,file):
     global arch_skipped
 
     rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
-    if cfg.ZIPRESCAN or db.zipisscanned(rel_path)==0:
+    rel_file=os.path.join(rel_path,name)
+    if cfg.ZIPRESCAN or db.zipisscanned(rel_file)==0:
        z = zipfile.ZipFile(file, 'r')
        filelist = z.namelist()
        for n in filelist:
