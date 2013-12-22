@@ -1,2 +1,4 @@
 covers/*
 *.fb2
+py/*.jpg
+py/*.png
