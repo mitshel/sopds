@@ -44,14 +44,20 @@ class cfgreader:
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
+
        if maxitems.isdigit():
           self.MAXITEMS=int(maxitems)
        else:
           self.MAXITEMS=50
+
        if fb2hsize.isdigit():
           self.FB2HSIZE=int(fb2hsize)
        else:
-          FB2HSIZE=0
+          self.FB2HSIZE=0
+
+       if self.COVER_ENABLE:
+          self.FB2SIZE=0
+
        if splitauthors.isdigit():
           self.SPLITAUTHORS=int(splitauthors)
        else:
