@@ -8,6 +8,7 @@ import zipfile
 import time
 import datetime
 import sopdscfg
+import base64
 
 
 ##########################################################################
@@ -58,6 +59,35 @@ books_in_archives = 0
 #
 # Вспомогательные функции
 #
+def create_cover(book_id,fb2,opdsdb):
+    ictype=fb2.cover_image.getattr('content-type')
+    coverid=fb2.cover_image.getattr('id')
+    fn=''
+    if ictype==None:
+       ictype=''
+    else:
+       ictype=ictype.lower()
+       if ictype=='image/jpeg' or ictype=='image/jpg':
+          fn=str(book_id)+'.jpg'
+       else:
+          if ictype=='image/png':
+             fn=str(book_id)+'.png'
+          else:
+             if coverid!=None:
+                (f,e)=os.path.splitext(coverid)
+             else: 
+                e='.img'
+             fn=str(book_id)+e
+         
+       fp=os.path.join(sopdscfg.COVER_PATH,fn)
+       if len(fb2.cover_image.cover_data)>0:
+          img=open(fp,'wb')
+          s=fb2.cover_image.cover_data
+          dstr=base64.b64decode(s)
+          img.write(dstr)
+          img.close()
+    opdsdb.addcover(book_id,fn,ictype)
+
 def processfile(db,fb2,name,full_path,file,archive=0):
     global books_added
     global books_skipped
@@ -89,6 +119,7 @@ def processfile(db,fb2,name,full_path,file,archive=0):
                 lang=fb2.lang.getvalue()[0].strip(' \'\"')
              if len(fb2.book_title.getvalue())>0:
                 title=fb2.book_title.getvalue()[0].strip(' \'\"\&()-.#[]\\\`')
+             
              if VERBOSE:
                 if fb2.parse_error!=0:
                    print('with fb2 parse warning...',end=" ")
@@ -98,6 +129,10 @@ def processfile(db,fb2,name,full_path,file,archive=0):
 
           book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,0,archive)
           books_added+=1
+          
+          if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_ENABLE:
+             create_cover(book_id,fb2,opdsdb)
+          
           if archive==1:
              books_in_archives+=1
           if VERBOSE:
@@ -120,7 +155,8 @@ def processzip(db,fb2,name,full_path,file):
     global arch_skipped
 
     rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
-    if cfg.ZIPRESCAN or db.zipisscanned(rel_path)==0:
+    rel_file=os.path.join(rel_path,name)
+    if cfg.ZIPRESCAN or db.zipisscanned(rel_file)==0:
        z = zipfile.ZipFile(file, 'r')
        filelist = z.namelist()
        for n in filelist:
@@ -146,7 +182,7 @@ opdsdb.openDB()
 if VERBOSE:
    opdsdb.printDBerr()
 
-fb2parser=sopdsparse.fb2parser()
+fb2parser=sopdsparse.fb2parser(cfg.COVER_ENABLE)
 
 extensions_set={x for x in cfg.EXT_LIST}
 if VERBOSE:
