@@ -1,7 +1,7 @@
 Simple OPDS Catalog
 Простой OPDS Каталог
-Author Dmitry V.Shelepnev
-Версия 0.01a
+Author: Dmitry V.Shelepnev
+Версия 0.03
 
 1. Установка:
 Для работы скрипта sopds-scan.py необходимо установить следующие зависимости:
