@@ -44,6 +44,7 @@ class cfgreader:
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
+       splittitles=config.get(CFG_S_GLOBAL,'splittitles')
 
        if maxitems.isdigit():
           self.MAXITEMS=int(maxitems)
@@ -62,6 +63,11 @@ class cfgreader:
           self.SPLITAUTHORS=int(splitauthors)
        else:
           self.SPLITAUTHORS=0
+
+       if splittitles.isdigit():
+          self.SPLITTITLES=int(splittitles)
+       else:
+          self.SPLITTITLES=0
 
        self.EXT_LIST=self.FORMATS.lower().split()
 

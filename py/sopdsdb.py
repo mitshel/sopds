@@ -295,19 +295,57 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getauthor_letters(self):
-    sql="select UPPER(substring(last_name,1,1)) as letter, count(*) as cnt from "+TBL_AUTHORS+" group by 1 order by 1"
+#  def getauthor_letters(self):
+#    sql="select UPPER(substring(last_name,1,1)) as letter, count(*) as cnt from "+TBL_AUTHORS+" group by 1 order by 1"
+#    cursor=self.cnx.cursor()
+#    cursor.execute(sql)
+#    rows=cursor.fetchall()
+#    cursor.close
+#    return rows
+
+  def getauthor_2letters(self,letters):
+    lc=len(letters)+1
+    sql="select UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc-1)+"))='"+letters+"' group by 1 order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
 
-  def getauthor_2letters(self,letter):
-    sql="select UPPER(substring(last_name,1,2)) as letteris, count(*) as cnt from "+TBL_AUTHORS+" where UPPER(substring(last_name,1,1))='"+letter+"' group by 1 order by 1"
+#  def gettitle_letters(self):
+#    sql="select UPPER(substring(title,1,1)) as letter, count(*) as cnt from "+TBL_BOOKS+" group by 1 order by 1"
+#    cursor=self.cnx.cursor()
+#    cursor.execute(sql)
+#    rows=cursor.fetchall()
+#    cursor.close
+#    return rows
+
+  def gettitle_2letters(self,letters):
+    lc=len(letters)+1
+    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letteris, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' group by 1 order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
+    cursor.close
+    return rows
+
+  def getbooksfortitle(self,letters,limit=0,page=0):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit*page)+","+str(limit)
+    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,genre,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' order by title "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
     cursor.close
     return rows
 
