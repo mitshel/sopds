@@ -33,6 +33,14 @@ def translit(s):
        s = s.replace(k,table2[k])
    return s.translate(table1)
 
+def websym(s):
+    """Replace special web-symbols"""
+    result = s
+    table = {'&':'&amp;','<':'&lt;'}
+    for k in table.keys():
+        result = result.replace(k,table[k])
+    return result;
+
 def enc_print(string='', encoding='utf8'):
     sys.stdout.buffer.write(string.encode(encoding) + b'\n')
 
@@ -179,7 +187,7 @@ elif type_value==2:
          id='02'+id
 
        enc_print('<entry>')
-       enc_print('<title>-= '+letters+' =-</title>')
+       enc_print('<title>-= '+websym(letters)+' =-</title>')
        enc_print('<id>sopds.cgi?id='+id_value+'</id>')
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
@@ -215,7 +223,7 @@ elif type_value==3:
          id='03'+id
    
        enc_print('<entry>')
-       enc_print('<title>-= '+letters+' =-</title>')
+       enc_print('<title>-= '+websym(letters)+' =-</title>')
        enc_print('<id>sopds.cgi?id='+id_value+'</id>')
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
@@ -241,7 +249,7 @@ if type_value==10:
    for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value):
        id='07'+str(book_id)
        enc_print('<entry>')
-       enc_print('<title>'+book_title+'</title>')
+       enc_print('<title>'+websym(book_title)+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id='+id+'</id>')
        covers(cover,cover_type)
@@ -276,7 +284,7 @@ elif type_value==4:
    for (book_id,book_name,book_path,reg_date,book_title) in opdsdb.getlastbooks(cfg.MAXITEMS):
        id='07'+str(book_id)
        enc_print('<entry>')
-       enc_print('<title>'+book_title+'</title>')
+       enc_print('<title>'+websym(book_title)+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id=04</id>')
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
@@ -298,12 +306,6 @@ elif type_value==4:
 if type_value==5:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
-#   if slice_value==0:
-#      letters=""
-#   elif slice_value>=10000:
-#      letters=chr(slice_value//10000)+chr(slice_value%10000)
-#   else:
-#      letters=chr(slice_value)
 
    i=slice_value
    letter=""
@@ -341,7 +343,7 @@ if type_value==6:
    for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value):
        id='07'+str(book_id)
        enc_print('<entry>')
-       enc_print('<title>'+book_title+'</title>')
+       enc_print('<title>'+websym(book_title)+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id='+id+'</id>')
        covers(cover,cover_type)
