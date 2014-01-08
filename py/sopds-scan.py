@@ -88,7 +88,7 @@ def create_cover(book_id,fb2,opdsdb):
           img.close()
     opdsdb.addcover(book_id,fn,ictype)
 
-def processfile(db,fb2,name,full_path,file,archive=0):
+def processfile(db,fb2,name,full_path,file,archive=0,file_size=0):
     global books_added
     global books_skipped
     global books_in_archives
@@ -106,6 +106,7 @@ def processfile(db,fb2,name,full_path,file,archive=0):
           title=''
           genre=''
           lang=''
+
           if e.lower()=='.fb2' and cfg.FB2PARSE:
              if isinstance(file, str):
                 f=open(file,'rb')
@@ -127,7 +128,7 @@ def processfile(db,fb2,name,full_path,file,archive=0):
           if title=='':
              title=n
 
-          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,0,archive)
+          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,file_size,archive)
           books_added+=1
           
           if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_EXTRACT:
@@ -163,7 +164,8 @@ def processzip(db,fb2,name,full_path,file):
            try:
                if VERBOSE:
                   print('Start process ZIPped file: ',file,' file: ',n)
-               processfile(db,fb2,n,file,z.open(n),1)
+               file_size=z.getinfo(n).file_size
+               processfile(db,fb2,n,file,z.open(n),1,file_size)
            except:
                print('Error processing zip atchive:',file,' file: ',n)
        z.close()
@@ -171,7 +173,7 @@ def processzip(db,fb2,name,full_path,file):
     else:
        arch_skipped+=1
        if VERBOSE:
-          print('Skip ZIP archive: ',full_path,'. Already scanned.')
+          print('Skip ZIP archive: ',rel_file,'. Already scanned.')
 
 
 ###########################################################################
@@ -196,7 +198,8 @@ for full_path, dirs, files in os.walk(cfg.ROOT_LIB):
        if cfg.ZIPSCAN:
           processzip(opdsdb,fb2parser,name,full_path,file)
     else:
-       processfile(opdsdb,fb2parser,name,full_path,file)
+       file_size=os.path.getsize(file)
+       processfile(opdsdb,fb2parser,name,full_path,file,0,file_size)
 
 opdsdb.closeDB()
 
