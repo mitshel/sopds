@@ -119,6 +119,7 @@ class opdsDatabase:
     if book_id!=0:
        return book_id
     format=exten[1:]
+    format=format.lower()
     sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,genre,lang,cat_type) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)")
     data_addbook=(name,path,cat_id,size,format,title,genre,lang,archive)
     cursor=self.cnx.cursor()
