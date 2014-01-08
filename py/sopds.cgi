@@ -12,6 +12,8 @@ import zipfile
 import io
 import locale
 import time
+import sopdsparse
+import base64
 
 #######################################################################
 #
@@ -85,14 +87,25 @@ def main_menu():
    enc_print('<id>sopds.cgi?id=4</id></entry>')
    opdsdb.closeDB()
 
-def covers(cover,cover_type):
-   if cover!=None and cover!='':
-      enc_print( '<link href="../covers/%s" rel="http://opds-spec.org/image" type="%s" />'%(cover,cover_type) )
-      enc_print( '<link href="../covers/%s" rel="x-stanza-cover-image" type="%s" />'%(cover,cover_type) )
-      enc_print( '<link href="../covers/%s" rel="http://opds-spec.org/thumbnail" type="%s" />'%(cover,cover_type) )
-      enc_print( '<link href="../covers/%s" rel="x-stanza-cover-image-thumbnail" type="%s" />'%(cover,cover_type) )
+def covers(cover,cover_type,book_id):
+   have_extracted_cover=0
+   if cfg.COVER_SHOW!=0:
+      if cfg.COVER_SHOW!=2:
+         if cover!=None and cover!='':
+            enc_print( '<link href="../covers/%s" rel="http://opds-spec.org/image" type="%s" />'%(cover,cover_type) )
+            enc_print( '<link href="../covers/%s" rel="x-stanza-cover-image" type="%s" />'%(cover,cover_type) )
+            enc_print( '<link href="../covers/%s" rel="http://opds-spec.org/thumbnail" type="%s" />'%(cover,cover_type) )
+            enc_print( '<link href="../covers/%s" rel="x-stanza-cover-image-thumbnail" type="%s" />'%(cover,cover_type) )
+            have_extracted_cover=1
+      if cfg.COVER_SHOW==2 or (cfg.COVER_SHOW==3 and have_extracted_cover==0):
+            id='99'+str(book_id)
+            enc_print( '<link href="sopds.cgi?id=%s" rel="http://opds-spec.org/image" />'%(id) )
+            enc_print( '<link href="sopds.cgi?id=%s" rel="x-stanza-cover-image" />'%(id) )
+            enc_print( '<link href="sopds.cgi?id=%s" rel="http://opds-spec.org/thumbnail" />'%(id) )
+            enc_print( '<link href="sopds.cgi?id=%s" rel="x-stanza-cover-image-thumbnail" />'%(id) )
 
-###########################################################################
+
+###########################################################################################################
 # Основной код программы
 #
 
@@ -252,7 +265,7 @@ if type_value==10:
        enc_print('<title>'+websym(book_title)+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id='+id+'</id>')
-       covers(cover,cover_type)
+       covers(cover,cover_type,book_id)
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        authors=""
@@ -346,7 +359,7 @@ if type_value==6:
        enc_print('<title>'+websym(book_title)+'</title>')
        enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
        enc_print('<id>sopds.cgi?id='+id+'</id>')
-       covers(cover,cover_type)
+       covers(cover,cover_type,book_id)
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        authors=""
@@ -383,7 +396,7 @@ elif type_value==7:
    idzip='09'+str(slice_value)
    enc_print('<entry>')
    enc_print('<title>Файл: '+book_name+'</title>')
-   covers(cover,cover_type)
+   covers(cover,cover_type,slice_value)
    enc_print('<link type="application/'+format+'" rel="alternate" href="sopds.cgi?id='+id+'"/>')
    enc_print('<link type="application/'+format+'" href="sopds.cgi?id='+id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'+zip" href="sopds.cgi?id='+idzip+'" rel="http://opds-spec.org/acquisition" />')
@@ -478,6 +491,47 @@ elif type_value==9:
       enc_print('Content-Length: %s'%len(buf))
       enc_print()
       sys.stdout.buffer.write(buf)
+
+   opdsdb.closeDB()
+
+#########################################################
+# Выдача Обложки На лету
+#
+elif type_value==99:
+   opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
+   opdsdb.openDB()
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
+   c0=0
+   if format=='fb2':
+      full_path=os.path.join(cfg.ROOT_LIB,book_path)
+      fb2=sopdsparse.fb2parser(1)
+      if cat_type==sopdsdb.CAT_NORMAL:
+         file_path=os.path.join(full_path,book_name)
+         fo=codecs.open(file_path.encode("utf-8"), "rb")
+         fb2.parse(fo,0)
+         fo.close()
+      elif cat_type==sopdsdb.CAT_ZIP:
+         fz=codecs.open(full_path.encode("utf-8"), "rb")
+         z = zipfile.ZipFile(fz, 'r')
+         fo = z.open(book_name)
+         fb2.parse(fo,0)
+         fo.close()
+         z.close()
+         fz.close()
+
+      if len(fb2.cover_image.cover_data)>0:
+         s=fb2.cover_image.cover_data
+         dstr=base64.b64decode(s)
+         ictype=fb2.cover_image.getattr('content-type')
+         enc_print('Content-Type:'+ictype)
+         enc_print()
+         sys.stdout.buffer.write(dstr)
+         c0=1
+
+   if c0==0: 
+      enc_print('Content-Type: text/plain')
+      enc_print()
+      enc_print('No Cover')
 
    opdsdb.closeDB()
 

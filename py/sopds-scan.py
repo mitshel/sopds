@@ -130,7 +130,7 @@ def processfile(db,fb2,name,full_path,file,archive=0):
           book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,0,archive)
           books_added+=1
           
-          if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_ENABLE:
+          if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_EXTRACT:
              create_cover(book_id,fb2,opdsdb)
           
           if archive==1:
@@ -182,7 +182,7 @@ opdsdb.openDB()
 if VERBOSE:
    opdsdb.printDBerr()
 
-fb2parser=sopdsparse.fb2parser(cfg.COVER_ENABLE)
+fb2parser=sopdsparse.fb2parser(cfg.COVER_EXTRACT)
 
 extensions_set={x for x in cfg.EXT_LIST}
 if VERBOSE:

@@ -36,15 +36,17 @@ class cfgreader:
        self.DB_CHARSET=config.get(CFG_S_GLOBAL,'db_charset')
        self.ROOT_LIB=os.path.abspath(config.get(CFG_S_GLOBAL,'root_lib'))
        self.FORMATS=config.get(CFG_S_GLOBAL,'formats')
-       self.DUBLICATES=config.getboolean(CFG_S_GLOBAL,'dublicates')
+       self.DUBLICATES_FIND=config.getboolean(CFG_S_GLOBAL,'dublicates_find')
+       self.DUBLICATES_SHOW=config.getboolean(CFG_S_GLOBAL,'dublicates_show')
        self.FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
        self.ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
        self.ZIPRESCAN=config.getboolean(CFG_S_GLOBAL,'ziprescan')
-       self.COVER_ENABLE=config.getboolean(CFG_S_GLOBAL,'cover_enable')
+       self.COVER_EXTRACT=config.getboolean(CFG_S_GLOBAL,'cover_extract')
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
        splittitles=config.get(CFG_S_GLOBAL,'splittitles')
+       cover_show=config.get(CFG_S_GLOBAL,'cover_show')
 
        if maxitems.isdigit():
           self.MAXITEMS=int(maxitems)
@@ -56,7 +58,7 @@ class cfgreader:
        else:
           self.FB2HSIZE=0
 
-       if self.COVER_ENABLE:
+       if self.COVER_EXTRACT:
           self.FB2SIZE=0
 
        if splitauthors.isdigit():
@@ -68,6 +70,12 @@ class cfgreader:
           self.SPLITTITLES=int(splittitles)
        else:
           self.SPLITTITLES=0
+
+       if cover_show.isdigit():
+          self.COVER_SHOW=int(cover_show)
+       else:
+          self.COVER_SHOW=0
+      
 
        self.EXT_LIST=self.FORMATS.lower().split()
 
