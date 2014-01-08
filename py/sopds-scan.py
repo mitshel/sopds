@@ -4,7 +4,7 @@
 import os
 import sopdsdb
 import sopdsparse
-import zipfile
+import zipf
 import time
 import datetime
 import sopdscfg
@@ -157,7 +157,7 @@ def processzip(db,fb2,name,full_path,file):
     rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
     rel_file=os.path.join(rel_path,name)
     if cfg.ZIPRESCAN or db.zipisscanned(rel_file)==0:
-       z = zipfile.ZipFile(file, 'r')
+       z = zipf.ZipFile(file, 'r', codepage=cfg.ZIP_CODEPAGE)
        filelist = z.namelist()
        for n in filelist:
            try:

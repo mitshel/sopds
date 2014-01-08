@@ -47,6 +47,7 @@ class cfgreader:
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
        splittitles=config.get(CFG_S_GLOBAL,'splittitles')
        cover_show=config.get(CFG_S_GLOBAL,'cover_show')
+       zip_codepage=cover_show=config.get(CFG_S_GLOBAL,'zip_codepage')
 
        if maxitems.isdigit():
           self.MAXITEMS=int(maxitems)
@@ -75,9 +76,13 @@ class cfgreader:
           self.COVER_SHOW=int(cover_show)
        else:
           self.COVER_SHOW=0
-      
 
        self.EXT_LIST=self.FORMATS.lower().split()
+
+       if zip_codepage.lower() in {'cp437','cp866','cp1251','utf-8'}:
+          self.ZIP_CODEPAGE=zip_codepage.lower()
+       else:
+          self.ZIP_CODEPAGE='cp437'
 
        CFG_S_SITE='site'
        self.SITE_ID=config.get(CFG_S_SITE,'id')
