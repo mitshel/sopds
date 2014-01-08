@@ -128,7 +128,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0):
           if title=='':
              title=n
 
-          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,file_size,archive)
+          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,file_size,archive,cfg.DUBLICATES_FIND)
           books_added+=1
           
           if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_EXTRACT:

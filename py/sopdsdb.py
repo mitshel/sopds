@@ -104,6 +104,19 @@ class opdsDatabase:
     cursor.close()
     return book_id
 
+  def finddouble(self,title,format,file_size)
+    sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and doublicat=0")
+    data_findbook=(title,format,file_size)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql_findbook,data_findbook)
+    row=cursor.fetchone()
+    if row==None:
+       book_id=0
+    else:
+       book_id=row[0]
+    cursor.close()
+    return book_id
+
   def findbtag(self, book_id, tag_id):
     sql_findbtag=("select book_id from "+TBL_BTAGS+" where book_id=%s and tag_id=%s")
     data_findbtag=(book_id,tag_id)
@@ -114,14 +127,18 @@ class opdsDatabase:
     cursor.close()
     return result
  
-  def addbook(self, name, path, cat_id, exten, title, genre, lang, size=0, archive=0):
+  def addbook(self, name, path, cat_id, exten, title, genre, lang, size=0, archive=0, doublicates=0):
     book_id=self.findbook(name,path)
     if book_id!=0:
        return book_id
     format=exten[1:]
     format=format.lower()
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,genre,lang,cat_type) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)")
-    data_addbook=(name,path,cat_id,size,format,title,genre,lang,archive)
+    if doublicates!=0:
+       doublicat=self.finddouble(title,format,size)
+    else:
+       doublicat=0
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,genre,lang,cat_type,doublicat) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data_addbook=(name,path,cat_id,size,format,title,genre,lang,archive,doublicat)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
