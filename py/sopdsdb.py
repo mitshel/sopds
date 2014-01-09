@@ -104,7 +104,7 @@ class opdsDatabase:
     cursor.close()
     return book_id
 
-  def finddouble(self,title,format,file_size)
+  def finddouble(self,title,format,file_size):
     sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and doublicat=0")
     data_findbook=(title,format,file_size)
     cursor=self.cnx.cursor()
@@ -338,41 +338,29 @@ class opdsDatabase:
 #    cursor.close
 #    return rows
 
-  def gettitle_2letters(self,letters):
+  def gettitle_2letters(self,letters,doublicates=True):
+    if doublicates:
+       dstr=''
+    else:
+       dstr=' and doublicat=0 '
     lc=len(letters)+1
-    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letteris, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' group by 1 order by 1"
+    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letteris, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' "+dstr+" group by 1 order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
 
-  def getbooksfortitle(self,letters,limit=0,page=0):
+  def getbooksfortitle(self,letters,limit=0,page=0,doublicates=True):
     if limit==0:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,genre,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' order by title "+limitstr
-    cursor=self.cnx.cursor()
-    cursor.execute(sql)
-    rows=cursor.fetchall()
-
-    cursor.execute("SELECT FOUND_ROWS()")
-    found_rows=cursor.fetchone()
-    if found_rows[0]>limit*page+limit:
-       self.next_page=True
+    if doublicates:
+       dstr=''
     else:
-       self.next_page=False
-
-    cursor.close
-    return rows
-
-  def getauthorsbyl(self,letters,limit=0,page=0):
-    if limit==0:
-       limitstr=""
-    else:
-       limitstr="limit "+str(limit*page)+","+str(limit)
-    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and UPPER(a.last_name) like '"+letters+"%' group by 1,2,3 order by 3,2 "+limitstr
+       dstr=' and doublicat=0 '
+    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,genre,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" order by title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -387,12 +375,40 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getbooksforautor(self,author_id,limit=0,page=0):
+  def getauthorsbyl(self,letters,limit=0,page=0,doublicates=True):
     if limit==0:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.genre,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+" order by a.title "+limitstr
+    if doublicates:
+       dstr=''
+    else:
+       dstr=' and c.doublicat=0 '
+    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and UPPER(a.last_name) like '"+letters+"%' "+dstr+" group by 1,2,3 order by 3,2 "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getbooksforautor(self,author_id,limit=0,page=0,doublicates=True):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates:
+       dstr=''
+    else:
+       dstr=' and a.doublicat=0 '
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.genre,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" order by a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -427,8 +443,12 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getdbinfo(self):
-    sql="select count(*) from %s union select count(*) from %s union select count(*) from %s"%(TBL_BOOKS,TBL_AUTHORS,TBL_CATALOGS)
+  def getdbinfo(self,doublicates=True):
+    if doublicates:
+       dstr=''
+    else:
+       dstr=' where doublicat=0 '
+    sql="select count(*) from %s %s union select count(*) from %s union select count(*) from %s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS)
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

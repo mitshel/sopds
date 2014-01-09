@@ -47,7 +47,7 @@ class cfgreader:
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
        splittitles=config.get(CFG_S_GLOBAL,'splittitles')
        cover_show=config.get(CFG_S_GLOBAL,'cover_show')
-       zip_codepage=cover_show=config.get(CFG_S_GLOBAL,'zip_codepage')
+       zip_codepage=config.get(CFG_S_GLOBAL,'zip_codepage')
 
        if maxitems.isdigit():
           self.MAXITEMS=int(maxitems)

@@ -56,6 +56,7 @@ def header(charset='utf-8'):
    enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<author><name>'+cfg.SITE_AUTOR+'</name><uri>'+cfg.SITE_URL+'</uri><email>'+cfg.SITE_EMAIL+'</email></author>')
+#   enc_print('<cover_show>'+str(cfg.COVER_SHOW)+'</cover_show>')
 
 def footer():
    enc_print('</feed>')
@@ -63,7 +64,7 @@ def footer():
 def main_menu():
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
-   dbinfo=opdsdb.getdbinfo()
+   dbinfo=opdsdb.getdbinfo(cfg.DUBLICATES_SHOW)
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="/"/>')
    enc_print('<entry>')
    enc_print('<title>По каталогам</title>')
@@ -224,7 +225,7 @@ elif type_value==3:
 
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
-   for (letters,cnt) in opdsdb.gettitle_2letters(letter):
+   for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW):
       
        id=""
        for i in range(len(letters)):
@@ -259,7 +260,7 @@ if type_value==10:
       i=i//10000
 
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value):
+   for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='07'+str(book_id)
        enc_print('<entry>')
        enc_print('<title>'+websym(book_title)+'</title>')
@@ -328,7 +329,7 @@ if type_value==5:
 
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
-   for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,cfg.MAXITEMS,page_value):
+   for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='06'+str(author_id)
        enc_print('<entry>')
        enc_print('<title>'+last_name+' '+first_name+'</title>')
@@ -353,7 +354,7 @@ if type_value==6:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value):
+   for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='07'+str(book_id)
        enc_print('<entry>')
        enc_print('<title>'+websym(book_title)+'</title>')
