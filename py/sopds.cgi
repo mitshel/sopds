@@ -530,9 +530,8 @@ elif type_value==99:
          c0=1
 
    if c0==0: 
-      enc_print('Content-Type: text/plain')
-      enc_print()
-      enc_print('No Cover')
+      print('Status: 404 Not Found')
+      print()
 
    opdsdb.closeDB()
 
