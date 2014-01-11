@@ -184,6 +184,10 @@ opdsdb.openDB()
 if VERBOSE:
    opdsdb.printDBerr()
 
+if cfg.COVER_EXTRACT:
+   if not os.path.isdir(sopdscfg.COVER_PATH):
+      os.mkdir(sopdscfg.COVER_PATH)
+
 fb2parser=sopdsparse.fb2parser(cfg.COVER_EXTRACT)
 
 extensions_set={x for x in cfg.EXT_LIST}
