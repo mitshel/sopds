@@ -134,6 +134,7 @@ if 'search' in form:
    searchTerm=form.getvalue("search","")
    type_value=10
    slice_value=-1
+   id_value='10&amp;search='+searchTerm
 
 if type_value==0:
    header()
