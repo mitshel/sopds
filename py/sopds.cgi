@@ -66,6 +66,8 @@ def main_menu():
    opdsdb.openDB()
    dbinfo=opdsdb.getdbinfo(cfg.DUBLICATES_SHOW)
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="/"/>')
+   enc_print('<link href="opensearch.xml" rel="search" type="application/opensearchdescription+xml" />')
+   enc_print('<link href="sopds.cgi?search={searchTerms}" rel="search" type="application/atom+xml" />')
    enc_print('<entry>')
    enc_print('<title>По каталогам</title>')
    enc_print('<content type="text">Каталогов: %s, книг: %s.</content>'%(dbinfo[2][0],dbinfo[0][0]))
@@ -128,6 +130,10 @@ if 'page' in form:
    page=form.getvalue("page","0")
    if page.isdigit():
          page_value=int(page)
+if 'search' in form:
+   searchTerm=form.getvalue("search","")
+   type_value=10
+   slice_value=-1
 
 if type_value==0:
    header()
@@ -247,17 +253,20 @@ elif type_value==3:
    opdsdb.closeDB()
 
 #########################################################
-# Выдача списка книг по наименованию
+# Выдача списка книг по наименованию или на основании поискового запроса
 #
 if type_value==10:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
 
-   i=slice_value
-   letter=""
-   while i>0:
-      letter=chr(i%10000)+letter
-      i=i//10000
+   if slice_value>=0:
+      i=slice_value
+      letter=""
+      while i>0:
+         letter=chr(i%10000)+letter
+         i=i//10000
+   else:
+      letter="%"+searchTerm
 
    header()
    for (book_id,book_name,book_path,reg_date,book_title,book_genre,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
