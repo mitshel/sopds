@@ -34,7 +34,7 @@ class fb2tag:
 
    def setvalue(self,value):
        if (self.index+1)==self.size:
-          self.values.append(value)
+          self.values.append(repr(value))
 
    def getvalue(self): 
        return self.values
@@ -49,13 +49,16 @@ class fb2tag:
 class fb2cover(fb2tag):
    def __init__(self,tags):
        self.iscover=False
-       self.cover_name='cover.jpg'
-       self.cover_data='';
+       self.cover_name=''
+       self.cover_data=''
+       self.isfind=False
        fb2tag.__init__(self,tags)
 
    def reset(self):
        self.iscover=False
-       self.cover_data='';
+       self.cover_name=''
+       self.cover_data=''
+       self.isfind=False
        fb2tag.reset(self)
 
    def tagopen(self,tag,attrs=[]):
@@ -69,7 +72,9 @@ class fb2cover(fb2tag):
        return result
 
    def tagclose(self,tag):
-       self.iscover=False
+       if self.iscover:
+          self.isfind=True
+          self.iscover=False
        fb2tag.tagclose(self,tag)
 
    def setcovername(self,cover_name):
@@ -79,7 +84,7 @@ class fb2cover(fb2tag):
 
    def add_data(self,data):
        if self.iscover:
-          new_data=data.strip("'")
+          new_data=repr(data).strip("'")
           if new_data!='\\n':
              self.cover_data+=new_data
 
@@ -109,9 +114,6 @@ class fb2parser:
        if self.rc!=0:
           self.cover_name.reset()
           self.cover_image.reset()
-
-   def xmldecl(self,version, encoding, standalone):
-       pass
 
    def start_element(self,name,attrs):
        name=name.lower()
@@ -147,6 +149,8 @@ class fb2parser:
              self.cover_name.tagclose(name)
        if self.rc!=0:
           self.cover_image.tagclose(name)
+          if self.cover_image.isfind:
+             raise StopIteration
 
        #Выравниваем количество last_name и first_name
        if name=='author': 
@@ -157,25 +161,26 @@ class fb2parser:
 
        if name==self.stoptag:
           if self.rc!=0:
-             self.process_description=False
+             if self.cover_image.cover_name == '':
+                raise StopIteration
+             else:
+                self.process_description=False
           else:
              raise StopIteration
-  
+
    def char_data(self,data):
-       value=repr(data)
        if self.process_description:
-          self.author_first.setvalue(value)
-          self.author_last.setvalue(value)
-          self.genre.setvalue(value)
-          self.lang.setvalue(value)
-          self.book_title.setvalue(value)
+          self.author_first.setvalue(data)
+          self.author_last.setvalue(data)
+          self.genre.setvalue(data)
+          self.lang.setvalue(data)
+          self.book_title.setvalue(data)
        if self.rc!=0:
-          self.cover_image.add_data(value)
+          self.cover_image.add_data(data)
 
    def parse(self,f,hsize=0):
        self.reset()
        parser = xml.parsers.expat.ParserCreate()
-       parser.XmlDeclHandler = self.xmldecl
        parser.StartElementHandler = self.start_element
        parser.EndElementHandler = self.end_element
        parser.CharacterDataHandler = self.char_data 
