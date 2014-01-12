@@ -449,7 +449,7 @@ elif type_value==8:
       fo.close()
    elif cat_type==sopdsdb.CAT_ZIP:
       fz=codecs.open(full_path.encode("utf-8"), "rb")
-      z = zipf.ZipFile(fz, 'r', codepage=cfg.ZIP_CODEPAGE)
+      z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
       book_size=z.getinfo(book_name).file_size
       enc_print('Content-Length: '+str(book_size))
       enc_print()
@@ -486,7 +486,7 @@ elif type_value==9:
       sys.stdout.buffer.write(buf)
    elif cat_type==sopdsdb.CAT_ZIP:
       fz=codecs.open(full_path.encode("utf-8"), "rb")
-      zi = zipf.ZipFile(fz, 'r', codepage=cfg.ZIP_CODEPAGE)
+      zi = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
       fo= zi.open(book_name)
       str=fo.read()
       fo.close()
@@ -523,7 +523,7 @@ elif type_value==99:
          fo.close()
       elif cat_type==sopdsdb.CAT_ZIP:
          fz=codecs.open(full_path.encode("utf-8"), "rb")
-         z = zipf.ZipFile(fz, 'r', codepage=cfg.ZIP_CODEPAGE)
+         z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
          fo = z.open(book_name)
          fb2.parse(fo,0)
          fo.close()

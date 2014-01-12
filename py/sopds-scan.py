@@ -88,7 +88,7 @@ def create_cover(book_id,fb2,opdsdb):
           img.close()
     opdsdb.addcover(book_id,fn,ictype)
 
-def processfile(db,fb2,name,full_path,file,archive=0,file_size=0):
+def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
     global books_added
     global books_skipped
     global books_in_archives
@@ -102,7 +102,8 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0):
        
        fb2.reset()
        if db.findbook(name,rel_path)==0:
-          cat_id=db.addcattree(rel_path,archive)
+          if archive==0:
+             cat_id=db.addcattree(rel_path,archive)
           title=''
           genre=''
           lang=''
@@ -132,7 +133,10 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0):
           books_added+=1
           
           if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_EXTRACT:
-             create_cover(book_id,fb2,opdsdb)
+             try:
+               create_cover(book_id,fb2,opdsdb)
+             except:
+               print('Error extract cover from file:',name) 
           
           if archive==1:
              books_in_archives+=1
@@ -158,16 +162,17 @@ def processzip(db,fb2,name,full_path,file):
     rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
     rel_file=os.path.join(rel_path,name)
     if cfg.ZIPRESCAN or db.zipisscanned(rel_file)==0:
-       z = zipf.ZipFile(file, 'r', codepage=cfg.ZIP_CODEPAGE)
+       cat_id=db.addcattree(rel_path,1)
+       z = zipf.ZipFile(file, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
        filelist = z.namelist()
        for n in filelist:
            try:
                if VERBOSE:
                   print('Start process ZIPped file: ',file,' file: ',n)
                file_size=z.getinfo(n).file_size
-               processfile(db,fb2,n,file,z.open(n),1,file_size)
+               processfile(db,fb2,n,file,z.open(n),1,file_size,cat_id=cat_id)
            except:
-               print('Error processing zip atchive:',file,' file: ',n)
+               print('Error processing zip archive:',file,' file: ',n)
        z.close()
        arch_scanned+=1
     else:

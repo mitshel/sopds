@@ -32,10 +32,10 @@ create table catalogs (
 cat_id INT not null AUTO_INCREMENT,
 parent_id INT null,
 cat_name VARCHAR(64),
-path VARCHAR(512),
+path VARCHAR(1024),
 cat_type INT not null DEFAULT 0,
 PRIMARY KEY(cat_id),
-KEY(cat_name,path));
+KEY(cat_name));
 
 create table tags (
 tag_id INT not null AUTO_INCREMENT,
@@ -64,7 +64,4 @@ PRIMARY KEY(book_id,author_id));
 insert into authors(author_id,last_name) values(1,"Неизвестный Автор");
 
 commit;
-
-
-
 

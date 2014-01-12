@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "create table genres("
+echo "genre VARCHAR(32),"
+echo "section VARCHAR(32),"
+echo "subsection VARCHAR(32),"
+echo "PRIMARY KEY(genre));"
+echo "commit;"
+echo
+cat genres.txt | grep -v '#' | awk -F'-' '{gsub(/^ +| +$/,"",$1)} {gsub(/^ +| +$/,"",$2)} {gsub(/^ +| +$/,"",$3)} {print "insert into genres(genre,section,subsection) values(\""$1"\",\""$2"\",\""$3"\");"}'
+echo "commit;"
+
