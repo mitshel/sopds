@@ -402,7 +402,7 @@ elif type_value==7:
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="sopds.cgi?id=0" title="'+cfg.SITE_MAINTITLE+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
-   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    id='08'+str(slice_value)
    idzip='09'+str(slice_value)
    enc_print('<entry>')
@@ -417,7 +417,7 @@ elif type_value==7:
        if len(authors)>0:
              authors+=', '
        authors+=last_name+' '+first_name
-   enc_print('<content type="text">'+title+' Автор(ы): '+authors+'</content>')
+   enc_print('<content type="text"> Название книги: '+title+'\nАвтор(ы): '+authors+'\nРазмер файла : '+str(fsize%1000)+'Кб</content>')
    
    enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<id>tag:book:'+id+'</id>')
@@ -431,7 +431,7 @@ elif type_value==7:
 elif type_value==8:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    transname=translit(book_name)
    # HTTP Header
@@ -467,7 +467,7 @@ elif type_value==8:
 elif type_value==9:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    transname=translit(book_name)
    # HTTP Header
@@ -511,7 +511,7 @@ elif type_value==9:
 elif type_value==99:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
    opdsdb.openDB()
-   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    c0=0
    if format=='fb2':
       full_path=os.path.join(cfg.ROOT_LIB,book_path)
@@ -531,13 +531,16 @@ elif type_value==99:
          fz.close()
 
       if len(fb2.cover_image.cover_data)>0:
-         s=fb2.cover_image.cover_data
-         dstr=base64.b64decode(s)
-         ictype=fb2.cover_image.getattr('content-type')
-         enc_print('Content-Type:'+ictype)
-         enc_print()
-         sys.stdout.buffer.write(dstr)
-         c0=1
+         try:
+           s=fb2.cover_image.cover_data
+           dstr=base64.b64decode(s)
+           ictype=fb2.cover_image.getattr('content-type')
+           enc_print('Content-Type:'+ictype)
+           enc_print()
+           sys.stdout.buffer.write(dstr)
+           c0=1
+         except:
+           c0=0
 
    if c0==0: 
       print('Status: 404 Not Found')
