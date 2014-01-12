@@ -32,7 +32,7 @@ create table catalogs (
 cat_id INT not null AUTO_INCREMENT,
 parent_id INT null,
 cat_name VARCHAR(64),
-path VARCHAR(1024),
+path VARCHAR(512),
 cat_type INT not null DEFAULT 0,
 PRIMARY KEY(cat_id),
 KEY(cat_name,path));
