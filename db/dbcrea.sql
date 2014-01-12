@@ -13,7 +13,6 @@ filesize INT not null DEFAULT 0,
 format VARCHAR(8),
 cat_id INT not null,
 cat_type INT not null DEFAULT 0,
-cat_tree VARCHAR(512),
 registerdate TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP,
 favorite INT not null DEFAULT 0,
 genre VARCHAR(32),
@@ -24,7 +23,6 @@ cover_type VARCHAR(32),
 doublicat INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
-KEY(cat_tree),
 KEY(genre),
 KEY(title));
 
@@ -36,18 +34,6 @@ path VARCHAR(1024),
 cat_type INT not null DEFAULT 0,
 PRIMARY KEY(cat_id),
 KEY(cat_name));
-
-create table tags (
-tag_id INT not null AUTO_INCREMENT,
-tag_type INT not null DEFAULT 0,
-tag VARCHAR(64),
-PRIMARY KEY(tag_id),
-KEY(tag));
-
-create table btags (
-tag_id INT not null,
-book_id INT not null,
-PRIMARY KEY(book_id,tag_id));
 
 create table authors (
 author_id INT not null AUTO_INCREMENT,
