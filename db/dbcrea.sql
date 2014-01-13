@@ -15,7 +15,6 @@ cat_id INT not null,
 cat_type INT not null DEFAULT 0,
 registerdate TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP,
 favorite INT not null DEFAULT 0,
-genre VARCHAR(32),
 lang  VARCHAR(16),
 title VARCHAR(256),
 cover VARCHAR(32),
@@ -23,7 +22,6 @@ cover_type VARCHAR(32),
 doublicat INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
-KEY(genre),
 KEY(title));
 
 create table catalogs (

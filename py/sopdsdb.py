@@ -11,11 +11,11 @@ from mysql.connector import errorcode
 #
 DB_PREFIX=""
 TBL_BOOKS=DB_PREFIX+"books"
-TBL_TAGS=DB_PREFIX+"tags"
-TBL_BTAGS=DB_PREFIX+"btags"
 TBL_CATALOGS=DB_PREFIX+"catalogs"
 TBL_AUTHORS=DB_PREFIX+"authors"
 TBL_BAUTHORS=DB_PREFIX+"bauthors"
+TBL_GENRES=DB_PREFIX+"genres"
+TBL_BGENRES=DB_PREFIX+"bgenres"
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -23,6 +23,12 @@ TBL_BAUTHORS=DB_PREFIX+"bauthors"
 CAT_NORMAL=0
 CAT_ZIP=1
 CAT_GZ=2
+
+##########################################################################
+# разные константы
+#
+unknown_genre='Неизвестный жанр'
+
 
 ###########################################################################
 # Класс доступа к  MYSQL
@@ -79,18 +85,6 @@ class opdsDatabase:
     self.err=""
     self.errcode=0
 
-  def findtag(self,tag):
-    sql_findtag=("select tag_id from "+TBL_TAGS+" where tag='"+tag+"'")
-    cursor=self.cnx.cursor()
-    cursor.execute(sql_findtag)
-    row=cursor.fetchone()
-    if row==None:
-       tag_id=0
-    else:
-       tag_id=row[0]
-    cursor.close()
-    return tag_id
-
   def findbook(self, name, path):
     sql_findbook=("select book_id from "+TBL_BOOKS+" where filename=%s and path=%s")
     data_findbook=(name,path)
@@ -117,17 +111,7 @@ class opdsDatabase:
     cursor.close()
     return book_id
 
-  def findbtag(self, book_id, tag_id):
-    sql_findbtag=("select book_id from "+TBL_BTAGS+" where book_id=%s and tag_id=%s")
-    data_findbtag=(book_id,tag_id)
-    cursor=self.cnx.cursor()
-    cursor.execute(sql_findbtag,data_findbtag)
-    row=cursor.fetchone()
-    result=(row!=None)
-    cursor.close()
-    return result
- 
-  def addbook(self, name, path, cat_id, exten, title, genre, lang, size=0, archive=0, doublicates=0):
+  def addbook(self, name, path, cat_id, exten, title, lang, size=0, archive=0, doublicates=0):
     book_id=self.findbook(name,path)
     if book_id!=0:
        return book_id
@@ -137,8 +121,8 @@ class opdsDatabase:
        doublicat=self.finddouble(title,format,size)
     else:
        doublicat=0
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,genre,lang,cat_type,doublicat) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
-    data_addbook=(name,path,cat_id,size,format,title,genre,lang,archive,doublicat)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,lang,cat_type,doublicat) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data_addbook=(name,path,cat_id,size,format,title,lang,archive,doublicat)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
@@ -154,28 +138,6 @@ class opdsDatabase:
     self.cnx.commit()
     cursor.close()
     
-  def addtag(self, tag, tag_type=0):
-    tag_id=self.findtag(tag)
-    if tag_id!=0:
-       return tag_id
-    sql_addtag=("insert into "+TBL_TAGS+"(tag,tag_type) VALUES(%s,%s)")
-    data_addtag=(tag,tag_type)
-    cursor=self.cnx.cursor()
-    cursor.execute(sql_addtag,data_addtag)
-    tag_id=cursor.lastrowid
-    self.cnx.commit()
-    cursor.close()
-    return tag_id
-
-  def addbtag(self, book_id, tag_id):
-    if not self.findbtag(book_id,tag_id):
-       sql_addbtag=("insert into "+TBL_BTAGS+"(book_id,tag_id) VALUES(%s,%s)")
-       data_addbtag=(book_id,tag_id)
-       cursor=self.cnx.cursor()
-       cursor.execute(sql_addbtag,data_addbtag)
-       self.cnx.commit()
-       cursor.close()
-
   def findauthor(self,first_name,last_name):
     sql_findauthor=("select author_id from "+TBL_AUTHORS+" where LOWER(first_name)=%s and LOWER(last_name)=%s")
     data_findauthor=(first_name.lower(),last_name.lower())
@@ -213,13 +175,65 @@ class opdsDatabase:
     return author_id
 
   def addbauthor(self, book_id, author_id):
-    if not self.findbauthor(book_id,author_id):
+#    if not self.findbauthor(book_id,author_id):
        sql_addbauthor=("insert into "+TBL_BAUTHORS+"(book_id,author_id) VALUES(%s,%s)")
        data_addbauthor=(book_id,author_id)
        cursor=self.cnx.cursor()
-       cursor.execute(sql_addbauthor,data_addbauthor)
-       self.cnx.commit()
-       cursor.close()
+       try:
+         cursor.execute(sql_addbauthor,data_addbauthor)
+         self.cnx.commit()
+       except:
+         pass
+       finally:
+         cursor.close()
+
+  def findgenre(self,genre):
+    sql=("select genre_id from "+TBL_GENRES+" where LOWER(genre)='"+genre+"'")
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    row=cursor.fetchone()
+    if row==None:
+       genre_id=0
+    else:
+       genre_id=row[0]
+    cursor.close()
+    return genre_id
+
+  def findbgenre(self, book_id, genre_id):
+    sql=("select book_id from "+TBL_BGENRES+" where book_id=%s and genre_id=%s")
+    data=(book_id,genre_id)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    row=cursor.fetchone()
+    result=(row!=None)
+    cursor.close()
+    return result
+
+  def addgenre(self, genre):
+    genre_id=self.findgenre(genre)
+    if genre_id!=0:
+       return genre_id
+    sql=("insert into "+TBL_GENRES+"(genre,section,subsection) VALUES(%s,%s,%s)")
+    data=(genre,genre,unknown_genre)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    genre_id=cursor.lastrowid
+    self.cnx.commit()
+    cursor.close()
+    return genre_id
+
+  def addbgenre(self, book_id, genre_id):
+#    if not self.findbgenre(book_id,genre_id):
+       sql=("insert into "+TBL_BGENRES+"(book_id,genre_id) VALUES(%s,%s)")
+       data=(book_id,genre_id)
+       cursor=self.cnx.cursor()
+       try:
+         cursor.execute(sql,data)
+         self.cnx.commit()
+       except:
+         pass
+       finally:
+         cursor.close()
 
   def findcat(self, catalog):
     (head,tail)=os.path.split(catalog)
@@ -313,14 +327,6 @@ class opdsDatabase:
     cursor.close
     return rows
 
-#  def getauthor_letters(self):
-#    sql="select UPPER(substring(last_name,1,1)) as letter, count(*) as cnt from "+TBL_AUTHORS+" group by 1 order by 1"
-#    cursor=self.cnx.cursor()
-#    cursor.execute(sql)
-#    rows=cursor.fetchall()
-#    cursor.close
-#    return rows
-
   def getauthor_2letters(self,letters):
     lc=len(letters)+1
     sql="select UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc-1)+"))='"+letters+"' group by 1 order by 1"
@@ -329,14 +335,6 @@ class opdsDatabase:
     rows=cursor.fetchall()
     cursor.close
     return rows
-
-#  def gettitle_letters(self):
-#    sql="select UPPER(substring(title,1,1)) as letter, count(*) as cnt from "+TBL_BOOKS+" group by 1 order by 1"
-#    cursor=self.cnx.cursor()
-#    cursor.execute(sql)
-#    rows=cursor.fetchall()
-#    cursor.close
-#    return rows
 
   def gettitle_2letters(self,letters,doublicates=True):
     if doublicates:

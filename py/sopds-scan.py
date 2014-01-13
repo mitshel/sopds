@@ -105,7 +105,6 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
           if archive==0:
              cat_id=db.addcattree(rel_path,archive)
           title=''
-          genre=''
           lang=''
 
           if e.lower()=='.fb2' and cfg.FB2PARSE:
@@ -115,8 +114,6 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
                 f=file
              fb2.parse(f,cfg.FB2HSIZE)
              f.close()
-             if len(fb2.genre.getvalue())>0:
-                genre=fb2.genre.getvalue()[0].strip(' \'\"')
              if len(fb2.lang.getvalue())>0:
                 lang=fb2.lang.getvalue()[0].strip(' \'\"')
              if len(fb2.book_title.getvalue())>0:
@@ -129,7 +126,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
           if title=='':
              title=n
 
-          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,genre,lang,file_size,archive,cfg.DUBLICATES_FIND)
+          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,lang,file_size,archive,cfg.DUBLICATES_FIND)
           books_added+=1
           
           if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_EXTRACT:
@@ -150,6 +147,10 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
               author_id=opdsdb.addauthor(first_name,last_name)
               opdsdb.addbauthor(book_id,author_id)
               idx+=1
+
+          for l in fb2.genre.getvalue():
+              opdsdb.addbgenre(book_id,opdsdb.addgenre(l.lower().strip(' \'\"')))
+
        else:
           books_skipped+=1
           if VERBOSE:
