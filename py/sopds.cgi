@@ -543,8 +543,15 @@ elif type_value==99:
            c0=0
 
    if c0==0: 
-      print('Status: 404 Not Found')
-      print()
+#      print('Status: 404 Not Found')
+#      print()
+      enc_print('Content-Type: image/jpeg')
+      enc_print()
+      f=open('sopds.jpg',"rb")
+      sys.stdout.buffer.write(f.read())
+      f.close()
+
+      
 
    opdsdb.closeDB()
 
