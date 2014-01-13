@@ -434,15 +434,15 @@ class opdsDatabase:
     return rows
 
   def getgenres_sections(self):
-    sql="select a.section, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id group by a.section order by a.section"
+    sql="select min(a.genre_id), a.section, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id group by a.section order by a.section"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
 
-  def getgenres_subsections(self,section_name):
-    sql="select a.genre_id, a.subsection, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id and section='"+section_name+"' group by a.subsection order by a.subsection"
+  def getgenres_subsections(self,section_id):
+    sql="select a.genre_id, a.subsection, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id and section in (select section from "+TBL_GENRES+" where genre_id="+str(section_id)+") group by a.subsection order by a.subsection"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

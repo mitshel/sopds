@@ -140,8 +140,6 @@ if 'search' in form:
    type_value=10
    slice_value=-1
    id_value='10&amp;search='+searchTerm
-if 'section' in form:
-   section=form.getvalue("section","")
 
 if type_value==0:
    header()
@@ -311,8 +309,8 @@ elif type_value==11:
    opdsdb.openDB()
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
-   for (genre_section,cnt) in opdsdb.getgenres_sections():
-       id='12&amp;section='+genre_section
+   for (genre_id,genre_section,cnt) in opdsdb.getgenres_sections():
+       id='12'+str(genre_id)
        enc_print('<entry>')
        enc_print('<title>'+genre_section+'</title>')
        enc_print('<id>sopds.cgi?id='+id_value+'</id>')
@@ -331,7 +329,7 @@ elif type_value==12:
    opdsdb.openDB()
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="sopds.cgi?id=00"/>')
-   for (genre_id,genre_subsection,cnt) in opdsdb.getgenres_subsections(section):
+   for (genre_id,genre_subsection,cnt) in opdsdb.getgenres_subsections(slice_value):
        id='13'+str(genre_id)
        enc_print('<entry>')
        enc_print('<title>'+genre_subsection+'</title>')
