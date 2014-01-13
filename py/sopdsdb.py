@@ -295,8 +295,8 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title, '' as genre from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
-    "select 2,book_id,filename,path,registerdate,title,genre from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,6 "+limitstr)
+    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
+    "select 2,book_id,filename,path,registerdate,title from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,6 "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_finditems)
     rows=cursor.fetchall()
@@ -358,7 +358,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,genre,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" order by title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" order by title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -406,7 +406,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.genre,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" order by a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" order by a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -433,11 +433,43 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getgenres(self):
-    sql="select lower(genre), count(*) from "+TBL_BOOKS+" group by 1 order by 1"
+  def getgenres_sections(self):
+    sql="select a.section, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id group by a.section order by a.section"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
+    cursor.close
+    return rows
+
+  def getgenres_subsections(self,section_name):
+    sql="select a.genre_id, a.subsection, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id and section='"+section_name+"' group by a.subsection order by a.subsection"
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
+
+  def getbooksforgenre(self,genre_id,limit=0,page=0,doublicates=True):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates:
+       dstr=''
+    else:
+       dstr=' and a.doublicat=0 '
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" order by a.title "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
     cursor.close
     return rows
 
