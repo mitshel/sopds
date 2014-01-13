@@ -214,7 +214,7 @@ class opdsDatabase:
     if genre_id!=0:
        return genre_id
     sql=("insert into "+TBL_GENRES+"(genre,section,subsection) VALUES(%s,%s,%s)")
-    data=(genre,genre,unknown_genre)
+    data=(genre,unknown_genre,genre)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     genre_id=cursor.lastrowid
