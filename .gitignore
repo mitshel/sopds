@@ -7,3 +7,4 @@ py/man.zip
 py/ziptest.py
 py/fb2parse.py
 py/b64decode.py
+py/*.log

@@ -417,7 +417,7 @@ elif type_value==7:
        if len(authors)>0:
              authors+=', '
        authors+=last_name+' '+first_name
-   enc_print('<content type="text"> Название книги: '+title+'\nАвтор(ы): '+authors+'\nРазмер файла : '+str(fsize%1000)+'Кб</content>')
+   enc_print('<content type="text"> Название книги: '+title+'\nАвтор(ы): '+authors+'\nРазмер файла : '+str(fsize//1000)+'Кб</content>')
    
    enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<id>tag:book:'+id+'</id>')

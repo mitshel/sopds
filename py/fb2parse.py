@@ -11,7 +11,7 @@ print(parser.author_first.getvalue(), parser.author_last.getvalue(), parser.genr
 i=0
 print(parser.cover_image.cover_data)
 jpg=open('image.jpg','wb')
-sstr=parser.cover_image.cover_data.strip("' =")
+sstr=parser.cover_image.cover_data.strip("' ")
 dstr=base64.b64decode(sstr)
 jpg.write(dstr)
 jpg.close()
