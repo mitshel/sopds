@@ -547,7 +547,7 @@ elif type_value==99:
 #      print()
       enc_print('Content-Type: image/jpeg')
       enc_print()
-      f=open('sopds.jpg',"rb")
+      f=open('nocover.jpg',"rb")
       sys.stdout.buffer.write(f.read())
       f.close()
 
