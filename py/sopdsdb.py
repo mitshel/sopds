@@ -458,7 +458,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" order by a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" order by a.lang desc, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

@@ -13,6 +13,7 @@ CFG_FILENAME='sopds.conf'
 CFG_PATH_DEFAULT=ROOT_PATH+os.path.sep+'conf'+os.path.sep+CFG_FILENAME
 CFG_PATH=CFG_PATH_DEFAULT
 COVER_PATH=os.path.join(ROOT_PATH,'covers')
+NOCOVER_IMG='nocover.jpg'
 
 ###########################################################################
 # Считываем конфигурацию из конфигурационного файла

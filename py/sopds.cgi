@@ -618,15 +618,15 @@ elif type_value==99:
            c0=0
 
    if c0==0: 
-#      print('Status: 404 Not Found')
-#      print()
-      enc_print('Content-Type: image/jpeg')
-      enc_print()
-      f=open('nocover.jpg',"rb")
-      sys.stdout.buffer.write(f.read())
-      f.close()
-
-      
+      if os.path.exists(cfg.NOCOVER_IMG):
+         enc_print('Content-Type: image/jpeg')
+         enc_print()
+         f=open(cfg.NOCOVER_IMG,"rb")
+         sys.stdout.buffer.write(f.read())
+         f.close()
+      else:
+         print('Status: 404 Not Found')
+         print()
 
    opdsdb.closeDB()
 
