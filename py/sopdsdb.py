@@ -327,6 +327,14 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getgenres(self,book_id):
+    sql=("select section, subsection from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where b.genre_id=a.genre_id and b.book_id="+str(book_id))
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
+
   def getauthor_2letters(self,letters):
     lc=len(letters)+1
     sql="select UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc-1)+"))='"+letters+"' group by 1 order by 1"

@@ -492,7 +492,14 @@ elif type_value==7:
        if len(authors)>0:
              authors+=', '
        authors+=last_name+' '+first_name
-   enc_print('<content type="text"> Название книги: '+title+'\nАвтор(ы): '+authors+'\nРазмер файла : '+str(fsize//1000)+'Кб</content>')
+   genres=""
+   for (section,genre) in opdsdb.getgenres(slice_value):
+       enc_print('<category term="%s" label="%s" />'%(genre,genre))
+       if len(genres)>0:
+             genres+=', '
+       genres+=genre
+
+   enc_print('<content type="text"> Название книги: '+title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nРазмер файла : '+str(fsize//1000)+'Кб</content>')
    
    enc_print('<updated>'+reg_date.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<id>tag:book:'+id+'</id>')
@@ -618,10 +625,10 @@ elif type_value==99:
            c0=0
 
    if c0==0: 
-      if os.path.exists(cfg.NOCOVER_IMG):
+      if os.path.exists(sopdscfg.NOCOVER_IMG):
          enc_print('Content-Type: image/jpeg')
          enc_print()
-         f=open(cfg.NOCOVER_IMG,"rb")
+         f=open(sopdscfg.NOCOVER_IMG,"rb")
          sys.stdout.buffer.write(f.read())
          f.close()
       else:
