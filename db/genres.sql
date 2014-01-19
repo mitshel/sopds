@@ -1,4 +1,6 @@
 use sopds;
+SET NAMES 'utf8';
+SET CHARACTER SET utf8;
 drop table if exists genres;
 drop table if exists bgenres;
 commit;

@@ -1,6 +1,8 @@
 #!/bin/bash
 
 echo "use sopds;"
+echo "SET NAMES 'utf8';"
+echo "SET CHARACTER SET utf8;"
 echo "drop table if exists genres;"
 echo "drop table if exists bgenres;"
 echo "commit;"
