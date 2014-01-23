@@ -4,6 +4,8 @@ create database sopds;
 alter database sopds CHARSET utf8;
 grant select,insert,update,delete on sopds.* to 'sopds'@'localhost' identified by 'sopds';
 use sopds;
+SET NAMES 'utf8';
+SET CHARACTER SET utf8;
 
 create table books (
 book_id INT not null AUTO_INCREMENT,
@@ -17,9 +19,11 @@ registerdate TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP,
 favorite INT not null DEFAULT 0,
 lang  VARCHAR(16),
 title VARCHAR(256),
+annotation VARCHAR(4096),
 cover VARCHAR(32),
 cover_type VARCHAR(32),
 doublicat INT not null DEFAULT 0,
+avail INT not null, DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
 KEY(title));
