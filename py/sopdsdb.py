@@ -111,7 +111,7 @@ class opdsDatabase:
     cursor.close()
     return book_id
 
-  def addbook(self, name, path, cat_id, exten, title, lang, size=0, archive=0, doublicates=0):
+  def addbook(self, name, path, cat_id, exten, title, annotation, lang, size=0, archive=0, doublicates=0):
     book_id=self.findbook(name,path)
     if book_id!=0:
        return book_id
@@ -121,8 +121,8 @@ class opdsDatabase:
        doublicat=self.finddouble(title,format,size)
     else:
        doublicat=0
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,lang,cat_type,doublicat) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)")
-    data_addbook=(name,path,cat_id,size,format,title,lang,archive,doublicat)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,lang,cat_type,doublicat) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    data_addbook=(name,path,cat_id,size,format,title,annotation,lang,archive,doublicat)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
@@ -312,7 +312,7 @@ class opdsDatabase:
     return rows
 
   def getbook(self,book_id):
-    sql_getbook=("select filename, path, registerdate, format, title, cat_type, cover, cover_type, filesize from "+TBL_BOOKS+" where book_id="+str(book_id))
+    sql_getbook=("select filename, path, registerdate, format, title, annotation, cat_type, cover, cover_type, filesize from "+TBL_BOOKS+" where book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql_getbook)
     row=cursor.fetchone()

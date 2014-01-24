@@ -34,10 +34,16 @@ class fb2tag:
 
    def setvalue(self,value):
        if (self.index+1)==self.size:
-          self.values.append(repr(value))
+          self.values.append(value)
 
    def getvalue(self): 
        return self.values
+
+   def gettext(self,divider='\n'):
+       result=''
+       if len(self.values)>0:
+          result=divider.join(self.values)
+       return result
 
    def getattr(self, attr):
        if len(self.attrs)>0:
@@ -84,9 +90,11 @@ class fb2cover(fb2tag):
 
    def add_data(self,data):
        if self.iscover:
-          new_data=repr(data).strip("'")
-          if new_data!='\\n':
-             self.cover_data+=new_data
+#          new_data=repr(data).strip("'")
+#          if new_data!='\\n':
+#             self.cover_data+=new_data
+          if data!='\\n':
+             self.cover_data+=data
 
 class fb2parser:
    def __init__(self, readcover=0):
@@ -96,6 +104,7 @@ class fb2parser:
        self.genre=fb2tag(('description','title-info','genre'))
        self.lang=fb2tag(('description','title-info','lang'))
        self.book_title=fb2tag(('description','title-info','book-title'))
+       self.annotation=fb2tag(('description','title-info','annotation','p'))
        if self.rc!=0:
           self.cover_name = fb2tag (('description','coverpage','image'))
           self.cover_image = fb2cover (('fictionbook','binary'));
@@ -111,6 +120,7 @@ class fb2parser:
        self.genre.reset()
        self.lang.reset()
        self.book_title.reset()
+       self.annotation.reset()
        if self.rc!=0:
           self.cover_name.reset()
           self.cover_image.reset()
@@ -123,6 +133,7 @@ class fb2parser:
           self.genre.tagopen(name)
           self.lang.tagopen(name)
           self.book_title.tagopen(name)
+          self.annotation.tagopen(name)
           if self.rc!=0:
              if self.cover_name.tagopen(name,attrs):
                 cover_name=self.cover_name.getattr('l:href')
@@ -145,6 +156,7 @@ class fb2parser:
           self.genre.tagclose(name)
           self.lang.tagclose(name)
           self.book_title.tagclose(name)
+          self.annotation.tagclose(name)
           if self.rc!=0:
              self.cover_name.tagclose(name)
        if self.rc!=0:
@@ -175,6 +187,7 @@ class fb2parser:
           self.genre.setvalue(data)
           self.lang.setvalue(data)
           self.book_title.setvalue(data)
+          self.annotation.setvalue(data)
        if self.rc!=0:
           self.cover_image.add_data(data)
 

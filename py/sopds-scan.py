@@ -26,7 +26,7 @@ from sys import argv
 
 t1=datetime.timedelta(seconds=time.time())
 
-parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version 0.05", add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
+parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version 0.07", add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
 parser.add_option('-s','--scan','--scanfull', action='store_true', dest='scanfull', default=True, help='Full rescan all stored files.')
 parser.add_option('-l','--scanlast', action='store_false', dest='scanfull', default=True, help='Scan files from date after last scan.')
 parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
@@ -53,6 +53,7 @@ books_added   = 0
 books_skipped = 0
 arch_scanned = 0
 arch_skipped = 0
+bad_archives = 0
 books_in_archives = 0
 
 #############################################################################
@@ -106,6 +107,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
              cat_id=db.addcattree(rel_path,archive)
           title=''
           lang=''
+          annotation='';
 
           if e.lower()=='.fb2' and cfg.FB2PARSE:
              if isinstance(file, str):
@@ -118,6 +120,9 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
                 lang=fb2.lang.getvalue()[0].strip(' \'\"')
              if len(fb2.book_title.getvalue())>0:
                 title=fb2.book_title.getvalue()[0].strip(' \'\"\&()-.#[]\\\`')
+             if len(fb2.annotation.getvalue())>0:
+                annotation='\n'.join(fb2.annotation.getvalue())
+             
              
              if VERBOSE:
                 if fb2.parse_error!=0:
@@ -126,7 +131,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
           if title=='':
              title=n
 
-          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,lang,file_size,archive,cfg.DUBLICATES_FIND)
+          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,lang,file_size,archive,cfg.DUBLICATES_FIND)
           books_added+=1
           
           if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_EXTRACT:
@@ -159,28 +164,32 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
 def processzip(db,fb2,name,full_path,file):
     global arch_scanned
     global arch_skipped
+    global bad_archives
 
     rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
     rel_file=os.path.join(rel_path,name)
     if cfg.ZIPRESCAN or db.zipisscanned(rel_file)==0:
        cat_id=db.addcattree(rel_path,1)
-       z = zipf.ZipFile(file, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
-       filelist = z.namelist()
-       for n in filelist:
-           try:
-               if VERBOSE:
-                  print('Start process ZIPped file: ',file,' file: ',n)
-               file_size=z.getinfo(n).file_size
-               processfile(db,fb2,n,file,z.open(n),1,file_size,cat_id=cat_id)
-           except:
-               print('Error processing zip archive:',file,' file: ',n)
-       z.close()
-       arch_scanned+=1
+       try:
+          z = zipf.ZipFile(file, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+          filelist = z.namelist()
+          for n in filelist:
+              try:
+                  if VERBOSE:
+                     print('Start process ZIPped file: ',file,' file: ',n)
+                  file_size=z.getinfo(n).file_size
+                  processfile(db,fb2,n,file,z.open(n),1,file_size,cat_id=cat_id)
+              except:
+                  print('Error processing zip archive:',file,' file: ',n)
+          z.close()
+          arch_scanned+=1
+       except:
+          print('Error while read ZIP archive. File '+file+' corrupt.')
+          bad_archives+=1
     else:
        arch_skipped+=1
        if VERBOSE:
           print('Skip ZIP archive: ',rel_file,'. Already scanned.')
-
 
 ###########################################################################
 # Основной код программы
@@ -220,6 +229,7 @@ print('Books skipped    : ',books_skipped)
 print('Books in archives: ',books_in_archives)
 print('Archives scanned : ',arch_scanned)
 print('Archives skipped : ',arch_skipped)
+print('Bad archives     : ',bad_archives)
 
 t=t2-t1
 seconds=t.seconds%60
