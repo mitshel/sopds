@@ -166,12 +166,9 @@ def processzip(db,fb2,name,full_path,file):
     global arch_skipped
     global bad_archives
 
-#    rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
-#    rel_file=os.path.join(rel_path,name)
-    rel_path=os.path.relpath(file,cfg.ROOT_LIB)
-    rel_file=rel_path
+    rel_file=os.path.relpath(file,cfg.ROOT_LIB)
     if cfg.ZIPRESCAN or db.zipisscanned(rel_file)==0:
-       cat_id=db.addcattree(rel_path,1)
+       cat_id=db.addcattree(rel_file,1)
        try:
           z = zipf.ZipFile(file, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
           filelist = z.namelist()
