@@ -85,7 +85,7 @@ class opdsDatabase:
     self.err=""
     self.errcode=0
 
-  def findbook(self, name, path):
+  def findbook(self, name, path, setavail=0):
     sql_findbook=("select book_id from "+TBL_BOOKS+" where filename=%s and path=%s")
     data_findbook=(name,path)
     cursor=self.cnx.cursor()
@@ -490,6 +490,7 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
+    cursor.close
     return rows
   
   def zipisscanned(self,zipname):
@@ -501,7 +502,33 @@ class opdsDatabase:
        cat_id=0
     else:
        cat_id=row[0]
+    cursor.close
     return cat_id
+
+# Книги где avail=0 уже известно что удалены
+# Книги где avail=2 это только что прверенные существующие книги
+# Устанавливаем avail=1 для книг которые не удалены. Во время проверки если они не удалены им присвоится значение 2
+# Книги с avail=0 проверятся не будут и будут убраны из всех выдач и всех обработок.
+# 
+# три позиции (0,1,2) сделаны для того чтобы сделать возможным корректную работу cgi-скрипта во время сканирования библиотеки
+#
+  def avail_check_prepare(self):
+    sql='update '+TBL_BOOKS+' set avail=1 where avail!=0'
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    cursor.close
+
+  def avail_after_check(self):
+    sql='update '+TBL_BOOKS+' set avail=0 where avail=1'
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    cursor.close
+
+  def update_double(self):
+    sql='call sp_update_dbl()'
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    cursor.close
 
   def __del__(self):
     self.closeDB()

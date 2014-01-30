@@ -198,6 +198,8 @@ opdsdb.openDB()
 if VERBOSE:
    opdsdb.printDBerr()
 
+opdsdb.avail_check_prepare()
+
 if cfg.COVER_EXTRACT:
    if not os.path.isdir(sopdscfg.COVER_PATH):
       os.mkdir(sopdscfg.COVER_PATH)
@@ -219,6 +221,8 @@ for full_path, dirs, files in os.walk(cfg.ROOT_LIB):
        file_size=os.path.getsize(file)
        processfile(opdsdb,fb2parser,name,full_path,file,0,file_size)
 
+opdsdb.avail_after_check()
+opdsdb.update_double()
 opdsdb.closeDB()
 
 t2=datetime.timedelta(seconds=time.time())
