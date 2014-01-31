@@ -28,8 +28,6 @@ class cfgreader:
        config.readfp(codecs.open(self.CONFIGFILE,"r","utf-8"))
 
        CFG_S_GLOBAL='global'
-       self.NAME=config.get(CFG_S_GLOBAL,'name')
-       self.ROOT_URL=config.get(CFG_S_GLOBAL,'root_url')
        self.DB_NAME=config.get(CFG_S_GLOBAL,'db_name')
        self.DB_USER=config.get(CFG_S_GLOBAL,'db_user')
        self.DB_PASS=config.get(CFG_S_GLOBAL,'db_pass')

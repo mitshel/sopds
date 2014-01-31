@@ -2,7 +2,7 @@ drop database sopds;
 commit;
 create database sopds;
 alter database sopds CHARSET utf8;
-grant select,insert,update,delete on sopds.* to 'sopds'@'localhost' identified by 'sopds';
+grant select,insert,update,delete,execute on sopds.* to 'sopds'@'localhost' identified by 'sopds';
 use sopds;
 SET NAMES 'utf8';
 SET CHARACTER SET utf8;

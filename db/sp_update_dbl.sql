@@ -1,3 +1,4 @@
+grant execute on sopds.* to 'sopds'@'localhost' identified by 'sopds';
 DROP PROCEDURE IF EXISTS sp_update_dbl;
 DELIMITER //
 
