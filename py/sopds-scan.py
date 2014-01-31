@@ -51,6 +51,7 @@ if VERBOSE:
 #
 books_added   = 0
 books_skipped = 0
+books_deleted = 0
 arch_scanned = 0
 arch_skipped = 0
 bad_archives = 0
@@ -102,7 +103,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
           print("Attempt to add book: ",rel_path," - ",name,"...",end=" ")
        
        fb2.reset()
-       if db.findbook(name,rel_path)==0:
+       if db.findbook(name,rel_path,1)==0:
           if archive==0:
              cat_id=db.addcattree(rel_path,archive)
           title=''
@@ -167,7 +168,7 @@ def processzip(db,fb2,name,full_path,file):
     global bad_archives
 
     rel_file=os.path.relpath(file,cfg.ROOT_LIB)
-    if cfg.ZIPRESCAN or db.zipisscanned(rel_file)==0:
+    if cfg.ZIPRESCAN or db.zipisscanned(rel_file,1)==0:
        cat_id=db.addcattree(rel_file,1)
        try:
           z = zipf.ZipFile(file, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
@@ -221,7 +222,11 @@ for full_path, dirs, files in os.walk(cfg.ROOT_LIB):
        file_size=os.path.getsize(file)
        processfile(opdsdb,fb2parser,name,full_path,file,0,file_size)
 
-opdsdb.avail_after_check()
+opdsdb.commit()
+if cfg.DELETE_LOGICAL:
+   books_deleted=opdsdb.books_del_logical()
+else:
+   books_deleted=opdsdb.books_del_phisical()
 opdsdb.update_double()
 opdsdb.closeDB()
 
@@ -229,6 +234,10 @@ t2=datetime.timedelta(seconds=time.time())
 print()
 print('Books added      : ',books_added)
 print('Books skipped    : ',books_skipped)
+if cfg.DELETE_LOGICAL:
+   print('Books deleted    : ',books_deleted)
+else:
+   print('Books DB entries deleted : ',books_deleted)
 print('Books in archives: ',books_in_archives)
 print('Archives scanned : ',arch_scanned)
 print('Archives skipped : ',arch_skipped)

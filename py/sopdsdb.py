@@ -86,20 +86,27 @@ class opdsDatabase:
     self.errcode=0
 
   def findbook(self, name, path, setavail=0):
+    # Здесь специально не делается проверка avail, т.к. если удаление было логическим, а книга была восстановлена в своем старом месте
+    # то произойдет восстановление записи об этой книги а не добавится новая
     sql_findbook=("select book_id from "+TBL_BOOKS+" where filename=%s and path=%s")
     data_findbook=(name,path)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findbook,data_findbook)
     row=cursor.fetchone()
+    cursor.close()
     if row==None:
        book_id=0
     else:
        book_id=row[0]
-    cursor.close()
+       if setavail:
+          sql='update '+TBL_BOOKS+' set avail=2 where book_id=%s'%(book_id)
+          cursor=self.cnx.cursor()
+          cursor.execute(sql)
+          cursor.close()
     return book_id
 
   def finddouble(self,title,format,file_size):
-    sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and doublicat=0")
+    sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and doublicat=0 and avail!=0")
     data_findbook=(title,format,file_size)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findbook,data_findbook)
@@ -121,7 +128,7 @@ class opdsDatabase:
        doublicat=self.finddouble(title,format,size)
     else:
        doublicat=0
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,lang,cat_type,doublicat) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,lang,cat_type,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
     data_addbook=(name,path,cat_id,size,format,title,annotation,lang,archive,doublicat)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
@@ -283,7 +290,7 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql_findbooks=("select book_id,filename, path, registerdate from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by filename "+limitstr)
+    sql_findbooks=("select book_id,filename, path, registerdate from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" and avail!=0 order by filename "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findbooks)
     rows=cursor.fetchall()
@@ -296,7 +303,7 @@ class opdsDatabase:
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
     sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
-    "select 2,book_id,filename,path,registerdate,title from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" order by 1,6 "+limitstr)
+    "select 2,book_id,filename,path,registerdate,title from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" and avail!=0 order by 1,6 "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_finditems)
     rows=cursor.fetchall()
@@ -312,7 +319,7 @@ class opdsDatabase:
     return rows
 
   def getbook(self,book_id):
-    sql_getbook=("select filename, path, registerdate, format, title, annotation, cat_type, cover, cover_type, filesize from "+TBL_BOOKS+" where book_id="+str(book_id))
+    sql_getbook=("select filename, path, registerdate, format, title, annotation, cat_type, cover, cover_type, filesize from "+TBL_BOOKS+" where book_id="+str(book_id)+" and avail!=0")
     cursor=self.cnx.cursor()
     cursor.execute(sql_getbook)
     row=cursor.fetchone()
@@ -350,7 +357,7 @@ class opdsDatabase:
     else:
        dstr=' and doublicat=0 '
     lc=len(letters)+1
-    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letteris, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' "+dstr+" group by 1 order by 1"
+    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letteris, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' "+dstr+"  and avail!=0 group by 1 order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -366,7 +373,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" order by title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" and avail!=0 order by title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -390,7 +397,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and c.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and UPPER(a.last_name) like '"+letters+"%' "+dstr+" group by 1,2,3 order by 3,2 "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and UPPER(a.last_name) like '"+letters+"%' "+dstr+" and c.avail!=0 group by 1,2,3 order by 3,2 "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -414,7 +421,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" order by a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" and a.avail!=0 order by a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -434,7 +441,7 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit)
-    sql="select book_id,filename,path,registerdate,title from "+TBL_BOOKS+" order by registerdate desc "+limitstr
+    sql="select book_id,filename,path,registerdate,title from "+TBL_BOOKS+" and avail!=0 order by registerdate desc "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -466,7 +473,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" order by a.lang desc, a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" and a.avail!=0 order by a.lang desc, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -485,24 +492,29 @@ class opdsDatabase:
     if doublicates:
        dstr=''
     else:
-       dstr=' where doublicat=0 '
-    sql="select count(*) from %s %s union select count(*) from %s union select count(*) from %s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS)
+       dstr='and doublicat=0'
+    sql="select count(*) from %s where avail!=0 %s union select count(*) from %s union select count(*) from %s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS)
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
   
-  def zipisscanned(self,zipname):
+  def zipisscanned(self,zipname,setavail=0):
     sql='select cat_id from '+TBL_CATALOGS+' where path="'+zipname+'" limit 1'
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     row=cursor.fetchone()
+    cursor.close
     if row==None:
        cat_id=0
     else:
        cat_id=row[0]
-    cursor.close
+       if setavail:
+          sql='update '+TBL_BOOKS+' set avail=2 where cat_id=%s'%(cat_id)
+          cursor=self.cnx.cursor()
+          cursor.execute(sql)
+          cursor.close()
     return cat_id
 
 # Книги где avail=0 уже известно что удалены
@@ -516,19 +528,38 @@ class opdsDatabase:
     sql='update '+TBL_BOOKS+' set avail=1 where avail!=0'
     cursor=self.cnx.cursor()
     cursor.execute(sql)
+    self.cnx.commit()
     cursor.close
 
-  def avail_after_check(self):
+  def books_del_logical(self):
     sql='update '+TBL_BOOKS+' set avail=0 where avail=1'
     cursor=self.cnx.cursor()
     cursor.execute(sql)
+    cursor.execute("SELECT ROW_COUNT()")
+    row_count=cursor.fetchone()[0]
+    self.cnx.commit()
     cursor.close
+    return row_count
+
+  def books_del_phisical(self):
+    sql='delete from '+TBL_BOOKS+' where avail<1'
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    cursor.execute("SELECT ROW_COUNT()")
+    row_count=cursor.fetchone()[0]
+    self.cnx.commit()
+    cursor.close
+    return row_count
 
   def update_double(self):
     sql='call sp_update_dbl()'
     cursor=self.cnx.cursor()
     cursor.execute(sql)
+    self.cnx.commit()
     cursor.close
+
+  def commit(self):
+    self.cnx.commit()
 
   def __del__(self):
     self.closeDB()

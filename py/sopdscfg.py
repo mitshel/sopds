@@ -43,6 +43,7 @@ class cfgreader:
        self.ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
        self.ZIPRESCAN=config.getboolean(CFG_S_GLOBAL,'ziprescan')
        self.COVER_EXTRACT=config.getboolean(CFG_S_GLOBAL,'cover_extract')
+       self.DELETE_LOGICAL=config.getboolean(CFG_S_GLOBAL,'delete_logical')
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
