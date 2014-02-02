@@ -9,6 +9,7 @@ Author: Dmitry V.Shelepnev
 Для работы проекта необходимо установить следующие зависимости:
 yum install httpd
 yum install mysql
+#Требуется Mysql не ниже версии 5 (необходима поддержка хранимых процедур)
 yum install python3
 yum install mysql-connector-python3
 
