@@ -107,10 +107,10 @@ def covers(cover,cover_type,book_id):
             have_extracted_cover=1
       if cfg.COVER_SHOW==2 or (cfg.COVER_SHOW==3 and have_extracted_cover==0):
             id='99'+str(book_id)
-            enc_print( '<link href="sopds.cgi?id=%s" rel="http://opds-spec.org/image" />'%(id) )
-            enc_print( '<link href="sopds.cgi?id=%s" rel="x-stanza-cover-image" />'%(id) )
-            enc_print( '<link href="sopds.cgi?id=%s" rel="http://opds-spec.org/thumbnail" />'%(id) )
-            enc_print( '<link href="sopds.cgi?id=%s" rel="x-stanza-cover-image-thumbnail" />'%(id) )
+            enc_print( '<link href="sopds.cgi?id=%s" rel="http://opds-spec.org/image" type="image/jpeg" />'%(id) )
+            enc_print( '<link href="sopds.cgi?id=%s" rel="x-stanza-cover-image" type="image/jpeg" />'%(id) )
+            enc_print( '<link href="sopds.cgi?id=%s" rel="http://opds-spec.org/thumbnail"  type="image/jpeg" />'%(id) )
+            enc_print( '<link href="sopds.cgi?id=%s" rel="x-stanza-cover-image-thumbnail"  type="image/jpeg" />'%(id) )
 
 
 ###########################################################################################################
