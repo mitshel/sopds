@@ -501,7 +501,7 @@ class opdsDatabase:
     return rows
   
   def zipisscanned(self,zipname,setavail=0):
-    sql='select cat_id from '+TBL_CATALOGS+' where path="'+zipname+'" limit 1'
+    sql='select cat_id from '+TBL_BOOKS+' where path="'+zipname+'" limit 1'
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     row=cursor.fetchone()

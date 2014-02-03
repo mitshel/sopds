@@ -111,6 +111,7 @@ class fb2parser:
        self.stoptag='description'
        self.process_description=True
        self.parse_error=0
+       self.parse_errormsg=''
 
    def reset(self):
        self.process_description=True
@@ -204,5 +205,6 @@ class fb2parser:
             parser.Parse(f.read(hsize), True)
        except StopIteration:
          pass
-       except:
-         parse_error=1
+       except Exception as err:
+         self.parse_errormsg=err 
+         self.parse_error=1

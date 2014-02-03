@@ -117,6 +117,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
                 f=file
              fb2.parse(f,cfg.FB2HSIZE)
              f.close()
+
              if len(fb2.lang.getvalue())>0:
                 lang=fb2.lang.getvalue()[0].strip(' \'\"')
              if len(fb2.book_title.getvalue())>0:
@@ -127,7 +128,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
              
              if VERBOSE:
                 if fb2.parse_error!=0:
-                   print('with fb2 parse warning...',end=" ")
+                   print('with fb2 parse warning [',fb2.parse_errormsg,']', end=" ")
 
           if title=='':
              title=n
