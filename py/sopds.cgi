@@ -53,6 +53,7 @@ def header(charset='utf-8'):
    enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:opds="http://opds-spec.org/">')
    enc_print('<id>'+cfg.SITE_ID+'</id>')
    enc_print('<title>'+cfg.SITE_TITLE+'</title>')
+   enc_print('<subtitle>Simple OPDS Catalog by www.sopds.ru</subtitle>')
    enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<author><name>'+cfg.SITE_AUTOR+'</name><uri>'+cfg.SITE_URL+'</uri><email>'+cfg.SITE_EMAIL+'</email></author>')
