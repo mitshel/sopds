@@ -327,7 +327,7 @@ class opdsDatabase:
     return row
 
   def getauthors(self,book_id):
-    sql=("select first_name,last_name from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b where b.author_id=a.author_id and b.book_id="+str(book_id))
+    sql=("select a.author_id,first_name,last_name from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b where b.author_id=a.author_id and b.book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

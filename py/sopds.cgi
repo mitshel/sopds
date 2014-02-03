@@ -170,7 +170,7 @@ elif type_value==1:
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        if item_type==2:
           authors=""
-          for (first_name,last_name) in opdsdb.getauthors(item_id):
+          for (author_id, first_name,last_name) in opdsdb.getauthors(item_id):
               enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
               if len(authors)>0:
                  authors+=', '
@@ -187,7 +187,7 @@ elif type_value==1:
    opdsdb.closeDB()
 
 #########################################################
-# Выбрана сортировка "По авторам" - выбор по несскольким первым буквам автора
+# Выбрана сортировка "По авторам" - выбор по нескольким первым буквам автора
 #
 elif type_value==2:
    opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
@@ -285,7 +285,7 @@ if type_value==10:
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        authors=""
-       for (first_name,last_name) in opdsdb.getauthors(book_id):
+       for (author_id,first_name,last_name) in opdsdb.getauthors(book_id):
            enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
            if len(authors)>0:
               authors+=', '
@@ -359,7 +359,7 @@ if type_value==13:
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        authors=""
-       for (first_name,last_name) in opdsdb.getauthors(book_id):
+       for (author_id, first_name,last_name) in opdsdb.getauthors(book_id):
            enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
            if len(authors)>0:
               authors+=', '
@@ -391,7 +391,7 @@ elif type_value==4:
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        authors=""
-       for (first_name,last_name) in opdsdb.getauthors(book_id):
+       for (author_id, first_name,last_name) in opdsdb.getauthors(book_id):
            enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
            if len(authors)>0:
               authors+=', '
@@ -451,7 +451,7 @@ if type_value==6:
        enc_print('<link type="application/atom+xml" rel="alternate" href="sopds.cgi?id='+id+'"/>')
        enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="sopds.cgi?id='+id+'"/>')
        authors=""
-       for (first_name,last_name) in opdsdb.getauthors(book_id):
+       for (author_id, first_name,last_name) in opdsdb.getauthors(book_id):
            enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
            if len(authors)>0:
               authors+=', '
@@ -488,11 +488,13 @@ elif type_value==7:
    enc_print('<link type="application/'+format+'" href="sopds.cgi?id='+id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'+zip" href="sopds.cgi?id='+idzip+'" rel="http://opds-spec.org/acquisition" />')
    authors=""
-   for (first_name,last_name) in opdsdb.getauthors(slice_value):
+   for (author_id,first_name,last_name) in opdsdb.getauthors(slice_value):
        enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
        if len(authors)>0:
              authors+=', '
        authors+=last_name+' '+first_name
+       author_ref='sopds.cgi?id=06'+str(author_id)
+       enc_print('<link href="'+author_ref+'" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги автора '+last_name+' '+first_name+'" />')
    genres=""
    for (section,genre) in opdsdb.getgenres(slice_value):
        enc_print('<category term="%s" label="%s" />'%(genre,genre))
