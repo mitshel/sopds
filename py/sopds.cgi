@@ -57,7 +57,6 @@ def header(charset='utf-8'):
    enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<author><name>'+cfg.SITE_AUTOR+'</name><uri>'+cfg.SITE_URL+'</uri><email>'+cfg.SITE_EMAIL+'</email></author>')
-#   enc_print('<cover_show>'+str(cfg.COVER_SHOW)+'</cover_show>')
 
 def footer():
    enc_print('</feed>')
