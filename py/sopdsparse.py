@@ -18,7 +18,7 @@ class fb2tag:
 
    def tagopen(self,tag,attrs=[]):
        result=False
-       if self.index<self.size:
+       if (self.index+1)<self.size:
           if self.tags[self.index+1]==tag:
              self.index+=1
        if (self.index+1)==self.size:
@@ -90,9 +90,6 @@ class fb2cover(fb2tag):
 
    def add_data(self,data):
        if self.iscover:
-#          new_data=repr(data).strip("'")
-#          if new_data!='\\n':
-#             self.cover_data+=new_data
           if data!='\\n':
              self.cover_data+=data
 
@@ -128,6 +125,7 @@ class fb2parser:
 
    def start_element(self,name,attrs):
        name=name.lower()
+       print('[',name,']')
        if self.process_description:
           self.author_first.tagopen(name)
           self.author_last.tagopen(name)
