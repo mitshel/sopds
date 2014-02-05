@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
-  <ShortName>TinyOPDS</ShortName>
-  <LongName>TinyOPDS</LongName>
+  <ShortName>SimpleOPDS</ShortName>
+  <LongName>SimpleOPDS</LongName>
   <Url type="application/atom+xml" template="sopds.cgi?search={searchTerms}" />
   <Image width="16" height="16">/favicon.ico</Image>
   <Tags />

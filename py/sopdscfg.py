@@ -28,6 +28,16 @@ class cfgreader:
        config.readfp(codecs.open(self.CONFIGFILE,"r","utf-8"))
 
        CFG_S_GLOBAL='global'
+       try:
+         self.CGI_PATH=config.get(CFG_S_GLOBAL,'cgi_path')
+       except configparser.NoOptionError:
+         self.CGI_PATH='sopds.cgi'
+       self.CGI_PATH=os.path.normpath(self.CGI_PATH)
+       try:
+         self.COVER_PATH=config.get(CFG_S_GLOBAL,'cover_path')
+       except configparser.NoOptionError:
+         self.COVER_PATH='../covers'
+       self.COVER_PATH=os.path.normpath(self.COVER_PATH)
        self.DB_NAME=config.get(CFG_S_GLOBAL,'db_name')
        self.DB_USER=config.get(CFG_S_GLOBAL,'db_user')
        self.DB_PASS=config.get(CFG_S_GLOBAL,'db_pass')
