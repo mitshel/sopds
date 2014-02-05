@@ -441,7 +441,7 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit)
-    sql="select book_id,filename,path,registerdate,title from "+TBL_BOOKS+" where avail!=0 order by registerdate desc "+limitstr
+    sql="select book_id,filename,path,registerdate,title,cover,cover_type from "+TBL_BOOKS+" where avail!=0 order by registerdate desc "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

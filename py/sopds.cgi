@@ -274,7 +274,7 @@ elif type_value==3:
          id='03'+id
   
        entry_start()
-       entry_head('-= '+letters+' =-', reg_date, id_value)
+       entry_head('-= '+letters+' =-', None, id_value)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' наименований.')
        entry_finish()
@@ -314,7 +314,7 @@ elif type_value==4:
    for (genre_id,genre_section,cnt) in opdsdb.getgenres_sections():
        id='14'+str(genre_id)
        entry_start()
-       entry_head(genre_section, reg_date, id_value)
+       entry_head(genre_section, None, id_value)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' книг.')
        entry_finish()
@@ -328,7 +328,7 @@ elif type_value==14:
    for (genre_id,genre_subsection,cnt) in opdsdb.getgenres_subsections(slice_value):
        id='24'+str(genre_id)
        entry_start()
-       entry_head(genre_subsection, reg_date, id_value)
+       entry_head(genre_subsection, None, id_value)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' книг.')
        entry_finish()
@@ -355,11 +355,12 @@ if type_value==24:
 #
 elif type_value==5:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title) in opdsdb.getlastbooks(cfg.MAXITEMS):
+   for (book_id,book_name,book_path,reg_date,book_title,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
        entry_link_subsection(id)
+       entry_covers(cover,cover_type,book_id)
        entry_authors(opdsdb,book_id)
        entry_finish()
    footer()
