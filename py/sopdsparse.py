@@ -125,7 +125,6 @@ class fb2parser:
 
    def start_element(self,name,attrs):
        name=name.lower()
-       print('[',name,']')
        if self.process_description:
           self.author_first.tagopen(name)
           self.author_last.tagopen(name)
