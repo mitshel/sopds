@@ -7,7 +7,7 @@ import sopdsdb
 import cgi
 import codecs
 import os
-import urllib.parse
+#import urllib.parse
 import zipf
 import io
 import locale
@@ -57,7 +57,7 @@ def header(charset='utf-8'):
    enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<author><name>'+cfg.SITE_AUTOR+'</name><uri>'+cfg.SITE_URL+'</uri><email>'+cfg.SITE_EMAIL+'</email></author>')
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="sopds.cgi?id=0"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" title="'+cfg.SITE_MAINTITLE+'" href="'+cfg.CGI_PATH+'?id=00"/>')
 
 def footer():
    enc_print('</feed>')
@@ -160,7 +160,7 @@ def entry_finish():
    enc_print('</entry>')
 
 def page_control(db, page, link_id):
-   if page_value>0:
+   if page>0:
       prev_href=cfg.CGI_PATH+"?id="+link_id+"&amp;page="+str(page-1)
       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="prev" title="Previous Page" href="'+prev_href+'" />')
    if db.next_page:
