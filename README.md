@@ -10,6 +10,7 @@ Author: Dmitry V.Shelepnev
 yum install httpd
 yum install mysql
 #Требуется Mysql не ниже версии 5 (необходима поддержка хранимых процедур)
+#Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3)
 yum install python3
 yum install mysql-connector-python3
 
