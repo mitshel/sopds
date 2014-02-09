@@ -7,13 +7,13 @@ import sopdsdb
 import cgi
 import codecs
 import os
-#import urllib.parse
 import zipf
 import io
 import locale
 import time
 import sopdsparse
 import base64
+import subprocess
 
 #######################################################################
 #
@@ -108,10 +108,14 @@ def entry_link_subsection(link_id):
    enc_print('<link type="application/atom+xml" rel="alternate" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
 
-def entry_link_book(link_id, link_idzip):
-   enc_print('<link type="application/'+format+'" rel="alternate" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
-   enc_print('<link type="application/'+format+'" href="'+cfg.CGI_PATH+'?id='+link_id+'" rel="http://opds-spec.org/acquisition" />')
-   enc_print('<link type="application/'+format+'+zip" href="'+cfg.CGI_PATH+'?id='+link_idzip+'" rel="http://opds-spec.org/acquisition" />')
+def entry_link_book(link_id,format):
+   str_id=str(link_id)
+   enc_print('<link type="application/'+format+'" rel="alternate" href="'+cfg.CGI_PATH+'?id=91'+str_id+'"/>')
+   if format.lower()=='fb2' and cfg.FB2TOEPUB:
+      enc_print('<link type="application/epub" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+      enc_print('<link type="application/epub+zip" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+   enc_print('<link type="application/'+format+'" href="'+cfg.CGI_PATH+'?id=91'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+   enc_print('<link type="application/'+format+'+zip" href="'+cfg.CGI_PATH+'?id=92'+str_id+'" rel="http://opds-spec.org/acquisition" />')
 
 def entry_authors(db,book_id,link_show=False):
    authors=""
@@ -410,11 +414,9 @@ elif type_value==90:
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
    (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
-   id='91'+str(slice_value)
-   idzip='92'+str(slice_value)
    entry_start()
    entry_head(title, reg_date, id_value)
-   entry_link_book(id,idzip)
+   entry_link_book(slice_value,format)
    entry_covers(cover,cover_type,slice_value)
    authors=entry_authors(opdsdb,slice_value,True)
    genres=entry_genres(opdsdb,slice_value)
@@ -496,6 +498,99 @@ elif type_value==92:
       sys.stdout.buffer.write(buf)
 
 #########################################################
+# Выдача файла книги после конвертации в EPUB
+#
+elif type_value==93:
+   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   full_path=os.path.join(cfg.ROOT_LIB,book_path)
+   (n,e)=os.path.splitext(book_name)
+   transname=translit(n+'.epub')
+   # HTTP Header
+   enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
+   enc_print("Content-Disposition: attachment; filename="+transname)
+   enc_print('Content-Transfer-Encoding: binary')
+   if cat_type==sopdsdb.CAT_NORMAL:
+      tmp_fb2_path=None
+      file_path=os.path.join(full_path,book_name)
+   elif cat_type==sopdsdb.CAT_ZIP:
+      fz=codecs.open(full_path.encode("utf-8"), "rb")
+      z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+      z.extract(book_name,'/tmp')
+      tmp_fb2_path=os.path.join(cfg.TEMP_DIR,book_name)
+      file_path=tmp_fb2_path
+
+   tmp_epub_path=os.path.join(cfg.TEMP_DIR,book_name+'.epub')
+   subprocess.call([cfg.FB2TOEPUB_PATH,file_path.encode('utf-8'),tmp_epub_path])
+   
+   if os.path.isfile(tmp_epub_path):
+      fo=codecs.open(tmp_epub_path.encode("utf-8"), "rb")
+      str=fo.read()
+      # HTTP Header
+      enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
+      enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
+      enc_print('Content-Transfer-Encoding: binary')
+      enc_print('Content-Length: %s'%len(buf))
+      enc_print()
+      sys.stdout.buffer.write(str)
+      fo.close()
+   else:
+      print('Status: 404 Not Found')
+      print()
+
+   try: os.remove(tmp_fb2_path.encode('utf-8'))
+   except: pass
+   try: os.remove(tmp_epub_path.encode('utf-8'))
+   except: pass
+
+#########################################################
+# Выдача файла книги после конвертации в EPUB+ZIP
+# (Видимо не нужная опция т.к. EPUB это собственно уже ZIP
+#
+#elif type_value==94:
+#   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+#   full_path=os.path.join(cfg.ROOT_LIB,book_path)
+#   (n,e)=os.path.splitext(book_name)
+#   transname=translit(n+'.epub')
+#   # HTTP Header
+#   enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
+#   enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
+#   enc_print('Content-Transfer-Encoding: binary')
+#   if cat_type==sopdsdb.CAT_NORMAL:
+#      tmp_fb2_path=None
+#      file_path=os.path.join(full_path,book_name)
+#   elif cat_type==sopdsdb.CAT_ZIP:
+#      fz=codecs.open(full_path.encode("utf-8"), "rb")
+#      z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+#      z.extract(book_name,'/tmp')
+#      tmp_fb2_path=os.path.join(cfg.TEMP_DIR,book_name)
+#      file_path=tmp_fb2_path
+#
+#   tmp_epub_path=os.path.join(cfg.TEMP_DIR,book_name+'.epub')
+#   subprocess.call([cfg.FB2TOEPUB_PATH,file_path.encode('utf-8'),tmp_epub_path])
+#
+#   if os.path.isfile(tmp_epub_path):
+#      dio = io.BytesIO()
+#      z = zipf.ZipFile(dio, 'w', zipf.ZIP_DEFLATED)
+#      z.write(tmp_epub_path.encode('utf-8'),transname)
+#      z.close()
+#      buf = dio.getvalue()
+#      # HTTP Header
+#      enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
+#      enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
+#      enc_print('Content-Transfer-Encoding: binary')
+#      enc_print('Content-Length: %s'%len(buf))
+#      enc_print()
+#      sys.stdout.buffer.write(buf)
+#   else:
+#      print('Status: 404 Not Found')
+#      print()
+#
+#   try: os.remove(tmp_fb2_path.encode('utf-8'))
+#   except: pass
+#   try: os.remove(tmp_epub_path.encode('utf-8'))
+#   except: pass
+
+######################################################
 # Выдача Обложки На лету
 #
 elif type_value==99:

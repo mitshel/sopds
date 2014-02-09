@@ -43,7 +43,7 @@ else:
    cfg=sopdscfg.cfgreader(CFG_FILE)
 
 if VERBOSE:
-        print('Options set: scanfull =',SCAN_FULL,', verbose =',VERBOSE,', configfile =',cfg.CONFIGFILE)
+        print('Options set: scanfull =',SCAN_FULL,', verbose =',VERBOSE,', configfile =',cfg.CONFIGFILE, 'FB2TOEPUB =',cfg.FB2TOEPUB,cfg.FB2TOEPUB_PATH)
 
 #############################################################################
 #

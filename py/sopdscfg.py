@@ -20,24 +20,34 @@ NOCOVER_IMG='nocover.jpg'
 # используем модуль configparser
 import configparser
 
+class ConfigParser_new(configparser.ConfigParser):
+   def get_default(self,section,value,default_value):
+     try:
+       result=self.get(section,value)
+     except:
+       result=default_value
+     return result
+
 class cfgreader:
    def __init__(self,configfile=CFG_PATH):
-       config=configparser.ConfigParser()
-       #config.read(CFG_PATH)
+#       config=configparser.ConfigParser()
+       config=ConfigParser_new()
        self.CONFIGFILE=configfile
        config.readfp(codecs.open(self.CONFIGFILE,"r","utf-8"))
-
        CFG_S_GLOBAL='global'
-       try:
-         self.CGI_PATH=config.get(CFG_S_GLOBAL,'cgi_path')
-       except configparser.NoOptionError:
-         self.CGI_PATH='sopds.cgi'
+
+       self.CGI_PATH=config.get_default(CFG_S_GLOBAL,'cgi_path','sopds.cgi')
        self.CGI_PATH=os.path.normpath(self.CGI_PATH)
-       try:
-         self.COVER_PATH=config.get(CFG_S_GLOBAL,'cover_path')
-       except configparser.NoOptionError:
-         self.COVER_PATH='../covers'
+
+       self.COVER_PATH=config.get_default(CFG_S_GLOBAL,'cover_path','../covers')
        self.COVER_PATH=os.path.normpath(self.COVER_PATH)
+
+       self.FB2TOEPUB_PATH=config.get_default(CFG_S_GLOBAL,'fb2toepub',None)
+       self.FB2TOEPUB=self.FB2TOEPUB_PATH!=None and os.path.isfile(self.FB2TOEPUB_PATH)
+
+       self.TEMP_DIR=config.get_default(CFG_S_GLOBAL,'temp_dir','/tmp')
+       self.TEMP_DIR=os.path.normpath(self.TEMP_DIR)
+   
        self.DB_NAME=config.get(CFG_S_GLOBAL,'db_name')
        self.DB_USER=config.get(CFG_S_GLOBAL,'db_user')
        self.DB_PASS=config.get(CFG_S_GLOBAL,'db_pass')
