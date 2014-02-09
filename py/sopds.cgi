@@ -527,9 +527,9 @@ elif type_value==93:
       str=fo.read()
       # HTTP Header
       enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-      enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
+      enc_print("Content-Disposition: attachment; filename="+transname)
       enc_print('Content-Transfer-Encoding: binary')
-      enc_print('Content-Length: %s'%len(buf))
+      enc_print('Content-Length: %s'%len(str))
       enc_print()
       sys.stdout.buffer.write(str)
       fo.close()
