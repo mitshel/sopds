@@ -119,9 +119,9 @@ class opdsDatabase:
     return book_id
 
   def addbook(self, name, path, cat_id, exten, title, annotation, lang, size=0, archive=0, doublicates=0):
-    book_id=self.findbook(name,path)
-    if book_id!=0:
-       return book_id
+#    book_id=self.findbook(name,path)
+#    if book_id!=0:
+#       return book_id
     format=exten[1:]
     format=format.lower()
     if doublicates!=0:

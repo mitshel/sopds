@@ -42,7 +42,7 @@ else: cfg=sopdscfg.cfgreader(CFG_FILE)
 zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
 
 if VERBOSE:
-        print('Options set: scanfull =',SCAN_FULL,', verbose =',VERBOSE,', configfile =',cfg.CONFIGFILE, 'FB2TOEPUB =',cfg.FB2TOEPUB,cfg.FB2TOEPUB_PATH)
+        print('Options set: scanfull =',SCAN_FULL,', verbose =',VERBOSE,', configfile =',cfg.CONFIGFILE, ', FB2TOEPUB =',cfg.FB2TOEPUB,cfg.FB2TOEPUB_PATH)
 
 #############################################################################
 #
