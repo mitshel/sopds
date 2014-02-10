@@ -48,6 +48,7 @@ class LargeZipFile(Exception):
 
 error = BadZipfile = BadZipFile      # Pre-3.2 compatibility names
 
+ZIP_CODEPAGE = 'cp866'
 
 ZIP64_LIMIT = (1 << 31) - 1
 ZIP_FILECOUNT_LIMIT = 1 << 16
@@ -885,7 +886,7 @@ class ZipFile:
     fp = None                   # Set here since __del__ checks it
     _windows_illegal_name_trans_table = None
 
-    def __init__(self, file, mode="r", compression=ZIP_STORED, allowZip64=False, codepage='cp437'):
+    def __init__(self, file, mode="r", compression=ZIP_STORED, allowZip64=False):
         """Open the ZIP file with mode read "r", write "w" or append "a"."""
         if mode not in ("r", "w", "a"):
             raise RuntimeError('ZipFile() requires mode "r", "w", or "a"')
@@ -901,7 +902,7 @@ class ZipFile:
         self.mode = key = mode.replace('b', '')[0]
         self.pwd = None
         self._comment = b''
-        self.codepage = codepage
+        self.codepage = ZIP_CODEPAGE
 
         # Check if we were passed a file-like object
         if isinstance(file, str):

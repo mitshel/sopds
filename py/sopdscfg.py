@@ -28,6 +28,14 @@ class ConfigParser_new(configparser.ConfigParser):
        result=default_value
      return result
 
+   def getboolean_default(self,section,value,default_value):
+     try:
+       result=self.getboolean(section,value)
+     except:
+       result=default_value
+     return result
+
+
 class cfgreader:
    def __init__(self,configfile=CFG_PATH):
 #       config=configparser.ConfigParser()
@@ -62,12 +70,13 @@ class cfgreader:
        self.ZIPRESCAN=config.getboolean(CFG_S_GLOBAL,'ziprescan')
        self.COVER_EXTRACT=config.getboolean(CFG_S_GLOBAL,'cover_extract')
        self.DELETE_LOGICAL=config.getboolean(CFG_S_GLOBAL,'delete_logical')
+       self.ZIPFILE_PATCH=config.getboolean_default(CFG_S_GLOBAL,'zipfile_patch',False)
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
        splittitles=config.get(CFG_S_GLOBAL,'splittitles')
        cover_show=config.get(CFG_S_GLOBAL,'cover_show')
-       zip_codepage=config.get(CFG_S_GLOBAL,'zip_codepage')
+       zip_codepage=config.get_default(CFG_S_GLOBAL,'zip_codepage','cp866')
 
        if maxitems.isdigit():
           self.MAXITEMS=int(maxitems)

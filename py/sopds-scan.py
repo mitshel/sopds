@@ -4,12 +4,11 @@
 import os
 import sopdsdb
 import sopdsparse
-import zipf
 import time
 import datetime
 import sopdscfg
 import base64
-
+import zipf
 
 ##########################################################################
 # Считываем параметры командной строки
@@ -37,10 +36,10 @@ SCAN_FULL=options.scanfull
 VERBOSE=options.verbose
 CFG_FILE=options.configfile
 
-if CFG_FILE=='':
-   cfg=sopdscfg.cfgreader()
-else:
-   cfg=sopdscfg.cfgreader(CFG_FILE)
+if CFG_FILE=='': cfg=sopdscfg.cfgreader()
+else: cfg=sopdscfg.cfgreader(CFG_FILE)
+
+zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
 
 if VERBOSE:
         print('Options set: scanfull =',SCAN_FULL,', verbose =',VERBOSE,', configfile =',cfg.CONFIGFILE, 'FB2TOEPUB =',cfg.FB2TOEPUB,cfg.FB2TOEPUB_PATH)
@@ -172,7 +171,7 @@ def processzip(db,fb2,name,full_path,file):
     if cfg.ZIPRESCAN or db.zipisscanned(rel_file,1)==0:
        cat_id=db.addcattree(rel_file,1)
        try:
-          z = zipf.ZipFile(file, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+          z = zipf.ZipFile(file, 'r', allowZip64=True)
           filelist = z.namelist()
           for n in filelist:
               try:

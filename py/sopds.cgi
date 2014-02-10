@@ -7,19 +7,20 @@ import sopdsdb
 import cgi
 import codecs
 import os
-import zipf
 import io
 import locale
 import time
 import sopdsparse
 import base64
 import subprocess
+import zipf
 
 #######################################################################
 #
 # Парсим конфигурационный файл
 #
 cfg=sopdscfg.cfgreader()
+zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
 
 #######################################################################
 #
@@ -446,7 +447,7 @@ elif type_value==91:
       fo.close()
    elif cat_type==sopdsdb.CAT_ZIP:
       fz=codecs.open(full_path.encode("utf-8"), "rb")
-      z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+      z = zipf.ZipFile(fz, 'r', allowZip64=True)
       book_size=z.getinfo(book_name).file_size
       enc_print('Content-Length: '+str(book_size))
       enc_print()
@@ -480,7 +481,7 @@ elif type_value==92:
       sys.stdout.buffer.write(buf)
    elif cat_type==sopdsdb.CAT_ZIP:
       fz=codecs.open(full_path.encode("utf-8"), "rb")
-      zi = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+      zi = zipf.ZipFile(fz, 'r', allowZip64=True)
       fo= zi.open(book_name)
       str=fo.read()
       fo.close()
@@ -514,7 +515,7 @@ elif type_value==93:
       file_path=os.path.join(full_path,book_name)
    elif cat_type==sopdsdb.CAT_ZIP:
       fz=codecs.open(full_path.encode("utf-8"), "rb")
-      z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+      z = zipf.ZipFile(fz, 'r', allowZip64=True)
       z.extract(book_name,'/tmp')
       tmp_fb2_path=os.path.join(cfg.TEMP_DIR,book_name)
       file_path=tmp_fb2_path
@@ -560,7 +561,7 @@ elif type_value==93:
 #      file_path=os.path.join(full_path,book_name)
 #   elif cat_type==sopdsdb.CAT_ZIP:
 #      fz=codecs.open(full_path.encode("utf-8"), "rb")
-#      z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+#      z = zipf.ZipFile(fz, 'r', allowZip64=True)
 #      z.extract(book_name,'/tmp')
 #      tmp_fb2_path=os.path.join(cfg.TEMP_DIR,book_name)
 #      file_path=tmp_fb2_path
@@ -606,7 +607,7 @@ elif type_value==99:
          fo.close()
       elif cat_type==sopdsdb.CAT_ZIP:
          fz=codecs.open(full_path.encode("utf-8"), "rb")
-         z = zipf.ZipFile(fz, 'r', allowZip64=True, codepage=cfg.ZIP_CODEPAGE)
+         z = zipf.ZipFile(fz, 'r', allowZip64=True)
          fo = z.open(book_name)
          fb2.parse(fo,0)
          fo.close()
