@@ -542,8 +542,13 @@ class opdsDatabase:
     return row_count
 
   def books_del_phisical(self):
-    sql='delete from '+TBL_BOOKS+' where avail<=1'
     cursor=self.cnx.cursor()
+    sql='delete from '+TBL_BAUTHORS+' where book_id in (select book_id from '+TBL_BOOKS+' where avail<=1)'
+    cursor.execute(sql)
+    sql='delete from '+TBL_BGENRES+' where book_id in (select book_id from '+TBL_BOOKS+' where avail<=1)'
+    cursor.execute(sql)
+
+    sql='delete from '+TBL_BOOKS+' where avail<=1'
     cursor.execute(sql)
     cursor.execute("SELECT ROW_COUNT()")
     row_count=cursor.fetchone()[0]
