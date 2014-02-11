@@ -213,7 +213,7 @@ if type_value==0:
 #
 elif type_value==1:
    header()
-   for (item_type,item_id,item_name,item_path,reg_date,item_title) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
+   for (item_type,item_id,item_name,item_path,reg_date,item_title,cover,cover_type) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
        if item_type==1:
           id='01'+str(item_id)
        elif item_type==2:
@@ -224,6 +224,7 @@ elif type_value==1:
        entry_head(item_title, reg_date, id_value)
        entry_link_subsection(id)
        if item_type==2:
+          entry_covers(cover,cover_type,item_id)
           entry_authors(opdsdb,item_id)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
