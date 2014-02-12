@@ -39,7 +39,8 @@ class fb2tag:
              self.index-=1
              if self.process_value:
                 if self.value_size!=0:
-                   self.current_value=self.current_value[:self.value_size] 
+                   if len(self.current_value)>self.value_size:
+                      self.current_value=self.current_value[:self.value_size] 
                 self.values.append(self.current_value)
                 self.current_value=''
              self.process_value=False
