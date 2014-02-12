@@ -168,7 +168,7 @@ def processzip(db,fb2,name,full_path,file):
 
     rel_file=os.path.relpath(file,cfg.ROOT_LIB)
     if cfg.ZIPRESCAN or db.zipisscanned(rel_file,1)==0:
-          cat_id=db.addcattree(rel_file,1)
+       cat_id=db.addcattree(rel_file,1)
        try:
           z = zipf.ZipFile(file, 'r', allowZip64=True)
           filelist = z.namelist()
