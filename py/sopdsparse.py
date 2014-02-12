@@ -10,11 +10,16 @@ class fb2tag:
        self.index=-1
        self.size=len(self.tags)
        self.values=[]
+       self.process_value=False
+       self.current_value=''
    
    def reset(self):
        self.index=-1
        self.values=[]
        self.attrs=[]
+       self.process_value=False
+       self.current_value=''
+
 
    def tagopen(self,tag,attrs=[]):
        result=False
@@ -31,10 +36,18 @@ class fb2tag:
        if self.index>=0:
           if self.tags[self.index]==tag:
              self.index-=1
+             if self.process_value:
+                self.values.append(self.current_value)
+                self.current_value=''
+             self.process_value=False
 
    def setvalue(self,value):
        if (self.index+1)==self.size:
-          self.values.append(value)
+          if self.process_value==False:
+             self.current_value=value
+             self.process_value=True
+          else:
+             self.current_value+=value
 
    def getvalue(self): 
        return self.values

@@ -169,23 +169,23 @@ def processzip(db,fb2,name,full_path,file):
 
     rel_file=os.path.relpath(file,cfg.ROOT_LIB)
     if cfg.ZIPRESCAN or db.zipisscanned(rel_file,1)==0:
-       cat_id=db.addcattree(rel_file,1)
-       try:
+          cat_id=db.addcattree(rel_file,1)
+#       try:
           z = zipf.ZipFile(file, 'r', allowZip64=True)
           filelist = z.namelist()
           for n in filelist:
-              try:
+#              try:
                   if VERBOSE:
                      print('Start process ZIPped file: ',file,' file: ',n)
                   file_size=z.getinfo(n).file_size
                   processfile(db,fb2,n,file,z.open(n),1,file_size,cat_id=cat_id)
-              except:
-                  print('Error processing zip archive:',file,' file: ',n)
+#              except:
+#                  print('Error processing zip archive:',file,' file: ',n)
           z.close()
           arch_scanned+=1
-       except:
-          print('Error while read ZIP archive. File '+file+' corrupt.')
-          bad_archives+=1
+#       except:
+#          print('Error while read ZIP archive. File '+file+' corrupt.')
+#          bad_archives+=1
     else:
        arch_skipped+=1
        if VERBOSE:
