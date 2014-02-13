@@ -4,9 +4,8 @@
 import xml.parsers.expat
 
 class fb2tag:
-   def __init__(self,tags,value_size=0):
+   def __init__(self,tags):
        self.tags=tags
-       self.value_size=value_size
        self.attrs=[]
        self.index=-1
        self.size=len(self.tags)
@@ -38,11 +37,7 @@ class fb2tag:
           if self.tags[self.index]==tag:
              self.index-=1
              if self.process_value:
-                if self.value_size!=0:
-                   if len(self.current_value)>self.value_size:
-                      self.current_value=self.current_value[:self.value_size] 
                 self.values.append(self.current_value)
-                self.current_value=''
              self.process_value=False
 
    def setvalue(self,value):
@@ -113,14 +108,14 @@ class fb2cover(fb2tag):
 class fb2parser:
    def __init__(self, readcover=0):
        self.rc=readcover
-       self.author_first=fb2tag(('description','title-info','author','first-name'),64)
-       self.author_last=fb2tag(('description','title-info','author','last-name'),64)
-       self.genre=fb2tag(('description','title-info','genre'),32)
-       self.lang=fb2tag(('description','title-info','lang'),16)
-       self.book_title=fb2tag(('description','title-info','book-title'),256)
-       self.annotation=fb2tag(('description','title-info','annotation','p'),10000)
+       self.author_first=fb2tag(('description','title-info','author','first-name'))
+       self.author_last=fb2tag(('description','title-info','author','last-name'))
+       self.genre=fb2tag(('description','title-info','genre'))
+       self.lang=fb2tag(('description','title-info','lang'))
+       self.book_title=fb2tag(('description','title-info','book-title'))
+       self.annotation=fb2tag(('description','title-info','annotation','p'))
        if self.rc!=0:
-          self.cover_name = fb2tag (('description','coverpage','image'),32)
+          self.cover_name = fb2tag (('description','coverpage','image'))
           self.cover_image = fb2cover (('fictionbook','binary'));
        self.stoptag='description'
        self.process_description=True
