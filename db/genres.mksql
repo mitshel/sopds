@@ -22,6 +22,6 @@ echo "book_id INT not NULL,"
 echo "PRIMARY KEY(book_id,genre_id));"
 echo "commit;"
 echo
-cat genres.txt | grep -v '#' | awk -F'-' '{gsub(/^ +| +$/,"",$1)} {gsub(/^ +| +$/,"",$2)} {gsub(/^ +| +$/,"",$3)} {print "insert into genres(genre,subsection,section) values(\""$1"\",\""$2"\",\""$3"\");"}'
+cat genres.txt | grep -v '#' | awk -F'@' '{gsub(/^ +| +$/,"",$1)} {gsub(/^ +| +$/,"",$2)} {gsub(/^ +| +$/,"",$3)} {print "insert into genres(genre,subsection,section) values(\""$1"\",\""$2"\",\""$3"\");"}'
 echo "commit;"
 
