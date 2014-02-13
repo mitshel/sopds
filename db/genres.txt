@@ -119,7 +119,7 @@
     palindromes @ Визуальная и экспериментальная поэзия, верлибры, палиндромы @ Поэзия
     poetry_for_classical @ Классическая зарубежная поэзия @ Поэзия
     poetry_classical @ Классическая поэзия @ Поэзия
-    poetry_rus_classical @ Классическая русская поэзия poetry_rus_classical @ Поэзия
+    poetry_rus_classical @ Классическая русская поэзия @ Поэзия
     lyrics @ Лирика @ Поэзия
     song_poetry @ Песенная поэзия @ Поэзия
     poetry @ Поэзия @ Поэзия
