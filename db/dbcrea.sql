@@ -47,7 +47,8 @@ KEY(last_name,first_name));
 create table bauthors (
 author_id INT not NULL,
 book_id INT not NULL,
-PRIMARY KEY(book_id,author_id));
+PRIMARY KEY(book_id,author_id),
+INDEX(author_id));
 
 insert into authors(author_id,last_name) values(1,"Неизвестный Автор");
 
