@@ -421,7 +421,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" and a.avail!=0 order by a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a where a.book_id in (select b.book_id from "+TBL_BAUTHORS+" b  where b.author_id="+str(author_id)+")"+dstr+" and a.avail!=0 order by a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -473,7 +473,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" and a.avail!=0 order by a.lang desc, a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a where a.book_id in (select book_id from "+TBL_BGENRES+" where genre_id="+str(genre_id)+") "+dstr+"and a.avail!=0 order by a.lang desc, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
