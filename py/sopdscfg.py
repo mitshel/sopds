@@ -46,6 +46,7 @@ class cfgreader:
 
        self.CGI_PATH=config.get_default(CFG_S_GLOBAL,'cgi_path','sopds.cgi')
        self.CGI_PATH=os.path.normpath(self.CGI_PATH)
+       self.SEARCHXML_PATH=os.path.join(os.path.dirname(self.CGI_PATH),'opensearch.xml')
 
        self.COVER_PATH=config.get_default(CFG_S_GLOBAL,'cover_path','../covers')
        self.COVER_PATH=os.path.normpath(self.COVER_PATH)
