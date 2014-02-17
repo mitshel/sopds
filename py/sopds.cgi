@@ -507,10 +507,6 @@ elif type_value==93:
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    (n,e)=os.path.splitext(book_name)
    transname=translit(n+'.epub')
-   # HTTP Header
-   enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-   enc_print("Content-Disposition: attachment; filename="+transname)
-   enc_print('Content-Transfer-Encoding: binary')
    if cat_type==sopdsdb.CAT_NORMAL:
       tmp_fb2_path=None
       file_path=os.path.join(full_path,book_name)
