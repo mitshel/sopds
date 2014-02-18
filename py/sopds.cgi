@@ -126,7 +126,7 @@ def entry_authors(db,book_id,link_show=False):
              authors+=', '
        authors+=last_name+' '+first_name
        if link_show:
-          author_ref=cfg.CGI_PATH+'?id=06'+str(author_id)
+          author_ref=cfg.CGI_PATH+'?id=22'+str(author_id)
           enc_print('<link href="'+author_ref+'" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги автора '+last_name+' '+first_name+'" />')
        else:
           enc_print('<content type="text">'+authors+'</content>')
@@ -196,9 +196,9 @@ if 'page' in form:
          page_value=int(page)
 if 'search' in form:
    searchTerm=form.getvalue("search","")
-   type_value=13
+   if type_value==0: type_value=7
    slice_value=-1
-   id_value='13&amp;search='+searchTerm
+   id_value='%02d&amp;search=%s'%(type_value,searchTerm)
 
 opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
 opdsdb.openDB()
@@ -289,7 +289,7 @@ elif type_value==3:
 #########################################################
 # Выдача списка книг по наименованию или на основании поискового запроса
 #
-if type_value==13:
+if type_value==13 or type_value==71:
 
    if slice_value>=0:
       i=slice_value
@@ -372,14 +372,38 @@ elif type_value==5:
    footer()
 
 #########################################################
-# Выдача списка авторов
+# Выбор типа поиска по автору или наименованию
 #
-if type_value==12:
-   i=slice_value
-   letter=""
-   while i>0:
-      letter=chr(i%10000)+letter
-      i=i//10000
+if type_value==7:
+   header()
+   enc_print('<link href="'+cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
+   enc_print('<link href="'+cfg.CGI_PATH+'?search={searchTerms}" rel="search" type="application/atom+xml" />')
+   entry_start()
+   entry_head('Поиск по наименованию',None,'71')
+   entry_content('Поиск книги по ее наименованию')
+   enc_print('<link href="'+cfg.CGI_PATH+'?id=71&amp;search='+searchTerm+'" type="application/atom+xml;profile=opds-catalog" />')
+   entry_finish()
+   entry_start()
+   entry_head('Поиск авторов',None,'72')
+   entry_content('Поиск авторов по имени')
+   enc_print('<link href="'+cfg.CGI_PATH+'?id=72&amp;search='+searchTerm+'" type="application/atom+xml;profile=opds-catalog" />')
+   entry_finish()
+   footer()
+
+
+#########################################################
+# Выдача списка авторов по имени или на основании поиска
+#
+if type_value==12 or type_value==72:
+
+   if slice_value>0:
+      i=slice_value
+      letter=""
+      while i>0:
+         letter=chr(i%10000)+letter
+         i=i//10000
+   else:
+      letter="%"+searchTerm
 
    header()
    for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
@@ -539,54 +563,6 @@ elif type_value==93:
    except: pass
    try: os.remove(tmp_epub_path.encode('utf-8'))
    except: pass
-
-#########################################################
-# Выдача файла книги после конвертации в EPUB+ZIP
-# (Видимо не нужная опция т.к. EPUB это собственно уже ZIP
-#
-#elif type_value==94:
-#   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
-#   full_path=os.path.join(cfg.ROOT_LIB,book_path)
-#   (n,e)=os.path.splitext(book_name)
-#   transname=translit(n+'.epub')
-#   # HTTP Header
-#   enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-#   enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
-#   enc_print('Content-Transfer-Encoding: binary')
-#   if cat_type==sopdsdb.CAT_NORMAL:
-#      tmp_fb2_path=None
-#      file_path=os.path.join(full_path,book_name)
-#   elif cat_type==sopdsdb.CAT_ZIP:
-#      fz=codecs.open(full_path.encode("utf-8"), "rb")
-#      z = zipf.ZipFile(fz, 'r', allowZip64=True)
-#      z.extract(book_name,'/tmp')
-#      tmp_fb2_path=os.path.join(cfg.TEMP_DIR,book_name)
-#      file_path=tmp_fb2_path
-#
-#   tmp_epub_path=os.path.join(cfg.TEMP_DIR,book_name+'.epub')
-#   subprocess.call([cfg.FB2TOEPUB_PATH,file_path.encode('utf-8'),tmp_epub_path])
-#
-#   if os.path.isfile(tmp_epub_path):
-#      dio = io.BytesIO()
-#      z = zipf.ZipFile(dio, 'w', zipf.ZIP_DEFLATED)
-#      z.write(tmp_epub_path.encode('utf-8'),transname)
-#      z.close()
-#      buf = dio.getvalue()
-#      # HTTP Header
-#      enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-#      enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
-#      enc_print('Content-Transfer-Encoding: binary')
-#      enc_print('Content-Length: %s'%len(buf))
-#      enc_print()
-#      sys.stdout.buffer.write(buf)
-#   else:
-#      print('Status: 404 Not Found')
-#      print()
-#
-#   try: os.remove(tmp_fb2_path.encode('utf-8'))
-#   except: pass
-#   try: os.remove(tmp_epub_path.encode('utf-8'))
-#   except: pass
 
 ######################################################
 # Выдача Обложки На лету
