@@ -1,26 +1,3 @@
-use sopds;
-SET NAMES 'utf8';
-SET CHARACTER SET utf8;
-drop table if exists genres;
-drop table if exists bgenres;
-commit;
-
-create table genres(
-genre_id INT not null AUTO_INCREMENT,
-genre VARCHAR(32),
-section VARCHAR(32),
-subsection VARCHAR(32),
-PRIMARY KEY(genre_id),
-KEY(genre));
-commit;
-
-create table bgenres(
-genre_id INT not NULL,
-book_id INT not NULL,
-PRIMARY KEY(book_id,genre_id),
-INDEX(genre_id));
-commit;
-
 insert into genres(genre,subsection,section) values("economics_ref","Деловая литература","Деловая литература");
 insert into genres(genre,subsection,section) values("popular_business","Карьера, кадры","Деловая литература");
 insert into genres(genre,subsection,section) values("org_behavior","Маркетинг, PR","Деловая литература");

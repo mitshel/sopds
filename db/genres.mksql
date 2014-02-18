@@ -1,28 +1,5 @@
 #!/bin/bash
 
-echo "use sopds;"
-echo "SET NAMES 'utf8';"
-echo "SET CHARACTER SET utf8;"
-echo "drop table if exists genres;"
-echo "drop table if exists bgenres;"
-echo "commit;"
-echo
-echo "create table genres("
-echo "genre_id INT not null AUTO_INCREMENT," 
-echo "genre VARCHAR(32),"
-echo "section VARCHAR(32),"
-echo "subsection VARCHAR(32),"
-echo "PRIMARY KEY(genre_id),"
-echo "KEY(genre));"
-echo "commit;"
-echo
-echo "create table bgenres("
-echo "genre_id INT not NULL,"
-echo "book_id INT not NULL,"
-echo "PRIMARY KEY(book_id,genre_id),"
-echo "INDEX(genre_id));"
-echo "commit;"
-echo
 cat genres.txt | grep -v '#' | awk -F'@' '{gsub(/^ +| +$/,"",$1)} {gsub(/^ +| +$/,"",$2)} {gsub(/^ +| +$/,"",$3)} {print "insert into genres(genre,subsection,section) values(\""$1"\",\""$2"\",\""$3"\");"}'
 echo "commit;"
 
