@@ -195,7 +195,7 @@ if 'page' in form:
    if page.isdigit():
          page_value=int(page)
 if 'search' in form:
-   searchTerm=form.getvalue("search","")
+   searchTerm=form.getvalue("search","").strip()
    if type_value==0: type_value=7
    slice_value=-1
    id_value='%02d&amp;search=%s'%(type_value,searchTerm)
