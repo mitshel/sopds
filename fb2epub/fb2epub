@@ -1,0 +1,5 @@
+#!/bin/bash
+
+run_path=`dirname $0`
+converter=$run_path'/fb2epub-0.3.0.jar'
+java -jar $converter $1 $2
