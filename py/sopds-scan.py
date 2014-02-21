@@ -120,7 +120,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
              if len(fb2.lang.getvalue())>0:
                 lang=fb2.lang.getvalue()[0].strip(' \'\"')
              if len(fb2.book_title.getvalue())>0:
-                title=fb2.book_title.getvalue()[0].strip(' \'\"\&()-.#[]\\\`')
+                title=fb2.book_title.getvalue()[0].strip(' \'\"\&-.#\\\`')
              if len(fb2.annotation.getvalue())>0:
                 annotation=('\n'.join(fb2.annotation.getvalue()))[:10000]
              
@@ -147,8 +147,8 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
 
           idx=0
           for l in fb2.author_last.getvalue():
-              last_name=l.strip(' \'\"\&()-.#[]\\\`')
-              first_name=fb2.author_first.getvalue()[idx].strip(' \'\"\&()-.#[]\\\`')
+              last_name=l.strip(' \'\"\&-.#\\\`')
+              first_name=fb2.author_first.getvalue()[idx].strip(' \'\"\&-.#\\\`')
               author_id=opdsdb.addauthor(first_name,last_name)
               opdsdb.addbauthor(book_id,author_id)
               idx+=1
