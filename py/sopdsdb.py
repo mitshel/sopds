@@ -133,7 +133,7 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
-    self.cnx.commit()
+#    self.cnx.commit()
     cursor.close()
     return book_id
 
@@ -142,7 +142,7 @@ class opdsDatabase:
     data=(fn,cover_type,book_id)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
-    self.cnx.commit()
+#    self.cnx.commit()
     cursor.close()
     
   def findauthor(self,first_name,last_name):
@@ -177,7 +177,7 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql_addauthor,data_addauthor)
     author_id=cursor.lastrowid
-    self.cnx.commit()
+#    self.cnx.commit()
     cursor.close()
     return author_id
 
@@ -188,7 +188,7 @@ class opdsDatabase:
        cursor=self.cnx.cursor()
        try:
          cursor.execute(sql_addbauthor,data_addbauthor)
-         self.cnx.commit()
+#         self.cnx.commit()
        except:
          pass
        finally:
@@ -225,7 +225,7 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     genre_id=cursor.lastrowid
-    self.cnx.commit()
+#    self.cnx.commit()
     cursor.close()
     return genre_id
 
@@ -236,7 +236,7 @@ class opdsDatabase:
        cursor=self.cnx.cursor()
        try:
          cursor.execute(sql,data)
-         self.cnx.commit()
+#         self.cnx.commit()
        except:
          pass
        finally:
@@ -269,7 +269,7 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql_addcat,data_addcat)
     cat_id=cursor.lastrowid
-    self.cnx.commit()
+#    self.cnx.commit()
     cursor.close()
     return cat_id
 
