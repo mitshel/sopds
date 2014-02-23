@@ -13,6 +13,7 @@ import time
 import sopdsparse
 import base64
 import subprocess
+import shutil
 import zipf
 
 #######################################################################
@@ -379,7 +380,7 @@ if type_value==7:
    enc_print('<link href="'+cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
    enc_print('<link href="'+cfg.CGI_PATH+'?search={searchTerms}" rel="search" type="application/atom+xml" />')
    entry_start()
-   entry_head('Поиск по наименованию',None,'71')
+   entry_head('Поиск книг',None,'71')
    entry_content('Поиск книги по ее наименованию')
    enc_print('<link href="'+cfg.CGI_PATH+'?id=71&amp;search='+searchTerm+'" type="application/atom+xml;profile=opds-catalog" />')
    entry_finish()
@@ -530,7 +531,7 @@ elif type_value==93:
    (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    (n,e)=os.path.splitext(book_name)
-   transname=translit(n+'.epub')
+   transname=translit(n)+'.epub'
    if cat_type==sopdsdb.CAT_NORMAL:
       tmp_fb2_path=None
       file_path=os.path.join(full_path,book_name)
@@ -541,11 +542,12 @@ elif type_value==93:
       tmp_fb2_path=os.path.join(cfg.TEMP_DIR,book_name)
       file_path=tmp_fb2_path
 
-   tmp_epub_path=os.path.join(cfg.TEMP_DIR,book_name+'.epub')
-   subprocess.call([cfg.FB2TOEPUB_PATH,file_path.encode('utf-8'),tmp_epub_path])
+   tmp_epub_path=os.path.join(cfg.TEMP_DIR,transname)
+   proc = subprocess.Popen(("%s %s %s"%(cfg.FB2TOEPUB_PATH,("\"%s\""%file_path),"\"%s\""%tmp_epub_path)).encode('utf8'), shell=True, stdout=subprocess.PIPE)
+   out = proc.stdout.readlines()
    
    if os.path.isfile(tmp_epub_path):
-      fo=codecs.open(tmp_epub_path.encode("utf-8"), "rb")
+      fo=codecs.open(tmp_epub_path, "rb")
       str=fo.read()
       # HTTP Header
       enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
@@ -561,7 +563,7 @@ elif type_value==93:
 
    try: os.remove(tmp_fb2_path.encode('utf-8'))
    except: pass
-   try: os.remove(tmp_epub_path.encode('utf-8'))
+   try: os.remove(tmp_epub_path)
    except: pass
 
 ######################################################
