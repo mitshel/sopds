@@ -135,7 +135,7 @@ def entry_authors(db,book_id,link_show=False):
 
 def entry_genres(db,book_id):
    genres=""
-   for (section,genre) in opdsdb.getgenres(slice_value):
+   for (section,genre) in opdsdb.getgenres(book_id):
        enc_print('<category term="%s" label="%s" />'%(genre,genre))
        if len(genres)>0:
              genres+=', '
@@ -214,19 +214,19 @@ if type_value==0:
 #
 elif type_value==1:
    header()
-   for (item_type,item_id,item_name,item_path,reg_date,item_title,cover,cover_type) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
-       if item_type==1:
-          id='01'+str(item_id)
-       elif item_type==2:
-          id='90'+str(item_id)
-       else:
-          id='00'
+   for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,format,fsize,cover,cover_type) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
        entry_start()
        entry_head(item_title, reg_date, id_value)
-       entry_link_subsection(id)
+       if item_type==1:
+          id='01'+str(item_id)
+          entry_link_subsection(id)
        if item_type==2:
+          id='90'+str(item_id)
+          entry_link_book(item_id,format)
           entry_covers(cover,cover_type,item_id)
-          entry_authors(opdsdb,item_id)
+          authors=entry_authors(opdsdb,item_id,True)
+          genres=entry_genres(opdsdb,item_id)
+          entry_content(annotation+'\n\nНазвание книги: '+item_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+item_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -302,13 +302,15 @@ if type_value==13 or type_value==71:
       letter="%"+searchTerm
 
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
-       entry_link_subsection(id)
+       entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
-       entry_authors(opdsdb,book_id)
+       authors=entry_authors(opdsdb,book_id,True)
+       genres=entry_genres(opdsdb,book_id)
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -346,13 +348,15 @@ elif type_value==14:
 #
 if type_value==24:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
-       entry_link_subsection(id)
+       entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
-       entry_authors(opdsdb,book_id)
+       authors=entry_authors(opdsdb,book_id,True)
+       genres=entry_genres(opdsdb,book_id)
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -362,13 +366,15 @@ if type_value==24:
 #
 elif type_value==5:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
-       entry_link_subsection(id)
+       entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
-       entry_authors(opdsdb,book_id)
+       authors=entry_authors(opdsdb,book_id,True)
+       genres=entry_genres(opdsdb,book_id)
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
        entry_finish()
    footer()
 
@@ -422,13 +428,15 @@ if type_value==12 or type_value==72:
 #
 if type_value==22:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
-       entry_link_subsection(id)
+       entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
-       entry_authors(opdsdb,book_id)
+       authors=entry_authors(opdsdb,book_id,True)
+       genres=entry_genres(opdsdb,book_id)
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()

@@ -302,8 +302,8 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit*page)+","+str(limit)
-    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title,'' as cover, '' as cover_type from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
-    "select 2,book_id,filename,path,registerdate,title,cover,cover_type from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" and avail!=0 order by 1,6 "+limitstr)
+    sql_finditems=("select SQL_CALC_FOUND_ROWS 1,cat_id,cat_name,path,now(),cat_name as title,'' as annotation,'cat' as format, 0 as filesize, '' as cover, '' as cover_type from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
+    "select 2,book_id,filename,path,registerdate,title,annotation,format,filesize,cover,cover_type from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" and avail!=0 order by 1,6 "+limitstr)
     cursor=self.cnx.cursor()
     cursor.execute(sql_finditems)
     rows=cursor.fetchall()
@@ -373,7 +373,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" and avail!=0 order by title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,annotation,format,filesize,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" and avail!=0 order by title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -421,7 +421,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" and a.avail!=0 order by a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" and a.avail!=0 order by a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -441,7 +441,7 @@ class opdsDatabase:
        limitstr=""
     else:
        limitstr="limit "+str(limit)
-    sql="select book_id,filename,path,registerdate,title,cover,cover_type from "+TBL_BOOKS+" where avail!=0 order by registerdate desc "+limitstr
+    sql="select book_id,filename,path,registerdate,title,annotation,format,filesize,cover,cover_type from "+TBL_BOOKS+" where avail!=0 order by registerdate desc "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -473,7 +473,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" and a.avail!=0 order by a.lang desc, a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" and a.avail!=0 order by a.lang desc, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
