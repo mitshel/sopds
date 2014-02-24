@@ -13,8 +13,8 @@ import time
 import sopdsparse
 import base64
 import subprocess
-import shutil
 import zipf
+from urllib import parse
 
 #######################################################################
 #
@@ -59,7 +59,19 @@ def header(charset='utf-8'):
    enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<author><name>'+cfg.SITE_AUTOR+'</name><uri>'+cfg.SITE_URL+'</uri><email>'+cfg.SITE_EMAIL+'</email></author>')
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
+   enc_print('<link type="application/atom+xml" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
+
+def header_search(sstr='',charset='utf-8'):
+   enc_print('Content-Type: text/xml; charset='+charset)
+   enc_print()
+   enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
+   enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
+   enc_print('<id>tag::search::'+sstr+'</id>')
+   enc_print('<title>Поиск</title>')
+   enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
+   enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
+   enc_print('<link type="application/atom+xml" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
+
 
 def footer():
    enc_print('</feed>')
@@ -69,7 +81,7 @@ def main_menu():
    opdsdb.openDB()
    dbinfo=opdsdb.getdbinfo(cfg.DUBLICATES_SHOW)
    enc_print('<link href="'+cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
-   enc_print('<link href="'+cfg.CGI_PATH+'?search={searchTerms}" rel="search" type="application/atom+xml;profile=opds-catalog" />')
+   enc_print('<link href="'+cfg.CGI_PATH+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
    enc_print('<entry>')
    enc_print('<title>По каталогам</title>')
    enc_print('<content type="text">Каталогов: %s, книг: %s.</content>'%(dbinfo[2][0],dbinfo[0][0]))
@@ -195,9 +207,13 @@ if 'page' in form:
    page=form.getvalue("page","0")
    if page.isdigit():
          page_value=int(page)
-if 'search' in form:
-   searchTerm=form.getvalue("search","").strip()
-   if type_value==0: type_value=7
+if 'searchType' in form:
+   searchType=form.getvalue("searchType","").strip()
+   if searchType=='books': type_value=71
+   if searchType=='authors': type_value=72
+if 'searchTerm' in form:
+   searchTerm=form.getvalue("searchTerm","").strip()
+   if type_value!=71 and type_value!=72: type_value=7
    slice_value=-1
    id_value='%02d&amp;search=%s'%(type_value,searchTerm)
 
@@ -382,18 +398,18 @@ elif type_value==5:
 # Выбор типа поиска по автору или наименованию
 #
 if type_value==7:
-   header()
+   header_search(searchTerm)
    enc_print('<link href="'+cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
-   enc_print('<link href="'+cfg.CGI_PATH+'?search={searchTerms}" rel="search" type="application/atom+xml" />')
+   enc_print('<link href="'+cfg.CGI_PATH+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
    entry_start()
    entry_head('Поиск книг',None,'71')
    entry_content('Поиск книги по ее наименованию')
-   enc_print('<link href="'+cfg.CGI_PATH+'?id=71&amp;search='+searchTerm+'" type="application/atom+xml;profile=opds-catalog" />')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog" href="'+cfg.CGI_PATH+'?searchType=books&amp;searchTerm='+parse.quote(searchTerm)+'" />')
    entry_finish()
    entry_start()
    entry_head('Поиск авторов',None,'72')
    entry_content('Поиск авторов по имени')
-   enc_print('<link href="'+cfg.CGI_PATH+'?id=72&amp;search='+searchTerm+'" type="application/atom+xml;profile=opds-catalog" />')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog" href="'+cfg.CGI_PATH+'?searchType=authors&amp;searchTerm='+parse.quote(searchTerm)+'" />')
    entry_finish()
    footer()
 
