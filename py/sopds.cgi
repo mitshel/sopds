@@ -124,10 +124,9 @@ def entry_link_subsection(link_id):
 
 def entry_link_book(link_id,format):
    str_id=str(link_id)
-   enc_print('<link type="application/'+format+'" rel="alternate" href="'+cfg.CGI_PATH+'?id=91'+str_id+'"/>')
+#   enc_print('<link type="application/'+format+'" rel="alternate" href="'+cfg.CGI_PATH+'?id=91'+str_id+'"/>')
    if format.lower()=='fb2' and cfg.FB2TOEPUB:
       enc_print('<link type="application/epub" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
-      enc_print('<link type="application/epub+zip" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'" href="'+cfg.CGI_PATH+'?id=91'+str_id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'+zip" href="'+cfg.CGI_PATH+'?id=92'+str_id+'" rel="http://opds-spec.org/acquisition" />')
 
