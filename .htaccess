@@ -1,7 +1,7 @@
 DirectoryIndex index.xml
 Options ExecCGI
-#AuthType Basic
-#AuthName "SOPDS Library"
-#AuthUserFile /home/www/.htpasswd
-#require valid-user
+AuthType Basic
+AuthName "SOPDS Library"
+AuthUserFile /home/www/.htpasswd
+require valid-user
 
