@@ -37,10 +37,13 @@ def translit(s):
        s = s.replace(k,table2[k])
    return s.translate(table1)
 
-def websym(s):
+def websym(s,attr=False):
     """Replace special web-symbols"""
     result = s
-    table = {'&':'&amp;','<':'&lt;'}
+    if attr:
+        table = {'&':'&amp;','<':'&lt;','"':'\''}
+    else:
+        table = {'&':'&amp;','<':'&lt;'}
     for k in table.keys():
         result = result.replace(k,table[k])
     return result;
@@ -140,7 +143,7 @@ def entry_authors(db,book_id,link_show=False):
        authors+=last_name+' '+first_name
        if link_show:
           author_ref=cfg.CGI_PATH+'?id=22'+str(author_id)
-          enc_print('<link href="'+author_ref+'" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги автора '+last_name+' '+first_name+'" />')
+          enc_print('<link href="'+author_ref+'" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги автора '+websym(last_name,True)+' '+websym(first_name,True)+'" />')
        else:
           enc_print('<content type="text">'+authors+'</content>')
    return authors
