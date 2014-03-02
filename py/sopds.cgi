@@ -175,7 +175,7 @@ def entry_covers(cover,cover_type,book_id):
             enc_print( '<link href="%s?id=%s" rel="x-stanza-cover-image-thumbnail"  type="image/jpeg" />'%(cfg.CGI_PATH,id) )
 
 def entry_content(e_content):
-  enc_print('<content type="text">'+e_content+'</content>')
+  enc_print('<content type="text">'+websym(e_content)+'</content>')
 
 def entry_finish():
    enc_print('</entry>')
