@@ -240,7 +240,7 @@ if 'searchTerm' in form:
    searchTerm=form.getvalue("searchTerm","").strip()
    if type_value!=71 and type_value!=72: type_value=7
    slice_value=-1
-   id_value='%02d&amp;search=%s'%(type_value,searchTerm)
+   id_value='%02d&amp;searchTerm=%s'%(type_value,searchTerm)
 if 'alpha' in form:
    salpha=form.getvalue("alpha","").strip()
    if salpha.isdigit(): alpha=int(salpha)
