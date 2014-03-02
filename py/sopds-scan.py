@@ -107,7 +107,8 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
              cat_id=db.addcattree(rel_path,archive)
           title=''
           lang=''
-          annotation='';
+          annotation=''
+          docdate=''
 
           if e.lower()=='.fb2' and cfg.FB2PARSE:
              if isinstance(file, str):
@@ -123,6 +124,8 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
                 title=fb2.book_title.getvalue()[0].strip(' \'\"\&-.#\\\`')
              if len(fb2.annotation.getvalue())>0:
                 annotation=('\n'.join(fb2.annotation.getvalue()))[:10000]
+             if len(fb2.docdate.getvalue())>0:
+                docdate=fb2.docdate.getvalue()[0].strip();
              
              if VERBOSE:
                 if fb2.parse_error!=0:
@@ -131,7 +134,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
           if title=='':
              title=n
 
-          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,lang,file_size,archive,cfg.DUBLICATES_FIND)
+          book_id=opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,docdate,lang,file_size,archive,cfg.DUBLICATES_FIND)
           books_added+=1
           
           if e.lower()=='.fb2' and cfg.FB2PARSE and cfg.COVER_EXTRACT:

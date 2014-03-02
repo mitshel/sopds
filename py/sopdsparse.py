@@ -114,6 +114,7 @@ class fb2parser:
        self.lang=fb2tag(('description','title-info','lang'))
        self.book_title=fb2tag(('description','title-info','book-title'))
        self.annotation=fb2tag(('description','title-info','annotation','p'))
+       self.docdate=fb2tag(('description','document-info','date'))
        if self.rc!=0:
           self.cover_name = fb2tag (('description','coverpage','image'))
           self.cover_image = fb2cover (('fictionbook','binary'));
@@ -131,6 +132,7 @@ class fb2parser:
        self.lang.reset()
        self.book_title.reset()
        self.annotation.reset()
+       self.docdate.reset()
        if self.rc!=0:
           self.cover_name.reset()
           self.cover_image.reset()
@@ -144,6 +146,7 @@ class fb2parser:
           self.lang.tagopen(name)
           self.book_title.tagopen(name)
           self.annotation.tagopen(name)
+          self.docdate.tagopen(name)
           if self.rc!=0:
              if self.cover_name.tagopen(name,attrs):
                 cover_name=self.cover_name.getattr('l:href')
@@ -167,6 +170,7 @@ class fb2parser:
           self.lang.tagclose(name)
           self.book_title.tagclose(name)
           self.annotation.tagclose(name)
+          self.docdate.tagclose(name)
           if self.rc!=0:
              self.cover_name.tagclose(name)
        if self.rc!=0:
@@ -198,6 +202,7 @@ class fb2parser:
           self.lang.setvalue(data)
           self.book_title.setvalue(data)
           self.annotation.setvalue(data)
+          self.docdate.setvalue(data)
        if self.rc!=0:
           self.cover_image.add_data(data)
 
