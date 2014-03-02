@@ -74,6 +74,7 @@ class cfgreader:
        self.ZIPFILE_PATCH=config.getboolean_default(CFG_S_GLOBAL,'zipfile_patch',False)
        self.SINGLE_COMMIT=config.getboolean_default(CFG_S_GLOBAL,'single_commit',False)
        self.TITLE_AS_FN=config.getboolean_default(CFG_S_GLOBAL,'title_as_filename',False)
+       self.ALPHA=config.getboolean_default(CFG_S_GLOBAL,'alphabet_menu',True)
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')

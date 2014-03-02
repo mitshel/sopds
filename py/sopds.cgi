@@ -80,8 +80,8 @@ def footer():
    enc_print('</feed>')
 
 def main_menu():
-   opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
-   opdsdb.openDB()
+   if cfg.ALPHA: am='30'
+   else: am=''
    dbinfo=opdsdb.getdbinfo(cfg.DUBLICATES_SHOW)
    enc_print('<link href="'+cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
    enc_print('<link href="'+cfg.CGI_PATH+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
@@ -93,12 +93,12 @@ def main_menu():
    enc_print('<entry>')
    enc_print('<title>По авторам</title>')
    enc_print('<content type="text">Авторов: %s, книг: %s.</content>'%(dbinfo[1][0],dbinfo[0][0]))
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=02"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'02"/>')
    enc_print('<id>id:02</id></entry>')
    enc_print('<entry>')
    enc_print('<title>По наименованию</title>')
    enc_print('<content type="text">Авторов: %s, книг: %s.</content>'%(dbinfo[1][0],dbinfo[0][0]))
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=03"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'03"/>')
    enc_print('<id>id:03</id></entry>')
    enc_print('<entry>')
    enc_print('<title>По Жанрам</title>')
@@ -110,7 +110,6 @@ def main_menu():
    enc_print('<content type="text">Книг: %s.</content>'%(cfg.MAXITEMS))
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=05"/>')
    enc_print('<id>id:05</id></entry>')
-   opdsdb.closeDB()
 
 def entry_start():
    enc_print('<entry>')
@@ -122,7 +121,7 @@ def entry_head(e_title,e_date,e_id):
    enc_print('<id>id:'+e_id+'</id>')
 
 def entry_link_subsection(link_id):
-   enc_print('<link type="application/atom+xml" rel="alternate" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
+#   enc_print('<link type="application/atom+xml" rel="alternate" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
 
 def entry_link_book(link_id,format):
@@ -188,6 +187,28 @@ def page_control(db, page, link_id):
       next_href=cfg.CGI_PATH+"?id="+link_id+"&amp;page="+str(page+1)
       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="next" title="Next Page" href="'+next_href+'" />')
 
+def alphabet_menu(iid_value):
+   entry_start()
+   entry_head('А..Я (РУС)', None, 'alpha:1')
+   id=iid_value+'&amp;alpha=1'
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
+   entry_finish()
+   entry_start()
+   entry_head('0..9 (Цифры)', None, 'alpha:2')
+   id=iid_value+'&amp;alpha=2'
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
+   entry_finish()
+   entry_start()
+   entry_head('A..Z (ENG)', None, 'alpha:3')
+   id=iid_value+'&amp;alpha=3'
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
+   entry_finish()
+   entry_start()
+   entry_head('Другие Символы', None, 'alpha:4')
+   id=iid_value+'&amp;alpha=4'
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
+   entry_finish()
+
 ###########################################################################################################
 # Основной код программы
 #
@@ -197,6 +218,7 @@ locale.setlocale(locale.LC_ALL,'ru_RU.UTF-8')
 type_value=0
 slice_value=0
 page_value=0
+alpha=0
 
 form = cgi.FieldStorage()
 if 'id' in form:
@@ -219,6 +241,9 @@ if 'searchTerm' in form:
    if type_value!=71 and type_value!=72: type_value=7
    slice_value=-1
    id_value='%02d&amp;search=%s'%(type_value,searchTerm)
+if 'alpha' in form:
+   salpha=form.getvalue("alpha","").strip()
+   if salpha.isdigit(): alpha=int(salpha)
 
 opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
 opdsdb.openDB()
@@ -252,6 +277,14 @@ elif type_value==1:
    footer()
 
 #########################################################
+# Вывод дополнительного меню алфавита для сортировок по Наименованиям, по Автроам и по Жанрам
+#
+elif (type_value==30):
+   header()
+   alphabet_menu(id_value[2:])
+   footer()
+
+#########################################################
 # Выбрана сортировка "По авторам" - выбор по нескольким первым буквам автора
 #
 elif type_value==2:
@@ -262,7 +295,7 @@ elif type_value==2:
       i=i//10000
 
    header()
-   for (letters,cnt) in opdsdb.getauthor_2letters(letter):
+   for (letters,cnt) in opdsdb.getauthor_2letters(letter,alpha):
        id=""
        for i in range(len(letters)):
            id+='%04d'%(ord(letters[i]))
@@ -273,7 +306,7 @@ elif type_value==2:
          id='02'+id
 
        entry_start()
-       entry_head('-= '+letters+' =-', None, id_value)
+       entry_head(letters, None, id_value)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' автора(ов).')
        entry_finish()
@@ -290,7 +323,7 @@ elif type_value==3:
       i=i//10000
 
    header()
-   for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW):
+   for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW,alpha):
        id=""
        for i in range(len(letters)):
            id+='%04d'%(ord(letters[i]))
@@ -301,7 +334,7 @@ elif type_value==3:
          id='03'+id
   
        entry_start()
-       entry_head('-= '+letters+' =-', None, id_value)
+       entry_head(letters, None, id_value)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' наименований.')
        entry_finish()
@@ -357,6 +390,7 @@ elif type_value==14:
    header()
    for (genre_id,genre_subsection,cnt) in opdsdb.getgenres_subsections(slice_value):
        id='24'+str(genre_id)
+       if cfg.ALPHA: id='30'+id
        entry_start()
        entry_head(genre_subsection, None, id_value)
        entry_link_subsection(id)
@@ -369,7 +403,7 @@ elif type_value==14:
 #
 if type_value==24:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,alpha):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)

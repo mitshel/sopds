@@ -330,22 +330,36 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getauthor_2letters(self,letters):
+  def getauthor_2letters(self,letters,alpha=0):
     lc=len(letters)+1
-    sql="select UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc-1)+"))='"+letters+"' group by 1 order by 1"
+    having=''
+    if lc==1:
+       if   alpha==1: having=" having INSTR('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ',letters)>0 and letters!=''"
+       elif alpha==2: having=" having INSTR('0123456789',letters)>0 and letters!=''"
+       elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
+       elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
+
+    sql="select UPPER(substring(CONCAT(TRIM(last_name),trim(first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc-1)+"))='"+letters+"' group by 1"+having+" order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
 
-  def gettitle_2letters(self,letters,doublicates=True):
+  def gettitle_2letters(self,letters,doublicates=True,alpha=0):
     if doublicates:
        dstr=''
     else:
        dstr=' and doublicat=0 '
     lc=len(letters)+1
-    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letteris, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' "+dstr+"  and avail!=0 group by 1 order by 1"
+    having=''
+    if lc==1:
+       if   alpha==1: having=" having INSTR('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ',letters)>0 and letters!=''"
+       elif alpha==2: having=" having INSTR('0123456789',letters)>0 and letters!=''"
+       elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
+       elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
+
+    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' "+dstr+"  and avail!=0 group by 1"+having+" order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -452,7 +466,7 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getbooksforgenre(self,genre_id,limit=0,page=0,doublicates=True):
+  def getbooksforgenre(self,genre_id,limit=0,page=0,doublicates=True,alpha=0):
     if limit==0:
        limitstr=""
     else:
@@ -461,7 +475,13 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" and a.avail!=0 order by a.lang desc, a.title "+limitstr
+    having=''
+    if   alpha==1: having=" and INSTR('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ',UPPER(substr(a.title,1,1)))>0"
+    elif alpha==2: having=" and INSTR('0123456789',UPPER(substr(a.title,1,1)))>0"
+    elif alpha==3: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',UPPER(substr(a.title,1,1)))>0"
+    elif alpha==4: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',UPPER(substr(a.title,1,1)))=0"
+
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" and a.avail!=0"+having+" order by a.lang desc, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
