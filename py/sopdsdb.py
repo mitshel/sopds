@@ -339,7 +339,7 @@ class opdsDatabase:
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
 
-    sql="select UPPER(substring(CONCAT(TRIM(last_name),trim(first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where UPPER(substring(trim(CONCAT(last_name,' ',first_name)),1,"+str(lc-1)+"))='"+letters+"' group by 1"+having+" order by 1"
+    sql="select UPPER(substring(CONCAT(TRIM(last_name),' ',trim(first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where substring(CONCAT(trim(last_name),' ',trim(first_name)),1,"+str(lc-1)+")='"+letters+"' group by 1"+having+" order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -359,7 +359,7 @@ class opdsDatabase:
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
 
-    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where UPPER(substring(trim(title),1,"+str(lc-1)+"))='"+letters+"' "+dstr+"  and avail!=0 group by 1"+having+" order by 1"
+    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where substring(trim(title),1,"+str(lc-1)+")='"+letters+"' "+dstr+"  and avail!=0 group by 1"+having+" order by 1"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -399,7 +399,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr=' and c.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and UPPER(a.last_name) like '"+letters+"%' "+dstr+" and c.avail!=0 group by 1,2,3 order by 3,2 "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and CONCAT(TRIM(a.last_name),' ',TRIM(a.first_name)) like '"+letters+"%' "+dstr+" and c.avail!=0 group by 1,2,3 order by 3,2 "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
