@@ -233,7 +233,7 @@ if type_value==0:
 #
 elif type_value==1:
    header()
-   for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,format,fsize,cover,cover_type) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
+   for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
        entry_start()
        entry_head(item_title, reg_date, id_value)
        if item_type==1:
@@ -245,7 +245,8 @@ elif type_value==1:
           entry_covers(cover,cover_type,item_id)
           authors=entry_authors(opdsdb,item_id,True)
           genres=entry_genres(opdsdb,item_id)
-          entry_content(annotation+'\n\nНазвание книги: '+item_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+item_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
+          if docdate!='': docdate=' \nДата правки: '+docdate
+          entry_content(annotation+'\n\nНазвание книги: '+item_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+item_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -321,7 +322,7 @@ if type_value==13 or type_value==71:
       letter="%"+searchTerm
 
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
@@ -329,7 +330,8 @@ if type_value==13 or type_value==71:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
+       if docdate!='': docdate=' \nДата правки: '+docdate
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -367,7 +369,7 @@ elif type_value==14:
 #
 if type_value==24:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
@@ -375,7 +377,8 @@ if type_value==24:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
+       if docdate!='': docdate=' \nДата правки: '+docdate
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -385,7 +388,7 @@ if type_value==24:
 #
 elif type_value==5:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
@@ -393,7 +396,8 @@ elif type_value==5:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
+       if docdate!='': docdate=' \nДата правки: '+docdate
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
        entry_finish()
    footer()
 
@@ -447,7 +451,7 @@ if type_value==12 or type_value==72:
 #
 if type_value==22:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
@@ -455,7 +459,8 @@ if type_value==22:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
+       if docdate!='': docdate=' \nДата правки: '+docdate
+       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -467,14 +472,15 @@ elif type_value==90:
    id='90'+str(slice_value)
    header()
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
-   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    entry_start()
    entry_head(title, reg_date, id_value)
    entry_link_book(slice_value,format)
    entry_covers(cover,cover_type,slice_value)
    authors=entry_authors(opdsdb,slice_value,True)
    genres=entry_genres(opdsdb,slice_value)
-   entry_content(annotation+'\n\nНазвание книги: '+title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл : '+book_name+'\nРазмер файла : '+str(fsize//1000)+'Кб')
+   if docdate!='': docdate=' \nДата правки: '+docdate
+   entry_content(annotation+'\n\nНазвание книги: '+title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
    entry_finish()
    footer()
 
@@ -482,7 +488,7 @@ elif type_value==90:
 # Выдача файла книги
 #
 elif type_value==91:
-   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    if cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
    else: transname=translit(book_name)
@@ -516,7 +522,7 @@ elif type_value==91:
 # Выдача файла книги в ZIP формате
 #
 elif type_value==92:
-   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    if cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
    else: transname=translit(book_name)
@@ -557,7 +563,7 @@ elif type_value==92:
 # Выдача файла книги после конвертации в EPUB
 #
 elif type_value==93:
-   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    (n,e)=os.path.splitext(book_name)
    if cfg.TITLE_AS_FN: transname=translit(title)+'.epub'
@@ -600,7 +606,7 @@ elif type_value==93:
 # Выдача Обложки На лету
 #
 elif type_value==99:
-   (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    c0=0
    if format=='fb2':
       full_path=os.path.join(cfg.ROOT_LIB,book_path)
