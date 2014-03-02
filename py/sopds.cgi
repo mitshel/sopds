@@ -484,9 +484,10 @@ elif type_value==90:
 elif type_value==91:
    (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
-   transname=translit(book_name)
+   if cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
+   else: transname=translit(book_name)
    # HTTP Header
-   enc_print('Content-Type:application/octet-stream; name="'+book_name+'"')
+   enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
    enc_print("Content-Disposition: attachment; filename="+transname)
    enc_print('Content-Transfer-Encoding: binary')
    if cat_type==sopdsdb.CAT_NORMAL:
@@ -517,9 +518,10 @@ elif type_value==91:
 elif type_value==92:
    (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
-   transname=translit(book_name)
+   if cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
+   else: transname=translit(book_name)
    # HTTP Header
-   enc_print('Content-Type:application/zip; name="'+book_name+'"')
+   enc_print('Content-Type:application/zip; name="'+transname+'"')
    enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
    enc_print('Content-Transfer-Encoding: binary')
    if cat_type==sopdsdb.CAT_NORMAL:
@@ -558,7 +560,8 @@ elif type_value==93:
    (book_name,book_path,reg_date,format,title,annotation,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    (n,e)=os.path.splitext(book_name)
-   transname=translit(n)+'.epub'
+   if cfg.TITLE_AS_FN: transname=translit(title)+'.epub'
+   else: transname=translit(n)+'.epub'
    if cat_type==sopdsdb.CAT_NORMAL:
       tmp_fb2_path=None
       file_path=os.path.join(full_path,book_name)

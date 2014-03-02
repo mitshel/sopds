@@ -8,3 +8,4 @@ py/*.log
 fb2toepub/*
 !fb2toepub/*.zip
 testinfo/*
+speed
