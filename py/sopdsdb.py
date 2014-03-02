@@ -119,9 +119,6 @@ class opdsDatabase:
     return book_id
 
   def addbook(self, name, path, cat_id, exten, title, annotation, lang, size=0, archive=0, doublicates=0):
-#    book_id=self.findbook(name,path)
-#    if book_id!=0:
-#       return book_id
     format=exten[1:]
     format=format.lower()
     if doublicates!=0:
@@ -133,7 +130,6 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
-#    self.cnx.commit()
     cursor.close()
     return book_id
 
@@ -142,12 +138,11 @@ class opdsDatabase:
     data=(fn,cover_type,book_id)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
-#    self.cnx.commit()
     cursor.close()
     
   def findauthor(self,first_name,last_name):
-    sql_findauthor=("select author_id from "+TBL_AUTHORS+" where LOWER(first_name)=%s and LOWER(last_name)=%s")
-    data_findauthor=(first_name.lower(),last_name.lower())
+    sql_findauthor=("select author_id from "+TBL_AUTHORS+" where last_name=%s and first_name=%s LIMIT 1")
+    data_findauthor=(last_name,first_name)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findauthor,data_findauthor)
     row=cursor.fetchone()
@@ -177,25 +172,22 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql_addauthor,data_addauthor)
     author_id=cursor.lastrowid
-#    self.cnx.commit()
     cursor.close()
     return author_id
 
   def addbauthor(self, book_id, author_id):
-#    if not self.findbauthor(book_id,author_id):
        sql_addbauthor=("insert into "+TBL_BAUTHORS+"(book_id,author_id) VALUES(%s,%s)")
        data_addbauthor=(book_id,author_id)
        cursor=self.cnx.cursor()
        try:
          cursor.execute(sql_addbauthor,data_addbauthor)
-#         self.cnx.commit()
        except:
          pass
        finally:
          cursor.close()
 
   def findgenre(self,genre):
-    sql=("select genre_id from "+TBL_GENRES+" where LOWER(genre)='"+genre+"'")
+    sql=("select genre_id from "+TBL_GENRES+" where genre='"+genre+"'")
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     row=cursor.fetchone()
@@ -225,18 +217,15 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     genre_id=cursor.lastrowid
-#    self.cnx.commit()
     cursor.close()
     return genre_id
 
   def addbgenre(self, book_id, genre_id):
-#    if not self.findbgenre(book_id,genre_id):
        sql=("insert into "+TBL_BGENRES+"(book_id,genre_id) VALUES(%s,%s)")
        data=(book_id,genre_id)
        cursor=self.cnx.cursor()
        try:
          cursor.execute(sql,data)
-#         self.cnx.commit()
        except:
          pass
        finally:
@@ -269,7 +258,6 @@ class opdsDatabase:
     cursor=self.cnx.cursor()
     cursor.execute(sql_addcat,data_addcat)
     cat_id=cursor.lastrowid
-#    self.cnx.commit()
     cursor.close()
     return cat_id
 

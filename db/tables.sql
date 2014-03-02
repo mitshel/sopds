@@ -11,6 +11,7 @@ format VARCHAR(8),
 cat_id INT not null,
 cat_type INT not null DEFAULT 0,
 registerdate TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP,
+docdate VARCHAR(10),
 favorite INT not null DEFAULT 0,
 lang  VARCHAR(16),
 title VARCHAR(256),
@@ -21,7 +22,7 @@ doublicat INT not null DEFAULT 0,
 avail INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
-KEY(title));
+KEY(title,format,filesize));
 commit;
 
 drop table if exists catalogs;

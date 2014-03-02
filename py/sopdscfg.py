@@ -72,6 +72,7 @@ class cfgreader:
        self.COVER_EXTRACT=config.getboolean(CFG_S_GLOBAL,'cover_extract')
        self.DELETE_LOGICAL=config.getboolean(CFG_S_GLOBAL,'delete_logical')
        self.ZIPFILE_PATCH=config.getboolean_default(CFG_S_GLOBAL,'zipfile_patch',False)
+       self.SINGLE_COMMIT=config.getboolean_default(CFG_S_GLOBAL,'single_commit',False)
        fb2hsize=config.get(CFG_S_GLOBAL,'fb2hsize')
        maxitems=config.get(CFG_S_GLOBAL,'maxitems')
        splitauthors=config.get(CFG_S_GLOBAL,'splitauthors')
