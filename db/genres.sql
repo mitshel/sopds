@@ -1,3 +1,6 @@
+SET NAMES 'utf8';
+SET CHARACTER SET utf8;
+
 insert into genres(genre,subsection,section) values("economics_ref","Деловая литература","Деловая литература");
 insert into genres(genre,subsection,section) values("popular_business","Карьера, кадры","Деловая литература");
 insert into genres(genre,subsection,section) values("org_behavior","Маркетинг, PR","Деловая литература");

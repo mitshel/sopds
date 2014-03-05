@@ -528,7 +528,7 @@ elif type_value==91:
    else: transname=translit(book_name)
    # HTTP Header
    enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-   enc_print("Content-Disposition: attachment; filename="+transname)
+   enc_print('Content-Disposition: attachment; filename="'+transname+'"')
    enc_print('Content-Transfer-Encoding: binary')
    if cat_type==sopdsdb.CAT_NORMAL:
       file_path=os.path.join(full_path,book_name)
@@ -562,7 +562,7 @@ elif type_value==92:
    else: transname=translit(book_name)
    # HTTP Header
    enc_print('Content-Type:application/zip; name="'+transname+'"')
-   enc_print("Content-Disposition: attachment; filename="+transname+'.zip')
+   enc_print('Content-Disposition: attachment; filename="'+transname+'.zip"')
    enc_print('Content-Transfer-Encoding: binary')
    if cat_type==sopdsdb.CAT_NORMAL:
       file_path=os.path.join(full_path,book_name)
@@ -621,7 +621,7 @@ elif type_value==93:
       str=fo.read()
       # HTTP Header
       enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-      enc_print("Content-Disposition: attachment; filename="+transname)
+      enc_print('Content-Disposition: attachment; filename="'+transname+'"')
       enc_print('Content-Transfer-Encoding: binary')
       enc_print('Content-Length: %s'%len(str))
       enc_print()
