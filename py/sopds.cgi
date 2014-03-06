@@ -176,6 +176,24 @@ def entry_covers(cover,cover_type,book_id):
 def entry_content(e_content):
   enc_print('<content type="text">'+websym(e_content)+'</content>')
 
+def entry_content2(annotation='',title='',authors='',genres='',filename='',filesize=0,docdate=''):
+  enc_print('<content type="text/html">')
+  if annotation!='':
+     enc_print('&lt;p class=book&gt;'+annotation+'&lt;/p&gt;')
+  if title!='':
+     enc_print('&lt;b&gt;Название книги:&lt;/b&gt; '+title+'&lt;br/&gt;')
+  if authors!='':
+     enc_print('&lt;b&gt;Авторы:&lt;/b&gt; '+authors+'&lt;br/&gt;')
+  if genres!='':
+     enc_print('&lt;b&gt;Жанры:&lt;/b&gt; '+genres+'&lt;br/&gt;')
+  if filename!='':
+     enc_print('&lt;b&gt;Файл:&lt;/b&gt; '+filename+'&lt;br/&gt;')
+  if filesize>0:
+     enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(fsize//1000)+'Кб.&lt;br/&gt;')
+  if docdate!='':
+     enc_print('&lt;b&gt;Дата правки:&lt;/b&gt; '+docdate+'&lt;br/&gt;')
+  enc_print('</content>')
+
 def entry_finish():
    enc_print('</entry>')
 
@@ -270,8 +288,7 @@ elif type_value==1:
           entry_covers(cover,cover_type,item_id)
           authors=entry_authors(opdsdb,item_id,True)
           genres=entry_genres(opdsdb,item_id)
-          if docdate!='': docdate=' \nДата правки: '+docdate
-          entry_content(annotation+'\n\nНазвание книги: '+item_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+item_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
+          entry_content2(annotation,item_title,authors,genres,item_name,fsize,docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -363,8 +380,7 @@ if type_value==13 or type_value==71:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       if docdate!='': docdate=' \nДата правки: '+docdate
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
+       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -411,8 +427,7 @@ if type_value==24:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       if docdate!='': docdate=' \nДата правки: '+docdate
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
+       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -430,8 +445,7 @@ elif type_value==5:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       if docdate!='': docdate=' \nДата правки: '+docdate
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
+       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate)
        entry_finish()
    footer()
 
@@ -493,8 +507,7 @@ if type_value==22:
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
        genres=entry_genres(opdsdb,book_id)
-       if docdate!='': docdate=' \nДата правки: '+docdate
-       entry_content(annotation+'\n\nНазвание книги: '+book_title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
+       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate)
        entry_finish()
    page_control(opdsdb,page_value,id_value)
    footer()
@@ -513,8 +526,7 @@ elif type_value==90:
    entry_covers(cover,cover_type,slice_value)
    authors=entry_authors(opdsdb,slice_value,True)
    genres=entry_genres(opdsdb,slice_value)
-   if docdate!='': docdate=' \nДата правки: '+docdate
-   entry_content(annotation+'\n\nНазвание книги: '+title+'\nАвтор(ы): '+authors+'\nЖанры: '+genres+'\nФайл: '+book_name+'\nРазмер файла: '+str(fsize//1000)+'Кб'+docdate)
+   entry_content2(annotation,title,authors,genres,book_name,fsize,docdate)
    entry_finish()
    footer()
 
