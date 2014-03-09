@@ -22,7 +22,8 @@ doublicat INT not null DEFAULT 0,
 avail INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
-KEY(title,format,filesize));
+KEY(title,format,filesize),
+KEY(avail));
 commit;
 
 drop table if exists catalogs;

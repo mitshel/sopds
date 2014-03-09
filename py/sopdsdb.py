@@ -501,7 +501,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr='and doublicat=0'
-    sql="select count(*) from %s where avail!=0 %s union select count(*) from %s union select count(*) from %s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS)
+    sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES)
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
