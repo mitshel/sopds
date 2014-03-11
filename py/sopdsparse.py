@@ -7,6 +7,7 @@ class fb2tag:
    def __init__(self,tags):
        self.tags=tags
        self.attrs=[]
+       self.attrss=[]
        self.index=-1
        self.size=len(self.tags)
        self.values=[]
@@ -17,6 +18,7 @@ class fb2tag:
        self.index=-1
        self.values=[]
        self.attrs=[]
+       self.attrss=[]
        self.process_value=False
        self.current_value=''
 
@@ -28,6 +30,7 @@ class fb2tag:
              self.index+=1
        if (self.index+1)==self.size:
           self.attrs=attrs
+          self.attrss.append(attrs)
           result=True
        # Возвращаем True если дошли до последнего значения дерева тэга
        return result
@@ -63,6 +66,13 @@ class fb2tag:
        else:
           val=None
        return val
+
+   def getattrs(self, attr):
+      if len(self.attrss)>0:
+         val=[a.get(attr) for a in self.attrss if attr in a]
+      else:
+         val=[]
+      return val
 
 class fb2cover(fb2tag):
    def __init__(self,tags):
@@ -115,6 +125,7 @@ class fb2parser:
        self.book_title=fb2tag(('description','title-info','book-title'))
        self.annotation=fb2tag(('description','title-info','annotation','p'))
        self.docdate=fb2tag(('description','document-info','date'))
+       self.series=fb2tag(('description','title-info','sequence'))
        if self.rc!=0:
           self.cover_name = fb2tag (('description','coverpage','image'))
           self.cover_image = fb2cover (('fictionbook','binary'));
@@ -132,6 +143,7 @@ class fb2parser:
        self.lang.reset()
        self.book_title.reset()
        self.annotation.reset()
+       self.series.reset()
        self.docdate.reset()
        if self.rc!=0:
           self.cover_name.reset()
@@ -147,6 +159,7 @@ class fb2parser:
           self.book_title.tagopen(name)
           self.annotation.tagopen(name)
           self.docdate.tagopen(name)
+          self.series.tagopen(name,attrs)
           if self.rc!=0:
              if self.cover_name.tagopen(name,attrs):
                 cover_name=self.cover_name.getattr('l:href')
@@ -171,6 +184,7 @@ class fb2parser:
           self.book_title.tagclose(name)
           self.annotation.tagclose(name)
           self.docdate.tagclose(name)
+          self.series.tagclose(name)
           if self.rc!=0:
              self.cover_name.tagclose(name)
        if self.rc!=0:

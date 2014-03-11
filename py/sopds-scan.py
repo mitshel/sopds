@@ -159,6 +159,9 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
           for l in fb2.genre.getvalue():
               opdsdb.addbgenre(book_id,opdsdb.addgenre(l.lower().strip(' \'\"')))
 
+          for l in fb2.series.getattrs('name'):
+              opdsdb.addbseries(book_id,opdsdb.addseries(l.strip()))
+
           if not cfg.SINGLE_COMMIT: opdsdb.commit()
 
        else:

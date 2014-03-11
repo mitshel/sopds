@@ -16,6 +16,8 @@ TBL_AUTHORS=DB_PREFIX+"authors"
 TBL_BAUTHORS=DB_PREFIX+"bauthors"
 TBL_GENRES=DB_PREFIX+"genres"
 TBL_BGENRES=DB_PREFIX+"bgenres"
+TBL_SERIES=DB_PREFIX+"series"
+TBL_BSERIES=DB_PREFIX+"bseries"
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -231,6 +233,52 @@ class opdsDatabase:
        finally:
          cursor.close()
 
+  def findseries(self,ser):
+    sql=("select ser_id from "+TBL_SERIES+" where ser=%s")
+    data=(ser,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    row=cursor.fetchone()
+    if row==None:
+       genre_id=0
+    else:
+       genre_id=row[0]
+    cursor.close()
+    return genre_id
+
+  def findbseries(self, book_id, ser_id):
+    sql=("select book_id from "+TBL_BSERIES+" where book_id=%s and ser_id=%s")
+    data=(book_id,ser_id)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    row=cursor.fetchone()
+    result=(row!=None)
+    cursor.close()
+    return result
+
+  def addseries(self, ser):
+    ser_id=self.findseries(ser)
+    if ser_id!=0:
+       return ser_id
+    sql=("insert into "+TBL_SERIES+"(ser) VALUES(%s)")
+    data=(ser,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    genre_id=cursor.lastrowid
+    cursor.close()
+    return genre_id
+
+  def addbseries(self, book_id, ser_id):
+       sql=("insert into "+TBL_BSERIES+"(book_id,ser_id) VALUES(%s,%s)")
+       data=(book_id,ser_id)
+       cursor=self.cnx.cursor()
+       try:
+         cursor.execute(sql,data)
+       except:
+         pass
+       finally:
+         cursor.close()
+
   def findcat(self, catalog):
     (head,tail)=os.path.split(catalog)
     sql_findcat=("select cat_id from "+TBL_CATALOGS+" where cat_name=%s and path=%s")
@@ -330,6 +378,14 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getseries(self,book_id):
+    sql=("select ser from "+TBL_SERIES+" a, "+TBL_BSERIES+" b where b.ser_id=a.ser_id and b.book_id="+str(book_id))
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
+
   def getauthor_2letters(self,letters,alpha=0):
     lc=len(letters)+1
     having=''
@@ -365,6 +421,23 @@ class opdsDatabase:
     rows=cursor.fetchall()
     cursor.close
     return rows
+
+  def getseries_2letters(self,letters,alpha=0):
+    lc=len(letters)+1
+    having=''
+    if lc==1:
+       if   alpha==1: having=" having INSTR('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ',letters)>0 and letters!=''"
+       elif alpha==2: having=" having INSTR('0123456789',letters)>0 and letters!=''"
+       elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
+       elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
+
+    sql="select UPPER(substring(TRIM(ser),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where substring(trim(ser),1,"+str(lc-1)+")='"+letters+"' group by 1"+having+" order by 1"
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
+
 
   def getbooksfortitle(self,letters,limit=0,page=0,doublicates=True):
     if limit==0:
@@ -438,6 +511,56 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getseriesbyl(self,letters,limit=0,page=0,doublicates=True):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates:
+       dstr=''
+    else:
+       dstr=' and c.doublicat=0 '
+    sql="select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) as cnt from "+TBL_SERIES+" a, "+TBL_BSERIES+" b, "+TBL_BOOKS+" c where a.ser_id=b.ser_id and b.book_id=c.book_id and TRIM(a.ser) like %s "+dstr+" and c.avail!=0 group by 1,2 order by 2 "+limitstr
+    data=(letters+'%',)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getbooksforser(self,ser_id,limit=0,page=0,doublicates=True):
+    if limit==0:
+       limitstr=""
+    else:
+       limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates:
+       dstr=''
+    else:
+       dstr=' and a.doublicat=0 '
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BSERIES+" b where a.book_id=b.book_id and b.ser_id="+str(ser_id)+dstr+" and a.avail!=0 order by a.title "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+
   def getlastbooks(self,limit=0):
     if limit==0:
        limitstr=""
@@ -501,7 +624,7 @@ class opdsDatabase:
        dstr=''
     else:
        dstr='and doublicat=0'
-    sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES)
+    sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s union all select 5 s, count(ser_id) from %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES,TBL_SERIES)
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

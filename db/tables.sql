@@ -23,7 +23,8 @@ avail INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
 KEY(title,format,filesize),
-KEY(avail));
+KEY(avail),
+KEY(doublicat));
 commit;
 
 drop table if exists catalogs;
@@ -72,6 +73,29 @@ PRIMARY KEY(book_id,genre_id),
 INDEX(genre_id));
 commit;
 
+drop table if exists series;
+create table series(
+ser_id INT not null AUTO_INCREMENT,
+ser VARCHAR(64),
+PRIMARY KEY(ser_id),
+KEY(ser));
+commit;
+
+drop table if exists bseries;
+create table bseries(
+ser_id INT not NULL,
+book_id INT not NULL,
+PRIMARY KEY(book_id,ser_id),
+INDEX(ser_id));
+commit;
+
+drop table if exists dbver;
+create table dbver(
+ver varchar(5));
+commit;
+
+insert into dbver(ver) values("0.14");
+commit;
 insert into authors(author_id,last_name) values(1,"Неизвестный Автор");
 commit;
 
