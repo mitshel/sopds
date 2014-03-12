@@ -402,11 +402,11 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def gettitle_2letters(self,letters,doublicates=True,alpha=0):
-    if doublicates:
-       dstr=''
-    else:
-       dstr=' and doublicat=0 '
+  def gettitle_2letters(self,letters,doublicates=True,alpha=0,news=0):
+    if doublicates: dstr=''
+    else: dstr=' and doublicat=0 '
+    if news==0: period=''
+    else: period="and (registerdate>now()-INTERVAL %s DAY)"%cfg.NEW_PERIOD
     lc=len(letters)+1
     having=''
     if lc==1:
@@ -414,6 +414,8 @@ class opdsDatabase:
        elif alpha==2: having=" having INSTR('0123456789',letters)>0 and letters!=''"
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
+    if having=="": having=" having "+period
+    else: having=having+" "+period
 
     sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where substring(trim(title),1,"+str(lc-1)+")='"+letters+"' "+dstr+"  and avail!=0 group by 1"+having+" order by 1"
     cursor=self.cnx.cursor()
@@ -620,16 +622,30 @@ class opdsDatabase:
     return rows
 
   def getdbinfo(self,doublicates=True):
-    if doublicates:
-       dstr=''
-    else:
-       dstr='and doublicat=0'
+    if doublicates: dstr=''
+    else: dstr='and doublicat=0'
+
     sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s union all select 5 s, count(ser_id) from %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES,TBL_SERIES)
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
+
+  def getnewinfo(self,doublicates=True,new_period=0):
+    if doublicates: dstr=''
+    else: dstr='and doublicat=0'
+
+    if new_period==0: period=''
+    else: period='and registerdate-INTERVAL %s DAY'%new_period
+
+    sql="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+    cursor.close
+    return rows
+
   
   def zipisscanned(self,zipname,setavail=0):
     sql='select cat_id from '+TBL_BOOKS+' where path="'+zipname+'" limit 1'

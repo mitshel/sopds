@@ -111,10 +111,32 @@ def main_menu():
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'06"/>')
    enc_print('<id>id:06</id></entry>')
    enc_print('<entry>')
-   enc_print('<title>Последние добавленные</title>')
-   enc_print('<content type="text">Книг: %s.</content>'%(cfg.MAXITEMS))
+   enc_print('<title>Новинки за %s суток</title>'%cfg.NEW_PERIOD)
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=05"/>')
    enc_print('<id>id:05</id></entry>')
+
+def new_menu():
+   if cfg.ALPHA: am='30'
+   else: am=''
+   newinfo=opdsdb.getnewinfo(cfg.DUBLICATES_SHOW,cfg.NEW_PERIOD)
+   enc_print('<entry>')
+   enc_print('<title>Все новинки за %s суток</title>'%cfg.NEW_PERIOD)
+   enc_print('<content type="text">Книг: %s.</content>'%newinfo[0][1])
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'03&amp;news=1"/>')
+   enc_print('<id>id:03:news</id></entry>')
+   enc_print('<entry>')
+   enc_print('<title>Новинки по авторам</title>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'02&amp;news=1"/>')
+   enc_print('<id>id:02:news</id></entry>')
+   enc_print('<entry>')
+   enc_print('<title>Новинки по Жанрам</title>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=04&amp;news=1"/>')
+   enc_print('<id>id:04:news</id></entry>')
+   enc_print('<entry>')
+   enc_print('<title>Новинки по Сериям</title>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'06&amp;news=1"/>')
+   enc_print('<id>id:06:news</id></entry>')
+   enc_print('<entry>')
 
 def entry_start():
    enc_print('<entry>')
@@ -252,6 +274,7 @@ type_value=0
 slice_value=0
 page_value=0
 alpha=0
+news=0
 
 form = cgi.FieldStorage()
 if 'id' in form:
@@ -278,6 +301,8 @@ if 'searchTerm' in form:
 if 'alpha' in form:
    salpha=form.getvalue("alpha","").strip()
    if salpha.isdigit(): alpha=int(salpha)
+if 'news' in form:
+   news=1
 
 opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
 opdsdb.openDB()
@@ -386,7 +411,7 @@ elif type_value==3:
       i=i//10000
 
    header()
-   for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW,alpha):
+   for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW,alpha,news):
        id=""
        for i in range(len(letters)):
            id+='%04d'%(ord(letters[i]))
@@ -485,17 +510,18 @@ if type_value==24:
 #
 elif type_value==5:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
-       id='90'+str(book_id)
-       entry_start()
-       entry_head(book_title, reg_date, id_value)
-       entry_link_book(book_id,format)
-       entry_covers(cover,cover_type,book_id)
-       authors=entry_authors(opdsdb,book_id,True)
-       genres=entry_genres(opdsdb,book_id)
-       series=entry_series(opdsdb,book_id)
-       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-       entry_finish()
+   new_menu()
+#   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
+#       id='90'+str(book_id)
+#       entry_start()
+#       entry_head(book_title, reg_date, id_value)
+#       entry_link_book(book_id,format)
+#       entry_covers(cover,cover_type,book_id)
+#       authors=entry_authors(opdsdb,book_id,True)
+#       genres=entry_genres(opdsdb,book_id)
+#       series=entry_series(opdsdb,book_id)
+#       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
+#       entry_finish()
    footer()
 
 #########################################################
