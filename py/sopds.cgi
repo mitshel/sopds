@@ -121,19 +121,22 @@ def new_menu():
    newinfo=opdsdb.getnewinfo(cfg.DUBLICATES_SHOW,cfg.NEW_PERIOD)
    enc_print('<entry>')
    enc_print('<title>Все новинки за %s суток</title>'%cfg.NEW_PERIOD)
-   enc_print('<content type="text">Книг: %s.</content>'%newinfo[0][1])
+   enc_print('<content type="text">Новых книг: %s.</content>'%newinfo[0][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'03&amp;news=1"/>')
    enc_print('<id>id:03:news</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Новинки по авторам</title>')
+   enc_print('<content type="text">Авторов новинок: %s.</content>'%newinfo[1][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'02&amp;news=1"/>')
    enc_print('<id>id:02:news</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Новинки по Жанрам</title>')
+   enc_print('<content type="text">Жанров новинок: %s.</content>'%newinfo[2][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=04&amp;news=1"/>')
    enc_print('<id>id:04:news</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Новинки по Сериям</title>')
+   enc_print('<content type="text">Серий новинок: %s.</content>'%newinfo[3][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'06&amp;news=1"/>')
    enc_print('<id>id:06:news</id></entry>')
    enc_print('<entry>')
@@ -149,7 +152,7 @@ def entry_head(e_title,e_date,e_id):
 
 def entry_link_subsection(link_id):
 #   enc_print('<link type="application/atom+xml" rel="alternate" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+cfg.CGI_PATH+'?id='+link_id+nl+'"/>')
 
 def entry_link_book(link_id,format):
    str_id=str(link_id)
@@ -245,7 +248,7 @@ def page_control(db, page, link_id):
 def alphabet_menu(iid_value):
    entry_start()
    entry_head('А..Я (РУС)', None, 'alpha:1')
-   id=iid_value+'&amp;alpha=1'
+   id=iid_value+'&amp;alpha=1'+nl
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
    entry_finish()
    entry_start()
@@ -275,6 +278,8 @@ slice_value=0
 page_value=0
 alpha=0
 news=0
+np=0
+nl=''
 
 form = cgi.FieldStorage()
 if 'id' in form:
@@ -303,6 +308,8 @@ if 'alpha' in form:
    if salpha.isdigit(): alpha=int(salpha)
 if 'news' in form:
    news=1
+   nl='&amp;news=1'
+   np=cfg.NEW_PERIOD
 
 opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
 opdsdb.openDB()
@@ -411,7 +418,7 @@ elif type_value==3:
       i=i//10000
 
    header()
-   for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW,alpha,news):
+   for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW,alpha,np):
        id=""
        for i in range(len(letters)):
            id+='%04d'%(ord(letters[i]))
@@ -443,7 +450,7 @@ if type_value==13 or type_value==71:
       letter="%"+searchTerm
 
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)

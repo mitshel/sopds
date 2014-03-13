@@ -108,7 +108,7 @@ class opdsDatabase:
     return book_id
 
   def finddouble(self,title,format,file_size):
-    sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and doublicat=0 and avail!=0")
+    sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and avail!=0 and doublicat=0")
     data_findbook=(title,format,file_size)
     cursor=self.cnx.cursor()
     cursor.execute(sql_findbook,data_findbook)
@@ -402,11 +402,11 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def gettitle_2letters(self,letters,doublicates=True,alpha=0,news=0):
-    if doublicates: dstr=''
-    else: dstr=' and doublicat=0 '
-    if news==0: period=''
-    else: period="and (registerdate>now()-INTERVAL %s DAY)"%cfg.NEW_PERIOD
+  def gettitle_2letters(self,letters,doublicates=True,alpha=0,new_period=0):
+    if doublicates: dstr=""
+    else: dstr=" and doublicat=0 "
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
     lc=len(letters)+1
     having=''
     if lc==1:
@@ -414,12 +414,11 @@ class opdsDatabase:
        elif alpha==2: having=" having INSTR('0123456789',letters)>0 and letters!=''"
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
-    if having=="": having=" having "+period
-    else: having=having+" "+period
 
-    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where substring(trim(title),1,"+str(lc-1)+")='"+letters+"' "+dstr+"  and avail!=0 group by 1"+having+" order by 1"
+    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where substring(trim(title),1,"+str(lc-1)+")=%s and avail!=0 "+dstr+period+" group by 1"+having+" order by 1"
+    data=(letters,)
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql,data)
     rows=cursor.fetchall()
     cursor.close
     return rows
@@ -441,18 +440,17 @@ class opdsDatabase:
     return rows
 
 
-  def getbooksfortitle(self,letters,limit=0,page=0,doublicates=True):
-    if limit==0:
-       limitstr=""
-    else:
-       limitstr="limit "+str(limit*page)+","+str(limit)
-    if doublicates:
-       dstr=''
-    else:
-       dstr=' and doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,annotation,docdate,format,filesize,cover,cover_type from "+TBL_BOOKS+" where title like '"+letters+"%' "+dstr+" and avail!=0 order by title "+limitstr
+  def getbooksfortitle(self,letters,limit=0,page=0,doublicates=True,new_period=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and doublicat=0'
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
+    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,annotation,docdate,format,filesize,cover,cover_type from "+TBL_BOOKS+" where title like %s and avail!=0"+dstr+period+" order by title "+limitstr
+    data=(letters+'%',)
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql,data)
     rows=cursor.fetchall()
 
     cursor.execute("SELECT FOUND_ROWS()")
@@ -637,15 +635,18 @@ class opdsDatabase:
     else: dstr='and doublicat=0'
 
     if new_period==0: period=''
-    else: period='and registerdate-INTERVAL %s DAY'%new_period
+    else: period='and registerdate>now()-INTERVAL %s DAY'%new_period
 
-    sql="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
+    sql1="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
+    sql2="select 2 s, count(*) from (select b.author_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.author_id) a1"%(TBL_BAUTHORS, TBL_BOOKS, period)
+    sql3="select 3 s, count(*) from (select b.genre_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.genre_id) a2"%(TBL_BGENRES, TBL_BOOKS, period)
+    sql4="select 4 s, count(*) from (select b.ser_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.ser_id) a3"%(TBL_BSERIES, TBL_BOOKS, period)
+    sql=sql1+" union all "+sql2+" union all "+sql3+" union all "+sql4+" order by s"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
-
   
   def zipisscanned(self,zipname,setavail=0):
     sql='select cat_id from '+TBL_BOOKS+' where path="'+zipname+'" limit 1'
