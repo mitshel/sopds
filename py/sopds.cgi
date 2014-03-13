@@ -361,7 +361,7 @@ elif type_value==2:
       i=i//10000
 
    header()
-   for (letters,cnt) in opdsdb.getauthor_2letters(letter,alpha):
+   for (letters,cnt) in opdsdb.getauthor_2letters(letter,alpha,np):
        id=""
        for i in range(len(letters)):
            id+='%04d'%(ord(letters[i]))
@@ -389,7 +389,7 @@ elif type_value==6:
       i=i//10000
 
    header()
-   for (letters,cnt) in opdsdb.getseries_2letters(letter,alpha):
+   for (letters,cnt) in opdsdb.getseries_2letters(letter,alpha,np):
        id=""
        for i in range(len(letters)):
            id+='%04d'%(ord(letters[i]))
@@ -571,7 +571,7 @@ if type_value==12 or type_value==72:
       letter="%"+searchTerm
 
    header()
-   for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='22'+str(author_id)
        entry_start()
        entry_head(last_name+' '+first_name, None, id_value)
@@ -597,7 +597,7 @@ if type_value==16 or type_value==73:
       letter="%"+searchTerm
 
    header()
-   for (ser_id,ser,cnt) in opdsdb.getseriesbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (ser_id,ser,cnt) in opdsdb.getseriesbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='26'+str(ser_id)
        entry_start()
        entry_head(ser, None, id_value)
@@ -613,7 +613,7 @@ if type_value==16 or type_value==73:
 #
 if type_value==22:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)
@@ -632,7 +632,7 @@ if type_value==22:
 #
 if type_value==26:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforser(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforser(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)

@@ -23,8 +23,8 @@ avail INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
 KEY(title,format,filesize),
-KEY(avail),
-KEY(doublicat));
+INDEX(avail,doublicat),
+INDEX(registerdate));
 commit;
 
 drop table if exists catalogs;

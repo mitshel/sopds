@@ -386,7 +386,7 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getauthor_2letters(self,letters,alpha=0):
+  def getauthor_2letters(self,letters,alpha=0,new_period=0):
     lc=len(letters)+1
     having=''
     if lc==1:
@@ -394,10 +394,12 @@ class opdsDatabase:
        elif alpha==2: having=" having INSTR('0123456789',letters)>0 and letters!=''"
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
-
-    sql="select UPPER(substring(CONCAT(TRIM(last_name),' ',trim(first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where substring(CONCAT(trim(last_name),' ',trim(first_name)),1,"+str(lc-1)+")='"+letters+"' group by 1"+having+" order by 1"
+    if new_period==0: period=''
+    else: period="and author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%new_period
+    sql="select UPPER(substring(CONCAT(TRIM(last_name),' ',trim(first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where substring(CONCAT(trim(last_name),' ',trim(first_name)),1,"+str(lc-1)+")=%s "+period+" group by 1"+having+" order by 1"
+    data=(letters,)
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql,data)
     rows=cursor.fetchall()
     cursor.close
     return rows
@@ -423,7 +425,7 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getseries_2letters(self,letters,alpha=0):
+  def getseries_2letters(self,letters,alpha=0,new_period=0):
     lc=len(letters)+1
     having=''
     if lc==1:
@@ -431,10 +433,13 @@ class opdsDatabase:
        elif alpha==2: having=" having INSTR('0123456789',letters)>0 and letters!=''"
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
+    if new_period==0: period=''
+    else: period="and ser_id in (select b.ser_id from bseries b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.ser_id)"%new_period
 
-    sql="select UPPER(substring(TRIM(ser),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where substring(trim(ser),1,"+str(lc-1)+")='"+letters+"' group by 1"+having+" order by 1"
+    sql="select UPPER(substring(TRIM(ser),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where substring(trim(ser),1,"+str(lc-1)+")=%s "+period+" group by 1"+having+" order by 1"
+    data=(letters,)
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql,data)
     rows=cursor.fetchall()
     cursor.close
     return rows
@@ -463,64 +468,15 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getauthorsbyl(self,letters,limit=0,page=0,doublicates=True):
-    if limit==0:
-       limitstr=""
-    else:
-       limitstr="limit "+str(limit*page)+","+str(limit)
-    if doublicates:
-       dstr=''
-    else:
-       dstr=' and c.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and CONCAT(TRIM(a.last_name),' ',TRIM(a.first_name)) like '"+letters+"%' "+dstr+" and c.avail!=0 group by 1,2,3 order by 3,2 "+limitstr
-    cursor=self.cnx.cursor()
-    cursor.execute(sql)
-    rows=cursor.fetchall()
+  def getauthorsbyl(self,letters,limit=0,page=0,doublicates=True,new_period=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and c.doublicat=0 '
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY) and a.author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%(new_period,new_period)
 
-    cursor.execute("SELECT FOUND_ROWS()")
-    found_rows=cursor.fetchone()
-    if found_rows[0]>limit*page+limit:
-       self.next_page=True
-    else:
-       self.next_page=False
-
-    cursor.close
-    return rows
-
-  def getbooksforautor(self,author_id,limit=0,page=0,doublicates=True):
-    if limit==0:
-       limitstr=""
-    else:
-       limitstr="limit "+str(limit*page)+","+str(limit)
-    if doublicates:
-       dstr=''
-    else:
-       dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+dstr+" and a.avail!=0 order by a.title "+limitstr
-    cursor=self.cnx.cursor()
-    cursor.execute(sql)
-    rows=cursor.fetchall()
-
-    cursor.execute("SELECT FOUND_ROWS()")
-    found_rows=cursor.fetchone()
-    if found_rows[0]>limit*page+limit:
-       self.next_page=True
-    else:
-       self.next_page=False
-
-    cursor.close
-    return rows
-
-  def getseriesbyl(self,letters,limit=0,page=0,doublicates=True):
-    if limit==0:
-       limitstr=""
-    else:
-       limitstr="limit "+str(limit*page)+","+str(limit)
-    if doublicates:
-       dstr=''
-    else:
-       dstr=' and c.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) as cnt from "+TBL_SERIES+" a, "+TBL_BSERIES+" b, "+TBL_BOOKS+" c where a.ser_id=b.ser_id and b.book_id=c.book_id and TRIM(a.ser) like %s "+dstr+" and c.avail!=0 group by 1,2 order by 2 "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and CONCAT(TRIM(a.last_name),' ',TRIM(a.first_name)) like %s and c.avail!=0 "+dstr+period+" group by 1,2,3 order by 3,2 "+limitstr
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
@@ -536,16 +492,59 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getbooksforser(self,ser_id,limit=0,page=0,doublicates=True):
-    if limit==0:
-       limitstr=""
+  def getbooksforautor(self,author_id,limit=0,page=0,doublicates=True,new_period=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and a.doublicat=0 '
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BAUTHORS+" b where a.book_id=b.book_id and b.author_id="+str(author_id)+" and a.avail!=0 "+dstr+period+" order by a.title "+limitstr
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
     else:
-       limitstr="limit "+str(limit*page)+","+str(limit)
-    if doublicates:
-       dstr=''
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getseriesbyl(self,letters,limit=0,page=0,doublicates=True,new_period=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and c.doublicat=0 '
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY) and a.ser_id in (select b.ser_id from bseries b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.ser_id)"%(new_period,new_period)
+    sql="select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) as cnt from "+TBL_SERIES+" a, "+TBL_BSERIES+" b, "+TBL_BOOKS+" c where a.ser_id=b.ser_id and b.book_id=c.book_id and TRIM(a.ser) like %s and c.avail!=0 "+dstr+period+" group by 1,2 order by 2 "+limitstr
+    data=(letters+'%',)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
     else:
-       dstr=' and a.doublicat=0 '
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BSERIES+" b where a.book_id=b.book_id and b.ser_id="+str(ser_id)+dstr+" and a.avail!=0 order by a.title "+limitstr
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getbooksforser(self,ser_id,limit=0,page=0,doublicates=True,new_period=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and a.doublicat=0 '
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BSERIES+" b where a.book_id=b.book_id and b.ser_id="+str(ser_id)+" and a.avail!=0 "+dstr+period+" order by a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
