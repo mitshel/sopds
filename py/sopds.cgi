@@ -110,10 +110,11 @@ def main_menu():
    enc_print('<content type="text">Серий: %s.</content>'%dbinfo[4][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'06"/>')
    enc_print('<id>id:06</id></entry>')
-   enc_print('<entry>')
-   enc_print('<title>Новинки за %s суток</title>'%cfg.NEW_PERIOD)
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=05"/>')
-   enc_print('<id>id:05</id></entry>')
+   if cfg.NEW_PERIOD!=0:
+      enc_print('<entry>')
+      enc_print('<title>Новинки за %s суток</title>'%cfg.NEW_PERIOD)
+      enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=05"/>')
+      enc_print('<id>id:05</id></entry>')
 
 def new_menu():
    if cfg.ALPHA: am='30'
