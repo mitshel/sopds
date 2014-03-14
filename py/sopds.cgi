@@ -253,19 +253,25 @@ def alphabet_menu(iid_value):
    entry_finish()
    entry_start()
    entry_head('0..9 (Цифры)', None, 'alpha:2')
-   id=iid_value+'&amp;alpha=2'
+   id=iid_value+'&amp;alpha=2'+nl
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
    entry_finish()
    entry_start()
    entry_head('A..Z (ENG)', None, 'alpha:3')
-   id=iid_value+'&amp;alpha=3'
+   id=iid_value+'&amp;alpha=3'+nl
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
    entry_finish()
    entry_start()
    entry_head('Другие Символы', None, 'alpha:4')
-   id=iid_value+'&amp;alpha=4'
+   id=iid_value+'&amp;alpha=4'+nl
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
    entry_finish()
+   entry_start()
+   entry_head('Показать все книги', None, 'alpha:5')
+   id=iid_value+nl
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
+   entry_finish()
+
 
 ###########################################################################################################
 # Основной код программы
@@ -469,7 +475,7 @@ if type_value==13 or type_value==71:
 #
 elif type_value==4:
    header()
-   for (genre_id,genre_section,cnt) in opdsdb.getgenres_sections():
+   for (genre_id,genre_section,cnt) in opdsdb.getgenres_sections(cfg.DUBLICATES_SHOW,np):
        id='14'+str(genre_id)
        entry_start()
        entry_head(genre_section, None, id_value)
@@ -483,7 +489,7 @@ elif type_value==4:
 #
 elif type_value==14:
    header()
-   for (genre_id,genre_subsection,cnt) in opdsdb.getgenres_subsections(slice_value):
+   for (genre_id,genre_subsection,cnt) in opdsdb.getgenres_subsections(slice_value,cfg.DUBLICATES_SHOW,np):
        id='24'+str(genre_id)
        if cfg.ALPHA: id='30'+id
        entry_start()
@@ -498,7 +504,7 @@ elif type_value==14:
 #
 if type_value==24:
    header()
-   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,alpha):
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,alpha,np):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)

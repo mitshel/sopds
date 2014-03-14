@@ -240,11 +240,11 @@ class opdsDatabase:
     cursor.execute(sql,data)
     row=cursor.fetchone()
     if row==None:
-       genre_id=0
+       ser_id=0
     else:
-       genre_id=row[0]
+       ser_id=row[0]
     cursor.close()
-    return genre_id
+    return ser_id
 
   def findbseries(self, book_id, ser_id):
     sql=("select book_id from "+TBL_BSERIES+" where book_id=%s and ser_id=%s")
@@ -264,9 +264,9 @@ class opdsDatabase:
     data=(ser,)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
-    genre_id=cursor.lastrowid
+    ser_id=cursor.lastrowid
     cursor.close()
-    return genre_id
+    return ser_id
 
   def addbseries(self, book_id, ser_id):
        sql=("insert into "+TBL_BSERIES+"(book_id,ser_id) VALUES(%s,%s)")
@@ -572,38 +572,51 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getgenres_sections(self):
-    sql="select min(a.genre_id), a.section, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id group by a.section order by a.section"
+  def getgenres_sections(self,doublicates=True,new_period=0):
+    if doublicates: dstr=''
+    else: dstr=' and c.doublicat=0 '
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
+    if new_period==0:
+       sql="select min(a.genre_id), a.section, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id group by a.section order by a.section"
+    else:
+       sql="select min(a.genre_id), a.section, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b, "+TBL_BOOKS+" c where a.genre_id=b.genre_id and b.book_id=c.book_id and c.avail!=0 "+dstr+period+" group by a.section order by a.section"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
 
-  def getgenres_subsections(self,section_id):
-    sql="select a.genre_id, a.subsection, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id and section in (select section from "+TBL_GENRES+" where genre_id="+str(section_id)+") group by a.subsection order by a.subsection"
+  def getgenres_subsections(self,section_id,doublicates=True,new_period=0):
+    if doublicates: dstr=''
+    else: dstr=' and c.doublicat=0 '
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
+    if new_period==0:
+       sql="select a.genre_id, a.subsection, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where a.genre_id=b.genre_id and section in (select section from "+TBL_GENRES+" where genre_id="+str(section_id)+") group by a.subsection order by a.subsection"
+    else:
+       sql="select a.genre_id, a.subsection, count(*) as cnt from "+TBL_GENRES+" a, "+TBL_BGENRES+" b, "+TBL_BOOKS+" c  where a.genre_id=b.genre_id and b.book_id=c.book_id and c.avail!=0 "+dstr+period+" and section in (select section from "+TBL_GENRES+" where genre_id="+str(section_id)+") group by a.subsection order by a.subsection"
+
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
     cursor.close
     return rows
 
-  def getbooksforgenre(self,genre_id,limit=0,page=0,doublicates=True,alpha=0):
-    if limit==0:
-       limitstr=""
-    else:
-       limitstr="limit "+str(limit*page)+","+str(limit)
-    if doublicates:
-       dstr=''
-    else:
-       dstr=' and a.doublicat=0 '
+  def getbooksforgenre(self,genre_id,limit=0,page=0,doublicates=True,alpha=0,new_period=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and a.doublicat=0 '
+    if new_period==0: period=''
+    else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
     having=''
     if   alpha==1: having=" and INSTR('АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ',UPPER(substr(a.title,1,1)))>0"
     elif alpha==2: having=" and INSTR('0123456789',UPPER(substr(a.title,1,1)))>0"
     elif alpha==3: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',UPPER(substr(a.title,1,1)))>0"
     elif alpha==4: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',UPPER(substr(a.title,1,1)))=0"
 
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+dstr+" and a.avail!=0"+having+" order by a.lang desc, a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+" and a.avail!=0 "+dstr+period+having+" order by a.lang desc, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
