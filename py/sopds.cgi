@@ -268,7 +268,7 @@ def alphabet_menu(iid_value):
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
    entry_finish()
    entry_start()
-   entry_head('Показать все книги', None, 'alpha:5')
+   entry_head('Показать всё', None, 'alpha:5')
    id=iid_value+nl
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+id+'"/>')
    entry_finish()
