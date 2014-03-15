@@ -140,7 +140,6 @@ def new_menu():
    enc_print('<content type="text">Серий новинок: %s.</content>'%newinfo[3][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'06&amp;news=1"/>')
    enc_print('<id>id:06:news</id></entry>')
-   enc_print('<entry>')
 
 def entry_start():
    enc_print('<entry>')
