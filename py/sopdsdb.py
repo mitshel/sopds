@@ -397,7 +397,7 @@ class opdsDatabase:
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
     if new_period==0: period=''
     else: period="and author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%new_period
-    sql="select UPPER(substring(CONCAT(last_name,' ',first_name),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where CONCAT(last_name,' ',first_name like %s "+period+" group by 1"+having+" order by 1"
+    sql="select UPPER(substring(CONCAT(last_name,' ',first_name),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where CONCAT(last_name,' ',first_name) like %s "+period+" group by 1"+having+" order by 1"
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
