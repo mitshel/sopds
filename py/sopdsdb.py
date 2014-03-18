@@ -396,8 +396,8 @@ class opdsDatabase:
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
     if new_period==0: period=''
     else: period="and author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%new_period
-    sql="select UPPER(substring(CONCAT(TRIM(last_name),' ',trim(first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where substring(CONCAT(trim(last_name),' ',trim(first_name)),1,"+str(lc-1)+")=%s "+period+" group by 1"+having+" order by 1"
-    data=(letters,)
+    sql="select UPPER(substring(CONCAT(last_name,' ',first_name),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where CONCAT(last_name,' ',first_name like %s "+period+" group by 1"+having+" order by 1"
+    data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     rows=cursor.fetchall()
@@ -417,8 +417,8 @@ class opdsDatabase:
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
 
-    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where substring(trim(title),1,"+str(lc-1)+")=%s and avail!=0 "+dstr+period+" group by 1"+having+" order by 1"
-    data=(letters,)
+    sql="select UPPER(substring(title,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where title like %s and avail!=0 "+dstr+period+" group by 1"+having+" order by 1"
+    data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     rows=cursor.fetchall()
@@ -436,8 +436,8 @@ class opdsDatabase:
     if new_period==0: period=''
     else: period="and ser_id in (select b.ser_id from bseries b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.ser_id)"%new_period
 
-    sql="select UPPER(substring(TRIM(ser),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where substring(trim(ser),1,"+str(lc-1)+")=%s "+period+" group by 1"+having+" order by 1"
-    data=(letters,)
+    sql="select UPPER(substring(ser,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where ser like %s "+period+" group by 1"+having+" order by 1"
+    data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     rows=cursor.fetchall()
@@ -476,7 +476,7 @@ class opdsDatabase:
     if new_period==0: period=''
     else: period=" and (registerdate>now()-INTERVAL %s DAY) and a.author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%(new_period,new_period)
 
-    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and CONCAT(TRIM(a.last_name),' ',TRIM(a.first_name)) like %s and c.avail!=0 "+dstr+period+" group by 1,2,3 order by 3,2 "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and CONCAT(a.last_name,' ',a.first_name) like %s and c.avail!=0 "+dstr+period+" group by 1,2,3 order by 3,2 "+limitstr
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
@@ -521,7 +521,7 @@ class opdsDatabase:
     else: dstr=' and c.doublicat=0 '
     if new_period==0: period=''
     else: period=" and (registerdate>now()-INTERVAL %s DAY) and a.ser_id in (select b.ser_id from bseries b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.ser_id)"%(new_period,new_period)
-    sql="select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) as cnt from "+TBL_SERIES+" a, "+TBL_BSERIES+" b, "+TBL_BOOKS+" c where a.ser_id=b.ser_id and b.book_id=c.book_id and TRIM(a.ser) like %s and c.avail!=0 "+dstr+period+" group by 1,2 order by 2 "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) as cnt from "+TBL_SERIES+" a, "+TBL_BSERIES+" b, "+TBL_BOOKS+" c where a.ser_id=b.ser_id and b.book_id=c.book_id and a.ser like %s and c.avail!=0 "+dstr+period+" group by 1,2 order by 2 "+limitstr
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
