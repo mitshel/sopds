@@ -3,6 +3,7 @@
 
 import os
 import sys
+import datetime
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -127,8 +128,8 @@ class opdsDatabase:
        doublicat=self.finddouble(title,format,size)
     else:
        doublicat=0
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
-    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,doublicat)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,registerdate,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
+    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,datetime.date.today(),doublicat)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
