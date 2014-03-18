@@ -1,7 +1,7 @@
 Simple OPDS Catalog
 Простой OPDS Каталог
 Author: Dmitry V.Shelepnev
-Версия 0.10.1
+Версия 0.15
 
 Установка Simple OPDS в Fedora:
 
@@ -92,6 +92,3 @@ Alias   /opds           "/home/www/opds"
      fb2toepub=../fb2epub/fb2epub
      temp_dir=/tmp
 
-
-
-   

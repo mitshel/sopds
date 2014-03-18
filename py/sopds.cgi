@@ -14,6 +14,7 @@ import sopdsparse
 import base64
 import subprocess
 import zipf
+from urllib import request
 from urllib import parse
 
 #######################################################################
@@ -22,6 +23,14 @@ from urllib import parse
 #
 cfg=sopdscfg.cfgreader()
 zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
+
+######################################################################
+#
+# Парсим данные response (выясняем имя пользователя если была Аутентификация)
+#
+user = None
+if 'REMOTE_USER' in os.environ:
+   user = os.environ['REMOTE_USER']
 
 #######################################################################
 #
@@ -82,7 +91,7 @@ def footer():
 def main_menu():
    if cfg.ALPHA: am='30'
    else: am=''
-   dbinfo=opdsdb.getdbinfo(cfg.DUBLICATES_SHOW)
+   dbinfo=opdsdb.getdbinfo(cfg.DUBLICATES_SHOW,cfg.BOOK_SHELF,user)
    enc_print('<link href="'+cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
    enc_print('<link href="'+cfg.CGI_PATH+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
    enc_print('<entry>')
@@ -115,6 +124,13 @@ def main_menu():
       enc_print('<title>Новинки за %s суток</title>'%cfg.NEW_PERIOD)
       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=05"/>')
       enc_print('<id>id:05</id></entry>')
+   if cfg.BOOK_SHELF and user!=None:
+      enc_print('<entry>')
+      enc_print('<title>Книжная полка для %s</title>'%user)
+      enc_print('<content type="text">Книг: %s.</content>'%dbinfo[5][1])
+      enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=08"/>')
+      enc_print('<id>id:08</id></entry>')
+
 
 def new_menu():
    if cfg.ALPHA: am='30'
@@ -217,17 +233,17 @@ def entry_content(e_content):
 def entry_content2(annotation='',title='',authors='',genres='',filename='',filesize=0,docdate='',series=''):
   enc_print('<content type="text/html">')
   if annotation!='':
-     enc_print('&lt;p class=book&gt;'+annotation+'&lt;/p&gt;')
+     enc_print('&lt;p class=book&gt;'+websym(annotation)+'&lt;/p&gt;')
   if title!='':
-     enc_print('&lt;b&gt;Название книги:&lt;/b&gt; '+title+'&lt;br/&gt;')
+     enc_print('&lt;b&gt;Название книги:&lt;/b&gt; '+websym(title)+'&lt;br/&gt;')
   if authors!='':
-     enc_print('&lt;b&gt;Авторы:&lt;/b&gt; '+authors+'&lt;br/&gt;')
+     enc_print('&lt;b&gt;Авторы:&lt;/b&gt; '+websym(authors)+'&lt;br/&gt;')
   if genres!='':
-     enc_print('&lt;b&gt;Жанры:&lt;/b&gt; '+genres+'&lt;br/&gt;')
+     enc_print('&lt;b&gt;Жанры:&lt;/b&gt; '+websym(genres)+'&lt;br/&gt;')
   if series!='':
-     enc_print('&lt;b&gt;Серии:&lt;/b&gt; '+series+'&lt;br/&gt;')
+     enc_print('&lt;b&gt;Серии:&lt;/b&gt; '+websym(series)+'&lt;br/&gt;')
   if filename!='':
-     enc_print('&lt;b&gt;Файл:&lt;/b&gt; '+filename+'&lt;br/&gt;')
+     enc_print('&lt;b&gt;Файл:&lt;/b&gt; '+websym(filename)+'&lt;br/&gt;')
   if filesize>0:
      enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(fsize//1000)+'Кб.&lt;br/&gt;')
   if docdate!='':
@@ -561,6 +577,24 @@ if type_value==7:
    entry_finish()
    footer()
 
+#########################################################
+# Выдача списка книг на книжной полке
+#
+if type_value==8:
+   header()
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforuser(user,cfg.MAXITEMS,page_value):
+       id='90'+str(book_id)
+       entry_start()
+       entry_head(book_title, reg_date, id_value)
+       entry_link_book(book_id,format)
+       entry_covers(cover,cover_type,book_id)
+       authors=entry_authors(opdsdb,book_id,True)
+       genres=entry_genres(opdsdb,book_id)
+       series=entry_series(opdsdb,book_id)
+       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
+       entry_finish()
+   page_control(opdsdb,page_value,id_value)
+   footer()
 
 #########################################################
 # Выдача списка авторов по имени или на основании поиска
@@ -676,6 +710,7 @@ elif type_value==90:
 #
 elif type_value==91:
    (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   if cfg.BOOK_SHELF and user!=None: opdsdb.addbookshelf(user,slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    if cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
    else: transname=translit(book_name)
@@ -710,6 +745,7 @@ elif type_value==91:
 #
 elif type_value==92:
    (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   if cfg.BOOK_SHELF and user!=None: opdsdb.addbookshelf(user,slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    if cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
    else: transname=translit(book_name)
@@ -751,6 +787,7 @@ elif type_value==92:
 #
 elif type_value==93:
    (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
+   if cfg.BOOK_SHELF and user!=None: opdsdb.addbookshelf(user,slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    (n,e)=os.path.splitext(book_name)
    if cfg.TITLE_AS_FN: transname=translit(title)+'.epub'

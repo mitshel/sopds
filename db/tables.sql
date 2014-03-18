@@ -89,14 +89,22 @@ PRIMARY KEY(book_id,ser_id),
 INDEX(ser_id));
 commit;
 
+drop table if exists bookshelf;
+create table bookshelf(
+user VARCHAR(32) not NULL,
+book_id INT not NULL,
+readtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+INDEX(user,readtime));
+commit;
+
 drop table if exists dbver;
 create table dbver(
 ver varchar(5));
 commit;
 
-insert into dbver(ver) values("0.14");
+insert into dbver(ver) values("0.15");
 commit;
-insert into authors(author_id,last_name) values(1,"Неизвестный Автор");
+insert into authors(author_id,last_name,first_name) values(1,"Неизвестный Автор","");
 commit;
 
 DROP PROCEDURE IF EXISTS sp_update_dbl;

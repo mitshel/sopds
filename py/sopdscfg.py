@@ -93,6 +93,7 @@ class cfgreader:
        self.COVER_SHOW=config.getdefault_int(CFG_S_GLOBAL,'cover_show',0)
        self.NEW_PERIOD=config.getdefault_int(CFG_S_GLOBAL,'new_period',7)
        zip_codepage=config.getdefault(CFG_S_GLOBAL,'zip_codepage','cp866')
+       self.BOOK_SHELF=config.getdefault_bool(CFG_S_GLOBAL,'book_shelf',True)
 
        if self.COVER_EXTRACT: self.FB2SIZE=0
        self.EXT_LIST=self.FORMATS.lower().split()

@@ -19,6 +19,7 @@ TBL_GENRES=DB_PREFIX+"genres"
 TBL_BGENRES=DB_PREFIX+"bgenres"
 TBL_SERIES=DB_PREFIX+"series"
 TBL_BSERIES=DB_PREFIX+"bseries"
+TBL_BOOKSHELF=DB_PREFIX+"bookshelf"
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -120,6 +121,30 @@ class opdsDatabase:
        book_id=row[0]
     cursor.close()
     return book_id
+
+  def findbookshelf(self,user,book_id):
+    sql=("select book_id from "+TBL_BOOKSHELF+" where user=%s and book_id=%s")
+    data=(user,book_id)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    row=cursor.fetchone()
+    if row==None:
+       book_id=0
+    else:
+       book_id=row[0]
+    cursor.close()
+    return book_id
+
+  def addbookshelf(self,user,book_id):
+    if self.findbookshelf(user,book_id)==0:
+       sql=("insert into "+TBL_BOOKSHELF+"(user,book_id) VALUES(%s, %s)")
+       data=(user,book_id)
+       cursor=self.cnx.cursor()
+       cursor.execute(sql,data)
+       self.cnx.commit()
+       book_id=cursor.lastrowid
+       cursor.close()
+       return book_id
 
   def addbook(self, name, path, cat_id, exten, title, annotation, docdate, lang, size=0, archive=0, doublicates=0):
     format=exten[1:]
@@ -617,7 +642,7 @@ class opdsDatabase:
     elif alpha==3: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',UPPER(substr(a.title,1,1)))>0"
     elif alpha==4: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',UPPER(substr(a.title,1,1)))=0"
 
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+" and a.avail!=0 "+dstr+period+having+" order by a.lang desc, a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+" and a.avail!=0 "+dstr+period+having+" order by a.lang, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -632,11 +657,32 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getdbinfo(self,doublicates=True):
+  def getbooksforuser(self,user,limit=0,page=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BOOKSHELF+" b where a.book_id=b.book_id and b.user=%s and a.avail!=0 order by readtime desc "+limitstr
+    data=(user,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getdbinfo(self,doublicates=True,book_shelf=False, user=None):
     if doublicates: dstr=''
     else: dstr='and doublicat=0'
+    if book_shelf and user!=None: bs=" union all select 6 s, count(book_id) from "+TBL_BOOKSHELF+" where user='"+user+"' "
+    else: bs=""
 
-    sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s union all select 5 s, count(ser_id) from %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES,TBL_SERIES)
+    sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s union all select 5 s, count(ser_id) from %s %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES,TBL_SERIES,bs)
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
