@@ -232,8 +232,6 @@ def entry_content(e_content):
 
 def entry_content2(annotation='',title='',authors='',genres='',filename='',filesize=0,docdate='',series=''):
   enc_print('<content type="text/html">')
-  if annotation!='':
-     enc_print('&lt;p class=book&gt;'+websym(annotation)+'&lt;/p&gt;')
   if title!='':
      enc_print('&lt;b&gt;Название книги:&lt;/b&gt; '+websym(title)+'&lt;br/&gt;')
   if authors!='':
@@ -248,6 +246,8 @@ def entry_content2(annotation='',title='',authors='',genres='',filename='',files
      enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(fsize//1000)+'Кб.&lt;br/&gt;')
   if docdate!='':
      enc_print('&lt;b&gt;Дата правки:&lt;/b&gt; '+docdate+'&lt;br/&gt;')
+  if annotation!='':
+     enc_print('&lt;p class=book&gt;'+websym(annotation)+'&lt;/p&gt;')
   enc_print('</content>')
 
 def entry_finish():
