@@ -10,7 +10,7 @@ filesize INT not null DEFAULT 0,
 format VARCHAR(8),
 cat_id INT not null,
 cat_type INT not null DEFAULT 0,
-registerdate DATE not null,
+registerdate TIMESTAMP not null DEFAULT CURRENT_TIMESTAMP,
 docdate VARCHAR(20),
 favorite INT not null DEFAULT 0,
 lang  VARCHAR(16),
@@ -108,6 +108,7 @@ insert into authors(author_id,last_name,first_name) values(1,"Неизвестн
 commit;
 
 DROP PROCEDURE IF EXISTS sp_update_dbl;
+DROP PROCEDURE IF EXISTS sp_newinfo;
 DELIMITER //
 
 CREATE PROCEDURE sp_update_dbl()
@@ -138,8 +139,23 @@ BEGIN
   CLOSE cur;
 END //
 
+CREATE PROCEDURE sp_newinfo(period INT)
+BEGIN
+  DECLARE min_book_id INT;
+
+  select MIN(book_id) into min_book_id from books where registerdate>now()-INTERVAL period DAY;
+  select 1 s, count(*) from books where book_id>=min_book_id and avail!=0 and doublicat=0
+  union all
+  select 2 s, count(*) from (select author_id from bauthors where book_id>=min_book_id group by author_id) a
+  union all
+  select 3 s, count(*) from (select genre_id from bgenres where book_id>=min_book_id group by genre_id) a
+  union all
+  select 4 s, count(*) from (select ser_id from bseries where book_id>=min_book_id group by ser_id) a
+  order by s;
+
+END //
+
+
 DELIMITER ;
-
 commit;
-
 

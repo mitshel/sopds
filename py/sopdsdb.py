@@ -153,8 +153,8 @@ class opdsDatabase:
        doublicat=self.finddouble(title,format,size)
     else:
        doublicat=0
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,registerdate,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
-    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,datetime.date.today(),doublicat)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
+    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,doublicat)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
@@ -690,20 +690,24 @@ class opdsDatabase:
     return rows
 
   def getnewinfo(self,doublicates=True,new_period=0):
-    if doublicates: dstr=''
-    else: dstr='and doublicat=0'
-
-    if new_period==0: period=''
-    else: period='and registerdate>now()-INTERVAL %s DAY'%new_period
-
-    sql1="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
-    sql2="select 2 s, count(*) from (select b.author_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.author_id) a1"%(TBL_BAUTHORS, TBL_BOOKS, period)
-    sql3="select 3 s, count(*) from (select b.genre_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.genre_id) a2"%(TBL_BGENRES, TBL_BOOKS, period)
-    sql4="select 4 s, count(*) from (select b.ser_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.ser_id) a3"%(TBL_BSERIES, TBL_BOOKS, period)
-    sql=sql1+" union all "+sql2+" union all "+sql3+" union all "+sql4+" order by s"
+#    if doublicates: dstr=''
+#    else: dstr='and doublicat=0'
+#
+#    if new_period==0: period=''
+#    else: period='and registerdate>now()-INTERVAL %s DAY'%new_period
+#
+#    sql1="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
+#    sql2="select 2 s, count(*) from (select b.author_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.author_id) a1"%(TBL_BAUTHORS, TBL_BOOKS, period)
+#    sql3="select 3 s, count(*) from (select b.genre_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.genre_id) a2"%(TBL_BGENRES, TBL_BOOKS, period)
+#    sql4="select 4 s, count(*) from (select b.ser_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.ser_id) a3"%(TBL_BSERIES, TBL_BOOKS, period)
+#    sql=sql1+" union all "+sql2+" union all "+sql3+" union all "+sql4+" order by s"
+    sql="call sp_newinfo(%s)"%new_period
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
-    rows=cursor.fetchall()
+#    cursor.execute(sql)
+    cursor.callproc('sp_newinfo',(new_period,))
+#    rows=cursor.fetchall()
+    for results in cursor.stored_results():
+        rows=results.fetchall()
     cursor.close
     return rows
   
