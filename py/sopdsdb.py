@@ -3,7 +3,6 @@
 
 import os
 import sys
-import datetime
 import mysql.connector
 from mysql.connector import errorcode
 

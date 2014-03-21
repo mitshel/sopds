@@ -14,7 +14,6 @@ import sopdsparse
 import base64
 import subprocess
 import zipf
-from urllib import request
 from urllib import parse
 
 #######################################################################
