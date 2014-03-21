@@ -701,13 +701,16 @@ class opdsDatabase:
 #    sql3="select 3 s, count(*) from (select b.genre_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.genre_id) a2"%(TBL_BGENRES, TBL_BOOKS, period)
 #    sql4="select 4 s, count(*) from (select b.ser_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.ser_id) a3"%(TBL_BSERIES, TBL_BOOKS, period)
 #    sql=sql1+" union all "+sql2+" union all "+sql3+" union all "+sql4+" order by s"
+#    cursor=self.cnx.cursor()
+#    cursor.execute(sql)
+#    rows=cursor.fetchall()
+
     sql="call sp_newinfo(%s)"%new_period
     cursor=self.cnx.cursor()
-#    cursor.execute(sql)
     cursor.callproc('sp_newinfo',(new_period,))
-#    rows=cursor.fetchall()
     for results in cursor.stored_results():
         rows=results.fetchall()
+
     cursor.close
     return rows
   
