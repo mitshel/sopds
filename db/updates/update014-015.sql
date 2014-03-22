@@ -1,6 +1,14 @@
 update dbver set ver="0.15";
 update authors set first_name="" where author_id=1;
 
+drop table if exists bookshelf;
+create table bookshelf(
+user VARCHAR(32) not NULL,
+book_id INT not NULL,
+readtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+INDEX(user,readtime));
+commit;
+
 DROP PROCEDURE IF EXISTS sp_newinfo;
 
 DELIMITER //
