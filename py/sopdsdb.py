@@ -18,6 +18,7 @@ TBL_GENRES=DB_PREFIX+"genres"
 TBL_BGENRES=DB_PREFIX+"bgenres"
 TBL_SERIES=DB_PREFIX+"series"
 TBL_BSERIES=DB_PREFIX+"bseries"
+TBL_BOOKSHELF=DB_PREFIX+"bookshelf"
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -119,6 +120,30 @@ class opdsDatabase:
        book_id=row[0]
     cursor.close()
     return book_id
+
+  def findbookshelf(self,user,book_id):
+    sql=("select book_id from "+TBL_BOOKSHELF+" where user=%s and book_id=%s")
+    data=(user,book_id)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    row=cursor.fetchone()
+    if row==None:
+       book_id=0
+    else:
+       book_id=row[0]
+    cursor.close()
+    return book_id
+
+  def addbookshelf(self,user,book_id):
+    if self.findbookshelf(user,book_id)==0:
+       sql=("insert into "+TBL_BOOKSHELF+"(user,book_id) VALUES(%s, %s)")
+       data=(user,book_id)
+       cursor=self.cnx.cursor()
+       cursor.execute(sql,data)
+       self.cnx.commit()
+       book_id=cursor.lastrowid
+       cursor.close()
+       return book_id
 
   def addbook(self, name, path, cat_id, exten, title, annotation, docdate, lang, size=0, archive=0, doublicates=0):
     format=exten[1:]
@@ -396,8 +421,8 @@ class opdsDatabase:
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
     if new_period==0: period=''
     else: period="and author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%new_period
-    sql="select UPPER(substring(CONCAT(TRIM(last_name),' ',trim(first_name)),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where substring(CONCAT(trim(last_name),' ',trim(first_name)),1,"+str(lc-1)+")=%s "+period+" group by 1"+having+" order by 1"
-    data=(letters,)
+    sql="select UPPER(substring(CONCAT(last_name,' ',first_name),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where CONCAT(last_name,' ',first_name) like %s "+period+" group by 1"+having+" order by 1"
+    data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     rows=cursor.fetchall()
@@ -417,8 +442,8 @@ class opdsDatabase:
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
 
-    sql="select UPPER(substring(trim(title),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where substring(trim(title),1,"+str(lc-1)+")=%s and avail!=0 "+dstr+period+" group by 1"+having+" order by 1"
-    data=(letters,)
+    sql="select UPPER(substring(title,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where title like %s and avail!=0 "+dstr+period+" group by 1"+having+" order by 1"
+    data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     rows=cursor.fetchall()
@@ -436,8 +461,8 @@ class opdsDatabase:
     if new_period==0: period=''
     else: period="and ser_id in (select b.ser_id from bseries b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.ser_id)"%new_period
 
-    sql="select UPPER(substring(TRIM(ser),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where substring(trim(ser),1,"+str(lc-1)+")=%s "+period+" group by 1"+having+" order by 1"
-    data=(letters,)
+    sql="select UPPER(substring(ser,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where ser like %s "+period+" group by 1"+having+" order by 1"
+    data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
     rows=cursor.fetchall()
@@ -476,7 +501,7 @@ class opdsDatabase:
     if new_period==0: period=''
     else: period=" and (registerdate>now()-INTERVAL %s DAY) and a.author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%(new_period,new_period)
 
-    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and CONCAT(TRIM(a.last_name),' ',TRIM(a.first_name)) like %s and c.avail!=0 "+dstr+period+" group by 1,2,3 order by 3,2 "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.author_id, a.first_name, a.last_name, count(*) as cnt from "+TBL_AUTHORS+" a, "+TBL_BAUTHORS+" b, "+TBL_BOOKS+" c where a.author_id=b.author_id and b.book_id=c.book_id and CONCAT(a.last_name,' ',a.first_name) like %s and c.avail!=0 "+dstr+period+" group by 1,2,3 order by 3,2 "+limitstr
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
@@ -521,7 +546,7 @@ class opdsDatabase:
     else: dstr=' and c.doublicat=0 '
     if new_period==0: period=''
     else: period=" and (registerdate>now()-INTERVAL %s DAY) and a.ser_id in (select b.ser_id from bseries b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.ser_id)"%(new_period,new_period)
-    sql="select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) as cnt from "+TBL_SERIES+" a, "+TBL_BSERIES+" b, "+TBL_BOOKS+" c where a.ser_id=b.ser_id and b.book_id=c.book_id and TRIM(a.ser) like %s and c.avail!=0 "+dstr+period+" group by 1,2 order by 2 "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) as cnt from "+TBL_SERIES+" a, "+TBL_BSERIES+" b, "+TBL_BOOKS+" c where a.ser_id=b.ser_id and b.book_id=c.book_id and a.ser like %s and c.avail!=0 "+dstr+period+" group by 1,2 order by 2 "+limitstr
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
@@ -616,7 +641,7 @@ class opdsDatabase:
     elif alpha==3: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',UPPER(substr(a.title,1,1)))>0"
     elif alpha==4: having=" and INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',UPPER(substr(a.title,1,1)))=0"
 
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+" and a.avail!=0 "+dstr+period+having+" order by a.lang desc, a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BGENRES+" b where a.book_id=b.book_id and b.genre_id="+str(genre_id)+" and a.avail!=0 "+dstr+period+having+" order by a.lang, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -631,11 +656,32 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getdbinfo(self,doublicates=True):
+  def getbooksforuser(self,user,limit=0,page=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BOOKSHELF+" b where a.book_id=b.book_id and b.user=%s and a.avail!=0 order by readtime desc "+limitstr
+    data=(user,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getdbinfo(self,doublicates=True,book_shelf=False, user=None):
     if doublicates: dstr=''
     else: dstr='and doublicat=0'
+    if book_shelf and user!=None: bs=" union all select 6 s, count(book_id) from "+TBL_BOOKSHELF+" where user='"+user+"' "
+    else: bs=""
 
-    sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s union all select 5 s, count(ser_id) from %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES,TBL_SERIES)
+    sql="select 1 s, count(avail) from %s where avail!=0 %s union all select 2 s, count(author_id) from %s union all select 3 s, count(cat_id) from %s union all select 4 s, count(genre_id) from %s union all select 5 s, count(ser_id) from %s %s order by s"%(TBL_BOOKS,dstr,TBL_AUTHORS,TBL_CATALOGS,TBL_GENRES,TBL_SERIES,bs)
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -643,20 +689,27 @@ class opdsDatabase:
     return rows
 
   def getnewinfo(self,doublicates=True,new_period=0):
-    if doublicates: dstr=''
-    else: dstr='and doublicat=0'
+#    if doublicates: dstr=''
+#    else: dstr='and doublicat=0'
+#
+#    if new_period==0: period=''
+#    else: period='and registerdate>now()-INTERVAL %s DAY'%new_period
+#
+#    sql1="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
+#    sql2="select 2 s, count(*) from (select b.author_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.author_id) a1"%(TBL_BAUTHORS, TBL_BOOKS, period)
+#    sql3="select 3 s, count(*) from (select b.genre_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.genre_id) a2"%(TBL_BGENRES, TBL_BOOKS, period)
+#    sql4="select 4 s, count(*) from (select b.ser_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.ser_id) a3"%(TBL_BSERIES, TBL_BOOKS, period)
+#    sql=sql1+" union all "+sql2+" union all "+sql3+" union all "+sql4+" order by s"
+#    cursor=self.cnx.cursor()
+#    cursor.execute(sql)
+#    rows=cursor.fetchall()
 
-    if new_period==0: period=''
-    else: period='and registerdate>now()-INTERVAL %s DAY'%new_period
-
-    sql1="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
-    sql2="select 2 s, count(*) from (select b.author_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.author_id) a1"%(TBL_BAUTHORS, TBL_BOOKS, period)
-    sql3="select 3 s, count(*) from (select b.genre_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.genre_id) a2"%(TBL_BGENRES, TBL_BOOKS, period)
-    sql4="select 4 s, count(*) from (select b.ser_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.ser_id) a3"%(TBL_BSERIES, TBL_BOOKS, period)
-    sql=sql1+" union all "+sql2+" union all "+sql3+" union all "+sql4+" order by s"
+    sql="call sp_newinfo(%s)"%new_period
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
-    rows=cursor.fetchall()
+    cursor.callproc('sp_newinfo',(new_period,))
+    for results in cursor.stored_results():
+        rows=results.fetchall()
+
     cursor.close
     return rows
   
