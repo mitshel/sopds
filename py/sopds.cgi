@@ -83,6 +83,16 @@ def header_search(sstr='',charset='utf-8'):
    enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<link type="application/atom+xml" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
 
+def header_authors(title,charset='utf-8'):
+   enc_print('Content-Type: text/xml; charset='+charset)
+   enc_print()
+   enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
+   enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
+   enc_print('<id>tag::authors submenu::</id>')
+   enc_print('<title>%s</title>'%title)
+   enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
+   enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
+   enc_print('<link type="application/atom+xml" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
 
 def footer():
    enc_print('</feed>')
@@ -155,6 +165,21 @@ def new_menu():
    enc_print('<content type="text">Серий новинок: %s.</content>'%newinfo[3][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'06&amp;news=1"/>')
    enc_print('<id>id:06:news</id></entry>')
+
+def authors_submenu(author_id):
+   enc_print('<entry>')
+   enc_print('<title>Книги по сериям</title>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=31'+str(author_id)+'"/>')
+   enc_print('<id>id:31:authors</id></entry>')
+   enc_print('<entry>')
+   enc_print('<title>Книги вне серий</title>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=32'+str(author_id)+'"/>')
+   enc_print('<id>id:32:authors</id></entry>')
+   enc_print('<entry>')
+   enc_print('<title>Книги по алфавиту</title>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=33'+str(author_id)+'"/>')
+   enc_print('<id>id:33:authors</id></entry>')
+   enc_print('<entry>')
 
 def entry_start():
    enc_print('<entry>')
@@ -646,11 +671,35 @@ if type_value==16 or type_value==73:
    page_control(opdsdb,page_value,id_value)
    footer()
 
+#########################################################
+# Выдача подменю вывода книг по автору - в случае флага новинок будет сразу переход к выдаче книг автора
+#
+if type_value==22 and np==0:
+   (first_name,last_name)=opdsdb.getauthor_name(slice_value)
+   header_authors('Книги автора %s %s'%(last_name,first_name))
+   authors_submenu(slice_value)
+   footer()
 
 #########################################################
-# Выдача списка книг по автору
+# Выдача серий по автору
 #
-if type_value==22:
+if type_value==31:
+   (first_name,last_name)=opdsdb.getauthor_name(slice_value)
+   header_authors('Сериии книг автора %s %s'%(last_name,first_name))
+   for (ser_id,ser,cnt) in opdsdb.getseriesforauthor(slice_value,cfg.MAXITEMS,page_value):
+       id='34'+str(slice_value)+'&amp;ser='+str(ser_id)
+       entry_start()
+       entry_head(ser, None, id_value)
+       entry_link_subsection(id)
+       entry_content('Всего: '+str(cnt)+' книг.')
+       entry_finish()
+   page_control(opdsdb,page_value,id_value)
+   footer()
+
+#########################################################
+# Выдача списка книг по автору по алфавиту
+#
+if type_value==33 or (type_value==22 and np!=0):
    header()
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)

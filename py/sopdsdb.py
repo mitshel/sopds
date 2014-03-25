@@ -395,6 +395,15 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getauthor_name(self, author_id):
+    sql=("select first_name,last_name from "+TBL_AUTHORS+" where author_id=%s")
+    data=(author_id,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    row=cursor.fetchone()
+    cursor.close
+    return row
+
   def getgenres(self,book_id):
     sql=("select section, subsection from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where b.genre_id=a.genre_id and b.book_id="+str(book_id))
     cursor=self.cnx.cursor()
@@ -539,6 +548,28 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getseriesforauthor(self,author_id,limit=0,page=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+
+    sql=("select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) from "+TBL_SERIES+" a "
+    "left join "+TBL_BSERIES+" b on a.ser_id=b.ser_id "
+    "left join "+TBL_BAUTHORS+" c on b.book_id=c.book_id "
+    "where author_id="+str(author_id)+" group by 1,2 order by a.ser "+limitstr)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+    
   def getseriesbyl(self,letters,limit=0,page=0,doublicates=True,new_period=0):
     if limit==0: limitstr=""
     else: limitstr="limit "+str(limit*page)+","+str(limit)
