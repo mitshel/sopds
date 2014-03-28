@@ -140,7 +140,6 @@ def main_menu():
       enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=08"/>')
       enc_print('<id>id:08</id></entry>')
 
-
 def new_menu():
    if cfg.ALPHA: am='30'
    else: am=''
@@ -152,17 +151,17 @@ def new_menu():
    enc_print('<id>id:03:news</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Новинки по авторам</title>')
-   enc_print('<content type="text">Авторов новинок: %s.</content>'%newinfo[1][1])
+#   enc_print('<content type="text">Авторов новинок: %s.</content>'%newinfo[1][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'02&amp;news=1"/>')
    enc_print('<id>id:02:news</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Новинки по Жанрам</title>')
-   enc_print('<content type="text">Жанров новинок: %s.</content>'%newinfo[2][1])
+#   enc_print('<content type="text">Жанров новинок: %s.</content>'%newinfo[2][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=04&amp;news=1"/>')
    enc_print('<id>id:04:news</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Новинки по Сериям</title>')
-   enc_print('<content type="text">Серий новинок: %s.</content>'%newinfo[3][1])
+#   enc_print('<content type="text">Серий новинок: %s.</content>'%newinfo[3][1])
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id='+am+'06&amp;news=1"/>')
    enc_print('<id>id:06:news</id></entry>')
 
@@ -569,17 +568,6 @@ if type_value==24:
 elif type_value==5:
    header()
    new_menu()
-#   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getlastbooks(cfg.MAXITEMS):
-#       id='90'+str(book_id)
-#       entry_start()
-#       entry_head(book_title, reg_date, id_value)
-#       entry_link_book(book_id,format)
-#       entry_covers(cover,cover_type,book_id)
-#       authors=entry_authors(opdsdb,book_id,True)
-#       genres=entry_genres(opdsdb,book_id)
-#       series=entry_series(opdsdb,book_id)
-#       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-#       entry_finish()
    footer()
 
 #########################################################
