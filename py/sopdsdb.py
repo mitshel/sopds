@@ -404,6 +404,15 @@ class opdsDatabase:
     cursor.close
     return row
 
+  def getser_name(self, ser_id):
+    sql=("select ser from "+TBL_SERIES+" where ser_id=%s")
+    data=(ser_id,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    row=cursor.fetchone()
+    cursor.close
+    return row
+
   def getgenres(self,book_id):
     sql=("select section, subsection from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where b.genre_id=a.genre_id and b.book_id="+str(book_id))
     cursor=self.cnx.cursor()

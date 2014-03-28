@@ -59,39 +59,17 @@ def websym(s,attr=False):
 def enc_print(string='', encoding='utf8'):
     sys.stdout.buffer.write(string.encode(encoding) + b'\n')
 
-def header(charset='utf-8'):
+def header(h_id=cfg.SITE_ID,h_title=cfg.SITE_TITLE, h_subtitle='Simple OPDS Catalog by www.sopds.ru',charset='utf-8'):
    enc_print('Content-Type: text/xml; charset='+charset)
    enc_print()
    enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
    enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
-   enc_print('<id>'+cfg.SITE_ID+'</id>')
-   enc_print('<title>'+cfg.SITE_TITLE+'</title>')
-   enc_print('<subtitle>Simple OPDS Catalog by www.sopds.ru</subtitle>')
+   enc_print('<id>%s</id>'%h_id)
+   enc_print('<title>%s</title>'%h_title)
+   enc_print('<subtitle>%s</subtitle>'%h_subtitle)
    enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
    enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<author><name>'+cfg.SITE_AUTOR+'</name><uri>'+cfg.SITE_URL+'</uri><email>'+cfg.SITE_EMAIL+'</email></author>')
-   enc_print('<link type="application/atom+xml" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
-
-def header_search(sstr='',charset='utf-8'):
-   enc_print('Content-Type: text/xml; charset='+charset)
-   enc_print()
-   enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
-   enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
-   enc_print('<id>tag::search::'+sstr+'</id>')
-   enc_print('<title>Поиск</title>')
-   enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
-   enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
-   enc_print('<link type="application/atom+xml" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
-
-def header_authors(title,charset='utf-8'):
-   enc_print('Content-Type: text/xml; charset='+charset)
-   enc_print()
-   enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
-   enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
-   enc_print('<id>tag::authors submenu::</id>')
-   enc_print('<title>%s</title>'%title)
-   enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
-   enc_print('<icon>'+cfg.SITE_ICON+'</icon>')
    enc_print('<link type="application/atom+xml" rel="start" href="'+cfg.CGI_PATH+'?id=00"/>')
 
 def footer():
@@ -190,12 +168,12 @@ def entry_head(e_title,e_date,e_id):
    enc_print('<id>id:'+e_id+'</id>')
 
 def entry_link_subsection(link_id):
-#   enc_print('<link type="application/atom+xml" rel="alternate" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
+   enc_print('<link type="application/atom+xml" rel="alternate" href="'+cfg.CGI_PATH+'?id='+link_id+'"/>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+cfg.CGI_PATH+'?id='+link_id+nl+'"/>')
 
 def entry_link_book(link_id,format):
    str_id=str(link_id)
-#   enc_print('<link type="application/'+format+'" rel="alternate" href="'+cfg.CGI_PATH+'?id=91'+str_id+'"/>')
+   enc_print('<link type="application/'+format+'" rel="alternate" href="'+cfg.CGI_PATH+'?id=91'+str_id+'"/>')
    if format.lower()=='fb2' and cfg.FB2TOEPUB:
       enc_print('<link type="application/epub" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
       enc_print('<link type="application/epub+zip" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
@@ -373,7 +351,7 @@ if type_value==0:
 # Выбрана сортировка "По каталогам"
 #
 elif type_value==1:
-   header()
+   header('id:catalogs','Сортировка по каталогам хранения')
    for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
        entry_start()
        entry_head(item_title, reg_date, id_value)
@@ -410,7 +388,7 @@ elif type_value==2:
       letter=chr(i%10000)+letter
       i=i//10000
 
-   header()
+   header('id:preauthors:%s'%letter,'Выбор авторов "%s"'%letter)
    for (letters,cnt) in opdsdb.getauthor_2letters(letter,alpha,np):
        id=""
        for i in range(len(letters)):
@@ -438,7 +416,7 @@ elif type_value==6:
       letter=chr(i%10000)+letter
       i=i//10000
 
-   header()
+   header('id:preseries:%s'%letter,'Выбор серий "%s"'%letter)
    for (letters,cnt) in opdsdb.getseries_2letters(letter,alpha,np):
        id=""
        for i in range(len(letters)):
@@ -467,7 +445,7 @@ elif type_value==3:
       letter=chr(i%10000)+letter
       i=i//10000
 
-   header()
+   header('id:pretitle:%s'%letter,'Выбор наименований "%s"'%letter)
    for (letters,cnt) in opdsdb.gettitle_2letters(letter,cfg.DUBLICATES_SHOW,alpha,np):
        id=""
        for i in range(len(letters)):
@@ -499,7 +477,7 @@ if type_value==13 or type_value==71:
    else:
       letter="%"+searchTerm
 
-   header()
+   header('id:title:%s'%letter,'Книги по наименованию "%s"'%letter)
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
@@ -518,7 +496,7 @@ if type_value==13 or type_value==71:
 # Выбрана сортировка "По жанрам" - показ секций
 #
 elif type_value==4:
-   header()
+   header('id:genre:sections','Список жанров')
    for (genre_id,genre_section,cnt) in opdsdb.getgenres_sections(cfg.DUBLICATES_SHOW,np):
        id='14'+str(genre_id)
        entry_start()
@@ -532,7 +510,7 @@ elif type_value==4:
 # Выбрана сортировка "По жанрам" - показ подсекций
 #
 elif type_value==14:
-   header()
+   header('id:genre:subsections:%s'%slice_value,'Список жанров (уровень 2)')
    for (genre_id,genre_subsection,cnt) in opdsdb.getgenres_subsections(slice_value,cfg.DUBLICATES_SHOW,np):
        id='24'+str(genre_id)
        if cfg.ALPHA: id='30'+id
@@ -547,7 +525,7 @@ elif type_value==14:
 # Выдача списка книг по жанру
 #
 if type_value==24:
-   header()
+   header('id:genres:%s'%slice_value,'Список книг по выбранному жанру')
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,alpha,np):
        id='90'+str(book_id)
        entry_start()
@@ -566,7 +544,7 @@ if type_value==24:
 # Выбрана сортировка "Последние поступления"
 #
 elif type_value==5:
-   header()
+   header('id:news','Последние поступления за %s дней'%cfg.NEW_PERIOD)
    new_menu()
    footer()
 
@@ -574,7 +552,7 @@ elif type_value==5:
 # Выбор типа поиска по автору или наименованию или серии
 #
 if type_value==7:
-   header_search(searchTerm)
+   header('id:search:%s'%searchTerm,'Поиск %s'%searchTerm)
    enc_print('<link href="'+cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
    enc_print('<link href="'+cfg.CGI_PATH+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
    entry_start()
@@ -598,7 +576,7 @@ if type_value==7:
 # Выдача списка книг на книжной полке
 #
 if type_value==8:
-   header()
+   header('id:bookshelf:%s'%user,'Книги пользователя %s'%user)
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforuser(user,cfg.MAXITEMS,page_value):
        id='90'+str(book_id)
        entry_start()
@@ -627,7 +605,7 @@ if type_value==12 or type_value==72:
    else:
       letter="%"+searchTerm
 
-   header()
+   header('id:authors:%s'%letter,'Авторы по имени "%s"'%letter)
    for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='22'+str(author_id)
        entry_start()
@@ -653,7 +631,7 @@ if type_value==16 or type_value==73:
    else:
       letter="%"+searchTerm
 
-   header()
+   header('id:series:%s'%letter,'Список серий книг "%s"'%letter)
    for (ser_id,ser,cnt) in opdsdb.getseriesbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='26'+str(ser_id)
        entry_start()
@@ -669,7 +647,7 @@ if type_value==16 or type_value==73:
 #
 if type_value==22 and np==0:
    (first_name,last_name)=opdsdb.getauthor_name(slice_value)
-   header_authors('Книги автора %s %s'%(last_name,first_name))
+   header('id:autor:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
    authors_submenu(slice_value)
    footer()
 
@@ -678,7 +656,7 @@ if type_value==22 and np==0:
 #
 if type_value==31:
    (first_name,last_name)=opdsdb.getauthor_name(slice_value)
-   header_authors('Сериии книг автора %s %s'%(last_name,first_name))
+   header('id:autorseries:%s %s'%(last_name,first_name),'Серии книг автора %s %s'%(last_name,first_name))
    for (ser_id,ser,cnt) in opdsdb.getseriesforauthor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='34'+str(slice_value)+'&amp;ser='+str(ser_id)
        entry_start()
@@ -693,7 +671,8 @@ if type_value==31:
 # Выдача списка книг по автору по алфавиту
 #
 if type_value==33 or (type_value==22 and np!=0):
-   header()
+   (first_name,last_name)=opdsdb.getauthor_name(slice_value)
+   header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
@@ -712,7 +691,8 @@ if type_value==33 or (type_value==22 and np!=0):
 # Выдача списка книг по автору по выбранной серии (или вне серий если ser_value==0)
 #
 if type_value==34:
-   header()
+   (first_name,last_name)=opdsdb.getauthor_name(slice_value)
+   header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautorser(slice_value,ser_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
@@ -731,7 +711,8 @@ if type_value==34:
 # Выдача списка книг по серии
 #
 if type_value==26:
-   header()
+   (ser_name,)=opdsdb.getser_name(slice_value)
+   header('id:ser:%s'%ser_name,'Книги серии %s'%ser_name)
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforser(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
