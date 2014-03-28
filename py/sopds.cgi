@@ -173,7 +173,7 @@ def authors_submenu(author_id):
    enc_print('<id>id:31:authors</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Книги вне серий</title>')
-   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=32'+str(author_id)+'"/>')
+   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=34'+str(author_id)+'"/>')
    enc_print('<id>id:32:authors</id></entry>')
    enc_print('<entry>')
    enc_print('<title>Книги по алфавиту</title>')
@@ -322,6 +322,7 @@ locale.setlocale(locale.LC_ALL,'ru_RU.UTF-8')
 type_value=0
 slice_value=0
 page_value=0
+ser_value=0
 alpha=0
 news=0
 np=0
@@ -356,6 +357,10 @@ if 'news' in form:
    news=1
    nl='&amp;news=1'
    np=cfg.NEW_PERIOD
+if 'ser' in form:
+   ser=form.getvalue("ser","0")
+   if ser.isdigit():
+      ser_value=int(ser)
 
 opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
 opdsdb.openDB()
@@ -686,7 +691,7 @@ if type_value==22 and np==0:
 if type_value==31:
    (first_name,last_name)=opdsdb.getauthor_name(slice_value)
    header_authors('Сериии книг автора %s %s'%(last_name,first_name))
-   for (ser_id,ser,cnt) in opdsdb.getseriesforauthor(slice_value,cfg.MAXITEMS,page_value):
+   for (ser_id,ser,cnt) in opdsdb.getseriesforauthor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='34'+str(slice_value)+'&amp;ser='+str(ser_id)
        entry_start()
        entry_head(ser, None, id_value)
@@ -702,6 +707,25 @@ if type_value==31:
 if type_value==33 or (type_value==22 and np!=0):
    header()
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
+       id='90'+str(book_id)
+       entry_start()
+       entry_head(book_title, reg_date, id_value)
+       entry_link_book(book_id,format)
+       entry_covers(cover,cover_type,book_id)
+       authors=entry_authors(opdsdb,book_id,True)
+       genres=entry_genres(opdsdb,book_id)
+       series=entry_series(opdsdb,book_id)
+       entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
+       entry_finish()
+   page_control(opdsdb,page_value,id_value)
+   footer()
+
+#########################################################
+# Выдача списка книг по автору по выбранной серии (или вне серий если ser_value==0)
+#
+if type_value==34:
+   header()
+   for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautorser(slice_value,ser_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
        entry_head(book_title, reg_date, id_value)

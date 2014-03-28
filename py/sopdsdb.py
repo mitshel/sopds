@@ -548,16 +548,54 @@ class opdsDatabase:
     cursor.close
     return rows
 
-  def getseriesforauthor(self,author_id,limit=0,page=0):
+  def getbooksforautorser(self,author_id,ser_id,limit=0,page=0,doublicates=True):
     if limit==0: limitstr=""
     else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and a.doublicat=0 '
+    if ser_id!=0:
+       sql=("select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type "
+       "from "+TBL_BOOKS+" a "
+       "left join "+TBL_BAUTHORS+" b on a.book_id=b.book_id "
+       "left join "+TBL_BSERIES +" c on a.book_id=c.book_id "
+       "where author_id=%s and ser_id=%s and a.avail!=0 "+dstr+" order by a.title "+limitstr)
+       data=(author_id,ser_id)
+    else:
+       sql=("select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type "
+       "from "+TBL_BOOKS+" a "
+       "left join "+TBL_BAUTHORS+" b on a.book_id=b.book_id "
+       "left outer join "+TBL_BSERIES +" c on a.book_id=c.book_id "
+       "where author_id=%s and ser_id is NULL and a.avail!=0 "+dstr+" order by a.title "+limitstr)
+       data=(author_id,)
+       
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
+  def getseriesforauthor(self,author_id,limit=0,page=0,doublicates=True):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    if doublicates: dstr=''
+    else: dstr=' and doublicat=0 '
 
     sql=("select SQL_CALC_FOUND_ROWS a.ser_id, a.ser, count(*) from "+TBL_SERIES+" a "
     "left join "+TBL_BSERIES+" b on a.ser_id=b.ser_id "
     "left join "+TBL_BAUTHORS+" c on b.book_id=c.book_id "
-    "where author_id="+str(author_id)+" group by 1,2 order by a.ser "+limitstr)
+    "left join "+TBL_BOOKS+" d on b.book_id=d.book_id "
+    "where author_id=%s and avail!=0 "+dstr+" group by 1,2 order by a.ser "+limitstr)
+    data=(author_id,)
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql,data)
     rows=cursor.fetchall()
 
     cursor.execute("SELECT FOUND_ROWS()")
