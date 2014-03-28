@@ -1,7 +1,7 @@
 Simple OPDS Catalog
 Простой OPDS Каталог
 Author: Dmitry V.Shelepnev
-Версия 0.15
+Версия 0.16
 
 Установка Simple OPDS в Fedora:
 

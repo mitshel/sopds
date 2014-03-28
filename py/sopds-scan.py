@@ -25,7 +25,7 @@ from sys import argv
 
 t1=datetime.timedelta(seconds=time.time())
 
-parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version 0.15", add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
+parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version 0.16", add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
 parser.add_option('-s','--scan','--scanfull', action='store_true', dest='scanfull', default=True, help='Full rescan all stored files.')
 parser.add_option('-l','--scanlast', action='store_false', dest='scanfull', default=True, help='Scan files from date after last scan.')
 parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
