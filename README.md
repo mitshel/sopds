@@ -97,10 +97,10 @@ Alias   /opds           "/home/www/opds"
      yum install python
      yum install python-lxml
      yum install python-cssutils
-   - скопировать архив проекта в opds/fb2conv (Здесь уже подготовлены shell-скрипты для запуска конвертера)
-     и разархивировать его
-   - Для конвертации в MOBI нужно также скачать с amazon утилиту KindleGen (http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621)
-     положить в каталог с конвертером и разархивировать
+   - скачать последнюю версию конвертера по ссылке выше (текущая уже находится в каталоге fb2conv проекта)
+   - скачать утилиту KindleGen с сайта Amazon http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 (текущая версия утилиты уже находится в каталоге fb2conv проекта)
+   - скопировать архив проекта в opds/fb2conv (Здесь уже подготовлены shell-скрипты для запуска конвертера) и разархивировать его
+   - Для конвертации в MOBI нужно архив с утилитой KindleGen положить в каталог с конвертером и разархивировать
    - В конфигурационном файле sopds.conf задать пути к соответствующим скриптам:
      fb2toepub=../fb2conv/fb2epub
      fb2tomobi=../fb2conv/fb2mobi
