@@ -7,5 +7,9 @@ py/b64decode.py
 py/*.log
 fb2toepub/*
 !fb2toepub/*.zip
+fb2conv/*
+!fb2conv/*.zip
+!fb2conv/*.gz
+!fb2conv/fb2conv
 testinfo/*
 speed

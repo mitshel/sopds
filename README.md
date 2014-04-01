@@ -1,7 +1,7 @@
 Simple OPDS Catalog
 Простой OPDS Каталог
 Author: Dmitry V.Shelepnev
-Версия 0.16
+Версия 0.17
 
 Установка Simple OPDS в Fedora:
 
@@ -73,7 +73,7 @@ Alias   /opds           "/home/www/opds"
   папку covers
   rm -rf covers
 
-9. Настройка конвертации fb2 в EPUB (возможно кому-нибудь нужно)
+9. Настройка конвертации fb2 в EPUB или MOBI (возможно кому-нибудь нужно)
    9.1 - Конвертер fb2-to-epub http://code.google.com/p/fb2-to-epub-converter/
    - во первых необходимо скачать последнюю версию конвертера fb2toepub по ссылке выше (текущая уже находится в проекте)
      к сожалению конвертер не совершенный и не все книги может конвертирвать, но большинство все-таки конвертируется
@@ -90,5 +90,19 @@ Alias   /opds           "/home/www/opds"
    - скопировать jar-файл например в каталог opds/fb2epub (Здесь уже лежит shell-скрипт для запуска jar-файла)
    - Соответственно прописать пути в файле конфигурации sopds.conf к shell-скрипту fb2epub
      fb2toepub=../fb2epub/fb2epub
+     temp_dir=/tmp
+
+   9.3 - Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447
+   - Необходимо установить python 2.7 и пакеты lxml, cssutils:
+     yum install python
+     yum install python-lxml
+     yum install python-cssutils
+   - скопировать архив проекта в opds/fb2conv (Здесь уже подготовлены shell-скрипты для запуска конвертера)
+     и разархивировать его
+   - Для конвертации в MOBI нужно также скачать с amazon утилиту KindleGen (http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621)
+     положить в каталог с конвертером и разархивировать
+   - В конфигурационном файле sopds.conf задать пути к соответствующим скриптам:
+     fb2toepub=../fb2conv/fb2epub
+     fb2tomobi=../fb2conv/fb2mobi
      temp_dir=/tmp
 

@@ -65,6 +65,9 @@ class cfgreader:
        self.FB2TOEPUB_PATH=config.getdefault(CFG_S_GLOBAL,'fb2toepub',None)
        self.FB2TOEPUB=self.FB2TOEPUB_PATH!=None and os.path.isfile(self.FB2TOEPUB_PATH)
 
+       self.FB2TOMOBI_PATH=config.getdefault(CFG_S_GLOBAL,'fb2tomobi',None)
+       self.FB2TOMOBI=self.FB2TOMOBI_PATH!=None and os.path.isfile(self.FB2TOMOBI_PATH)
+
        self.TEMP_DIR=config.getdefault(CFG_S_GLOBAL,'temp_dir','/tmp')
        self.TEMP_DIR=os.path.normpath(self.TEMP_DIR)
    

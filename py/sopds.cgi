@@ -40,7 +40,7 @@ def translit(s):
    assert s is not str, "Error: argument MUST be string"
 
    table1 = str.maketrans("абвгдеёзийклмнопрстуфхъыьэАБВГДЕЁЗИЙКЛМНОПРСТУФХЪЫЬЭ",  "abvgdeezijklmnoprstufh'y'eABVGDEEZIJKLMNOPRSTUFH'Y'E")
-   table2 = {'ж':'zh','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ю':'ju','я':'ja',  'Ж':'Zh','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch','Ю':'Ju','Я':'Ja'}
+   table2 = {'ж':'zh','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ю':'ju','я':'ja',  'Ж':'Zh','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch','Ю':'Ju','Я':'Ja', '«':'\'', '»':'\'','"':'\''}
    for k in table2.keys():
        s = s.replace(k,table2[k])
    return s.translate(table1)
@@ -177,6 +177,9 @@ def entry_link_book(link_id,format):
    if format.lower()=='fb2' and cfg.FB2TOEPUB:
       enc_print('<link type="application/epub" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
       enc_print('<link type="application/epub+zip" href="'+cfg.CGI_PATH+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+   if format.lower()=='fb2' and cfg.FB2TOMOBI:
+      enc_print('<link type="application/mobi" href="'+cfg.CGI_PATH+'?id=94'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+      enc_print('<link type="application/mobi+zip" href="'+cfg.CGI_PATH+'?id=94'+str_id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'" href="'+cfg.CGI_PATH+'?id=91'+str_id+'" rel="http://opds-spec.org/acquisition" />')
    enc_print('<link type="application/'+format+'+zip" href="'+cfg.CGI_PATH+'?id=92'+str_id+'" rel="http://opds-spec.org/acquisition" />')
 
@@ -824,15 +827,21 @@ elif type_value==92:
       sys.stdout.buffer.write(buf)
 
 #########################################################
-# Выдача файла книги после конвертации в EPUB
+# Выдача файла книги после конвертации в EPUB или mobi
 #
-elif type_value==93:
+elif type_value==93 or type_value==94:
    (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
    if cfg.BOOK_SHELF and user!=None: opdsdb.addbookshelf(user,slice_value)
    full_path=os.path.join(cfg.ROOT_LIB,book_path)
    (n,e)=os.path.splitext(book_name)
-   if cfg.TITLE_AS_FN: transname=translit(title)+'.epub'
-   else: transname=translit(n)+'.epub'
+   if type_value==93: 
+      convert_type='.epub'
+      converter_path=cfg.FB2TOEPUB_PATH
+   elif type_value==94: 
+      convert_type='.mobi'
+      converter_path=cfg.FB2TOMOBI_PATH
+   if cfg.TITLE_AS_FN: transname=translit(title)+convert_type
+   else: transname=translit(n)+convert_type
    if cat_type==sopdsdb.CAT_NORMAL:
       tmp_fb2_path=None
       file_path=os.path.join(full_path,book_name)
@@ -843,12 +852,12 @@ elif type_value==93:
       tmp_fb2_path=os.path.join(cfg.TEMP_DIR,book_name)
       file_path=tmp_fb2_path
 
-   tmp_epub_path=os.path.join(cfg.TEMP_DIR,transname)
-   proc = subprocess.Popen(("%s %s %s"%(cfg.FB2TOEPUB_PATH,("\"%s\""%file_path),"\"%s\""%tmp_epub_path)).encode('utf8'), shell=True, stdout=subprocess.PIPE)
+   tmp_conv_path=os.path.join(cfg.TEMP_DIR,transname)
+   proc = subprocess.Popen(("%s %s %s"%(converter_path,("\"%s\""%file_path),"\"%s\""%tmp_conv_path)).encode('utf8'), shell=True, stdout=subprocess.PIPE)
    out = proc.stdout.readlines()
    
-   if os.path.isfile(tmp_epub_path):
-      fo=codecs.open(tmp_epub_path, "rb")
+   if os.path.isfile(tmp_conv_path):
+      fo=codecs.open(tmp_conv_path, "rb")
       str=fo.read()
       # HTTP Header
       enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
@@ -864,7 +873,7 @@ elif type_value==93:
 
    try: os.remove(tmp_fb2_path.encode('utf-8'))
    except: pass
-   try: os.remove(tmp_epub_path)
+   try: os.remove(tmp_conv_path)
    except: pass
 
 ######################################################
