@@ -10,6 +10,7 @@ fb2toepub/*
 fb2conv/*
 !fb2conv/*.zip
 !fb2conv/*.gz
-!fb2conv/fb2conv
+!fb2conv/fb2epub
+!fb2conv/fb2mobi
 testinfo/*
 speed

@@ -1,0 +1,9 @@
+#!/bin/bash
+LANG=ru_RU.UTF-8
+LC_ALL=ru_RU.UTF-8
+export LANG
+export LC_ALL
+
+run_path=`dirname $0`
+converter=$run_path'/fb2conv.py'
+python $converter -f epub "$1" "$2"
