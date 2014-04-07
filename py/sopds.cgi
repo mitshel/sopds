@@ -8,7 +8,7 @@ import cgi
 import codecs
 import os
 import io
-import locale
+#import locale
 import time
 import sopdsparse
 import base64
@@ -297,7 +297,7 @@ def alphabet_menu(iid_value):
 # Основной код программы
 #
 
-locale.setlocale(locale.LC_ALL,'ru_RU.UTF-8')
+# locale.setlocale(locale.LC_ALL,'ru_RU.UTF-8')
 
 type_value=0
 slice_value=0
