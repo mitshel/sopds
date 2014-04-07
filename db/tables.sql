@@ -24,6 +24,7 @@ PRIMARY KEY(book_id),
 KEY(filename),
 KEY(title,format,filesize),
 INDEX(path),
+INDEX(cat_id),
 INDEX(avail,doublicat),
 INDEX(registerdate));
 commit;
@@ -36,7 +37,7 @@ cat_name VARCHAR(64),
 path VARCHAR(1024),
 cat_type INT not null DEFAULT 0,
 PRIMARY KEY(cat_id),
-KEY(cat_name));
+KEY(cat_name,path));
 commit;
 
 drop table if exists authors;

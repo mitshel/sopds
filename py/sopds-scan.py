@@ -106,7 +106,7 @@ def processfile(db,fb2,name,full_path,file,archive=0,file_size=0,cat_id=0):
     if e.lower() in extensions_set:
        rel_path=os.path.relpath(full_path,cfg.ROOT_LIB)
 
-       logging.debug("Attempt to add book "+rel_path+" - "+name)
+       logging.debug("Attempt to add book "+rel_path+"/"+name)
 
        fb2.reset()
        if db.findbook(name,rel_path,1)==0:
