@@ -23,6 +23,7 @@ avail INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
 KEY(title,format,filesize),
+INDEX(path),
 INDEX(avail,doublicat),
 INDEX(registerdate));
 commit;
@@ -102,7 +103,7 @@ create table dbver(
 ver varchar(5));
 commit;
 
-insert into dbver(ver) values("0.17");
+insert into dbver(ver) values("0.18");
 commit;
 insert into authors(author_id,last_name,first_name) values(1,"Неизвестный Автор","");
 commit;
