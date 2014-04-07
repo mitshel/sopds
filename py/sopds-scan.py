@@ -186,7 +186,7 @@ def processzip(db,fb2,name,full_path,file):
           filelist = z.namelist()
           for n in filelist:
               try:
-                  logging.info('Start process ZIP file = '+file+' book file = '+n)
+                  logging.debug('Start process ZIP file = '+file+' book file = '+n)
                   file_size=z.getinfo(n).file_size
                   processfile(db,fb2,n,file,z.open(n),1,file_size,cat_id=cat_id)
               except:
