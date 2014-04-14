@@ -3,6 +3,7 @@
 import os
 import sys
 import codecs
+import logging
 
 ##########################################################################
 # Глобальные переменные
@@ -14,6 +15,9 @@ CFG_PATH_DEFAULT=ROOT_PATH+os.path.sep+'conf'+os.path.sep+CFG_FILENAME
 CFG_PATH=CFG_PATH_DEFAULT
 COVER_PATH=os.path.join(ROOT_PATH,'covers')
 NOCOVER_IMG='nocover.jpg'
+LOG_PATH=os.path.join(ROOT_PATH,'logs')
+
+loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
 
 ###########################################################################
 # Считываем конфигурацию из конфигурационного файла
@@ -70,6 +74,14 @@ class cfgreader:
 
        self.TEMP_DIR=config.getdefault(CFG_S_GLOBAL,'temp_dir','/tmp')
        self.TEMP_DIR=os.path.normpath(self.TEMP_DIR)
+       
+       logfile=config.getdefault(CFG_S_GLOBAL,'logfile','sopds.log')
+       self.LOGFILE=os.path.join(LOG_PATH,logfile)
+       loglevel=config.getdefault(CFG_S_GLOBAL,'loglevel','none')
+       if loglevel.lower() in loglevels:
+           self.LOGLEVEL=loglevels[loglevel.lower()]
+       else:
+           self.LOGLEVEL=logging.NOTSET
    
        self.DB_NAME=config.get(CFG_S_GLOBAL,'db_name')
        self.DB_USER=config.get(CFG_S_GLOBAL,'db_user')

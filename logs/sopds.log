@@ -1,0 +1,16 @@
+INFO     [2014-04-14 21:25:34,904] Books added      : 0
+INFO     [2014-04-14 21:25:34,935] Books skipped    : 5569
+INFO     [2014-04-14 21:25:34,936] Books DB entries deleted : 0
+INFO     [2014-04-14 21:25:34,936] Books in archives: 0
+INFO     [2014-04-14 21:25:34,936] Archives scanned : 35
+INFO     [2014-04-14 21:25:34,936] Archives skipped : 127
+INFO     [2014-04-14 21:25:34,936] Bad archives     : 0
+INFO     [2014-04-14 21:25:34,937] Time estimated:0 hours, 3 minutes, 43 seconds.
+2014-04-14 21:48:44,661 INFO     Books added      : 0
+2014-04-14 21:48:44,701 INFO     Books skipped    : 5569
+2014-04-14 21:48:44,701 INFO     Books DB entries deleted : 0
+2014-04-14 21:48:44,702 INFO     Books in archives: 0
+2014-04-14 21:48:44,702 INFO     Archives scanned : 35
+2014-04-14 21:48:44,703 INFO     Archives skipped : 127
+2014-04-14 21:48:44,703 INFO     Bad archives     : 0
+2014-04-14 21:48:44,704 INFO     Time estimated:0 hours, 3 minutes, 43 seconds.

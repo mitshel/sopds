@@ -39,18 +39,28 @@ else: cfg=sopdscfg.cfgreader(CFG_FILE)
 
 zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
 
+if cfg.LOGLEVEL!=logging.NOTSET:
+    # Создаем обработчик для записи логов в файл
+    fh = logging.FileHandler(cfg.LOGFILE)
+    fh.setLevel(cfg.LOGLEVEL)
 
 if VERBOSE:
-   logging.basicConfig(level = logging.DEBUG)
-else:
-   logging.basicConfig(level = logging.INFO)
+   # Создадим обработчик для вывода логов на экран с максимальным уровнем вывода
+   ch = logging.StreamHandler()
+   ch.setLevel(logging.DEBUG)
 
-logging.info('OPTIONS SET')
-if cfg.CONFIGFILE!=None:     logging.info('configfile = '+cfg.CONFIGFILE)
-if cfg.ROOT_LIB!=None:       logging.info('root_lib = '+cfg.ROOT_LIB)
-if cfg.FB2TOEPUB_PATH!=None: logging.info('fb2toepub = '+cfg.FB2TOEPUB_PATH)
-if cfg.FB2TOMOBI_PATH!=None: logging.info('fb2tomobi = '+cfg.FB2TOMOBI_PATH)
-if cfg.TEMP_DIR!=None:       logging.info('temp_dir = '+cfg.TEMP_DIR)
+logformat='%(asctime)s %(levelname)-8s %(message)s'
+if VERBOSE:
+   logging.basicConfig(format = logformat, level = logging.DEBUG, handlers=(fh,ch))
+else:
+   logging.basicConfig(format = logformat, level = logging.INFO, handlers=(fh,))
+
+logging.debug('OPTIONS SET')
+if cfg.CONFIGFILE!=None:     logging.debug('configfile = '+cfg.CONFIGFILE)
+if cfg.ROOT_LIB!=None:       logging.debug('root_lib = '+cfg.ROOT_LIB)
+if cfg.FB2TOEPUB_PATH!=None: logging.debug('fb2toepub = '+cfg.FB2TOEPUB_PATH)
+if cfg.FB2TOMOBI_PATH!=None: logging.debug('fb2tomobi = '+cfg.FB2TOMOBI_PATH)
+if cfg.TEMP_DIR!=None:       logging.debug('temp_dir = '+cfg.TEMP_DIR)
 
 #############################################################################
 #
@@ -235,20 +245,20 @@ opdsdb.update_double()
 opdsdb.closeDB()
 
 t2=datetime.timedelta(seconds=time.time())
-print()
-print('Books added      : ',books_added)
-print('Books skipped    : ',books_skipped)
+logging.info('Books added      : '+str(books_added))
+logging.info('Books skipped    : '+str(books_skipped))
 if cfg.DELETE_LOGICAL:
-   print('Books deleted    : ',books_deleted)
+   logging.info('Books deleted    : '+str(books_deleted))
 else:
-   print('Books DB entries deleted : ',books_deleted)
-print('Books in archives: ',books_in_archives)
-print('Archives scanned : ',arch_scanned)
-print('Archives skipped : ',arch_skipped)
-print('Bad archives     : ',bad_archives)
+   logging.info('Books DB entries deleted : '+str(books_deleted))
+logging.info('Books in archives: '+str(books_in_archives))
+logging.info('Archives scanned : '+str(arch_scanned))
+logging.info('Archives skipped : '+str(arch_skipped))
+logging.info('Bad archives     : '+str(bad_archives))
 
 t=t2-t1
 seconds=t.seconds%60
 minutes=((t.seconds-seconds)//60)%60
 hours=t.seconds//3600
-print('Time estimated:',hours,' hours, ',minutes,' minutes, ',seconds,' seconds.')
+logging.info('Time estimated:'+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
+
