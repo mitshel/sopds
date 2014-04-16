@@ -14,3 +14,39 @@ INFO     [2014-04-14 21:25:34,937] Time estimated:0 hours, 3 minutes, 43 seconds
 2014-04-14 21:48:44,703 INFO     Archives skipped : 127
 2014-04-14 21:48:44,703 INFO     Bad archives     : 0
 2014-04-14 21:48:44,704 INFO     Time estimated:0 hours, 3 minutes, 43 seconds.
+2014-04-14 22:22:24,055 INFO     Starting sopds-scan...
+2014-04-14 22:25:31,667 INFO     Books added      : 0
+2014-04-14 22:25:31,668 INFO     Books skipped    : 5569
+2014-04-14 22:25:31,668 INFO     Books DB entries deleted : 0
+2014-04-14 22:25:31,668 INFO     Books in archives: 0
+2014-04-14 22:25:31,669 INFO     Archives scanned : 35
+2014-04-14 22:25:31,669 INFO     Archives skipped : 127
+2014-04-14 22:25:31,669 INFO     Bad archives     : 0
+2014-04-14 22:25:31,670 INFO     Time estimated:0 hours, 3 minutes, 7 seconds.
+2014-04-14 22:26:55,890 INFO      ***** Starting sopds-scan...
+2014-04-14 22:29:43,030 INFO     Books added      : 0
+2014-04-14 22:29:43,031 INFO     Books skipped    : 5569
+2014-04-14 22:29:43,031 INFO     Books DB entries deleted : 0
+2014-04-14 22:29:43,031 INFO     Books in archives: 0
+2014-04-14 22:29:43,031 INFO     Archives scanned : 35
+2014-04-14 22:29:43,032 INFO     Archives skipped : 127
+2014-04-14 22:29:43,032 INFO     Bad archives     : 0
+2014-04-14 22:29:43,032 INFO     Time estimated:0 hours, 2 minutes, 47 seconds.
+2014-04-15 01:00:03,585 INFO      ***** Starting sopds-scan...
+2014-04-15 01:03:13,938 INFO     Books added      : 0
+2014-04-15 01:03:13,955 INFO     Books skipped    : 5569
+2014-04-15 01:03:13,955 INFO     Books DB entries deleted : 0
+2014-04-15 01:03:13,955 INFO     Books in archives: 0
+2014-04-15 01:03:13,956 INFO     Archives scanned : 35
+2014-04-15 01:03:13,956 INFO     Archives skipped : 127
+2014-04-15 01:03:13,956 INFO     Bad archives     : 0
+2014-04-15 01:03:13,956 INFO     Time estimated:0 hours, 3 minutes, 10 seconds.
+2014-04-16 01:00:03,093 INFO      ***** Starting sopds-scan...
+2014-04-16 01:03:09,771 INFO     Books added      : 0
+2014-04-16 01:03:09,791 INFO     Books skipped    : 5569
+2014-04-16 01:03:09,791 INFO     Books DB entries deleted : 0
+2014-04-16 01:03:09,792 INFO     Books in archives: 0
+2014-04-16 01:03:09,792 INFO     Archives scanned : 35
+2014-04-16 01:03:09,792 INFO     Archives skipped : 127
+2014-04-16 01:03:09,792 INFO     Bad archives     : 0
+2014-04-16 01:03:09,792 INFO     Time estimated:0 hours, 3 minutes, 6 seconds.

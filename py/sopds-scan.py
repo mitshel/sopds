@@ -55,6 +55,7 @@ if VERBOSE:
 else:
    logging.basicConfig(format = logformat, level = logging.INFO, handlers=(fh,))
 
+logging.info(' ***** Starting sopds-scan...')
 logging.debug('OPTIONS SET')
 if cfg.CONFIGFILE!=None:     logging.debug('configfile = '+cfg.CONFIGFILE)
 if cfg.ROOT_LIB!=None:       logging.debug('root_lib = '+cfg.ROOT_LIB)
