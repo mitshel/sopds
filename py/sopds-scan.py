@@ -10,70 +10,8 @@ import sopdscfg
 import base64
 import zipf
 import logging
-
-##########################################################################
-# Считываем параметры командной строки
-# пример возможных параметров
-# sopds-scan.py <--scanfull | --scanlast | --scan | -s> [ [-c <configfile>]
-#
-# -s, --scan, --scanfull  - Полное пересканирование всех файлов библиотеки (по умолчанию)
-# --scanlast              - Обрабатываются только файлы с датой поздней, чем дата последнего сканирования (не сделано)
-# -v, --verbose           - Включить вывод отладочной информации
-# -c <configfile>         - Указывается путь к файлу конфигурации
-
 from optparse import OptionParser
 from sys import argv
-
-t1=datetime.timedelta(seconds=time.time())
-
-parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version 0.17", add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
-parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
-parser.add_option('-c','--config',dest='configfile',default='',help='Config file pargh')
-(options,arguments)=parser.parse_args()
-
-VERBOSE=options.verbose
-CFG_FILE=options.configfile
-
-if CFG_FILE=='': cfg=sopdscfg.cfgreader()
-else: cfg=sopdscfg.cfgreader(CFG_FILE)
-
-zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
-
-if cfg.LOGLEVEL!=logging.NOTSET:
-    # Создаем обработчик для записи логов в файл
-    fh = logging.FileHandler(cfg.LOGFILE)
-    fh.setLevel(cfg.LOGLEVEL)
-
-if VERBOSE:
-   # Создадим обработчик для вывода логов на экран с максимальным уровнем вывода
-   ch = logging.StreamHandler()
-   ch.setLevel(logging.DEBUG)
-
-logformat='%(asctime)s %(levelname)-8s %(message)s'
-if VERBOSE:
-   logging.basicConfig(format = logformat, level = logging.DEBUG, handlers=(fh,ch))
-else:
-   logging.basicConfig(format = logformat, level = logging.INFO, handlers=(fh,))
-
-logging.info(' ***** Starting sopds-scan...')
-logging.debug('OPTIONS SET')
-if cfg.CONFIGFILE!=None:     logging.debug('configfile = '+cfg.CONFIGFILE)
-if cfg.ROOT_LIB!=None:       logging.debug('root_lib = '+cfg.ROOT_LIB)
-if cfg.FB2TOEPUB_PATH!=None: logging.debug('fb2toepub = '+cfg.FB2TOEPUB_PATH)
-if cfg.FB2TOMOBI_PATH!=None: logging.debug('fb2tomobi = '+cfg.FB2TOMOBI_PATH)
-if cfg.TEMP_DIR!=None:       logging.debug('temp_dir = '+cfg.TEMP_DIR)
-
-#############################################################################
-#
-# Переменные для сбора статистики
-#
-books_added   = 0
-books_skipped = 0
-books_deleted = 0
-arch_scanned = 0
-arch_skipped = 0
-bad_archives = 0
-books_in_archives = 0
 
 #############################################################################
 #
@@ -211,6 +149,61 @@ def processzip(db,fb2,name,full_path,file):
        arch_skipped+=1
        logging.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
 
+#############################################################################
+# Инициализируем переменные для сбора статистики
+#
+t1=datetime.timedelta(seconds=time.time())
+books_added   = 0
+books_skipped = 0
+books_deleted = 0
+arch_scanned = 0
+arch_skipped = 0
+bad_archives = 0
+books_in_archives = 0
+
+###########################################################################
+# Разбираем опции командной строки и конфиг файла
+#
+parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version "+sopdscfg.VERSION, add_help_option=True, usage='sopds-scan.py [options]', description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
+parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
+parser.add_option('-c','--config',dest='configfile',default='',help='Config file pargh')
+(options,arguments)=parser.parse_args()
+VERBOSE=options.verbose
+CFG_FILE=options.configfile
+
+if CFG_FILE=='': cfg=sopdscfg.cfgreader()
+else: cfg=sopdscfg.cfgreader(CFG_FILE)
+
+zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
+
+
+###########################################################################
+# Инициализруем logger
+#
+if cfg.LOGLEVEL!=logging.NOTSET:
+    # Создаем обработчик для записи логов в файл
+    fh = logging.FileHandler(cfg.LOGFILE)
+    fh.setLevel(cfg.LOGLEVEL)
+
+if VERBOSE:
+   # Создадим обработчик для вывода логов на экран с максимальным уровнем вывода
+   ch = logging.StreamHandler()
+   ch.setLevel(logging.DEBUG)
+
+logformat='%(asctime)s %(levelname)-8s %(message)s'
+if VERBOSE:
+   logging.basicConfig(format = logformat, level = logging.DEBUG, handlers=(fh,ch))
+else:
+   logging.basicConfig(format = logformat, level = logging.INFO, handlers=(fh,))
+
+logging.info(' ***** Starting sopds-scan...')
+logging.debug('OPTIONS SET')
+if cfg.CONFIGFILE!=None:     logging.debug('configfile = '+cfg.CONFIGFILE)
+if cfg.ROOT_LIB!=None:       logging.debug('root_lib = '+cfg.ROOT_LIB)
+if cfg.FB2TOEPUB_PATH!=None: logging.debug('fb2toepub = '+cfg.FB2TOEPUB_PATH)
+if cfg.FB2TOMOBI_PATH!=None: logging.debug('fb2tomobi = '+cfg.FB2TOMOBI_PATH)
+if cfg.TEMP_DIR!=None:       logging.debug('temp_dir = '+cfg.TEMP_DIR)
+
 ###########################################################################
 # Основной код программы
 #
@@ -245,6 +238,10 @@ else:
 opdsdb.update_double()
 opdsdb.closeDB()
 
+
+###########################################################################
+# Вывод статистической информации по окончании программы сканирования
+#
 t2=datetime.timedelta(seconds=time.time())
 logging.info('Books added      : '+str(books_added))
 logging.info('Books skipped    : '+str(books_skipped))
