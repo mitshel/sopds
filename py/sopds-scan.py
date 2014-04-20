@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
 import sopdscfg
 from sopdscan import opdsScanner
 from optparse import OptionParser
@@ -17,7 +18,25 @@ if (__name__=="__main__"):
     if CFG_FILE=='': cfg=sopdscfg.cfgreader()
     else: cfg=sopdscfg.cfgreader(CFG_FILE)
 
-    scanner=opdsScanner(cfg,VERBOSE)
+    logger = logging.getLogger('')
+    logger.setLevel(cfg.LOGLEVEL)
+    formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+
+    if cfg.LOGLEVEL!=logging.NOTSET:
+       # Создаем обработчик для записи логов в файл
+       fh = logging.FileHandler(cfg.LOGFILE)
+       fh.setLevel(cfg.LOGLEVEL)
+       fh.setFormatter(formatter)
+       logger.addHandler(fh)
+
+    if VERBOSE:
+       # Создадим обработчик для вывода логов на экран с максимальным уровнем вывода
+       ch = logging.StreamHandler()
+       ch.setLevel(logging.DEBUG)
+       ch.setFormatter(formatter)
+       logger.addHandler(ch)
+
+    scanner=opdsScanner(cfg,logger)
     scanner.log_options()
     scanner.scan_all()
     scanner.log_stats()

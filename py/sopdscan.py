@@ -12,33 +12,32 @@ import zipf
 import logging
 
 class opdsScanner:
-    def __init__(self, cfg, verbose=False):
-        self.VERBOSE=verbose
+    def __init__(self, cfg, logger):
         self.cfg=cfg
+        self.logger=logger
         self.opdsdb=None
         self.fb2parser=None
         self.init_stats()
-        self.init_logger()
         self.init_parser()
         zipf.ZIP_CODEPAGE=self.cfg.ZIP_CODEPAGE
         self.extensions_set={x for x in self.cfg.EXT_LIST}
 
-    def init_logger(self):
-        if self.cfg.LOGLEVEL!=logging.NOTSET:
-            # Создаем обработчик для записи логов в файл
-            self.fh = logging.FileHandler(self.cfg.LOGFILE)
-            self.fh.setLevel(self.cfg.LOGLEVEL)
-
-        if self.VERBOSE:
-            # Создадим обработчик для вывода логов на экран с максимальным уровнем вывода
-            self.ch = logging.StreamHandler()
-            self.ch.setLevel(logging.DEBUG)
-
-        logformat='%(asctime)s %(levelname)-8s %(message)s'
-        if self.VERBOSE:
-            logging.basicConfig(format = logformat, level = logging.DEBUG, handlers=(self.fh,self.ch))
-        else:
-            logging.basicConfig(format = logformat, level = logging.INFO, handlers=(self.fh,))
+#    def init_logger(self):
+#        if self.cfg.LOGLEVEL!=logging.NOTSET:
+#            # Создаем обработчик для записи логов в файл
+#            self.fh = logging.FileHandler(self.cfg.LOGFILE)
+#            self.fh.setLevel(self.cfg.LOGLEVEL)
+#
+#        if self.VERBOSE:
+#            # Создадим обработчик для вывода логов на экран с максимальным уровнем вывода
+#            self.ch = logging.StreamHandler()
+#            self.ch.setLevel(logging.DEBUG)
+#
+#        logformat='%(asctime)s %(levelname)-8s %(message)s'
+#        if self.VERBOSE:
+#            logging.basicConfig(format = logformat, level = logging.DEBUG, handlers=(self.fh,self.ch))
+#        else:
+#            logging.basicConfig(format = logformat, level = logging.INFO, handlers=(self.fh,))
 
     def init_stats(self):
         self.t1=datetime.timedelta(seconds=time.time())
@@ -55,32 +54,32 @@ class opdsScanner:
         self.fb2parser=sopdsparse.fb2parser(self.cfg.COVER_EXTRACT)
 
     def log_options(self):
-        logging.info(' ***** Starting sopds-scan...')
-        logging.debug('OPTIONS SET')
-        if self.cfg.CONFIGFILE!=None:     logging.debug('configfile = '+self.cfg.CONFIGFILE)
-        if self.cfg.ROOT_LIB!=None:       logging.debug('root_lib = '+self.cfg.ROOT_LIB)
-        if self.cfg.FB2TOEPUB_PATH!=None: logging.debug('fb2toepub = '+self.cfg.FB2TOEPUB_PATH)
-        if self.cfg.FB2TOMOBI_PATH!=None: logging.debug('fb2tomobi = '+self.cfg.FB2TOMOBI_PATH)
-        if self.cfg.TEMP_DIR!=None:       logging.debug('temp_dir = '+self.cfg.TEMP_DIR)
+        self.logger.info(' ***** Starting sopds-scan...')
+        self.logger.debug('OPTIONS SET')
+        if self.cfg.CONFIGFILE!=None:     self.logger.debug('configfile = '+self.cfg.CONFIGFILE)
+        if self.cfg.ROOT_LIB!=None:       self.logger.debug('root_lib = '+self.cfg.ROOT_LIB)
+        if self.cfg.FB2TOEPUB_PATH!=None: self.logger.debug('fb2toepub = '+self.cfg.FB2TOEPUB_PATH)
+        if self.cfg.FB2TOMOBI_PATH!=None: self.logger.debug('fb2tomobi = '+self.cfg.FB2TOMOBI_PATH)
+        if self.cfg.TEMP_DIR!=None:       self.logger.debug('temp_dir = '+self.cfg.TEMP_DIR)
 
     def log_stats(self):
         self.t2=datetime.timedelta(seconds=time.time())
-        logging.info('Books added      : '+str(self.books_added))
-        logging.info('Books skipped    : '+str(self.books_skipped))
+        self.logger.info('Books added      : '+str(self.books_added))
+        self.logger.info('Books skipped    : '+str(self.books_skipped))
         if self.cfg.DELETE_LOGICAL:
-            logging.info('Books deleted    : '+str(self.books_deleted))
+            self.logger.info('Books deleted    : '+str(self.books_deleted))
         else:
-            logging.info('Books DB entries deleted : '+str(self.books_deleted))
-        logging.info('Books in archives: '+str(self.books_in_archives)) 
-        logging.info('Archives scanned : '+str(self.arch_scanned))
-        logging.info('Archives skipped : '+str(self.arch_skipped))
-        logging.info('Bad archives     : '+str(self.bad_archives))
+            self.logger.info('Books DB entries deleted : '+str(self.books_deleted))
+        self.logger.info('Books in archives: '+str(self.books_in_archives)) 
+        self.logger.info('Archives scanned : '+str(self.arch_scanned))
+        self.logger.info('Archives skipped : '+str(self.arch_skipped))
+        self.logger.info('Bad archives     : '+str(self.bad_archives))
 
         t=self.t2-self.t1
         seconds=t.seconds%60
         minutes=((t.seconds-seconds)//60)%60
         hours=t.seconds//3600
-        logging.info('Time estimated:'+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
+        self.logger.info('Time estimated:'+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
 
     def scan_all(self):
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
@@ -120,25 +119,25 @@ class opdsScanner:
                 filelist = z.namelist()
                 for n in filelist:
                     try:
-                        logging.debug('Start process ZIP file = '+file+' book file = '+n)
+                        self.logger.debug('Start process ZIP file = '+file+' book file = '+n)
                         file_size=z.getinfo(n).file_size
                         self.processfile(n,file,z.open(n),1,file_size,cat_id=cat_id)
                     except:
-                        logging.error('Error processing ZIP file = '+file+' book file = '+n)
+                        self.logger.error('Error processing ZIP file = '+file+' book file = '+n)
                 z.close()
                 self.arch_scanned+=1
             except:
-                logging.error('Error while read ZIP archive. File '+file+' corrupt.')
+                self.logger.error('Error while read ZIP archive. File '+file+' corrupt.')
                 self.bad_archives+=1
         else:
             self.arch_skipped+=1
-            logging.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
+            self.logger.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
 
     def processfile(self,name,full_path,file,archive=0,file_size=0,cat_id=0):
         (n,e)=os.path.splitext(name)
         if e.lower() in self.extensions_set:
             rel_path=os.path.relpath(full_path,self.cfg.ROOT_LIB)
-            logging.debug("Attempt to add book "+rel_path+"/"+name)
+            self.logger.debug("Attempt to add book "+rel_path+"/"+name)
             self.fb2parser.reset()
             if self.opdsdb.findbook(name,rel_path,1)==0:
                if archive==0:
@@ -166,7 +165,7 @@ class opdsScanner:
                      docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
                   if self.fb2parser.parse_error!=0:
-                     logging.warning(rel_path+' - '+name+' fb2 parse warning ['+self.fb2parser.parse_errormsg+']')
+                     self.logger.warning(rel_path+' - '+name+' fb2 parse warning ['+self.fb2parser.parse_errormsg+']')
 
                if title=='': title=n
 
@@ -177,11 +176,11 @@ class opdsScanner:
                   try:
                     create_cover(book_id)
                   except:
-                    logging.error('Error extract cover from file '+name)
+                    self.logger.error('Error extract cover from file '+name)
 
                if archive==1:
                   self.books_in_archives+=1
-               logging.debug("Book "+rel_path+"/"+name+" Added ok.")
+               self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
 
                idx=0
                for l in self.fb2parser.author_last.getvalue():
@@ -198,7 +197,7 @@ class opdsScanner:
 
             else:
                self.books_skipped+=1
-               logging.debug("Book "+rel_path+"/"+name+" Already in DB.")
+               self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
 
     def create_cover(self,book_id):
         ictype=self.fb2parser.cover_image.getattr('content-type')

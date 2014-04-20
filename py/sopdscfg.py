@@ -80,7 +80,7 @@ class cfgreader:
        
        logfile=config.getdefault(CFG_S_GLOBAL,'logfile','sopds.log')
        self.LOGFILE=os.path.join(LOG_PATH,logfile)
-       loglevel=config.getdefault(CFG_S_GLOBAL,'loglevel','none')
+       loglevel=config.getdefault(CFG_S_GLOBAL,'loglevel','info')
        if loglevel.lower() in loglevels:
            self.LOGLEVEL=loglevels[loglevel.lower()]
        else:

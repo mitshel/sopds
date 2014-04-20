@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 import sys, os, time, atexit
 from signal import SIGTERM
 
@@ -148,7 +149,7 @@ class Daemon(object):
         self.stop()
         time.sleep(1)
         self.start()
- 
+
     def run(self):
         """
         You should override this method when you subclass Daemon.
@@ -159,11 +160,45 @@ class opdsDaemon(Daemon):
     def __init__(self):
         self.start_scan=False
         self.cfg=sopdscfg.cfgreader()
-        self.scanner=opdsScanner(self.cfg)
+
+        self.logger = logging.getLogger('')
+        self.logger.setLevel(self.cfg.LOGLEVEL)
+        formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+        self.fh = logging.FileHandler(self.cfg.LOGFILE)
+        self.fh.setLevel(self.cfg.LOGLEVEL)
+        self.fh.setFormatter(formatter)
+        self.logger.addHandler(self.fh)
+        self.logger.info('sopdsDaemon initializing...')
+
+        self.scanner=opdsScanner(self.cfg, self.logger)
+
         Daemon.__init__(self, self.cfg.PID_FILE, self.cfg.LOGFILE,self.cfg.LOGFILE,self.cfg.LOGFILE)
+
+    def start(self):
+        self.logger.info('sopdsDaemon starting...')
+        Daemon.start(self)
+
+    def delpid(self):
+        self.logger.info('sopdsDaemon exitting (delpid function)...')
+        Daemon.delpid(self)
+
+    def status(self):
+        self.logger.info('sopdsDaemon status checking...')
+        Daemon.status(self)
+
+    def stop(self):
+        self.logger.info('sopdsDaemon stopping...')
+        Daemon.stop(self)
+
+    def restart(self):
+        self.logger.info('sopdsDaemon restarting...')
+        Daemon.restart(self)
 
     def run(self):
         self.cfg.parse()
+        self.fh.setLevel(self.cfg.LOGLEVEL)
+        self.logger.info('sopdsDaemon entering in main loop...')
+        
         while True:
             t=time.localtime()
             if (((self.cfg.DAY_OF_WEEK==0) or (self.cfg.DAY_OF_WEEK==t.tm_wday+1)) and (t.tm_hour*60+t.tm_min in self.cfg.SCAN_TIMES)) or (self.cfg.SCAN_ON_START and not self.start_scan):
