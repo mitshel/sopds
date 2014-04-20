@@ -1,132 +1,191 @@
-#!/usr/bin/env python
-#http://www.jejik.com/articles/2007/02/a_simple_unix_linux_daemon_in_python/
+#!/usr/bin/env python3
 
 import sys, os, time, atexit
 from signal import SIGTERM
-
-class Daemon:
+ 
+class Daemon(object):
     """
-A generic daemon class.
-
-Usage: subclass the Daemon class and override the run() method
-"""
+    Subclass Daemon class and override the run() method.
+    """
     def __init__(self, pidfile, stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
         self.stdin = stdin
         self.stdout = stdout
         self.stderr = stderr
         self.pidfile = pidfile
-
+ 
     def daemonize(self):
         """
-do the UNIX double-fork magic, see Stevens' "Advanced
-Programming in the UNIX Environment" for details (ISBN 0201563177)
-http://www.erlenstar.demon.co.uk/unix/faq_2.html#SEC16
-"""
+        Deamonize, do double-fork magic.
+        """
         try:
             pid = os.fork()
             if pid > 0:
-                # exit first parent
+                # Exit first parent.
                 sys.exit(0)
-        except OSError, e:
-            sys.stderr.write("fork #1 failed: %d (%s)\n" % (e.errno, e.strerror))
+        except OSError as e:
+            message = "Fork #1 failed: {}\n".format(e)
+            sys.stderr.write(message)
             sys.exit(1)
-
-        # decouple from parent environment
+ 
+        # Decouple from parent environment.
         os.chdir("/")
         os.setsid()
         os.umask(0)
-
-        # do second fork
+ 
+        # Do second fork.
         try:
             pid = os.fork()
             if pid > 0:
-                # exit from second parent
+                # Exit from second parent.
                 sys.exit(0)
-        except OSError, e:
-            sys.stderr.write("fork #2 failed: %d (%s)\n" % (e.errno, e.strerror))
+        except OSError as e:
+            message = "Fork #2 failed: {}\n".format(e)
+            sys.stderr.write(message)
             sys.exit(1)
-
-        # redirect standard file descriptors
+ 
+        print('daemon going to background, PID: {}'.format(os.getpid(),end="\r"))
+ 
+        # Redirect standard file descriptors.
         sys.stdout.flush()
         sys.stderr.flush()
-        si = file(self.stdin, 'r')
-        so = file(self.stdout, 'a+')
-        se = file(self.stderr, 'a+', 0)
+        si = open(self.stdin, 'r')
+        so = open(self.stdout, 'a+')
+        se = open(self.stderr, 'a+')
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
-
-        # write pidfile
-        atexit.register(self.delpid)
+ 
+        # Write pidfile.
         pid = str(os.getpid())
-        file(self.pidfile,'w+').write("%s\n" % pid)
-
+        open(self.pidfile,'w+').write("{}\n".format(pid))
+ 
+        # Register a function to clean up.
+        atexit.register(self.delpid)
+ 
     def delpid(self):
         os.remove(self.pidfile)
-
+ 
     def start(self):
         """
-Start the daemon
-"""
-        # Check for a pidfile to see if the daemon already runs
+        Start daemon.
+        """
+        # Check pidfile to see if the daemon already runs.
         try:
-            pf = file(self.pidfile,'r')
+            pf = open(self.pidfile,'r')
             pid = int(pf.read().strip())
             pf.close()
         except IOError:
             pid = None
-
+ 
         if pid:
-            message = "pidfile %s already exist. Daemon already running?\n"
-            sys.stderr.write(message % self.pidfile)
+            message = "Pidfile {} already exist. Daemon already running?\n".format(self.pidfile)
+            sys.stderr.write(message)
             sys.exit(1)
-
-        # Start the daemon
+ 
+        # Start daemon.
         self.daemonize()
         self.run()
-
-    def stop(self):
+ 
+    def status(self):
         """
-Stop the daemon
-"""
-        # Get the pid from the pidfile
+        Get status of daemon.
+        """
         try:
-            pf = file(self.pidfile,'r')
+            pf = open(self.pidfile,'r')
             pid = int(pf.read().strip())
             pf.close()
         except IOError:
-            pid = None
-
-        if not pid:
-            message = "pidfile %s does not exist. Daemon not running?\n"
-            sys.stderr.write(message % self.pidfile)
-            return # not an error in a restart
-
-        # Try killing the daemon process
+            message = "There is not PID file. Daemon already running?\n"
+            sys.stderr.write(message)
+            sys.exit(1)
+ 
         try:
-            while 1:
-                os.kill(pid, SIGTERM)
-                time.sleep(0.1)
-        except OSError, err:
-            #FIX for Ru_ru locale
-            # Anton Fischer <a.fschr@gmail.com>
-            #err = str(err)
-            #if err.find("No such process") > 0:
-                if os.path.exists(self.pidfile):
-                    os.remove(self.pidfile)
-            #else:
-            # print str(err)
-            # sys.exit(1)
-
+            procfile = open("/proc/{}/status".format(pid), 'r')
+            procfile.close()
+            message = "There is a process with the PID {}\n".format(pid)
+            sys.stdout.write(message)
+        except IOError:
+            message = "There is not a process with the PID {}\n".format(self.pidfile)
+            sys.stdout.write(message)
+ 
+    def stop(self):
+        """
+        Stop the daemon.
+        """
+        # Get the pid from pidfile.
+        try:
+            pf = open(self.pidfile,'r')
+            pid = int(pf.read().strip())
+            pf.close()
+        except IOError as e:
+            message = str(e) + "\nDaemon not running?\n"
+            sys.stderr.write(message)
+            sys.exit(1)
+ 
+        # Try killing daemon process.
+        try:
+            os.kill(pid, SIGTERM)
+            time.sleep(1)
+        except OSError as e:
+            print(str(e))
+            sys.exit(1)
+ 
+        try:
+            if os.path.exists(self.pidfile):
+                os.remove(self.pidfile)
+        except IOError as e:
+            message = str(e) + "\nCan not remove pid file {}".format(self.pidfile)
+            sys.stderr.write(message)
+            sys.exit(1)
+ 
     def restart(self):
         """
-Restart the daemon
-"""
+        Restart daemon.
+        """
         self.stop()
+        time.sleep(1)
         self.start()
-
+ 
     def run(self):
         """
-You should override this method when you subclass Daemon. It will be called after the process has been
-daemonized by start() or restart().
-"""
+        You should override this method when you subclass Daemon.
+        It will be called after the process has been daemonized by start() or restart().
+        """
+ 
+class MyDaemon(Daemon):
+    def run(self):
+        while True:
+            time.sleep(1)
+ 
+if __name__ == "__main__":
+    daemon = MyDaemon('/tmp/python-daemon.pid')
+    if len(sys.argv) == 2:
+        print('{} {}'.format(sys.argv[0],sys.argv[1]))
+ 
+        if 'start' == sys.argv[1]:
+            daemon.start()
+        elif 'stop' == sys.argv[1]:
+            daemon.stop()
+        elif 'restart' == sys.argv[1]:
+            daemon.restart()
+        elif 'status' == sys.argv[1]:
+            daemon.status()
+        else:
+            print ("Unknown command")
+            sys.exit(2)
+        sys.exit(0)
+    else:
+        print ('show cmd deamon usage')
+        print ("Usage: {} start|stop|restart|status".format(sys.argv[0]))
+        sys.exit(2)
+
+
+#scanner=opdsScanner()
+#scanner.log_options()
+#scanner.scan_all()
+#scanner.log_stats()
+
+
+#print('Start daemon...')
+#d=Daemon('/var/run/sopds.pid')
+#d.start()
