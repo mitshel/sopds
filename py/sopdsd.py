@@ -2,6 +2,9 @@
 
 import sys, os, time, atexit
 from signal import SIGTERM
+
+import sopdscfg
+from sopdscan import opdsScanner
  
 class Daemon(object):
     """
@@ -152,15 +155,30 @@ class Daemon(object):
         It will be called after the process has been daemonized by start() or restart().
         """
  
-class MyDaemon(Daemon):
+class opdsDaemon(Daemon):
+    def __init__(self):
+        self.start_scan=False
+        self.cfg=sopdscfg.cfgreader()
+        self.scanner=opdsScanner(self.cfg)
+        Daemon.__init__(self, self.cfg.PID_FILE, self.cfg.LOGFILE,self.cfg.LOGFILE,self.cfg.LOGFILE)
+
     def run(self):
+        self.cfg.parse()
         while True:
-            time.sleep(1)
+            t=time.localtime()
+            if (((self.cfg.DAY_OF_WEEK==0) or (self.cfg.DAY_OF_WEEK==t.tm_wday+1)) and (t.tm_hour*60+t.tm_min in self.cfg.SCAN_TIMES)) or (self.cfg.SCAN_ON_START and not self.start_scan):
+                  self.scanner.log_options()
+                  self.scanner.scan_all()
+                  self.scanner.log_stats()
+            self.start_scan=True
+            time.sleep(30)
+
  
 if __name__ == "__main__":
-    daemon = MyDaemon('/tmp/python-daemon.pid')
+
+    daemon = opdsDaemon()
     if len(sys.argv) == 2:
-        print('{} {}'.format(sys.argv[0],sys.argv[1]))
+#        print('{} {}'.format(sys.argv[0],sys.argv[1]))
  
         if 'start' == sys.argv[1]:
             daemon.start()
@@ -179,13 +197,3 @@ if __name__ == "__main__":
         print ("Usage: {} start|stop|restart|status".format(sys.argv[0]))
         sys.exit(2)
 
-
-#scanner=opdsScanner()
-#scanner.log_options()
-#scanner.scan_all()
-#scanner.log_stats()
-
-
-#print('Start daemon...')
-#d=Daemon('/var/run/sopds.pid')
-#d.start()

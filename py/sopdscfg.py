@@ -54,9 +54,11 @@ class ConfigParser_new(configparser.ConfigParser):
 
 class cfgreader:
    def __init__(self,configfile=CFG_PATH):
-#       config=configparser.ConfigParser()
-       config=ConfigParser_new()
        self.CONFIGFILE=configfile
+       self.parse()
+
+   def parse(self):
+       config=ConfigParser_new()
        config.readfp(codecs.open(self.CONFIGFILE,"r","utf-8"))
        CFG_S_GLOBAL='global'
 
@@ -125,3 +127,28 @@ class cfgreader:
        self.SITE_URL=config.get(CFG_S_SITE,'url')
        self.SITE_EMAIL=config.get(CFG_S_SITE,'email')
        self.SITE_MAINTITLE=config.get(CFG_S_SITE,'main_title')
+
+       CFG_S_DAEMON='daemon'
+       self.SCAN_ON_START=config.getdefault_bool(CFG_S_DAEMON,'scan_on_start',True)
+       self.PID_FILE=config.getdefault(CFG_S_DAEMON,'pid_file',r'/tmp/sopds.pid')
+       self.DAY_OF_WEEK=config.getdefault_int(CFG_S_DAEMON,'scan_day_of_week',0)
+       self.SCAN_INTERVAL=config.getdefault_int(CFG_S_DAEMON,'scan_interval',0)
+       self.SCAN_TIME=config.getdefault(CFG_S_DAEMON,'scan_time','00:00')
+       try:
+          (scan_hour,scan_min)=self.SCAN_TIME.split(':')
+          scan_hour=scan_hour.strip()
+          scan_min=scan_min.strip()
+          if scan_hour.isdigit():
+             self.SCAN_HOUR=int(scan_hour)
+          else:
+             self.SCAN_HOUR=0
+          if scan_min.isdigit():
+             self.SCAN_MIN=int(scan_min)
+          else:
+             self.SCAN_MIN=0
+       except:
+          (self.SCAN_HOUR,self.SCAN_MIN)=(0,0)
+       if self.SCAN_INTERVAL>0:
+          self.SCAN_TIMES=list(range(self.SCAN_HOUR*60+self.SCAN_MIN,1440,self.SCAN_INTERVAL))
+       else:
+          self.SCAN_TIMES=[self.SCAN_HOUR*60+self.SCAN_MIN]

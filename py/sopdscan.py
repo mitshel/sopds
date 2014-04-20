@@ -10,19 +10,16 @@ import sopdscfg
 import base64
 import zipf
 import logging
-from optparse import OptionParser
-from sys import argv
 
 class opdsScanner:
-    def __init__(self, configfile='', verbose=False):
+    def __init__(self, cfg, verbose=False):
         self.VERBOSE=verbose
-        self.CONFIGFILE=configfile
-        self.cfg=None
+        self.cfg=cfg
         self.opdsdb=None
         self.fb2parser=None
         self.init_stats()
-        self.init_config()
         self.init_logger()
+        self.init_parser()
         zipf.ZIP_CODEPAGE=self.cfg.ZIP_CODEPAGE
         self.extensions_set={x for x in self.cfg.EXT_LIST}
 
@@ -54,9 +51,8 @@ class opdsScanner:
         self.bad_archives = 0
         self.books_in_archives = 0
 
-    def init_config(self):
-        if self.CONFIGFILE=='': self.cfg=sopdscfg.cfgreader()
-        else: self.cfg=sopdscfg.cfgreader(self.CONFIGFILE)
+    def init_parser(self):
+        self.fb2parser=sopdsparse.fb2parser(self.cfg.COVER_EXTRACT)
 
     def log_options(self):
         logging.info(' ***** Starting sopds-scan...')
@@ -95,8 +91,6 @@ class opdsScanner:
             if not os.path.isdir(sopdscfg.COVER_PATH):
                 os.mkdir(sopdscfg.COVER_PATH)
 
-        self.fb2parser=sopdsparse.fb2parser(self.cfg.COVER_EXTRACT)
-
         for full_path, dirs, files in os.walk(self.cfg.ROOT_LIB):
             for name in files:
                 file=os.path.join(full_path,name)
@@ -104,9 +98,9 @@ class opdsScanner:
                 if (e.lower() == '.zip'):
                     if self.cfg.ZIPSCAN:
                         self.processzip(name,full_path,file)
-                    else:
-                        file_size=os.path.getsize(file)
-                        self.processfile(name,full_path,file,0,file_size)
+                else:
+                    file_size=os.path.getsize(file)
+                    self.processfile(name,full_path,file,0,file_size)
 
         self.opdsdb.commit()
         if self.cfg.DELETE_LOGICAL:
@@ -154,61 +148,61 @@ class opdsScanner:
                annotation=''
                docdate=''
 
-            if e.lower()=='.fb2' and cfg.FB2PARSE:
-               if isinstance(file, str):
-                  f=open(file,'rb')
-               else:
-                  f=file
-               self.fb2parser.parse(f,self.cfg.FB2HSIZE)
-               f.close()
+               if e.lower()=='.fb2' and self.cfg.FB2PARSE:
+                  if isinstance(file, str):
+                     f=open(file,'rb')
+                  else:
+                     f=file
+                  self.fb2parser.parse(f,self.cfg.FB2HSIZE)
+                  f.close()
 
-               if len(self.fb2parser.lang.getvalue())>0:
-                  lang=self.fb2parser.lang.getvalue()[0].strip(' \'\"')
-               if len(self.fb2parser.book_title.getvalue())>0:
-                  title=self.fb2parser.book_title.getvalue()[0].strip(' \'\"\&-.#\\\`')
-               if len(self.fb2parser.annotation.getvalue())>0:
-                  annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:10000]
-               if len(self.fb2parser.docdate.getvalue())>0:
-                  docdate=self.fb2parser.docdate.getvalue()[0].strip();
+                  if len(self.fb2parser.lang.getvalue())>0:
+                     lang=self.fb2parser.lang.getvalue()[0].strip(' \'\"')
+                  if len(self.fb2parser.book_title.getvalue())>0:
+                     title=self.fb2parser.book_title.getvalue()[0].strip(' \'\"\&-.#\\\`')
+                  if len(self.fb2parser.annotation.getvalue())>0:
+                     annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:10000]
+                  if len(self.fb2parser.docdate.getvalue())>0:
+                     docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
-               if self.fb2parser.parse_error!=0:
-                  logging.warning(rel_path+' - '+name+' fb2 parse warning ['+self.fb2parser.parse_errormsg+']')
+                  if self.fb2parser.parse_error!=0:
+                     logging.warning(rel_path+' - '+name+' fb2 parse warning ['+self.fb2parser.parse_errormsg+']')
 
-            if title=='': title=n
+               if title=='': title=n
 
-            book_id=self.opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,docdate,lang,file_size,archive,self.cfg.DUBLICATES_FIND)
-            self.books_added+=1
+               book_id=self.opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,docdate,lang,file_size,archive,self.cfg.DUBLICATES_FIND)
+               self.books_added+=1
 
-            if e.lower()=='.fb2' and self.cfg.FB2PARSE and self.cfg.COVER_EXTRACT:
-               try:
-                 create_cover(book_id)
-               except:
-                 logging.error('Error extract cover from file '+name)
+               if e.lower()=='.fb2' and self.cfg.FB2PARSE and self.cfg.COVER_EXTRACT:
+                  try:
+                    create_cover(book_id)
+                  except:
+                    logging.error('Error extract cover from file '+name)
 
-            if archive==1:
-               self.books_in_archives+=1
-            logging.debug('Added ok.')
+               if archive==1:
+                  self.books_in_archives+=1
+               logging.debug("Book "+rel_path+"/"+name+" Added ok.")
 
-            idx=0
-            for l in self.fb2parse.author_last.getvalue():
-                last_name=l.strip(' \'\"\&-.#\\\`')
-                first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \'\"\&-.#\\\`')
-                author_id=self.opdsdb.addauthor(first_name,last_name)
-                self.opdsdb.addbauthor(book_id,author_id)
-                idx+=1
-            for l in self.fb2parse.genre.getvalue():
-                self.opdsdb.addbgenre(book_id,self.opdsdb.addgenre(l.lower().strip(' \'\"')))
-            for l in self.fb2parse.series.getattrs('name'):
-                self.opdsdb.addbseries(book_id,self.opdsdb.addseries(l.strip()))
-            if not self.cfg.SINGLE_COMMIT: self.opdsdb.commit()
+               idx=0
+               for l in self.fb2parser.author_last.getvalue():
+                   last_name=l.strip(' \'\"\&-.#\\\`')
+                   first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \'\"\&-.#\\\`')
+                   author_id=self.opdsdb.addauthor(first_name,last_name)
+                   self.opdsdb.addbauthor(book_id,author_id)
+                   idx+=1
+               for l in self.fb2parser.genre.getvalue():
+                   self.opdsdb.addbgenre(book_id,self.opdsdb.addgenre(l.lower().strip(' \'\"')))
+               for l in self.fb2parser.series.getattrs('name'):
+                   self.opdsdb.addbseries(book_id,self.opdsdb.addseries(l.strip()))
+               if not self.cfg.SINGLE_COMMIT: self.opdsdb.commit()
 
-        else:
-            self.books_skipped+=1
-            logging.debug('Already in DB.')
+            else:
+               self.books_skipped+=1
+               logging.debug("Book "+rel_path+"/"+name+" Already in DB.")
 
     def create_cover(self,book_id):
-        ictype=self.fb2parse.cover_image.getattr('content-type')
-        coverid=self.fb2parse.cover_image.getattr('id')
+        ictype=self.fb2parser.cover_image.getattr('content-type')
+        coverid=self.fb2parser.cover_image.getattr('id')
         fn=''
         if ictype==None:
            ictype=''
@@ -227,25 +221,11 @@ class opdsScanner:
                  fn=str(book_id)+e
 
            fp=os.path.join(sopdscfg.COVER_PATH,fn)
-           if len(self.fb2parse.cover_image.cover_data)>0:
+           if len(self.fb2parser.cover_image.cover_data)>0:
               img=open(fp,'wb')
-              s=self.fb2parse.cover_image.cover_data
+              s=self.fb2parser.cover_image.cover_data
               dstr=base64.b64decode(s)
               img.write(dstr)
               img.close()
         self.opdsdb.addcover(book_id,fn,ictype)
-
-
-if (__name__=="__main__"):
-    parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version "+sopdscfg.VERSION, add_help_option=True, usage='sopds-scan.py [options]',description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
-    parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
-    parser.add_option('-c','--config',dest='configfile',default='',help='Config file pargh')
-    (options,arguments)=parser.parse_args()
-    VERBOSE=options.verbose
-    CFG_FILE=options.configfile
-
-    scanner=opdsScanner(CFG_FILE,VERBOSE)
-    scanner.log_options()
-    scanner.scan_all()
-    scanner.log_stats()
 

@@ -4,7 +4,7 @@ py/__pycache__/*
 py/ziptest.py
 py/fb2parse.py
 py/b64decode.py
-py/*.log
+*.log
 fb2toepub/*
 !fb2toepub/*.zip
 fb2conv/*
