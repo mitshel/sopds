@@ -14,14 +14,12 @@ from optparse import OptionParser
 from sys import argv
 
 class opdsScanner:
-    def __init__(self, configfile='', verbose=False):
+    def __init__(self, cfg, verbose=False):
         self.VERBOSE=verbose
-        self.CONFIGFILE=configfile
-        self.cfg=None
+        self.cfg=cfg
         self.opdsdb=None
         self.fb2parser=None
         self.init_stats()
-        self.init_config()
         self.init_logger()
         zipf.ZIP_CODEPAGE=self.cfg.ZIP_CODEPAGE
         self.extensions_set={x for x in self.cfg.EXT_LIST}
@@ -53,10 +51,6 @@ class opdsScanner:
         self.arch_skipped = 0
         self.bad_archives = 0
         self.books_in_archives = 0
-
-    def init_config(self):
-        if self.CONFIGFILE=='': self.cfg=sopdscfg.cfgreader()
-        else: self.cfg=sopdscfg.cfgreader(self.CONFIGFILE)
 
     def log_options(self):
         logging.info(' ***** Starting sopds-scan...')
@@ -235,7 +229,6 @@ class opdsScanner:
               img.close()
         self.opdsdb.addcover(book_id,fn,ictype)
 
-
 if (__name__=="__main__"):
     parser=OptionParser(conflict_handler="resolve", version="sopds-scan.py. Version "+sopdscfg.VERSION, add_help_option=True, usage='sopds-scan.py [options]',description='sopds-scan.py: Simple OPDS Scanner - programm for scan your e-books directory and store data to MYSQL database.')
     parser.add_option('-v','--verbose', action='store_true', dest='verbose', default=False, help='Enable verbose output')
@@ -244,7 +237,10 @@ if (__name__=="__main__"):
     VERBOSE=options.verbose
     CFG_FILE=options.configfile
 
-    scanner=opdsScanner(CFG_FILE,VERBOSE)
+    if CFG_FILE=='': cfg=sopdscfg.cfgreader()
+    else: cfg=sopdscfg.cfgreader(CFG_FILE)
+
+    scanner=opdsScanner(cfg,VERBOSE)
     scanner.log_options()
     scanner.scan_all()
     scanner.log_stats()
