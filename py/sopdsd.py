@@ -168,30 +168,30 @@ class opdsDaemon(Daemon):
         self.fh.setLevel(self.cfg.LOGLEVEL)
         self.fh.setFormatter(formatter)
         self.logger.addHandler(self.fh)
-        self.logger.info('sopdsDaemon initializing...')
+        self.logger.info('sopdsDaemon __init__()...')
 
         self.scanner=opdsScanner(self.cfg, self.logger)
 
         Daemon.__init__(self, self.cfg.PID_FILE, self.cfg.LOGFILE,self.cfg.LOGFILE,self.cfg.LOGFILE)
 
     def start(self):
-        self.logger.info('sopdsDaemon starting...')
+        self.logger.info('sopdsDaemon start()...')
         Daemon.start(self)
 
     def delpid(self):
-        self.logger.info('sopdsDaemon exitting (delpid function)...')
+        self.logger.info('sopdsDaemon delpid()...')
         Daemon.delpid(self)
 
     def status(self):
-        self.logger.info('sopdsDaemon status checking...')
+        self.logger.info('sopdsDaemon status()...')
         Daemon.status(self)
 
     def stop(self):
-        self.logger.info('sopdsDaemon stopping...')
+        self.logger.info('sopdsDaemon stop()...')
         Daemon.stop(self)
 
     def restart(self):
-        self.logger.info('sopdsDaemon restarting...')
+        self.logger.info('sopdsDaemon restart()...')
         Daemon.restart(self)
 
     def run(self):
