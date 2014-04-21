@@ -147,3 +147,81 @@ mysql.connector.errors.DatabaseError: 1205 (HY000): Lock wait timeout exceeded; 
 2014-04-20 23:21:39,495 INFO     sopdsDaemon starting...
 2014-04-20 23:21:39,545 INFO     sopdsDaemon entering in main loop...
 2014-04-20 23:21:39,545 INFO      ***** Starting sopds-scan...
+2014-04-20 23:28:48,768 INFO     sopdsDaemon __init__()...
+2014-04-20 23:28:48,769 INFO     sopdsDaemon stop()...
+2014-04-20 23:29:08,057 INFO     sopdsDaemon __init__()...
+2014-04-20 23:29:08,058 INFO     sopdsDaemon start()...
+2014-04-20 23:29:08,122 INFO     sopdsDaemon entering in main loop...
+2014-04-20 23:29:08,123 INFO      ***** Starting sopds-scan...
+2014-04-20 23:42:40,180 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-000024-030559.zip book file = 25453.fb2
+2014-04-20 23:42:41,956 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-000024-030559.zip book file = 25608.fb2
+2014-04-21 00:47:58,326 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-074392-091839.zip book file = 91582.fb2
+2014-04-21 01:12:10,713 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-365000-370999.zip book file = 366784.fb2
+2014-04-21 01:49:00,572 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-182285-187147.zip book file = 185993.fb2
+2014-04-21 02:03:50,470 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 120844.fb2
+2014-04-21 02:03:51,091 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 120845.fb2
+2014-04-21 02:03:51,995 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 120867.fb2
+2014-04-21 02:03:52,292 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 120869.fb2
+2014-04-21 02:03:53,231 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 120882.fb2
+2014-04-21 02:03:57,218 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 121005.fb2
+2014-04-21 02:04:37,037 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 122485.fb2
+2014-04-21 02:05:14,522 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 124269.fb2
+2014-04-21 02:05:46,782 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 126076.fb2
+2014-04-21 02:05:52,301 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 126390.fb2
+2014-04-21 02:05:56,028 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 126570.fb2
+2014-04-21 02:05:57,324 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 126620.fb2
+2014-04-21 02:06:05,150 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 129300.fb2
+2014-04-21 02:06:05,204 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 129304.fb2
+2014-04-21 02:06:05,266 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 129305.fb2
+2014-04-21 02:06:09,021 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 129556.fb2
+2014-04-21 02:06:13,436 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-119691-132107.zip book file = 129813.fb2
+2014-04-21 02:22:12,199 INFO     Books added      : 288522
+2014-04-21 02:22:12,199 INFO     Books skipped    : 0
+2014-04-21 02:22:12,200 INFO     Books DB entries deleted : 0
+2014-04-21 02:22:12,200 INFO     Books in archives: 282953
+2014-04-21 02:22:12,200 INFO     Archives scanned : 162
+2014-04-21 02:22:12,200 INFO     Archives skipped : 0
+2014-04-21 02:22:12,201 INFO     Bad archives     : 0
+2014-04-21 02:22:12,201 INFO     Time estimated:2 hours, 53 minutes, 4 seconds.
+2014-04-21 04:00:17,635 INFO      ***** Starting sopds-scan...
+2014-04-21 04:03:58,687 INFO     Books added      : 288522
+2014-04-21 04:03:58,722 INFO     Books skipped    : 5569
+2014-04-21 04:03:58,723 INFO     Books DB entries deleted : 0
+2014-04-21 04:03:58,723 INFO     Books in archives: 282953
+2014-04-21 04:03:58,723 INFO     Archives scanned : 197
+2014-04-21 04:03:58,723 INFO     Archives skipped : 127
+2014-04-21 04:03:58,724 INFO     Bad archives     : 0
+2014-04-21 04:03:58,724 INFO     Time estimated:4 hours, 34 minutes, 50 seconds.
+2014-04-21 08:00:11,529 INFO      ***** Starting sopds-scan...
+2014-04-21 08:03:16,654 INFO     Books added      : 288522
+2014-04-21 08:03:16,655 INFO     Books skipped    : 11138
+2014-04-21 08:03:16,655 INFO     Books DB entries deleted : 0
+2014-04-21 08:03:16,655 INFO     Books in archives: 282953
+2014-04-21 08:03:16,655 INFO     Archives scanned : 232
+2014-04-21 08:03:16,655 INFO     Archives skipped : 254
+2014-04-21 08:03:16,656 INFO     Bad archives     : 0
+2014-04-21 08:03:16,656 INFO     Time estimated:8 hours, 34 minutes, 8 seconds.
+2014-04-21 08:19:14,396 INFO     sopdsDaemon __init__()...
+2014-04-21 08:19:14,397 INFO     sopdsDaemon restart()...
+2014-04-21 08:19:14,397 INFO     sopdsDaemon stop()...
+2014-04-21 08:19:16,400 INFO     sopdsDaemon start()...
+2014-04-21 08:19:16,452 INFO     sopdsDaemon entering in main loop...
+Traceback (most recent call last):
+  File "./sopdsd.py", line 224, in <module>
+    daemon.restart()
+  File "./sopdsd.py", line 195, in restart
+    Daemon.restart(self)
+  File "./sopdsd.py", line 151, in restart
+    self.start()
+  File "./sopdsd.py", line 179, in start
+    Daemon.start(self)
+  File "./sopdsd.py", line 91, in start
+    self.run()
+  File "./sopdsd.py", line 205, in run
+    self.scanner.init_statas()
+AttributeError: 'opdsScanner' object has no attribute 'init_statas'
+2014-04-21 08:19:16,456 INFO     sopdsDaemon delpid()...
+2014-04-21 08:20:50,251 INFO     sopdsDaemon __init__()...
+2014-04-21 08:20:50,252 INFO     sopdsDaemon start()...
+2014-04-21 08:20:50,300 INFO     sopdsDaemon entering in main loop...
+2014-04-21 08:20:50,301 INFO      ***** Starting sopds-scan...
