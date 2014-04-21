@@ -156,7 +156,6 @@ def authors_submenu(author_id):
    enc_print('<title>Книги по алфавиту</title>')
    enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+cfg.CGI_PATH+'?id=33'+str(author_id)+'"/>')
    enc_print('<id>id:33:authors</id></entry>')
-   enc_print('<entry>')
 
 def entry_start():
    enc_print('<entry>')
@@ -357,7 +356,7 @@ elif type_value==1:
    header('id:catalogs','Сортировка по каталогам хранения')
    for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getitemsincat(slice_value,cfg.MAXITEMS,page_value):
        entry_start()
-       entry_head(item_title, reg_date, id_value)
+       entry_head(item_title, reg_date, 'item:'+str(item_id))
        if item_type==1:
           id='01'+str(item_id)
           entry_link_subsection(id)
@@ -403,7 +402,7 @@ elif type_value==2:
          id='02'+id
 
        entry_start()
-       entry_head(letters, None, id_value)
+       entry_head(letters, None, id)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' автора(ов).')
        entry_finish()
@@ -431,7 +430,7 @@ elif type_value==6:
          id='06'+id
 
        entry_start()
-       entry_head(letters, None, id_value)
+       entry_head(letters, None, id)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' серий.')
        entry_finish()
@@ -460,7 +459,7 @@ elif type_value==3:
          id='03'+id
   
        entry_start()
-       entry_head(letters, None, id_value)
+       entry_head(letters, None, id)
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' наименований.')
        entry_finish()
@@ -484,7 +483,7 @@ if type_value==13 or type_value==71:
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksfortitle(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
-       entry_head(book_title, reg_date, id_value)
+       entry_head(book_title, reg_date, 'book:'+str(book_id))
        entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
@@ -503,7 +502,7 @@ elif type_value==4:
    for (genre_id,genre_section,cnt) in opdsdb.getgenres_sections(cfg.DUBLICATES_SHOW,np):
        id='14'+str(genre_id)
        entry_start()
-       entry_head(genre_section, None, id_value)
+       entry_head(genre_section, None, 'genre:'+str(genre_id))
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' книг.')
        entry_finish()
@@ -518,7 +517,7 @@ elif type_value==14:
        id='24'+str(genre_id)
        if cfg.ALPHA: id='30'+id
        entry_start()
-       entry_head(genre_subsection, None, id_value)
+       entry_head(genre_subsection, None, 'genre:'+str(genre_id))
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' книг.')
        entry_finish()
@@ -532,7 +531,7 @@ if type_value==24:
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforgenre(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,alpha,np):
        id='90'+str(book_id)
        entry_start()
-       entry_head(book_title, reg_date, id_value)
+       entry_head(book_title, reg_date, 'book:'+str(book_id))
        entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
@@ -583,7 +582,7 @@ if type_value==8:
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforuser(user,cfg.MAXITEMS,page_value):
        id='90'+str(book_id)
        entry_start()
-       entry_head(book_title, reg_date, id_value)
+       entry_head(book_title, reg_date, 'book:'+str(book_id))
        entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
@@ -612,7 +611,7 @@ if type_value==12 or type_value==72:
    for (author_id,first_name, last_name,cnt) in opdsdb.getauthorsbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='22'+str(author_id)
        entry_start()
-       entry_head(last_name+' '+first_name, None, id_value)
+       entry_head(last_name+' '+first_name, None, 'author:'+str(author_id))
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' книг.')
        entry_finish()
@@ -638,7 +637,7 @@ if type_value==16 or type_value==73:
    for (ser_id,ser,cnt) in opdsdb.getseriesbyl(letter,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='26'+str(ser_id)
        entry_start()
-       entry_head(ser, None, id_value)
+       entry_head(ser, None, 'series:'+str(ser_id))
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' книг.')
        entry_finish()
@@ -663,7 +662,7 @@ if type_value==31:
    for (ser_id,ser,cnt) in opdsdb.getseriesforauthor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='34'+str(slice_value)+'&amp;ser='+str(ser_id)
        entry_start()
-       entry_head(ser, None, id_value)
+       entry_head(ser, None, 'series:'+str(ser_id))
        entry_link_subsection(id)
        entry_content('Всего: '+str(cnt)+' книг.')
        entry_finish()
@@ -679,7 +678,7 @@ if type_value==33 or (type_value==22 and np!=0):
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautor(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
-       entry_head(book_title, reg_date, id_value)
+       entry_head(book_title, reg_date, 'book:'+str(book_id))
        entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
@@ -699,7 +698,7 @@ if type_value==34:
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforautorser(slice_value,ser_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW):
        id='90'+str(book_id)
        entry_start()
-       entry_head(book_title, reg_date, id_value)
+       entry_head(book_title, reg_date, 'book:'+str(book_id))
        entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)
@@ -719,7 +718,7 @@ if type_value==26:
    for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in opdsdb.getbooksforser(slice_value,cfg.MAXITEMS,page_value,cfg.DUBLICATES_SHOW,np):
        id='90'+str(book_id)
        entry_start()
-       entry_head(book_title, reg_date, id_value)
+       entry_head(book_title, reg_date, 'book:'+str(book_id))
        entry_link_book(book_id,format)
        entry_covers(cover,cover_type,book_id)
        authors=entry_authors(opdsdb,book_id,True)

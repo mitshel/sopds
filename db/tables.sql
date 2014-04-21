@@ -23,6 +23,8 @@ avail INT not null DEFAULT 0,
 PRIMARY KEY(book_id),
 KEY(filename),
 KEY(title,format,filesize),
+INDEX(path),
+INDEX(cat_id),
 INDEX(avail,doublicat),
 INDEX(registerdate));
 commit;
@@ -35,7 +37,7 @@ cat_name VARCHAR(64),
 path VARCHAR(1024),
 cat_type INT not null DEFAULT 0,
 PRIMARY KEY(cat_id),
-KEY(cat_name));
+KEY(cat_name,path));
 commit;
 
 drop table if exists authors;
@@ -102,7 +104,7 @@ create table dbver(
 ver varchar(5));
 commit;
 
-insert into dbver(ver) values("0.17");
+insert into dbver(ver) values("0.18");
 commit;
 insert into authors(author_id,last_name,first_name) values(1,"Неизвестный Автор","");
 commit;
