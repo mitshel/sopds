@@ -1383,3 +1383,18 @@ AttributeError: 'opdsScanner' object has no attribute 'init_statas'
 2014-04-21 14:47:10,547 INFO     sopdsDaemon start()...
 2014-04-21 14:47:10,602 INFO     sopdsDaemon entering in main loop...
 2014-04-21 14:47:10,603 INFO      ***** Starting sopds-scan...
+2014-04-21 18:00:58,888 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-000024-030559.zip book file = 25453.fb2
+2014-04-21 18:01:00,917 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-000024-030559.zip book file = 25608.fb2
+2014-04-21 18:06:22,338 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-104215-113436.zip book file = 105858.fb2
+2014-04-21 18:06:23,554 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-104215-113436.zip book file = 105863.fb2
+2014-04-21 18:30:05,564 ERROR    Error extract cover from file 166213.fb2
+2014-04-21 18:42:50,147 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-349000-353999.zip book file = 351689.fb2
+2014-04-21 18:46:16,873 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-349000-353999.zip book file = 353440.fb2
+2014-04-21 18:46:55,997 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-349000-353999.zip book file = 353815.fb2
+2014-04-21 18:47:41,259 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-209029-212751.zip book file = 209215.fb2
+2014-04-21 18:47:41,927 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-209029-212751.zip book file = 209221.fb2
+2014-04-21 18:49:08,032 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-209029-212751.zip book file = 209912.fb2
+2014-04-21 18:50:45,993 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-209029-212751.zip book file = 210769.fb2
+2014-04-21 18:55:08,228 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-209029-212751.zip book file = 211044.fb2
+2014-04-21 19:05:53,829 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-209029-212751.zip book file = 211923.fb2
+2014-04-21 19:08:47,263 ERROR    Error processing ZIP file = /mnt/SATA1TB-2/КНИГИ/BOOKS/Художественная литература/LIB.RUS.EC/fb2-463400-467299.zip book file = 463868.fb2
