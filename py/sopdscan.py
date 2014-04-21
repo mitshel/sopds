@@ -22,23 +22,6 @@ class opdsScanner:
         zipf.ZIP_CODEPAGE=self.cfg.ZIP_CODEPAGE
         self.extensions_set={x for x in self.cfg.EXT_LIST}
 
-#    def init_logger(self):
-#        if self.cfg.LOGLEVEL!=logging.NOTSET:
-#            # Создаем обработчик для записи логов в файл
-#            self.fh = logging.FileHandler(self.cfg.LOGFILE)
-#            self.fh.setLevel(self.cfg.LOGLEVEL)
-#
-#        if self.VERBOSE:
-#            # Создадим обработчик для вывода логов на экран с максимальным уровнем вывода
-#            self.ch = logging.StreamHandler()
-#            self.ch.setLevel(logging.DEBUG)
-#
-#        logformat='%(asctime)s %(levelname)-8s %(message)s'
-#        if self.VERBOSE:
-#            logging.basicConfig(format = logformat, level = logging.DEBUG, handlers=(self.fh,self.ch))
-#        else:
-#            logging.basicConfig(format = logformat, level = logging.INFO, handlers=(self.fh,))
-
     def init_stats(self):
         self.t1=datetime.timedelta(seconds=time.time())
         self.t2=self.t1
@@ -174,7 +157,7 @@ class opdsScanner:
 
                if e.lower()=='.fb2' and self.cfg.FB2PARSE and self.cfg.COVER_EXTRACT:
                   try:
-                    create_cover(book_id)
+                    self.create_cover(book_id)
                   except:
                     self.logger.error('Error extract cover from file '+name)
 

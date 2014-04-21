@@ -19,7 +19,7 @@ if (__name__=="__main__"):
     else: cfg=sopdscfg.cfgreader(CFG_FILE)
 
     logger = logging.getLogger('')
-    logger.setLevel(cfg.LOGLEVEL)
+    logger.setLevel(logging.DEBUG)
     formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
 
     if cfg.LOGLEVEL!=logging.NOTSET:
