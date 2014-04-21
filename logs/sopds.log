@@ -225,3 +225,11 @@ AttributeError: 'opdsScanner' object has no attribute 'init_statas'
 2014-04-21 08:20:50,252 INFO     sopdsDaemon start()...
 2014-04-21 08:20:50,300 INFO     sopdsDaemon entering in main loop...
 2014-04-21 08:20:50,301 INFO      ***** Starting sopds-scan...
+2014-04-21 08:23:33,317 INFO     Books added      : 0
+2014-04-21 08:23:33,318 INFO     Books skipped    : 5569
+2014-04-21 08:23:33,318 INFO     Books DB entries deleted : 0
+2014-04-21 08:23:33,319 INFO     Books in archives: 0
+2014-04-21 08:23:33,319 INFO     Archives scanned : 35
+2014-04-21 08:23:33,319 INFO     Archives skipped : 127
+2014-04-21 08:23:33,320 INFO     Bad archives     : 0
+2014-04-21 08:23:33,320 INFO     Time estimated:0 hours, 2 minutes, 43 seconds.
