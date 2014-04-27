@@ -1,10 +1,10 @@
 covers/*
 *.fb2
+*.log
 py/__pycache__/*
 py/ziptest.py
 py/fb2parse.py
 py/b64decode.py
-*.log
 fb2toepub/*
 !fb2toepub/*.zip
 fb2conv/*
