@@ -92,7 +92,7 @@ class opdsClient():
            if salpha.isdigit(): self.alpha=int(salpha)
         if 'news' in form:
            self.news=1
-           self.l='&amp;news=1'
+           self.nl='&amp;news=1'
            self.np=self.cfg.NEW_PERIOD
         if 'ser' in form:
            ser=form.getvalue("ser","0")
@@ -213,7 +213,7 @@ class opdsClient():
         self.enc_print('<id>id:'+e_id+'</id>')
 
     def entry_link_subsection(self,link_id):
-        self.enc_print('<link type="application/atom+xml" rel="alternate" href="'+self.modulePath+'?id='+link_id+'"/>')
+        self.enc_print('<link type="application/atom+xml" rel="alternate" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
         self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
 
     def entry_link_book(self,link_id,format):
@@ -231,7 +231,7 @@ class opdsClient():
     def entry_authors(self,book_id,link_show=False):
         authors=""
         for (author_id,first_name,last_name) in self.opdsdb.getauthors(book_id):
-            enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
+            self.enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
             if len(authors)>0:
                authors+=', '
             authors+=last_name+' '+first_name
@@ -245,7 +245,7 @@ class opdsClient():
     def entry_genres(self,book_id):
         genres=""
         for (section,genre) in self.opdsdb.getgenres(book_id):
-            enc_print('<category term="%s" label="%s" />'%(genre,genre))
+            self.enc_print('<category term="%s" label="%s" />'%(genre,genre))
             if len(genres)>0:
                   genres+=', '
             genres+=genre
@@ -401,7 +401,7 @@ class opdsClient():
         while i>0:
            letter=chr(i%10000)+letter
            i=i//10000
-        header('id:preseries:%s'%letter,'Выбор серий "%s"'%letter)
+        self.header('id:preseries:%s'%letter,'Выбор серий "%s"'%letter)
         for (letters,cnt) in self.opdsdb.getseries_2letters(letter,self.alpha,self.np):
             id=""
             for i in range(len(letters)):
@@ -417,7 +417,7 @@ class opdsClient():
             self.entry_link_subsection(id)
             self.entry_content('Всего: '+str(cnt)+' серий.')
             self.entry_finish()
-        footer()
+        self.footer()
 
     def response_titles(self):
         """ Cортировка 'По наименованию' - выбор по нескольким первым буквам наименования """
@@ -480,7 +480,7 @@ class opdsClient():
             self.entry_link_subsection(id)
             self.entry_content('Всего: '+str(cnt)+' книг.')
             self.entry_finish()
-        footer()
+        self.footer()
 
     def response_genres_subsections(self):
         """ Cортировка 'По жанрам' - показ подсекций """
@@ -493,7 +493,7 @@ class opdsClient():
             self.entry_link_subsection(id)
             self.entry_content('Всего: '+str(cnt)+' книг.')
             self.entry_finish()
-        footer()
+        self.footer()
 
     def response_genres_books(self):
         """ Выдача списка книг по жанру """
@@ -549,9 +549,9 @@ class opdsClient():
             self.entry_head(book_title, reg_date, 'book:'+str(book_id))
             self.entry_link_book(book_id,format)
             self.entry_covers(cover,cover_type,book_id)
-            self.authors=entry_authors(book_id,True)
-            self.genres=entry_genres(book_id)
-            self.series=entry_series(book_id)
+            authors=self.entry_authors(book_id,True)
+            genres=self.entry_genres(book_id)
+            series=self.entry_series(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
@@ -640,10 +640,10 @@ class opdsClient():
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
-    def response_authors_series(self):
+    def response_authors_series_books(self):
         """ Выдача списка книг по автору по выбранной серии (или вне серий если ser_value==0) """
         (first_name,last_name)=self.opdsdb.getauthor_name(self.slice_value)
-        header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
+        self.header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforautorser(self.slice_value,self.ser_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW):
             id='90'+str(book_id)
             self.entry_start()
@@ -661,7 +661,7 @@ class opdsClient():
     def response_series_books(self):
         """ Выдача списка книг по серии """
         (ser_name,)=self.opdsdb.getser_name(self.slice_value)
-        header('id:ser:%s'%ser_name,'Книги серии %s'%ser_name)
+        self.header('id:ser:%s'%ser_name,'Книги серии %s'%ser_name)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforser(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
             self.entry_start()
@@ -693,8 +693,8 @@ class opdsClient():
            self.enc_print('Content-Length: '+str(book_size))
            self.enc_print()
            fo=codecs.open(file_path.encode("utf-8"), "rb")
-           str=fo.read()
-           sys.stdout.buffer.write(str)
+           s=fo.read()
+           sys.stdout.buffer.write(s)
            fo.close()
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
@@ -703,8 +703,8 @@ class opdsClient():
            self.enc_print('Content-Length: '+str(book_size))
            self.enc_print()
            fo= z.open(book_name)
-           str=fo.read()
-           sys.stdout.buffer.write(str)
+           s=fo.read()
+           sys.stdout.buffer.write(s)
            fo.close()
            z.close()
            fz.close()
@@ -734,14 +734,14 @@ class opdsClient():
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            zi = zipf.ZipFile(fz, 'r', allowZip64=True)
            fo= zi.open(book_name)
-           str=fo.read()
+           s=fo.read()
            fo.close()
            zi.close()
            fz.close()
 
            dio = io.BytesIO()
            zo = zipf.ZipFile(dio, 'w', zipf.ZIP_DEFLATED)
-           zo.writestr(transname,str)
+           zo.writestr(transname,s)
            zo.close()
 
            buf = dio.getvalue()
@@ -779,14 +779,14 @@ class opdsClient():
 
         if os.path.isfile(tmp_conv_path):
            fo=codecs.open(tmp_conv_path, "rb")
-           str=fo.read()
+           s=fo.read()
            # HTTP Header
            self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
            self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
            self.enc_print('Content-Transfer-Encoding: binary')
            self.enc_print('Content-Length: %s'%len(str))
            self.enc_print()
-           sys.stdout.buffer.write(str)
+           sys.stdout.buffer.write(s)
            fo.close()
         else:
            self.enc_print('Status: 404 Not Found')
@@ -861,7 +861,7 @@ class opdsClient():
         elif self.type_value==33 or (self.type_value==22 and self.np!=0):
            self.response_authors_alpha()
         elif self.type_value==34:
-           self.response_authors_series()
+           self.response_authors_series_books()
 
         elif self.type_value==3:
            self.response_titles()
