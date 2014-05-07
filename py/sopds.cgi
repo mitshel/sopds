@@ -50,7 +50,7 @@ class opdsClient():
     def __init__(self,cfg):
         self.cfg=cfg
         self.modulePath=self.cfg.CGI_PATH
-        self.opdsdb=None
+        self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
 
     def resetParams(self):
         self.id_value='0'
@@ -842,7 +842,6 @@ class opdsClient():
               self.enc_print()
 
     def do_response(self):
-        self.opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
         self.opdsdb.openDB()
 
         if self.type_value==0:
@@ -925,35 +924,19 @@ class opdsClient():
 #   entry_finish()
 #   footer()
 
+if (__name__=="__main__"):
+   cfg=sopdscfg.cfgreader()
+   zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
 
-#######################################################################
-#
-# Парсим конфигурационный файл
-#
-cfg=sopdscfg.cfgreader()
-zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
+   user = None
+   if 'REMOTE_USER' in os.environ:
+      user = os.environ['REMOTE_USER']
 
-######################################################################
-#
-# Парсим данные response (выясняем имя пользователя если была Аутентификация)
-#
-user = None
-if 'REMOTE_USER' in os.environ:
-   user = os.environ['REMOTE_USER']
+   form = cgi.FieldStorage()
 
-######################################################################
-#
-# Получаем данные из cgi-запроса
-#
-form = cgi.FieldStorage()
-
-######################################################################
-#
-# Создаем объект opdsClient и обрабатываем запрос
-#
-sopds = opdsClient(cfg)
-sopds.resetParams()
-sopds.parseParams(form)
-sopds.setUser(user)
-sopds.do_response()
+   sopds = opdsClient(cfg)
+   sopds.resetParams()
+   sopds.parseParams(form)
+   sopds.setUser(user)
+   sopds.do_response()
 

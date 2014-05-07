@@ -46,11 +46,11 @@ def websym(s,attr=False):
 #
 # Основной класс OPDS-клиента
 #
-class opdsClient()
+class opdsClient():
     def __init__(self,cfg):
         self.cfg=cfg
         self.modulePath=self.cfg.CGI_PATH
-        self.opdsdb=None
+        self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
 
     def resetParams(self):
         self.id_value='0'
@@ -92,7 +92,7 @@ class opdsClient()
            if salpha.isdigit(): self.alpha=int(salpha)
         if 'news' in form:
            self.news=1
-           self.l='&amp;news=1'
+           self.nl='&amp;news=1'
            self.np=self.cfg.NEW_PERIOD
         if 'ser' in form:
            ser=form.getvalue("ser","0")
@@ -105,7 +105,10 @@ class opdsClient()
     def enc_print(self, string='', encoding='utf8'):
         sys.stdout.buffer.write(string.encode(encoding) + b'\n')
 
-    def header(self,h_id=self.cfg.SITE_ID,h_title=self.cfg.SITE_TITLE, h_subtitle='Simple OPDS Catalog by www.sopds.ru',charset='utf-8'):
+    def header(self, h_id=None, h_title=None, h_subtitle=None,charset='utf-8'):
+        if h_id==None: h_id=self.cfg.SITE_ID
+        if h_title==None: h_title=self.cfg.SITE_TITLE
+        if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru'
         self.enc_print('Content-Type: text/xml; charset='+charset)
         self.enc_print()
         self.enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
@@ -156,7 +159,7 @@ class opdsClient()
            self.enc_print('<entry>')
            self.enc_print('<title>Новинки за %s суток</title>'%self.cfg.NEW_PERIOD)
            self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=05"/>')
-           slf.enc_print('<id>id:05</id></entry>')
+           self.enc_print('<id>id:05</id></entry>')
         if self.cfg.BOOK_SHELF and self.user!=None:
            self.enc_print('<entry>')
            self.enc_print('<title>Книжная полка для %s</title>'%self.user)
@@ -210,7 +213,7 @@ class opdsClient()
         self.enc_print('<id>id:'+e_id+'</id>')
 
     def entry_link_subsection(self,link_id):
-        self.enc_print('<link type="application/atom+xml" rel="alternate" href="'+self.modulePath+'?id='+link_id+'"/>')
+        self.enc_print('<link type="application/atom+xml" rel="alternate" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
         self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
 
     def entry_link_book(self,link_id,format):
@@ -228,7 +231,7 @@ class opdsClient()
     def entry_authors(self,book_id,link_show=False):
         authors=""
         for (author_id,first_name,last_name) in self.opdsdb.getauthors(book_id):
-            enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
+            self.enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
             if len(authors)>0:
                authors+=', '
             authors+=last_name+' '+first_name
@@ -242,7 +245,7 @@ class opdsClient()
     def entry_genres(self,book_id):
         genres=""
         for (section,genre) in self.opdsdb.getgenres(book_id):
-            enc_print('<category term="%s" label="%s" />'%(genre,genre))
+            self.enc_print('<category term="%s" label="%s" />'%(genre,genre))
             if len(genres)>0:
                   genres+=', '
             genres+=genre
@@ -289,12 +292,12 @@ class opdsClient()
         if filename!='':
            self.enc_print('&lt;b&gt;Файл:&lt;/b&gt; '+websym(filename)+'&lt;br/&gt;')
         if filesize>0:
-           self.enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(fsize//1000)+'Кб.&lt;br/&gt;')
+           self.enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(filesize//1000)+'Кб.&lt;br/&gt;')
         if docdate!='':
            self.enc_print('&lt;b&gt;Дата правки:&lt;/b&gt; '+docdate+'&lt;br/&gt;')
         if annotation!='':
            self.enc_print('&lt;p class=book&gt;'+websym(annotation)+'&lt;/p&gt;')
-        enc_print('</content>')
+        self.enc_print('</content>')
 
     def entry_finish(self):
         self.enc_print('</entry>')
@@ -398,7 +401,7 @@ class opdsClient()
         while i>0:
            letter=chr(i%10000)+letter
            i=i//10000
-        header('id:preseries:%s'%letter,'Выбор серий "%s"'%letter)
+        self.header('id:preseries:%s'%letter,'Выбор серий "%s"'%letter)
         for (letters,cnt) in self.opdsdb.getseries_2letters(letter,self.alpha,self.np):
             id=""
             for i in range(len(letters)):
@@ -414,7 +417,7 @@ class opdsClient()
             self.entry_link_subsection(id)
             self.entry_content('Всего: '+str(cnt)+' серий.')
             self.entry_finish()
-        footer()
+        self.footer()
 
     def response_titles(self):
         """ Cортировка 'По наименованию' - выбор по нескольким первым буквам наименования """
@@ -477,7 +480,7 @@ class opdsClient()
             self.entry_link_subsection(id)
             self.entry_content('Всего: '+str(cnt)+' книг.')
             self.entry_finish()
-        footer()
+        self.footer()
 
     def response_genres_subsections(self):
         """ Cортировка 'По жанрам' - показ подсекций """
@@ -490,7 +493,7 @@ class opdsClient()
             self.entry_link_subsection(id)
             self.entry_content('Всего: '+str(cnt)+' книг.')
             self.entry_finish()
-        footer()
+        self.footer()
 
     def response_genres_books(self):
         """ Выдача списка книг по жанру """
@@ -546,9 +549,9 @@ class opdsClient()
             self.entry_head(book_title, reg_date, 'book:'+str(book_id))
             self.entry_link_book(book_id,format)
             self.entry_covers(cover,cover_type,book_id)
-            self.authors=entry_authors(book_id,True)
-            self.genres=entry_genres(book_id)
-            self.series=entry_series(book_id)
+            authors=self.entry_authors(book_id,True)
+            genres=self.entry_genres(book_id)
+            series=self.entry_series(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
@@ -637,10 +640,10 @@ class opdsClient()
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
-    def response_authors_series(self):
+    def response_authors_series_books(self):
         """ Выдача списка книг по автору по выбранной серии (или вне серий если ser_value==0) """
         (first_name,last_name)=self.opdsdb.getauthor_name(self.slice_value)
-        header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
+        self.header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforautorser(self.slice_value,self.ser_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW):
             id='90'+str(book_id)
             self.entry_start()
@@ -658,7 +661,7 @@ class opdsClient()
     def response_series_books(self):
         """ Выдача списка книг по серии """
         (ser_name,)=self.opdsdb.getser_name(self.slice_value)
-        header('id:ser:%s'%ser_name,'Книги серии %s'%ser_name)
+        self.header('id:ser:%s'%ser_name,'Книги серии %s'%ser_name)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforser(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
             self.entry_start()
@@ -690,8 +693,8 @@ class opdsClient()
            self.enc_print('Content-Length: '+str(book_size))
            self.enc_print()
            fo=codecs.open(file_path.encode("utf-8"), "rb")
-           str=fo.read()
-           sys.stdout.buffer.write(str)
+           s=fo.read()
+           sys.stdout.buffer.write(s)
            fo.close()
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
@@ -700,8 +703,8 @@ class opdsClient()
            self.enc_print('Content-Length: '+str(book_size))
            self.enc_print()
            fo= z.open(book_name)
-           str=fo.read()
-           sys.stdout.buffer.write(str)
+           s=fo.read()
+           sys.stdout.buffer.write(s)
            fo.close()
            z.close()
            fz.close()
@@ -727,18 +730,18 @@ class opdsClient()
            self.enc_print('Content-Length: %s'%len(buf))
            self.enc_print()
            sys.stdout.buffer.write(buf)
-       elif cat_type==sopdsdb.CAT_ZIP:
+        elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            zi = zipf.ZipFile(fz, 'r', allowZip64=True)
            fo= zi.open(book_name)
-           str=fo.read()
+           s=fo.read()
            fo.close()
            zi.close()
            fz.close()
 
            dio = io.BytesIO()
            zo = zipf.ZipFile(dio, 'w', zipf.ZIP_DEFLATED)
-           zo.writestr(transname,str)
+           zo.writestr(transname,s)
            zo.close()
 
            buf = dio.getvalue()
@@ -776,14 +779,14 @@ class opdsClient()
 
         if os.path.isfile(tmp_conv_path):
            fo=codecs.open(tmp_conv_path, "rb")
-           str=fo.read()
+           s=fo.read()
            # HTTP Header
            self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
            self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
            self.enc_print('Content-Transfer-Encoding: binary')
            self.enc_print('Content-Length: %s'%len(str))
            self.enc_print()
-           sys.stdout.buffer.write(str)
+           sys.stdout.buffer.write(s)
            fo.close()
         else:
            self.enc_print('Status: 404 Not Found')
@@ -839,8 +842,7 @@ class opdsClient()
               self.enc_print()
 
     def do_response(self):
-        self.opdsdb=sopdsdb.opdsDatabase(cfg.DB_NAME,cfg.DB_USER,cfg.DB_PASS,cfg.DB_HOST,cfg.ROOT_LIB)
-        self.pdsdb.openDB()
+        self.opdsdb.openDB()
 
         if self.type_value==0:
            self.response_main()
@@ -858,7 +860,7 @@ class opdsClient()
         elif self.type_value==33 or (self.type_value==22 and self.np!=0):
            self.response_authors_alpha()
         elif self.type_value==34:
-           self.response_authors_series()
+           self.response_authors_series_books()
 
         elif self.type_value==3:
            self.response_titles()
@@ -879,7 +881,7 @@ class opdsClient()
            self.response_series()
         elif self.type_value==16 or self.type_value==73:
            self.response_series_search()
-        elif type_value==26:
+        elif self.type_value==26:
            self.response_series_books()
 
         elif self.type_value==7:
@@ -898,7 +900,7 @@ class opdsClient()
         elif self.type_value==99:
            self.response_book_cover()
 
-        opdsdb.closeDB()
+        self.opdsdb.closeDB()
 
 
 
@@ -922,35 +924,19 @@ class opdsClient()
 #   entry_finish()
 #   footer()
 
+if (__name__=="__main__"):
+   cfg=sopdscfg.cfgreader()
+   zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
 
-#######################################################################
-#
-# Парсим конфигурационный файл
-#
-cfg=sopdscfg.cfgreader()
-zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
+   user = None
+   if 'REMOTE_USER' in os.environ:
+      user = os.environ['REMOTE_USER']
 
-######################################################################
-#
-# Парсим данные response (выясняем имя пользователя если была Аутентификация)
-#
-user = None
-if 'REMOTE_USER' in os.environ:
-   user = os.environ['REMOTE_USER']
+   form = cgi.FieldStorage()
 
-######################################################################
-#
-# Получаем данные из cgi-запроса
-#
-form = cgi.FieldStorage()
-
-######################################################################
-#
-# Создаем объект opdsClient и обрабатываем запрос
-#
-sopds = opdsClient(cfg)
-sopds.resetParams()
-sopds.parseParams(form)
-sopds.setUser(user)
-sopds.do_response()
+   sopds = opdsClient(cfg)
+   sopds.resetParams()
+   sopds.parseParams(form)
+   sopds.setUser(user)
+   sopds.do_response()
 
