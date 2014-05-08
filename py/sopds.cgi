@@ -105,6 +105,9 @@ class opdsClient():
     def enc_print(self, string='', encoding='utf8'):
         sys.stdout.buffer.write(string.encode(encoding) + b'\n')
 
+    def bin_print(self, data)
+        sys.stdout.buffer.write(dstr)
+
     def header(self, h_id=None, h_title=None, h_subtitle=None,charset='utf-8'):
         if h_id==None: h_id=self.cfg.SITE_ID
         if h_title==None: h_title=self.cfg.SITE_TITLE
@@ -694,7 +697,8 @@ class opdsClient():
            self.enc_print()
            fo=codecs.open(file_path.encode("utf-8"), "rb")
            s=fo.read()
-           sys.stdout.buffer.write(s)
+           self.bin_print(s)
+#           sys.stdout.buffer.write(s)
            fo.close()
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
@@ -704,7 +708,8 @@ class opdsClient():
            self.enc_print()
            fo= z.open(book_name)
            s=fo.read()
-           sys.stdout.buffer.write(s)
+           self.bin_print(s)
+#           sys.stdout.buffer.write(s)
            fo.close()
            z.close()
            fz.close()
@@ -729,7 +734,8 @@ class opdsClient():
            buf = dio.getvalue()
            self.enc_print('Content-Length: %s'%len(buf))
            self.enc_print()
-           sys.stdout.buffer.write(buf)
+           self.bin_print(buf)
+#           sys.stdout.buffer.write(buf)
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            zi = zipf.ZipFile(fz, 'r', allowZip64=True)
@@ -747,7 +753,8 @@ class opdsClient():
            buf = dio.getvalue()
            self.enc_print('Content-Length: %s'%len(buf))
            self.enc_print()
-           sys.stdout.buffer.write(buf)
+           self.bin_print(buf)
+#           sys.stdout.buffer.write(buf)
 
     def response_book_convert(self):
         """ Выдача файла книги после конвертации в EPUB или mobi """
@@ -786,7 +793,8 @@ class opdsClient():
            self.enc_print('Content-Transfer-Encoding: binary')
            self.enc_print('Content-Length: %s'%len(str))
            self.enc_print()
-           sys.stdout.buffer.write(s)
+           self.bin_print(s)
+#           sys.stdout.buffer.write(s)
            fo.close()
         else:
            self.enc_print('Status: 404 Not Found')
@@ -825,7 +833,8 @@ class opdsClient():
                 ictype=fb2.cover_image.getattr('content-type')
                 self.enc_print('Content-Type:'+ictype)
                 self.enc_print()
-                sys.stdout.buffer.write(dstr)
+                self.bin_print(dstr)
+#                sys.stdout.buffer.write(dstr)
                 c0=1
               except:
                 c0=0
@@ -835,7 +844,8 @@ class opdsClient():
               self.enc_print('Content-Type: image/jpeg')
               self.enc_print()
               f=open(sopdscfg.NOCOVER_IMG,"rb")
-              sys.stdout.buffer.write(f.read())
+              self.bin_print(f.read())
+#              sys.stdout.buffer.write(f.read())
               f.close()
            else:
               self.enc_print('Status: 404 Not Found')
