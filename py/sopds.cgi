@@ -105,8 +105,8 @@ class opdsClient():
     def enc_print(self, string='', encoding='utf8'):
         sys.stdout.buffer.write(string.encode(encoding) + b'\n')
 
-    def bin_print(self, data)
-        sys.stdout.buffer.write(dstr)
+    def bin_print(self, data):
+        sys.stdout.buffer.write(data)
 
     def header(self, h_id=None, h_title=None, h_subtitle=None,charset='utf-8'):
         if h_id==None: h_id=self.cfg.SITE_ID
