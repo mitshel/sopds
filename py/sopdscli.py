@@ -40,6 +40,24 @@ def websym(s,attr=False):
         result = result.replace(k,table[k])
     return result;
 
+def opensearch(script):
+    code='''<?xml version="1.0" encoding="utf-8"?>
+            <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+            <ShortName>SimpleOPDS</ShortName>
+            <LongName>SimpleOPDS</LongName>
+            <Url type="application/atom+xml" template="{0}?searchTerm={{searchTerms}}" />
+            <Image width="16" height="16">http://www.sopds.ru/favicon.ico</Image>
+            <Tags />
+            <Contact />
+            <Developer />
+            <Attribution />
+            <SyndicationRight>open</SyndicationRight>
+            <AdultContent>false</AdultContent>
+            <Language>*</Language>
+            <OutputEncoding>UTF-8</OutputEncoding>
+            <InputEncoding>UTF-8</InputEncoding>
+            </OpenSearchDescription>'''.format(script)
+    return code
 
 #######################################################################
 #
@@ -49,6 +67,7 @@ class opdsClient():
     def __init__(self,cfg):
         self.cfg=cfg
         self.modulePath=self.cfg.CGI_PATH
+        self.cfg.SEARCHXML_PATH=self.modulePath+'?id=09'
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
 
     def resetParams(self):
@@ -902,6 +921,10 @@ class opdsClient():
 #              self.enc_print('Status: 404 Not Found')
 #              self.enc_print()
 
+    def response_search(self):
+        self.add_response_header([('Content-Type','text/xml')])
+        self.enc_print(opensearch(self.modulePath))
+
     def make_response(self):
         self.opdsdb.openDB()
 
@@ -951,6 +974,9 @@ class opdsClient():
            self.response_bookshelf()
         elif self.type_value==30:
            self.response_alpha()
+
+        elif self.type_value==9:
+           self.response_search()
 
         elif self.type_value==91:
            self.response_book_file()
