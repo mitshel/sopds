@@ -1,4 +1,4 @@
-DirectoryIndex index.xml py/sopds.cgi
+DirectoryIndex index.xml py/sopds.wsgi
 AddHandler wsgi-script .wsgi
 Options ExecCGI
 AuthType Basic

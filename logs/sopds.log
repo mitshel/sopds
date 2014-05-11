@@ -1956,3 +1956,128 @@ AttributeError: 'opdsScanner' object has no attribute 'init_statas'
 2014-05-06 18:02:52,802 INFO     Archives skipped : 128
 2014-05-06 18:02:52,803 INFO     Bad archives     : 0
 2014-05-06 18:02:52,803 INFO     Time estimated:0 hours, 2 minutes, 52 seconds.
+2014-05-08 21:54:51,638 INFO     sopdsDaemon __init__()...
+2014-05-08 21:54:51,639 INFO     sopdsDaemon status()...
+2014-05-08 21:54:56,001 INFO     sopdsDaemon __init__()...
+2014-05-08 21:54:56,002 INFO     sopdsDaemon status()...
+2014-05-08 21:54:59,834 INFO     sopdsDaemon __init__()...
+2014-05-08 21:54:59,834 INFO     sopdsDaemon stop()...
+2014-05-08 21:55:04,044 INFO     sopdsDaemon __init__()...
+2014-05-08 21:55:04,045 INFO     sopdsDaemon status()...
+2014-05-08 21:55:13,376 INFO     sopdsDaemon __init__()...
+2014-05-08 21:55:13,376 INFO     sopdsDaemon status()...
+2014-05-08 21:55:27,265 INFO     sopdsDaemon __init__()...
+2014-05-08 21:55:27,265 INFO     sopdsDaemon status()...
+2014-05-08 21:55:31,495 INFO     sopdsDaemon __init__()...
+2014-05-08 21:55:31,496 INFO     sopdsDaemon start()...
+2014-05-08 21:55:31,549 INFO     sopdsDaemon entering in main loop...
+2014-05-08 21:55:31,550 INFO      ***** Starting sopds-scan...
+2014-05-08 21:55:35,827 INFO     sopdsDaemon __init__()...
+2014-05-08 21:55:35,827 INFO     sopdsDaemon status()...
+2014-05-08 21:58:44,271 INFO     Books added      : 0
+2014-05-08 21:58:44,272 INFO     Books skipped    : 5571
+2014-05-08 21:58:44,272 INFO     Books DB entries deleted : 0
+2014-05-08 21:58:44,273 INFO     Books in archives: 0
+2014-05-08 21:58:44,273 INFO     Archives scanned : 35
+2014-05-08 21:58:44,273 INFO     Archives skipped : 128
+2014-05-08 21:58:44,273 INFO     Bad archives     : 0
+2014-05-08 21:58:44,274 INFO     Time estimated:0 hours, 3 minutes, 12 seconds.
+2014-05-09 00:00:20,903 INFO      ***** Starting sopds-scan...
+2014-05-09 00:03:37,495 INFO     Books added      : 0
+2014-05-09 00:03:37,495 INFO     Books skipped    : 5571
+2014-05-09 00:03:37,495 INFO     Books DB entries deleted : 0
+2014-05-09 00:03:37,496 INFO     Books in archives: 0
+2014-05-09 00:03:37,496 INFO     Archives scanned : 35
+2014-05-09 00:03:37,496 INFO     Archives skipped : 128
+2014-05-09 00:03:37,497 INFO     Bad archives     : 0
+2014-05-09 00:03:37,497 INFO     Time estimated:0 hours, 3 minutes, 16 seconds.
+2014-05-09 06:00:26,568 INFO      ***** Starting sopds-scan...
+2014-05-09 06:03:28,337 INFO     Books added      : 0
+2014-05-09 06:03:28,357 INFO     Books skipped    : 5571
+2014-05-09 06:03:28,358 INFO     Books DB entries deleted : 0
+2014-05-09 06:03:28,358 INFO     Books in archives: 0
+2014-05-09 06:03:28,358 INFO     Archives scanned : 35
+2014-05-09 06:03:28,358 INFO     Archives skipped : 128
+2014-05-09 06:03:28,359 INFO     Bad archives     : 0
+2014-05-09 06:03:28,359 INFO     Time estimated:0 hours, 3 minutes, 1 seconds.
+2014-05-09 12:00:17,341 INFO      ***** Starting sopds-scan...
+2014-05-09 12:03:20,693 INFO     Books added      : 0
+2014-05-09 12:03:20,694 INFO     Books skipped    : 5571
+2014-05-09 12:03:20,694 INFO     Books DB entries deleted : 0
+2014-05-09 12:03:20,694 INFO     Books in archives: 0
+2014-05-09 12:03:20,694 INFO     Archives scanned : 35
+2014-05-09 12:03:20,695 INFO     Archives skipped : 128
+2014-05-09 12:03:20,695 INFO     Bad archives     : 0
+2014-05-09 12:03:20,695 INFO     Time estimated:0 hours, 3 minutes, 3 seconds.
+2014-05-09 18:00:09,849 INFO      ***** Starting sopds-scan...
+2014-05-09 18:03:31,278 INFO     Books added      : 0
+2014-05-09 18:03:31,296 INFO     Books skipped    : 5571
+2014-05-09 18:03:31,296 INFO     Books DB entries deleted : 0
+2014-05-09 18:03:31,297 INFO     Books in archives: 0
+2014-05-09 18:03:31,297 INFO     Archives scanned : 35
+2014-05-09 18:03:31,297 INFO     Archives skipped : 128
+2014-05-09 18:03:31,298 INFO     Bad archives     : 0
+2014-05-09 18:03:31,298 INFO     Time estimated:0 hours, 3 minutes, 21 seconds.
+2014-05-10 00:00:20,533 INFO      ***** Starting sopds-scan...
+2014-05-10 00:03:45,206 INFO     Books added      : 0
+2014-05-10 00:03:45,218 INFO     Books skipped    : 5571
+2014-05-10 00:03:45,219 INFO     Books DB entries deleted : 0
+2014-05-10 00:03:45,219 INFO     Books in archives: 0
+2014-05-10 00:03:45,219 INFO     Archives scanned : 35
+2014-05-10 00:03:45,219 INFO     Archives skipped : 128
+2014-05-10 00:03:45,220 INFO     Bad archives     : 0
+2014-05-10 00:03:45,220 INFO     Time estimated:0 hours, 3 minutes, 24 seconds.
+2014-05-10 06:00:04,004 INFO      ***** Starting sopds-scan...
+2014-05-10 06:02:49,731 INFO     Books added      : 0
+2014-05-10 06:02:49,731 INFO     Books skipped    : 5571
+2014-05-10 06:02:49,732 INFO     Books DB entries deleted : 0
+2014-05-10 06:02:49,732 INFO     Books in archives: 0
+2014-05-10 06:02:49,732 INFO     Archives scanned : 35
+2014-05-10 06:02:49,733 INFO     Archives skipped : 128
+2014-05-10 06:02:49,733 INFO     Bad archives     : 0
+2014-05-10 06:02:49,734 INFO     Time estimated:0 hours, 2 minutes, 45 seconds.
+2014-05-10 12:00:08,840 INFO      ***** Starting sopds-scan...
+2014-05-10 12:03:11,757 INFO     Books added      : 0
+2014-05-10 12:03:11,757 INFO     Books skipped    : 5571
+2014-05-10 12:03:11,777 INFO     Books DB entries deleted : 0
+2014-05-10 12:03:11,778 INFO     Books in archives: 0
+2014-05-10 12:03:11,778 INFO     Archives scanned : 35
+2014-05-10 12:03:11,779 INFO     Archives skipped : 128
+2014-05-10 12:03:11,779 INFO     Bad archives     : 0
+2014-05-10 12:03:11,779 INFO     Time estimated:0 hours, 3 minutes, 2 seconds.
+2014-05-10 18:00:01,336 INFO      ***** Starting sopds-scan...
+2014-05-10 18:03:03,905 INFO     Books added      : 0
+2014-05-10 18:03:03,906 INFO     Books skipped    : 5571
+2014-05-10 18:03:03,906 INFO     Books DB entries deleted : 0
+2014-05-10 18:03:03,907 INFO     Books in archives: 0
+2014-05-10 18:03:03,907 INFO     Archives scanned : 35
+2014-05-10 18:03:03,907 INFO     Archives skipped : 128
+2014-05-10 18:03:03,908 INFO     Bad archives     : 0
+2014-05-10 18:03:03,908 INFO     Time estimated:0 hours, 3 minutes, 2 seconds.
+2014-05-11 00:00:23,370 INFO      ***** Starting sopds-scan...
+2014-05-11 00:06:34,349 INFO     Books added      : 0
+2014-05-11 00:06:34,411 INFO     Books skipped    : 5571
+2014-05-11 00:06:34,411 INFO     Books DB entries deleted : 0
+2014-05-11 00:06:34,412 INFO     Books in archives: 0
+2014-05-11 00:06:34,412 INFO     Archives scanned : 35
+2014-05-11 00:06:34,412 INFO     Archives skipped : 128
+2014-05-11 00:06:34,413 INFO     Bad archives     : 0
+2014-05-11 00:06:34,413 INFO     Time estimated:0 hours, 6 minutes, 11 seconds.
+2014-05-11 06:00:24,784 INFO      ***** Starting sopds-scan...
+2014-05-11 06:03:26,788 INFO     Books added      : 0
+2014-05-11 06:03:26,801 INFO     Books skipped    : 5571
+2014-05-11 06:03:26,801 INFO     Books DB entries deleted : 0
+2014-05-11 06:03:26,801 INFO     Books in archives: 0
+2014-05-11 06:03:26,801 INFO     Archives scanned : 35
+2014-05-11 06:03:26,802 INFO     Archives skipped : 128
+2014-05-11 06:03:26,802 INFO     Bad archives     : 0
+2014-05-11 06:03:26,802 INFO     Time estimated:0 hours, 3 minutes, 2 seconds.
+2014-05-11 12:00:15,949 INFO      ***** Starting sopds-scan...
+2014-05-11 12:03:28,502 INFO     Books added      : 0
+2014-05-11 12:03:28,517 INFO     Books skipped    : 5571
+2014-05-11 12:03:28,518 INFO     Books DB entries deleted : 0
+2014-05-11 12:03:28,518 INFO     Books in archives: 0
+2014-05-11 12:03:28,518 INFO     Archives scanned : 35
+2014-05-11 12:03:28,518 INFO     Archives skipped : 128
+2014-05-11 12:03:28,519 INFO     Bad archives     : 0
+2014-05-11 12:03:28,519 INFO     Time estimated:0 hours, 3 minutes, 12 seconds.

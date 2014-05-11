@@ -16,6 +16,7 @@ CFG_PATH_DEFAULT=ROOT_PATH+os.path.sep+'conf'+os.path.sep+CFG_FILENAME
 CFG_PATH=CFG_PATH_DEFAULT
 COVER_PATH=os.path.join(ROOT_PATH,'covers')
 NOCOVER_IMG='nocover.jpg'
+NOCOVER_PATH=os.path.join(PY_PATH,NOCOVER_IMG)
 LOG_PATH=os.path.join(ROOT_PATH,'logs')
 
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}

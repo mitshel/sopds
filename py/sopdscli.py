@@ -4,17 +4,16 @@
 import sys
 import sopdscfg
 import sopdsdb
-import cgi
 import codecs
 import os
 import io
-#import locale
 import time
 import sopdsparse
 import base64
 import subprocess
 import zipf
 from urllib import parse
+
 
 #######################################################################
 #
@@ -64,38 +63,51 @@ class opdsClient():
         self.nl=''
         self.searchTerm=''
         self.user=None
+        self.response_status='200 Ok'
+        self.response_headers=[]
+        self.response_body=[]
 
-    def parseParams(self,form):
-        if 'id' in form:
-           self.id_value=form.getvalue("id", "0")
-           if self.id_value.isdigit():
-              if len(self.id_value)>1:
-                 self.type_value = int(self.id_value[0:2])
-              if len(self.id_value)>2:
-                 self.slice_value = int(self.id_value[2:])
-        if 'page' in form:
-           page=form.getvalue("page","0")
+    def parseParams(self,qs):
+        if 'id' in qs:
+           self.id_value=qs.get("id")[0]
+        else:
+           self.id_value="0"
+        if self.id_value.isdigit():
+           if len(self.id_value)>1:
+              self.type_value = int(self.id_value[0:2])
+           if len(self.id_value)>2:
+              self.slice_value = int(self.id_value[2:])
+
+        if 'page' in qs:
+           page=qs.get("page")[0]
            if page.isdigit():
-                self.page_value=int(page)
-        if 'searchType' in form:
-           searchType=form.getvalue("searchType","").strip()
+              self.page_value=int(page)
+
+        if 'searchType' in qs:
+           searchType=qs.get("searchType")[0].strip()
            if searchType=='books': self.type_value=71
            if searchType=='authors': self.type_value=72
            if searchType=='series': self.type_value=73
-        if 'searchTerm' in form:
-           self.searchTerm=form.getvalue("searchTerm","").strip()
+
+        if 'searchTerm' in qs:
+           self.searchTerm=qs.get("searchTerm")[0].strip()
            if self.type_value!=71 and self.type_value!=72 and self.type_value!=73: self.type_value=7
            self.slice_value=-1
            self.id_value='%02d&amp;searchTerm=%s'%(self.type_value,self.searchTerm)
-        if 'alpha' in form:
-           salpha=form.getvalue("alpha","").strip()
+        else:
+           self.searchTerm=''
+
+        if 'alpha' in qs:
+           salpha=qs.get("alpha")[0].strip()
            if salpha.isdigit(): self.alpha=int(salpha)
-        if 'news' in form:
+
+        if 'news' in qs:
            self.news=1
            self.nl='&amp;news=1'
            self.np=self.cfg.NEW_PERIOD
-        if 'ser' in form:
-           ser=form.getvalue("ser","0")
+
+        if 'ser' in qs:
+           ser=qs.get("ser")[0]
            if ser.isdigit():
               self.ser_value=int(ser)
 
@@ -103,14 +115,37 @@ class opdsClient():
         self.user=user
 
     def enc_print(self, string='', encoding='utf8'):
-        sys.stdout.buffer.write(string.encode(encoding) + b'\n')
+#        sys.stdout.buffer.write(string.encode(encoding) + b'\n')
+        self.response_body+=[string.encode(encoding)]
+
+    def bin_print(self, data):
+#        sys.stdout.buffer.write(data)
+        self.response_body+=[data]
+
+    def add_response_header(self,list):
+        self.response_headers+=list
+
+    def set_response_status(self,status):
+        self.response_status=status
+
+    def write_response_headers(self, encoding='utf8'):
+        sys.stdout.buffer.write(b'Status: '+self.response_status.encode(encoding)+ b'\n')
+        for header in self.response_headers:
+            (a,b)=header
+            sys.stdout.buffer.write(a.encode(encoding)+b': '+b.encode(encoding) + b'\n')
+        sys.stdout.buffer.write(b'\n')
+
+    def write_response(self):
+        for element in self.response_body:
+            sys.stdout.buffer.write(element + b'\n')
 
     def header(self, h_id=None, h_title=None, h_subtitle=None,charset='utf-8'):
         if h_id==None: h_id=self.cfg.SITE_ID
         if h_title==None: h_title=self.cfg.SITE_TITLE
         if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru'
-        self.enc_print('Content-Type: text/xml; charset='+charset)
-        self.enc_print()
+        self.add_response_header([('Content-Type','text/xml; charset='+charset)])
+#        self.enc_print('Content-Type: text/xml; charset='+charset)
+#        self.enc_print()
         self.enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
         self.enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
         self.enc_print('<id>%s</id>'%h_id)
@@ -292,7 +327,7 @@ class opdsClient():
         if filename!='':
            self.enc_print('&lt;b&gt;Файл:&lt;/b&gt; '+websym(filename)+'&lt;br/&gt;')
         if filesize>0:
-           self.enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(filesize//1000)+'Кб.&lt;br/&gt;')
+           self.enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(filesize//1024)+'Кб.&lt;br/&gt;')
         if docdate!='':
            self.enc_print('&lt;b&gt;Дата правки:&lt;/b&gt; '+docdate+'&lt;br/&gt;')
         if annotation!='':
@@ -684,27 +719,34 @@ class opdsClient():
         if self.cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
         else: transname=translit(book_name)
         # HTTP Header
-        self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-        self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
-        self.enc_print('Content-Transfer-Encoding: binary')
+        self.add_response_header([('Content-Type','application/octet-stream; name="'+transname+'"')])
+        self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
+        self.add_response_header([('Content-Transfer-Encoding','binary')])
+#        self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
+#        self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
+#        self.enc_print('Content-Transfer-Encoding: binary')
         if cat_type==sopdsdb.CAT_NORMAL:
            file_path=os.path.join(full_path,book_name)
            book_size=os.path.getsize(file_path.encode('utf-8'))
-           self.enc_print('Content-Length: '+str(book_size))
-           self.enc_print()
+           self.add_response_header([('Content-Length',str(book_size))])
+#           self.enc_print('Content-Length: '+str(book_size))
+#           self.enc_print()
            fo=codecs.open(file_path.encode("utf-8"), "rb")
            s=fo.read()
-           sys.stdout.buffer.write(s)
+           self.bin_print(s)
+#           sys.stdout.buffer.write(s)
            fo.close()
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            z = zipf.ZipFile(fz, 'r', allowZip64=True)
            book_size=z.getinfo(book_name).file_size
-           self.enc_print('Content-Length: '+str(book_size))
-           self.enc_print()
+           self.add_response_header([('Content-Length',str(book_size))])
+#           self.enc_print('Content-Length: '+str(book_size))
+#           self.enc_print()
            fo= z.open(book_name)
            s=fo.read()
-           sys.stdout.buffer.write(s)
+           self.bin_print(s)
+#           sys.stdout.buffer.write(s)
            fo.close()
            z.close()
            fz.close()
@@ -717,9 +759,12 @@ class opdsClient():
         if self.cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
         else: transname=translit(book_name)
         # HTTP Header
-        self.enc_print('Content-Type:application/zip; name="'+transname+'"')
-        self.enc_print('Content-Disposition: attachment; filename="'+transname+'.zip"')
-        self.enc_print('Content-Transfer-Encoding: binary')
+        self.add_response_header([('Content-Type','application/zip; name="'+transname+'"')])
+        self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
+        self.add_response_header([('Content-Transfer-Encoding','binary')])
+ #       self.enc_print('Content-Type:application/zip; name="'+transname+'"')
+ #       self.enc_print('Content-Disposition: attachment; filename="'+transname+'.zip"')
+ #       self.enc_print('Content-Transfer-Encoding: binary')
         if cat_type==sopdsdb.CAT_NORMAL:
            file_path=os.path.join(full_path,book_name)
            dio = io.BytesIO()
@@ -727,9 +772,11 @@ class opdsClient():
            z.write(file_path.encode('utf-8'),transname)
            z.close()
            buf = dio.getvalue()
-           self.enc_print('Content-Length: %s'%len(buf))
-           self.enc_print()
-           sys.stdout.buffer.write(buf)
+           self.add_response_header([('Content-Length',str(len(buf)))])
+#           self.enc_print('Content-Length: %s'%len(buf))
+#           self.enc_print()
+           self.bin_print(buf)
+#           sys.stdout.buffer.write(buf)
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            zi = zipf.ZipFile(fz, 'r', allowZip64=True)
@@ -745,9 +792,11 @@ class opdsClient():
            zo.close()
 
            buf = dio.getvalue()
-           self.enc_print('Content-Length: %s'%len(buf))
-           self.enc_print()
-           sys.stdout.buffer.write(buf)
+           self.add_response_header([('Content-Length',str(len(buf)))])
+#           self.enc_print('Content-Length: %s'%len(buf))
+#           self.enc_print()
+           self.bin_print(buf)
+#           sys.stdout.buffer.write(buf)
 
     def response_book_convert(self):
         """ Выдача файла книги после конвертации в EPUB или mobi """
@@ -781,16 +830,23 @@ class opdsClient():
            fo=codecs.open(tmp_conv_path, "rb")
            s=fo.read()
            # HTTP Header
-           self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-           self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
-           self.enc_print('Content-Transfer-Encoding: binary')
-           self.enc_print('Content-Length: %s'%len(str))
-           self.enc_print()
-           sys.stdout.buffer.write(s)
+           self.add_response_header([('Content-Type','application/octet-stream; name="'+transname+'"')])
+           self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
+           self.add_response_header([('Content-Transfer-Encoding','binary')])
+           self.add_response_header([('Content-Length',str(len(s)))])
+
+ #          self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
+ #          self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
+ #          self.enc_print('Content-Transfer-Encoding: binary')
+ #          self.enc_print('Content-Length: %s'%len(s))
+ #          self.enc_print()
+           self.bin_print(s)
+#           sys.stdout.buffer.write(s)
            fo.close()
         else:
-           self.enc_print('Status: 404 Not Found')
-           self.enc_print()
+           self.set_response_status('404 Not Found')
+#           self.enc_print('Status: 404 Not Found')
+#           self.enc_print()
 
         try: os.remove(tmp_fb2_path.encode('utf-8'))
         except: pass
@@ -823,25 +879,30 @@ class opdsClient():
                 s=fb2.cover_image.cover_data
                 dstr=base64.b64decode(s)
                 ictype=fb2.cover_image.getattr('content-type')
-                self.enc_print('Content-Type:'+ictype)
-                self.enc_print()
-                sys.stdout.buffer.write(dstr)
+                self.add_response_header([('Content-Type',ictype)])
+#                self.enc_print('Content-Type:'+ictype)
+#                self.enc_print()
+                self.bin_print(dstr)
+#                sys.stdout.buffer.write(dstr)
                 c0=1
               except:
                 c0=0
 
         if c0==0:
-           if os.path.exists(sopdscfg.NOCOVER_IMG):
-              self.enc_print('Content-Type: image/jpeg')
-              self.enc_print()
-              f=open(sopdscfg.NOCOVER_IMG,"rb")
-              sys.stdout.buffer.write(f.read())
+           if os.path.exists(sopdscfg.NOCOVER_PATH):
+              self.add_response_header([('Content-Type','image/jpeg')])
+#              self.enc_print('Content-Type: image/jpeg')
+#              self.enc_print()
+              f=open(sopdscfg.NOCOVER_PATH,"rb")
+              self.bin_print(f.read())
+#              sys.stdout.buffer.write(f.read())
               f.close()
            else:
-              self.enc_print('Status: 404 Not Found')
-              self.enc_print()
+              self.set_response_status('404 Not Found')
+#              self.enc_print('Status: 404 Not Found')
+#              self.enc_print()
 
-    def do_response(self):
+    def make_response(self):
         self.opdsdb.openDB()
 
         if self.type_value==0:
@@ -899,44 +960,6 @@ class opdsClient():
            self.response_book_convert()
         elif self.type_value==99:
            self.response_book_cover()
-
+        
         self.opdsdb.closeDB()
-
-
-
-
-#########################################################
-# Выдача ссылок на книгу
-#
-#elif type_value==90:
-#   id='90'+str(slice_value)
-#   header()
-#   enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="self" href="sopds.cgi?id='+id+'"/>')
-#   (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=opdsdb.getbook(slice_value)
-#   entry_start()
-#   entry_head(title, reg_date, id_value)
-#   entry_link_book(slice_value,format)
-#   entry_covers(cover,cover_type,slice_value)
-#   authors=entry_authors(opdsdb,slice_value,True)
-#   genres=entry_genres(opdsdb,slice_value)
-#   series=entry_series(opdsdb,book_id)
-#   entry_content2(annotation,title,authors,genres,book_name,fsize,docdate,series)
-#   entry_finish()
-#   footer()
-
-if (__name__=="__main__"):
-   cfg=sopdscfg.cfgreader()
-   zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
-
-   user = None
-   if 'REMOTE_USER' in os.environ:
-      user = os.environ['REMOTE_USER']
-
-   form = cgi.FieldStorage()
-
-   sopds = opdsClient(cfg)
-   sopds.resetParams()
-   sopds.parseParams(form)
-   sopds.setUser(user)
-   sopds.do_response()
 
