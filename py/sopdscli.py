@@ -67,7 +67,6 @@ class opdsClient():
     def __init__(self,cfg):
         self.cfg=cfg
         self.modulePath=self.cfg.CGI_PATH
-        self.cfg.SEARCHXML_PATH=self.modulePath+'?id=09'
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
 
     def resetParams(self):
@@ -182,7 +181,7 @@ class opdsClient():
         if self.cfg.ALPHA: am='30'
         else: am=''
         dbinfo=self.opdsdb.getdbinfo(self.cfg.DUBLICATES_SHOW,self.cfg.BOOK_SHELF,self.user)
-        self.enc_print('<link href="'+self.cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
+        self.enc_print('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
         self.enc_print('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
         self.enc_print('<entry>')
         self.enc_print('<title>По каталогам</title>')
@@ -575,7 +574,7 @@ class opdsClient():
     def response_search_type(self):
         """ Выбор типа поиска по автору или наименованию или серии """
         self.header('id:search:%s'%self.searchTerm,'Поиск %s'%self.searchTerm)
-        self.enc_print('<link href="'+self.cfg.SEARCHXML_PATH+'" rel="search" type="application/opensearchdescription+xml" />')
+        self.enc_print('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
         self.enc_print('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
         self.entry_start()
         self.entry_head('Поиск книг',None,'71')
