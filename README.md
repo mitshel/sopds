@@ -59,14 +59,29 @@ Alias   /opds           "/home/www/opds"
 в режиме демона командой ./sopdsd.py start
 
 6. Доступ к OPDS каталогу через WWW.
+
+6.1 Использование CGI
 Для сервера Apache необходимо разрешить запуск cgi-скрипта ./py/sopds.cgi
 при помощи директивы, помещенной в .htacess:
   Options ExecCGI
 или
   Options +ExecCGI
 
+6.2 Использование WSGI
+Для начала необходимо установить mod_wsgi в Apache
+Далее необходимо разрешить запуск wsgi-скрипта ./py/sopds.wsgi
+при помощи директив, помещенной в .htacess:
+  AddHandler wsgi-script .wsgi
+  Options ExecCGI
+или
+  AddHandler wsgi-script .wsgi
+  Options +ExecCGI
+
+Описания по нектороым проблемам, которые могут возникнуть с mod_wsgi: https://code.google.com/p/modwsgi/wiki/IssuesWithExpatLibrary
+
 7. Использование OPDS каталога с устройств поддерживающих OPDS.
 Ввести OPDS каталог и следующий URL: your_domain_name/opds/py/sopds.cgi
+Либо, если Вы используете WSGI     : your_domain_name/opds/py/sopds.wsgi
 
 8. Обновление версий
 - Поскольку при переходе от версии к версии возможно изменение структуры БД необходимо пересоздать ее следующей командой

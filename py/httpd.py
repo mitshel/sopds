@@ -1,60 +1,54 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import base64
-import cgi
+from urllib import parse
+from wsgiref.simple_server import make_server
+import sopdscli
+import sopdscfg
+import zipf
 
-PORT_NUMBER = 8080
-acct='user:pass'
+cfg=sopdscfg.cfgreader()
+zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
+sopds = sopdscli.opdsClient(cfg,sopdscli.modeINT)
 
-class opdsHandler(BaseHTTPRequestHandler):
-    def do_HEAD(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+def authorized_user(auth_list, auth_data):
+    user=None
+    alist=auth_list.split()
+    for ainfo in alist:
+        acode='Basic %s'%base64.encodestring(ainfo.strip().encode()).decode().strip()
+        if acode==auth_data.strip():
+           (user,pw)=ainfo.split(':')
+    return user
+        
+def app(environ, start_response):
+   sopds.resetParams()
+   user=None
+   if 'HTTP_AUTHORIZATION' in environ:
+      adata=environ['HTTP_AUTHORIZATION']
+      user=authorized_user(cfg.ACCOUNTS,adata)
 
-    def do_AUTHHEAD(self):
-        self.send_response(401)
-        self.send_header('WWW-Authenticate', 'Basic realm=\"Test\"')
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+   if (user!=None) or not cfg.AUTH:
+      qs   = None
+      if 'QUERY_STRING' in environ:
+         qs = parse.parse_qs(environ['QUERY_STRING'])
+      sopds.resetParams()
+      sopds.parseParams(qs)
+      sopds.setUser(user)
+      sopds.make_response()
+   else:
+       sopds.set_response_status('401 Unauthorized')
+       sopds.add_response_header([('WWW-Authenticate', 'Basic realm=\"%s\"'%cfg.SITE_TITLE)])
+       sopds.add_response_header([('Content-type', 'text/html')])
 
-    def do_AUTH(self):
-        authcode='Basic %s'%base64.encodestring(acct.encode()).decode().strip()
-        result=False
-        if self.headers.get('Authorization') == None:
-            self.do_AUTHHEAD()
-#            self.wfile.write('no auth header received'.encode())
-            pass
-        elif self.headers.get('Authorization') == authcode:
-            result=True
-#            self.do_HEAD()
-#            self.wfile.write(self.headers.get('Authorization').encode())
-#            self.wfile.write('authenticated!'.encode())
-            pass
-        else:
-            self.do_AUTHHEAD()
-#            self.wfile.write(self.headers.get('Authorization').encode())
-#            self.wfile.write('not authenticated'.encode())
-            pass
-        return result
+   start_response(sopds.response_status, sopds.response_headers)
+   return sopds.response_body
 
-
-    def do_GET(self):
-        ''' Present frontpage with user authentication. '''
-        if self.do_AUTH():
-           self.do_HEAD()
-           self.wfile.write('authenticated!'.encode())
-        return
-			
 try:
-    server_address = ('',PORT_NUMBER)
-    server = HTTPServer(server_address, opdsHandler)
-    print('Started httpserver on port ' , PORT_NUMBER)
-	
-    #Wait forever for incoming http requests
-    server.serve_forever()
-
+   httpd = make_server(cfg.BIND_ADDRESS, cfg.PORT, app)
+   print('Started httpserver on port ' , cfg.PORT)
+   httpd.serve_forever()
 except KeyboardInterrupt:
-    print('^C received, shutting down the web server')
-    server.socket.close()
+   print('^C received, shutting down the web server')
+   httpd.socket.close()
+

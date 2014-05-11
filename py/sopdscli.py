@@ -14,6 +14,9 @@ import subprocess
 import zipf
 from urllib import parse
 
+modeCGI  = 0
+modeWSGI = 1
+modeINT  = 2
 
 #######################################################################
 #
@@ -24,7 +27,7 @@ def translit(s):
    assert s is not str, "Error: argument MUST be string"
 
    table1 = str.maketrans("абвгдеёзийклмнопрстуфхъыьэАБВГДЕЁЗИЙКЛМНОПРСТУФХЪЫЬЭ",  "abvgdeezijklmnoprstufh'y'eABVGDEEZIJKLMNOPRSTUFH'Y'E")
-   table2 = {'ж':'zh','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ю':'ju','я':'ja',  'Ж':'Zh','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch','Ю':'Ju','Я':'Ja', '«':'\'', '»':'\'','"':'\''}
+   table2 = {'ж':'zh','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ю':'ju','я':'ja',  'Ж':'Zh','Ц':'Ts','Ч':'Ch','Ш':'Sh','Щ':'Sch','Ю':'Ju','Я':'Ja', '«':'\'', '»':'\'','"':'\'','\n':' '}
    for k in table2.keys():
        s = s.replace(k,table2[k])
    return s.translate(table1)
@@ -64,9 +67,14 @@ def opensearch(script):
 # Основной класс OPDS-клиента
 #
 class opdsClient():
-    def __init__(self,cfg):
+    def __init__(self,cfg,mode=modeCGI):
         self.cfg=cfg
-        self.modulePath=self.cfg.CGI_PATH
+        if mode==modeWSGI:
+           self.modulePath=self.cfg.WSGI_PATH
+        elif mode==modeINT:
+           self.modulePath=''
+        else:
+           self.modulePath=self.cfg.CGI_PATH
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
 
     def resetParams(self):
@@ -778,7 +786,7 @@ class opdsClient():
         else: transname=translit(book_name)
         # HTTP Header
         self.add_response_header([('Content-Type','application/zip; name="'+transname+'"')])
-        self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
+        self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'.zip"')])
         self.add_response_header([('Content-Transfer-Encoding','binary')])
  #       self.enc_print('Content-Type:application/zip; name="'+transname+'"')
  #       self.enc_print('Content-Disposition: attachment; filename="'+transname+'.zip"')

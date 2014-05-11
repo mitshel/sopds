@@ -8,7 +8,7 @@ import logging
 ##########################################################################
 # Глобальные переменные
 #
-VERSION="0.18"
+VERSION="0.19"
 PY_PATH=os.path.dirname(os.path.abspath(__file__))
 (ROOT_PATH,tmp)=os.path.split(PY_PATH)
 CFG_FILENAME='sopds.conf'
@@ -65,6 +65,9 @@ class cfgreader:
 
        self.CGI_PATH=config.getdefault(CFG_S_GLOBAL,'cgi_path','sopds.cgi')
        self.CGI_PATH=os.path.normpath(self.CGI_PATH)
+
+       self.WSGI_PATH=config.getdefault(CFG_S_GLOBAL,'wsgi_path','sopds.wsgi')
+       self.WSGI_PATH=os.path.normpath(self.WSGI_PATH)
 
        self.COVER_PATH=config.getdefault(CFG_S_GLOBAL,'cover_path','../covers')
        self.COVER_PATH=os.path.normpath(self.COVER_PATH)
@@ -152,3 +155,10 @@ class cfgreader:
           self.SCAN_TIMES=list(range(self.SCAN_HOUR*60+self.SCAN_MIN,1440,self.SCAN_INTERVAL))
        else:
           self.SCAN_TIMES=[self.SCAN_HOUR*60+self.SCAN_MIN]
+
+       CFG_S_HTTPD='httpd'
+       self.SERVER=config.getdefault_bool(CFG_S_HTTPD,'server',True)
+       self.PORT=config.getdefault_int(CFG_S_HTTPD,'port',8081)
+       self.BIND_ADDRESS=config.getdefault(CFG_S_HTTPD,'bind_address','0.0.0.0')
+       self.AUTH=config.getdefault_bool(CFG_S_HTTPD,'auth',False)
+       self.ACCOUNTS=config.getdefault(CFG_S_HTTPD,'accounts','')

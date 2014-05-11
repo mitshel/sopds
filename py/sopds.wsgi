@@ -13,9 +13,8 @@ import sopdscfg
 import zipf
 
 cfg=sopdscfg.cfgreader()
-cfg.CGI_PATH='/opds/py/sopds.wsgi'
 zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
-sopds = sopdscli.opdsClient(cfg)
+sopds = sopdscli.opdsClient(cfg,sopdscli.modeWSGI)
 
 def app(environ, start_response):
    user = None
@@ -31,10 +30,5 @@ def app(environ, start_response):
    sopds.make_response()
    start_response(sopds.response_status, sopds.response_headers)
    return sopds.response_body
-
-#   message1 = "You use Python %s" % sys.version[:3]
-#   start_response("200 OK", [("Content-Type", "text/html")])
-#   return [message1.encode(), cfg.CGI_PATH.encode()]
-
 
 application = app
