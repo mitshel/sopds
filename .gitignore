@@ -14,3 +14,4 @@ fb2conv/*
 !fb2conv/fb2mobi
 testinfo/*
 speed
+.htaccess

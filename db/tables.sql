@@ -104,7 +104,7 @@ create table dbver(
 ver varchar(5));
 commit;
 
-insert into dbver(ver) values("0.18");
+insert into dbver(ver) values("0.19");
 commit;
 insert into authors(author_id,last_name,first_name) values(1,"Неизвестный Автор","");
 commit;

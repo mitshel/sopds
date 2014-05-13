@@ -144,15 +144,15 @@ class opdsDatabase:
        cursor.close()
        return book_id
 
-  def addbook(self, name, path, cat_id, exten, title, annotation, docdate, lang, size=0, archive=0, doublicates=0):
+  def addbook(self, name, path, cat_id, exten, title, annotation, docdate, lang, size=0, archive=0, doublicates=0, fnpat='', ictype=''):
     format=exten[1:]
     format=format.lower()
     if doublicates!=0:
        doublicat=self.finddouble(title,format,size)
     else:
        doublicat=0
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
-    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,doublicat)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,doublicat,avail,cover,cover_type) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2, %s, %s)")
+    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,doublicat,fnpat,ictype)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid

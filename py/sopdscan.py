@@ -129,6 +129,8 @@ class opdsScanner:
                lang=''
                annotation=''
                docdate=''
+               fnpat=''
+               ictype=''
 
                if e.lower()=='.fb2' and self.cfg.FB2PARSE:
                   if isinstance(file, str):
@@ -152,14 +154,23 @@ class opdsScanner:
 
                if title=='': title=n
 
-               book_id=self.opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,docdate,lang,file_size,archive,self.cfg.DUBLICATES_FIND)
+               if e.lower()=='.fb2' and self.cfg.FB2PARSE and self.cfg.COVER_EXTRACT:
+                  (fnpat,ictype)=self.cover_meta()
+
+               book_id=self.opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,docdate,lang,file_size,archive,self.cfg.DUBLICATES_FIND, fnpat, ictype)
                self.books_added+=1
 
-               if e.lower()=='.fb2' and self.cfg.FB2PARSE and self.cfg.COVER_EXTRACT:
+               if e.lower()=='.fb2' and self.cfg.FB2PARSE and self.cfg.COVER_EXTRACT and fnpat!='':
                   try:
-                    self.create_cover(book_id)
+                    fn=fnpat.format(book_id)
+                    self.cover_save(fn)
                   except:
-                    self.logger.error('Error extract cover from file '+name)
+                    self.logger.error('Error extract cover from file '+name) 
+
+#                  try:
+#                    self.create_cover(book_id)
+#                  except:
+#                    self.logger.error('Error extract cover from file '+name)
 
                if archive==1:
                   self.books_in_archives+=1
@@ -181,6 +192,35 @@ class opdsScanner:
             else:
                self.books_skipped+=1
                self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
+    
+    def cover_meta(self):
+        ictype=self.fb2parser.cover_image.getattr('content-type')
+        coverid=self.fb2parser.cover_image.getattr('id')
+        fn=''
+        e='.img'
+        if ictype==None:
+           ictype=''
+        else:
+           ictype=ictype.lower()
+           if ictype=='image/jpeg' or ictype=='image/jpg':
+              e='.jpg'
+           elif ictype=='image/png':
+              e='.png'
+           elif coverid!=None:
+             (f,e)=os.path.splitext(coverid)
+           else:
+             e='.img'
+           fn='{}'+e
+        return (fn,ictype)
+
+    def cover_save(self,fn):
+        fp=os.path.join(sopdscfg.COVER_PATH,fn)
+        if len(self.fb2parser.cover_image.cover_data)>0:
+           img=open(fp,'wb')
+           s=self.fb2parser.cover_image.cover_data
+           dstr=base64.b64decode(s)
+           img.write(dstr)
+           img.close()
 
     def create_cover(self,book_id):
         ictype=self.fb2parser.cover_image.getattr('content-type')
