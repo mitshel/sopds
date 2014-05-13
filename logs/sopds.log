@@ -2090,3 +2090,388 @@ AttributeError: 'opdsScanner' object has no attribute 'init_statas'
 2014-05-11 18:03:15,056 INFO     Archives skipped : 128
 2014-05-11 18:03:15,056 INFO     Bad archives     : 0
 2014-05-11 18:03:15,056 INFO     Time estimated:0 hours, 2 minutes, 57 seconds.
+2014-05-11 22:35:26,244 INFO     sopdsDaemon __init__()...
+2014-05-11 22:35:26,245 INFO     sopdsDaemon status()...
+2014-05-11 22:35:49,387 INFO     sopdsDaemon __init__()...
+2014-05-11 22:35:49,388 INFO     sopdsDaemon stop()...
+2014-05-11 22:36:00,870 INFO     sopdsDaemon __init__()...
+2014-05-11 22:36:00,871 INFO     sopdsDaemon start()...
+2014-05-11 22:36:00,930 INFO     sopdsDaemon entering in main loop...
+2014-05-11 22:36:00,931 INFO      ***** Starting sopds-scan...
+2014-05-11 22:39:28,559 INFO     Books added      : 0
+2014-05-11 22:39:28,560 INFO     Books skipped    : 5571
+2014-05-11 22:39:28,560 INFO     Books DB entries deleted : 0
+2014-05-11 22:39:28,560 INFO     Books in archives: 0
+2014-05-11 22:39:28,560 INFO     Archives scanned : 35
+2014-05-11 22:39:28,561 INFO     Archives skipped : 128
+2014-05-11 22:39:28,561 INFO     Bad archives     : 0
+2014-05-11 22:39:28,561 INFO     Time estimated:0 hours, 3 minutes, 27 seconds.
+2014-05-11 22:57:08,021 INFO     sopdsDaemon __init__()...
+2014-05-11 22:57:08,022 INFO     sopdsDaemon stop()...
+2014-05-11 22:57:10,460 INFO     sopdsDaemon __init__()...
+2014-05-11 22:57:10,460 INFO     sopdsDaemon stop()...
+2014-05-11 22:57:14,282 INFO     sopdsDaemon __init__()...
+2014-05-11 22:57:14,283 INFO     sopdsDaemon start()...
+Started Simple OPDS server on port  8081
+Traceback (most recent call last):
+  File "/usr/lib/python3.3/wsgiref/handlers.py", line 137, in run
+    self.result = application(self.environ, self.start_response)
+  File "/home/www/opds/py/sopdserve.py", line 27, in app
+    user=authorized_user(cfg.ACCOUNTS,adata)
+NameError: global name 'cfg' is not defined
+192.168.7.5 - - [11/May/2014 22:58:12] "GET /?id=141 HTTP/1.1" 500 59
+Traceback (most recent call last):
+  File "/usr/lib/python3.3/wsgiref/handlers.py", line 137, in run
+    self.result = application(self.environ, self.start_response)
+  File "/home/www/opds/py/sopdserve.py", line 27, in app
+    user=authorized_user(cfg.ACCOUNTS,adata)
+NameError: global name 'cfg' is not defined
+192.168.7.5 - - [11/May/2014 22:58:20] "GET / HTTP/1.1" 500 59
+Traceback (most recent call last):
+  File "/usr/lib/python3.3/wsgiref/handlers.py", line 137, in run
+    self.result = application(self.environ, self.start_response)
+  File "/home/www/opds/py/sopdserve.py", line 27, in app
+    user=authorized_user(cfg.ACCOUNTS,adata)
+NameError: global name 'cfg' is not defined
+192.168.7.5 - - [11/May/2014 22:58:23] "GET / HTTP/1.1" 500 59
+2014-05-11 23:00:21,973 INFO     sopdsDaemon __init__()...
+2014-05-11 23:00:21,977 INFO     sopdsDaemon stop()...
+2014-05-11 23:00:26,773 INFO     sopdsDaemon __init__()...
+2014-05-11 23:00:26,774 INFO     sopdsDaemon start()...
+Started Simple OPDS server on port  8081
+192.168.7.5 - - [11/May/2014 23:00:32] "GET / HTTP/1.1" 200 2148
+192.168.7.5 - - [11/May/2014 23:00:34] "GET /?id=3006 HTTP/1.1" 200 1394
+192.168.7.5 - - [11/May/2014 23:00:36] "GET /?id=06&alpha=1 HTTP/1.1" 200 9119
+2014-05-11 23:01:25,620 INFO     sopdsDaemon __init__()...
+2014-05-11 23:01:25,621 INFO     sopdsDaemon stop()...
+2014-05-11 23:01:27,919 INFO     sopdsDaemon __init__()...
+2014-05-11 23:01:27,919 INFO     sopdsDaemon stop()...
+2014-05-11 23:07:55,485 INFO     sopdsDaemon __init__()...
+2014-05-11 23:07:55,485 INFO     sopdsDaemon stop()...
+2014-05-11 23:07:59,211 INFO     sopdsDaemon __init__()...
+2014-05-11 23:07:59,212 INFO     sopdsDaemon start()...
+Process Process-1:
+Traceback (most recent call last):
+  File "/usr/lib/python3.3/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/lib/python3.3/multiprocessing/process.py", line 95, in run
+    self._target(*self._args, **self._kwargs)
+TypeError: run_server() takes 1 positional argument but 2 were given
+2014-05-11 23:07:59,341 INFO     sopdsDaemon entering in main loop...
+2014-05-11 23:07:59,342 INFO      ***** Starting sopds-scan...
+2014-05-11 23:08:25,686 INFO     sopdsDaemon __init__()...
+2014-05-11 23:08:25,687 INFO     sopdsDaemon stop()...
+2014-05-11 23:08:46,838 INFO     sopdsDaemon __init__()...
+2014-05-11 23:08:46,838 INFO     sopdsDaemon start()...
+2014-05-11 23:08:46,967 INFO     sopdsDaemon entering in main loop...
+2014-05-11 23:08:46,968 INFO      ***** Starting sopds-scan...
+Started Simple OPDS server on port  8081
+Traceback (most recent call last):
+  File "./sopdsd.py", line 230, in <module>
+    daemon.start()
+  File "./sopdsd.py", line 181, in start
+    Daemon.start(self)
+  File "./sopdsd.py", line 93, in start
+    self.run()
+  File "./sopdsd.py", line 220, in run
+    self.run_scanner()
+  File "./sopdsd.py", line 209, in run_scanner
+    self.scanner.scan_all()
+  File "/home/www/opds/py/sopdscan.py", line 70, in scan_all
+    self.opdsdb.avail_check_prepare()
+  File "/home/www/opds/py/sopdsdb.py", line 820, in avail_check_prepare
+    cursor.execute(sql)
+  File "/usr/lib/python3.3/site-packages/mysql/connector/cursor.py", line 508, in execute
+    self._handle_result(self._connection.cmd_query(stmt))
+  File "/usr/lib/python3.3/site-packages/mysql/connector/connection.py", line 636, in cmd_query
+    result = self._handle_result(self._send_cmd(ServerCmd.QUERY, query))
+  File "/usr/lib/python3.3/site-packages/mysql/connector/connection.py", line 554, in _handle_result
+    raise errors.get_exception(packet)
+mysql.connector.errors.DatabaseError: 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+2014-05-11 23:09:38,430 INFO     sopdsDaemon delpid()...
+192.168.7.5 - - [11/May/2014 23:09:49] "GET / HTTP/1.1" 200 2148
+2014-05-11 23:09:59,180 INFO     sopdsDaemon __init__()...
+2014-05-11 23:09:59,181 INFO     sopdsDaemon status()...
+2014-05-11 23:10:53,267 INFO     sopdsDaemon __init__()...
+2014-05-11 23:10:53,267 INFO     sopdsDaemon start()...
+2014-05-11 23:10:53,354 INFO     sopdsDaemon entering in main loop...
+2014-05-11 23:10:53,355 INFO      ***** Starting sopds-scan...
+Started Simple OPDS server on port  8081
+192.168.7.5 - - [11/May/2014 23:12:14] "GET / HTTP/1.1" 200 2148
+192.168.7.5 - - [11/May/2014 23:12:27] "GET /?id=01 HTTP/1.1" 200 5929
+192.168.7.5 - - [11/May/2014 23:12:40] "GET /?id=0118 HTTP/1.1" 200 21492
+192.168.7.5 - - [11/May/2014 23:12:45] "GET /?id=91452 HTTP/1.1" 200 4136603
+2014-05-11 23:13:54,033 INFO     Books added      : 0
+2014-05-11 23:13:54,034 INFO     Books skipped    : 5571
+2014-05-11 23:13:54,034 INFO     Books DB entries deleted : 0
+2014-05-11 23:13:54,035 INFO     Books in archives: 0
+2014-05-11 23:13:54,035 INFO     Archives scanned : 35
+2014-05-11 23:13:54,035 INFO     Archives skipped : 128
+2014-05-11 23:13:54,036 INFO     Bad archives     : 0
+2014-05-11 23:13:54,036 INFO     Time estimated:0 hours, 3 minutes, 0 seconds.
+192.168.7.1 - - [11/May/2014 23:16:07] "GET / HTTP/1.1" 401 0
+192.168.7.1 - - [11/May/2014 23:16:09] "GET / HTTP/1.1" 200 2148
+192.168.7.1 - - [11/May/2014 23:16:11] "GET /?id=09 HTTP/1.1" 200 748
+192.168.7.1 - - [11/May/2014 23:16:17] "GET /?searchTerm=%D1%81%D0%B5%D0%BA%D1%81 HTTP/1.1" 200 1525
+192.168.7.1 - - [11/May/2014 23:16:25] "GET /?searchType=books&searchTerm=%D1%81%D0%B5%D0%BA%D1%81 HTTP/1.1" 200 139723
+192.168.7.1 - - [11/May/2014 23:16:26] "GET /?id=99116548 HTTP/1.1" 200 23345
+192.168.7.1 - - [11/May/2014 23:16:27] "GET /?id=99262169 HTTP/1.1" 200 27456
+192.168.7.1 - - [11/May/2014 23:16:28] "GET /?id=99253312 HTTP/1.1" 200 70856
+192.168.7.1 - - [11/May/2014 23:16:29] "GET /?id=9980412 HTTP/1.1" 200 292756
+192.168.7.1 - - [11/May/2014 23:16:30] "GET /?id=99253347 HTTP/1.1" 200 71102
+192.168.7.1 - - [11/May/2014 23:16:32] "GET /?id=99253348 HTTP/1.1" 200 71102
+192.168.7.1 - - [11/May/2014 23:16:33] "GET /?id=9964810 HTTP/1.1" 200 51715
+192.168.7.1 - - [11/May/2014 23:16:34] "GET /?id=9964476 HTTP/1.1" 200 51715
+192.168.7.1 - - [11/May/2014 23:16:35] "GET /?id=99168709 HTTP/1.1" 200 36172
+192.168.7.1 - - [11/May/2014 23:27:18] "GET / HTTP/1.1" 401 0
+192.168.7.1 - - [11/May/2014 23:27:18] "GET / HTTP/1.1" 200 2148
+192.168.7.1 - - [11/May/2014 23:27:24] "GET /?id=04 HTTP/1.1" 200 7718
+192.168.7.1 - - [11/May/2014 23:27:28] "GET /?id=1473 HTTP/1.1" 200 3226
+192.168.7.1 - - [11/May/2014 23:27:29] "GET /?id=302478 HTTP/1.1" 200 1404
+192.168.7.1 - - [11/May/2014 23:27:32] "GET /?id=2478&alpha=1 HTTP/1.1" 200 62738
+192.168.7.1 - - [11/May/2014 23:27:33] "GET /?id=99230481 HTTP/1.1" 200 53424
+192.168.7.1 - - [11/May/2014 23:27:34] "GET /?id=99194932 HTTP/1.1" 200 51078
+192.168.7.1 - - [11/May/2014 23:27:35] "GET /?id=99151532 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:35] "GET /?id=99151520 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:36] "GET /?id=99200192 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:37] "GET /?id=99272509 HTTP/1.1" 200 42586
+192.168.7.1 - - [11/May/2014 23:27:37] "GET /?id=99151521 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:38] "GET /?id=99200191 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:38] "GET /?id=99151523 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:39] "GET /?id=996116 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:39] "GET /?id=99152133 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:39] "GET /?id=99194192 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:40] "GET /?id=99195140 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:40] "GET /?id=99151524 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:41] "GET /?id=99151525 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:41] "GET /?id=99151526 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:42] "GET /?id=99151527 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:42] "GET /?id=99155340 HTTP/1.1" 200 22177
+192.168.7.1 - - [11/May/2014 23:27:43] "GET /?id=99270639 HTTP/1.1" 200 50654
+192.168.7.1 - - [11/May/2014 23:27:44] "GET /?id=99151531 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:45] "GET /?id=99151529 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:45] "GET /?id=99151351 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:46] "GET /?id=9977856 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:46] "GET /?id=99151515 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:47] "GET /?id=99100155 HTTP/1.1" 200 110305
+192.168.7.1 - - [11/May/2014 23:27:47] "GET /?id=99151528 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:49] "GET /?id=99202492 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:27:54] "GET /?id=92151532 HTTP/1.1" 200 8703
+192.168.7.1 - - [11/May/2014 23:29:47] "GET /?id=3006 HTTP/1.1" 200 1394
+192.168.7.1 - - [11/May/2014 23:30:09] "GET /?id=92151525 HTTP/1.1" 200 18244
+192.168.7.1 - - [11/May/2014 23:31:14] "GET /?id=92151351 HTTP/1.1" 200 100525
+192.168.7.1 - - [11/May/2014 23:48:18] "GET / HTTP/1.1" 401 0
+192.168.7.1 - - [11/May/2014 23:48:19] "GET / HTTP/1.1" 200 2148
+192.168.7.1 - - [11/May/2014 23:48:27] "GET /?id=08 HTTP/1.1" 200 32514
+192.168.7.1 - - [11/May/2014 23:48:28] "GET /?id=99452 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:48:37] "GET /?id=3006 HTTP/1.1" 200 1394
+192.168.7.1 - - [11/May/2014 23:48:40] "GET /?id=06&alpha=1 HTTP/1.1" 200 9119
+192.168.7.1 - - [11/May/2014 23:48:41] "GET /?id=061043 HTTP/1.1" 200 3856
+192.168.7.1 - - [11/May/2014 23:48:44] "GET /?id=1610431045 HTTP/1.1" 200 14653
+192.168.7.1 - - [11/May/2014 23:48:47] "GET /?id=2616752 HTTP/1.1" 200 3012
+192.168.7.1 - - [11/May/2014 23:48:47] "GET /?id=99268887 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:48:51] "GET /?id=265024 HTTP/1.1" 200 12389
+192.168.7.1 - - [11/May/2014 23:48:51] "GET /?id=99137809 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:48:52] "GET /?id=9985489 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:48:52] "GET /?id=9985488 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:48:52] "GET /?id=9985487 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:48:53] "GET /?id=99137810 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:48:57] "GET /?id=262410 HTTP/1.1" 200 12559
+192.168.7.1 - - [11/May/2014 23:48:59] "GET /?id=9942410 HTTP/1.1" 200 21940
+192.168.7.1 - - [11/May/2014 23:49:00] "GET /?id=99217098 HTTP/1.1" 200 21940
+192.168.7.1 - - [11/May/2014 23:49:01] "GET /?id=99183524 HTTP/1.1" 200 32601
+192.168.7.1 - - [11/May/2014 23:49:02] "GET /?id=99183531 HTTP/1.1" 200 28494
+192.168.7.1 - - [11/May/2014 23:49:03] "GET /?id=99117714 HTTP/1.1" 200 24157
+192.168.7.1 - - [11/May/2014 23:49:13] "GET /?id=1610431054 HTTP/1.1" 200 19382
+192.168.7.1 - - [11/May/2014 23:49:18] "GET /?id=09 HTTP/1.1" 200 748
+192.168.7.1 - - [11/May/2014 23:49:25] "GET /?searchTerm=%D0%BF%D0%BE%D1%80%D0%BD%D0%BE HTTP/1.1" 200 1547
+192.168.7.1 - - [11/May/2014 23:49:29] "GET /?searchType=series&searchTerm=%D0%BF%D0%BE%D1%80%D0%BD%D0%BE HTTP/1.1" 200 903
+192.168.7.1 - - [11/May/2014 23:49:33] "GET /?id=261628 HTTP/1.1" 200 3593
+192.168.7.1 - - [11/May/2014 23:49:34] "GET /?id=99109169 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:49:36] "GET /?id=9919832 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:49:48] "GET /?searchTerm=%D1%81%D0%B5%D0%BA%D1%81 HTTP/1.1" 200 1525
+192.168.7.1 - - [11/May/2014 23:49:49] "GET /?searchType=series&searchTerm=%D1%81%D0%B5%D0%BA%D1%81 HTTP/1.1" 200 2936
+192.168.7.1 - - [11/May/2014 23:50:00] "GET /?id=269190 HTTP/1.1" 200 57521
+192.168.7.1 - - [11/May/2014 23:50:00] "GET /?id=99244331 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:01] "GET /?id=99241867 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:01] "GET /?id=99241880 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:02] "GET /?id=99244329 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:02] "GET /?id=99241866 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:03] "GET /?id=99244332 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:03] "GET /?id=99241868 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:04] "GET /?id=99241869 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:04] "GET /?id=99241870 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:05] "GET /?id=99243714 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:05] "GET /?id=99241871 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:05] "GET /?id=99241872 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:06] "GET /?id=99137409 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:06] "GET /?id=99241873 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:06] "GET /?id=99241874 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:07] "GET /?id=99241875 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:07] "GET /?id=99137415 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:08] "GET /?id=99243715 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:08] "GET /?id=99241876 HTTP/1.1" 200 6599
+192.168.7.1 - - [11/May/2014 23:50:08] "GET /?id=99241877 HTTP/1.1" 200 6599
+2014-05-12 00:00:26,599 INFO      ***** Starting sopds-scan...
+2014-05-12 00:04:13,369 INFO     Books added      : 0
+2014-05-12 00:04:13,370 INFO     Books skipped    : 5571
+2014-05-12 00:04:13,371 INFO     Books DB entries deleted : 0
+2014-05-12 00:04:13,371 INFO     Books in archives: 0
+2014-05-12 00:04:13,371 INFO     Archives scanned : 35
+2014-05-12 00:04:13,371 INFO     Archives skipped : 128
+2014-05-12 00:04:13,372 INFO     Bad archives     : 0
+2014-05-12 00:04:13,372 INFO     Time estimated:0 hours, 3 minutes, 46 seconds.
+2014-05-12 06:00:02,478 INFO      ***** Starting sopds-scan...
+2014-05-12 06:02:49,130 INFO     Books added      : 0
+2014-05-12 06:02:49,130 INFO     Books skipped    : 5571
+2014-05-12 06:02:49,130 INFO     Books DB entries deleted : 0
+2014-05-12 06:02:49,131 INFO     Books in archives: 0
+2014-05-12 06:02:49,131 INFO     Archives scanned : 35
+2014-05-12 06:02:49,131 INFO     Archives skipped : 128
+2014-05-12 06:02:49,132 INFO     Bad archives     : 0
+2014-05-12 06:02:49,132 INFO     Time estimated:0 hours, 2 minutes, 46 seconds.
+192.168.7.1 - - [12/May/2014 06:53:58] "GET / HTTP/1.1" 401 0
+192.168.7.1 - - [12/May/2014 06:53:59] "GET / HTTP/1.1" 200 2148
+217.118.93.186 - - [12/May/2014 08:55:29] "GET / HTTP/1.1" 401 0
+217.118.93.186 - - [12/May/2014 08:55:30] "GET / HTTP/1.1" 200 2148
+217.118.93.186 - - [12/May/2014 08:55:32] "GET /?id=09 HTTP/1.1" 200 748
+217.118.93.186 - - [12/May/2014 08:55:45] "GET /?searchTerm=%D0%BE%D1%81%D0%B2%D0%B5%D0%BD%D1%86%D0%B8%D0%BC HTTP/1.1" 200 1613
+217.118.93.186 - - [12/May/2014 08:55:54] "GET /?searchType=books&searchTerm=%D0%BE%D1%81%D0%B2%D0%B5%D0%BD%D1%86%D0%B8%D0%BC HTTP/1.1" 200 27006
+217.118.93.186 - - [12/May/2014 08:55:56] "GET /?id=99197102 HTTP/1.1" 200 100839
+217.118.93.186 - - [12/May/2014 08:55:57] "GET /?id=9983850 HTTP/1.1" 200 6599
+217.118.93.186 - - [12/May/2014 08:55:58] "GET /?id=99178549 HTTP/1.1" 200 6599
+217.118.93.186 - - [12/May/2014 08:55:59] "GET /?id=9983677 HTTP/1.1" 200 57828
+217.118.93.186 - - [12/May/2014 08:55:59] "GET /?id=99203528 HTTP/1.1" 200 6599
+217.118.93.186 - - [12/May/2014 08:56:00] "GET /?id=99210467 HTTP/1.1" 200 6599
+217.118.93.186 - - [12/May/2014 08:56:01] "GET /?id=9991228 HTTP/1.1" 200 28314
+217.118.93.186 - - [12/May/2014 08:56:02] "GET /?id=99249441 HTTP/1.1" 200 28314
+217.118.93.186 - - [12/May/2014 08:56:03] "GET /?id=99249446 HTTP/1.1" 200 28314
+217.118.93.186 - - [12/May/2014 08:56:13] "GET /?id=2253811 HTTP/1.1" 200 1156
+2014-05-12 12:00:08,068 INFO      ***** Starting sopds-scan...
+2014-05-12 12:03:01,279 INFO     Books added      : 0
+2014-05-12 12:03:01,279 INFO     Books skipped    : 5571
+2014-05-12 12:03:01,279 INFO     Books DB entries deleted : 0
+2014-05-12 12:03:01,279 INFO     Books in archives: 0
+2014-05-12 12:03:01,280 INFO     Archives scanned : 35
+2014-05-12 12:03:01,280 INFO     Archives skipped : 128
+2014-05-12 12:03:01,280 INFO     Bad archives     : 0
+2014-05-12 12:03:01,280 INFO     Time estimated:0 hours, 2 minutes, 53 seconds.
+2014-05-12 19:18:17,262 INFO     sopdsDaemon __init__()...
+2014-05-12 19:18:17,272 INFO     sopdsDaemon start()...
+2014-05-12 19:18:41,765 INFO     sopdsDaemon __init__()...
+2014-05-12 19:18:41,765 INFO     sopdsDaemon start()...
+2014-05-12 19:18:41,881 INFO     sopdsDaemon entering in main loop...
+2014-05-12 19:18:41,881 INFO      ***** Starting sopds-scan...
+Started Simple OPDS server on port  8081
+2014-05-12 19:19:17,624 INFO     sopdsDaemon __init__()...
+2014-05-12 19:19:17,625 INFO     sopdsDaemon stop()...
+2014-05-12 23:04:27,362 INFO     sopdsDaemon __init__()...
+2014-05-12 23:04:27,391 INFO     sopdsDaemon start()...
+2014-05-12 23:04:27,524 INFO     sopdsDaemon entering in main loop...
+2014-05-12 23:04:27,525 INFO      ***** Starting sopds-scan...
+Started Simple OPDS server on port  8081
+192.168.7.5 - - [12/May/2014 23:04:43] "GET / HTTP/1.1" 401 0
+192.168.7.5 - - [12/May/2014 23:05:01] "GET / HTTP/1.1" 200 2148
+192.168.7.5 - - [12/May/2014 23:05:16] "GET /favicon.ico HTTP/1.1" 200 2148
+192.168.7.5 - - [12/May/2014 23:05:16] "GET /?id=01 HTTP/1.1" 200 5929
+192.168.7.5 - - [12/May/2014 23:05:54] "GET /favicon.ico HTTP/1.1" 200 2148
+192.168.7.5 - - [12/May/2014 23:06:30] "GET /favicon.ico HTTP/1.1" 200 2148
+192.168.7.5 - - [12/May/2014 23:06:31] "GET /favicon.ico HTTP/1.1" 200 2148
+2014-05-12 23:09:33,592 INFO     Books added      : 0
+2014-05-12 23:09:33,648 INFO     Books skipped    : 5571
+2014-05-12 23:09:33,648 INFO     Books DB entries deleted : 0
+2014-05-12 23:09:33,648 INFO     Books in archives: 0
+2014-05-12 23:09:33,648 INFO     Archives scanned : 35
+2014-05-12 23:09:33,649 INFO     Archives skipped : 128
+2014-05-12 23:09:33,649 INFO     Bad archives     : 0
+2014-05-12 23:09:33,649 INFO     Time estimated:0 hours, 5 minutes, 6 seconds.
+2014-05-13 00:00:06,472 INFO      ***** Starting sopds-scan...
+2014-05-13 00:03:36,219 INFO     Books added      : 0
+2014-05-13 00:03:36,219 INFO     Books skipped    : 5571
+2014-05-13 00:03:36,220 INFO     Books DB entries deleted : 0
+2014-05-13 00:03:36,220 INFO     Books in archives: 0
+2014-05-13 00:03:36,221 INFO     Archives scanned : 35
+2014-05-13 00:03:36,221 INFO     Archives skipped : 128
+2014-05-13 00:03:36,221 INFO     Bad archives     : 0
+2014-05-13 00:03:36,222 INFO     Time estimated:0 hours, 3 minutes, 29 seconds.
+2014-05-13 06:00:25,447 INFO      ***** Starting sopds-scan...
+2014-05-13 06:03:13,095 INFO     Books added      : 0
+2014-05-13 06:03:13,110 INFO     Books skipped    : 5571
+2014-05-13 06:03:13,110 INFO     Books DB entries deleted : 0
+2014-05-13 06:03:13,110 INFO     Books in archives: 0
+2014-05-13 06:03:13,111 INFO     Archives scanned : 35
+2014-05-13 06:03:13,111 INFO     Archives skipped : 128
+2014-05-13 06:03:13,111 INFO     Bad archives     : 0
+2014-05-13 06:03:13,111 INFO     Time estimated:0 hours, 2 minutes, 47 seconds.
+2014-05-13 12:00:02,052 INFO      ***** Starting sopds-scan...
+2014-05-13 12:03:57,632 INFO     Books added      : 0
+2014-05-13 12:03:57,649 INFO     Books skipped    : 5571
+2014-05-13 12:03:57,650 INFO     Books DB entries deleted : 0
+2014-05-13 12:03:57,650 INFO     Books in archives: 0
+2014-05-13 12:03:57,650 INFO     Archives scanned : 35
+2014-05-13 12:03:57,650 INFO     Archives skipped : 128
+2014-05-13 12:03:57,651 INFO     Bad archives     : 0
+2014-05-13 12:03:57,651 INFO     Time estimated:0 hours, 3 minutes, 55 seconds.
+2014-05-13 18:14:07,871 INFO     sopdsDaemon __init__()...
+2014-05-13 18:14:07,883 INFO     sopdsDaemon start()...
+2014-05-13 18:14:08,023 INFO     sopdsDaemon entering in main loop...
+2014-05-13 18:14:08,024 INFO      ***** Starting sopds-scan...
+Started Simple OPDS server on port  8081
+2014-05-13 18:17:42,403 INFO     Books added      : 0
+2014-05-13 18:17:42,403 INFO     Books skipped    : 5571
+2014-05-13 18:17:42,404 INFO     Books DB entries deleted : 0
+2014-05-13 18:17:42,404 INFO     Books in archives: 0
+2014-05-13 18:17:42,404 INFO     Archives scanned : 35
+2014-05-13 18:17:42,404 INFO     Archives skipped : 128
+2014-05-13 18:17:42,405 INFO     Bad archives     : 0
+2014-05-13 18:17:42,405 INFO     Time estimated:0 hours, 3 minutes, 34 seconds.
+2014-05-13 18:45:12,107 INFO     sopdsDaemon __init__()...
+2014-05-13 18:45:12,131 INFO     sopdsDaemon stop()...
+2014-05-13 19:24:11,300 INFO     sopdsDaemon __init__()...
+2014-05-13 19:24:11,313 INFO     sopdsDaemon start()...
+Traceback (most recent call last):
+  File "./sopdsd.py", line 310, in <module>
+Traceback (most recent call last):
+  File "./sopdsd.py", line 310, in <module>
+    daemon.start()
+  File "./sopdsd.py", line 261, in start
+    Daemon.start(self)
+  File "./sopdsd.py", line 129, in start
+    self.run()
+  File "./sopdsd.py", line 298, in run
+    daemon.start()
+  File "./sopdsd.py", line 261, in start
+    if self.daemonType == typeSCAND:
+AttributeError: 'opdsDaemon' object has no attribute 'daemonType'
+    Daemon.start(self)
+  File "./sopdsd.py", line 129, in start
+    self.run()
+  File "./sopdsd.py", line 298, in run
+    if self.daemonType == typeSCAND:
+AttributeError: 'opdsDaemon' object has no attribute 'daemonType'
+2014-05-13 19:24:11,342 INFO     sopdsDaemon delpid()...
+2014-05-13 19:24:11,357 INFO     sopdsDaemon delpid()...
+2014-05-13 19:25:39,090 INFO     sopdsDaemon __init__()...
+2014-05-13 19:25:39,091 INFO     sopdsDaemon start()...
+2014-05-13 19:25:39,154 INFO     sopdsDaemon entering in main loop...
+2014-05-13 19:25:39,155 INFO      ***** Starting sopds-scan...
+Started Simple OPDS server on port  8081
+2014-05-13 19:26:28,397 INFO     sopdsDaemon __init__()...
+2014-05-13 19:26:28,397 INFO     sopdsDaemon status()...
+2014-05-13 19:27:26,469 INFO     sopdsDaemon __init__()...
+2014-05-13 19:27:26,469 INFO     sopdsDaemon status()...
+2014-05-13 19:27:32,189 INFO     sopdsDaemon __init__()...
+2014-05-13 19:27:32,190 INFO     sopdsDaemon stop()...
+2014-05-13 19:30:15,830 INFO     sopdsDaemon __init__()...
+2014-05-13 19:30:15,831 INFO     sopdsDaemon start()...
+2014-05-13 19:30:15,971 INFO     sopdsDaemon entering in main loop...
+2014-05-13 19:30:15,972 INFO      ***** Starting sopds-scan...
+Started Simple OPDS server on port  8081
+2014-05-13 19:30:19,732 INFO     sopdsDaemon __init__()...
+2014-05-13 19:30:19,733 INFO     sopdsDaemon start()...
+2014-05-13 19:30:30,003 INFO     sopdsDaemon __init__()...
+2014-05-13 19:30:30,004 INFO     sopdsDaemon stop()...
+2014-05-13 19:34:20,483 INFO     sopdsDaemon __init__()...
+2014-05-13 19:34:20,484 INFO     sopdsDaemon status()...
+2014-05-13 19:35:37,128 INFO     sopdsDaemon __init__()...
+2014-05-13 19:35:37,129 INFO     sopdsDaemon status()...

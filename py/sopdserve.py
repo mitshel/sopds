@@ -4,13 +4,18 @@
 import base64
 from urllib import parse
 from wsgiref.simple_server import make_server
+from wsgiref.simple_server import WSGIRequestHandler
 import sopdscli
 import sopdscfg
 import zipf
 
-cfg=sopdscfg.cfgreader()
-zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
-sopds = sopdscli.opdsClient(cfg,sopdscli.modeINT)
+sopds = None
+cfg   = None
+
+#class opdsHandler(WSGIRequestHandler):
+#      def get_stderr(self):
+#          se = open(cfg.HTTPD_LOGFILE, 'a+')
+#          return se.fileno()
 
 def authorized_user(auth_list, auth_data):
     user=None
@@ -44,11 +49,23 @@ def app(environ, start_response):
    start_response(sopds.response_status, sopds.response_headers)
    return sopds.response_body
 
-try:
-   httpd = make_server(cfg.BIND_ADDRESS, cfg.PORT, app)
-   print('Started httpserver on port ' , cfg.PORT)
-   httpd.serve_forever()
-except KeyboardInterrupt:
-   print('^C received, shutting down the web server')
-   httpd.socket.close()
+def start_server(config):
+    global sopds
+    global cfg
 
+    cfg=config
+    zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
+    sopds = sopdscli.opdsClient(cfg,sopdscli.modeINT)
+
+    try:
+       httpd = make_server(cfg.BIND_ADDRESS, cfg.PORT, app)
+       print('Started Simple OPDS server on port ' , cfg.PORT)
+       httpd.serve_forever()
+    except KeyboardInterrupt:
+       print('^C received, shutting down the web server')
+       httpd.socket.close()
+
+
+if __name__ == "__main__":
+    config=sopdscfg.cfgreader()
+    start_server(config)
