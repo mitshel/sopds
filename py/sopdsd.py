@@ -16,7 +16,7 @@ class Daemon(object):
     """
     Subclass Daemon class and override the run() method.
     """
-    def __init__(self, scan_pidfile, http_pidfile, stdin='/dev/null', scan_stdout='/dev/null', http_stdout='/dev/null', scan_stderr='/dev/null', http_stderr='/dev/null'):
+    def __init__(self, scan_pidfile, http_pidfile, stdin='/dev/null', scan_stdout='/dev/null', http_stdout='/dev/null', scan_stderr='/dev/null', http_stderr='/dev/null', enable_scand=True, enable_httpd=True):
         self.stdin = stdin
         self.scan_stdout = scan_stdout
         self.scan_stderr = scan_stderr
@@ -24,6 +24,8 @@ class Daemon(object):
         self.http_stderr = http_stderr
         self.scan_pidfile  = scan_pidfile
         self.http_pidfile  = http_pidfile
+        self.enable_httpd = enable_httpd
+        self.enable_scand = enable_scand
         self.daemon_type = 0
  
     def daemonize(self):
@@ -46,26 +48,31 @@ class Daemon(object):
         os.umask(0)
  
         # Do second fork (SCAN DAEMON)
-        try:
-            pid = os.fork()
-            if pid > 0:
-                # Exit from second parent.
-                sys.exit(0)
-        except OSError as e:
-            message = "Fork #2 (scand) failed: {}\n".format(e)
-            sys.stderr.write(message)
-            sys.exit(1)
+        if self.enable_scand:
+           try:
+               pid = os.fork()
+               if pid > 0:
+                   # Exit from second parent.
+                   sys.exit(0)
+           except OSError as e:
+               message = "Fork #2 (scand) failed: {}\n".format(e)
+               sys.stderr.write(message)
+               sys.exit(1)
 
         # Do third fork (HTTPD DAEMON)
-        try: 
-            pid = os.fork()
-        except OSError as e:
-            message = "Fork #3 (httpd) failed: {}. Exitting\n".format(e)
-            sys.stderr.write(message)
-            sys.exit(1)
+        if self.enable_httpd:
+           try: 
+               pid = os.fork()
+               if pid>0 and not self.enable_scand:
+                   # Exit from second parent.
+                   sys.exit(0)
+           except OSError as e:
+               message = "Fork #3 (httpd) failed: {}. Exitting\n".format(e)
+               sys.stderr.write(message)
+               sys.exit(1)
 
  
-        if pid>0:
+        if (pid>0 and self.enable_httpd) or (self.enable_httpd and not self.enable_scand):
            print('SOPDS HTTP Daemon going to background, PID: {}'.format(os.getpid(),end="\r"))
            self.daemon_type=typeHTTPD
            self.pidfile=self.http_pidfile
@@ -103,32 +110,36 @@ class Daemon(object):
         Start daemon.
         """
         # Check pidfile to see if the daemon already runs.
-        try:
-            pf = open(self.scan_pidfile,'r')
-            scan_pid = int(pf.read().strip())
-            pf.close()
-        except IOError:
-            scan_pid = None
-
-        try:
-            pf = open(self.http_pidfile,'r')
-            http_pid = int(pf.read().strip())
-            pf.close()
-        except IOError:
-            http_pid = None
-
+        scan_pid=None
+        http_pid=None
  
-        if scan_pid:
-            message = "Pidfile {} for SOPDS SCAN daemon already exist. Daemon already running?\n".format(self.scan_pidfile)
-            sys.stderr.write(message)
+        if self.enable_scand:
+           try:
+               pf = open(self.scan_pidfile,'r')
+               scan_pid = int(pf.read().strip())
+               pf.close()
+           except IOError:
+               scan_pid = None
 
-        if http_pid:
-            message = "Pidfile {} for SOPDS HTTP daemon already exist. Daemon already running?\n".format(self.http_pidfile)
-            sys.stderr.write(message)
+           if scan_pid:
+               message = "Pidfile {} for SOPDS SCAN daemon already exist. Daemon already running?\n".format(self.scan_pidfile)
+               sys.stderr.write(message)
 
-        if scan_pid or http_pid:
+
+        if self.enable_httpd:
+           try:
+               pf = open(self.http_pidfile,'r')
+               http_pid = int(pf.read().strip())
+               pf.close()
+           except IOError:
+               http_pid = None
+ 
+           if http_pid:
+               message = "Pidfile {} for SOPDS HTTP daemon already exist. Daemon already running?\n".format(self.http_pidfile)
+               sys.stderr.write(message)
+
+        if (scan_pid and self.enable_scand) or (http_pid and self.enable_httpd):
              sys.exit(1)
-
  
         # Start daemon.
         self.daemonize()
@@ -138,44 +149,51 @@ class Daemon(object):
         """
         Get status of daemon.
         """
-        try:
-            pf = open(self.scan_pidfile,'r')
-            scan_pid = int(pf.read().strip())
-            pf.close()
-        except IOError:
-            message = "There is not PID file {}. SOPDS SCAN Daemon already running?\n".format(self.scan_pidfile)
-            sys.stderr.write(message)
-            scan_pid = None
+        scan_pid = None
+        http_pid = None
 
-        try:
-            pf = open(self.http_pidfile,'r')
-            http_pid = int(pf.read().strip())
-            pf.close()
-        except IOError:
-            message = "There is not PID file {}. SOPDS HTTP Daemon already running?\n".format(self.http_pidfile)
-            sys.stderr.write(message)
-            http_pid=None
+        if self.enable_scand:
+           try:
+               pf = open(self.scan_pidfile,'r')
+               scan_pid = int(pf.read().strip())
+               pf.close()
+           except IOError:
+               message = "There is not PID file {}. SOPDS SCAN Daemon already running?\n".format(self.scan_pidfile)
+               sys.stderr.write(message)
+               scan_pid = None
 
-        if not (scan_pid and http_pid):
+        if self.enable_httpd:
+           try:
+               pf = open(self.http_pidfile,'r')
+               http_pid = int(pf.read().strip())
+               pf.close()
+           except IOError:
+               message = "There is not PID file {}. SOPDS HTTP Daemon already running?\n".format(self.http_pidfile)
+               sys.stderr.write(message)
+               http_pid=None
+
+        if not ((scan_pid or not self.enable_scand) and (http_pid or not self.enable_httpd)):
             sys.exit(1)
  
-        try:
-            procfile = open("/proc/{}/status".format(scan_pid), 'r')
-            procfile.close()
-            message = "There is a SOPDS SCAN process with the PID {}\n".format(scan_pid)
-            sys.stdout.write(message)
-        except IOError:
-            message = "There is not a SOPDS SCAN process with the PID {}\n".format(self.scan_pid)
-            sys.stdout.write(message)
+        if self.enable_scand:
+           try:
+               procfile = open("/proc/{}/status".format(scan_pid), 'r')
+               procfile.close()
+               message = "There is a SOPDS SCAN process with the PID {}\n".format(scan_pid)
+               sys.stdout.write(message)
+           except IOError:
+               message = "There is not a SOPDS SCAN process with the PID {}\n".format(self.scan_pid)
+               sys.stdout.write(message)
 
-        try:
-            procfile = open("/proc/{}/status".format(http_pid), 'r')
-            procfile.close()
-            message = "There is a SOPDS HTTP process with the PID {}\n".format(http_pid)
-            sys.stdout.write(message)
-        except IOError:
-            message = "There is not a SOPDS HTTP process with the PID {}\n".format(self.http_pid)
-            sys.stdout.write(message)
+        if self.enable_httpd:
+           try:
+               procfile = open("/proc/{}/status".format(http_pid), 'r')
+               procfile.close()
+               message = "There is a SOPDS HTTP process with the PID {}\n".format(http_pid)
+               sys.stdout.write(message)
+           except IOError:
+               message = "There is not a SOPDS HTTP process with the PID {}\n".format(self.http_pid)
+               sys.stdout.write(message)
 
  
     def stop(self):
@@ -183,52 +201,56 @@ class Daemon(object):
         Stop the daemon.
         """
         # Get the pid from pidfile.
-        try:
-            pf = open(self.scan_pidfile,'r')
-            scan_pid = int(pf.read().strip())
-            pf.close()
-        except IOError as e:
-            message = str(e) + "\n SOPDS SCAN Daemon not running?\n"
-            sys.stderr.write(message)
-            scan_pid = None
-
-        try:
-            pf = open(self.http_pidfile,'r')
-            http_pid = int(pf.read().strip())
-            pf.close()
-        except IOError as e:
-            message = str(e) + "\n SOPDS HTTP Daemon not running?\n"
-            sys.stderr.write(message)
-            http_pid = None
-
-        # Try killing daemon process.
-        if scan_pid:
+        scan_pid=None
+        http_pid=None
+ 
+        if self.enable_scand:
            try:
-               os.kill(scan_pid, SIGTERM)
-               time.sleep(1)
-           except OSError as e:
-               print(str(e))
+               pf = open(self.scan_pidfile,'r')
+               scan_pid = int(pf.read().strip())
+               pf.close()
+           except IOError as e:
+               message = str(e) + "\n SOPDS SCAN Daemon not running?\n"
+               sys.stderr.write(message)
+               scan_pid = None
 
-        if http_pid:
+           if scan_pid:
+              try:
+                  os.kill(scan_pid, SIGTERM)
+                  time.sleep(1)
+              except OSError as e:
+                  print(str(e))
+
            try:
-               os.kill(http_pid, SIGTERM)
-               time.sleep(1)
-           except OSError as e:
-               print(str(e))
+               if os.path.exists(self.scan_pidfile):
+                   os.remove(self.scan_pidfile)
+           except IOError as e:
+               message = str(e) + "\nCan not remove pid file {}".format(self.scan_pidfile)
+               sys.stderr.write(message)
 
-        try:
-            if os.path.exists(self.scan_pidfile):
-                os.remove(self.scan_pidfile)
-        except IOError as e:
-            message = str(e) + "\nCan not remove pid file {}".format(self.scan_pidfile)
-            sys.stderr.write(message)
+        if self.enable_httpd:
+           try:
+               pf = open(self.http_pidfile,'r')
+               http_pid = int(pf.read().strip())
+               pf.close()
+           except IOError as e:
+               message = str(e) + "\n SOPDS HTTP Daemon not running?\n"
+               sys.stderr.write(message)
+               http_pid = None
 
-        try:
-            if os.path.exists(self.http_pidfile):
-                os.remove(self.http_pidfile)
-        except IOError as e:
-            message = str(e) + "\nCan not remove pid file {}".format(self.scan_pidfile)
-            sys.stderr.write(message)
+           if http_pid:
+              try:
+                  os.kill(http_pid, SIGTERM)
+                  time.sleep(1)
+              except OSError as e:
+                  print(str(e))
+
+           try:
+               if os.path.exists(self.http_pidfile):
+                   os.remove(self.http_pidfile)
+           except IOError as e:
+               message = str(e) + "\nCan not remove pid file {}".format(self.scan_pidfile)
+               sys.stderr.write(message)
  
     def restart(self):
         """
@@ -248,11 +270,14 @@ class opdsDaemon(Daemon):
     def __init__(self):
         self.start_scan=False
         self.cfg=sopdscfg.cfgreader()
+        if not (self.cfg.SCAN_DAEMON or self.cfg.HTTP_DAEMON):
+           print('Check configuration file. No daemons enabled.')
+           sys.exit(0)
 
         self.logger = logging.getLogger('')
         self.logger.setLevel(self.cfg.LOGLEVEL)
         formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
-        self.fh = logging.FileHandler(self.cfg.LOGFILE)
+        self.fh = logging.FileHandler(self.cfg.SCAND_LOGFILE)
         self.fh.setLevel(self.cfg.LOGLEVEL)
         self.fh.setFormatter(formatter)
         self.logger.addHandler(self.fh)
@@ -260,7 +285,7 @@ class opdsDaemon(Daemon):
 
         self.scanner=opdsScanner(self.cfg, self.logger)
 
-        Daemon.__init__(self, self.cfg.PID_FILE, self.cfg.HTTPD_PID_FILE, '/dev/null', self.cfg.LOGFILE,self.cfg.HTTPD_LOGFILE,self.cfg.LOGFILE,self.cfg.HTTPD_LOGFILE)
+        Daemon.__init__(self, self.cfg.PID_FILE, self.cfg.HTTPD_PID_FILE, '/dev/null', self.cfg.SCAND_LOGFILE,self.cfg.HTTPD_LOGFILE,self.cfg.SCAND_LOGFILE,self.cfg.HTTPD_LOGFILE, self.cfg.SCAN_DAEMON, self.cfg.HTTP_DAEMON)
 
     def start(self):
         self.logger.info('sopdsDaemon start()...')

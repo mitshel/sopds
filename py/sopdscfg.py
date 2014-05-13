@@ -81,7 +81,7 @@ class cfgreader:
        self.TEMP_DIR=config.getdefault(CFG_S_GLOBAL,'temp_dir','/tmp')
        self.TEMP_DIR=os.path.normpath(self.TEMP_DIR)
        
-       logfile=config.getdefault(CFG_S_GLOBAL,'logfile','sopds.log')
+       logfile=config.getdefault(CFG_S_GLOBAL,'logfile','scan.log')
        self.LOGFILE=os.path.join(LOG_PATH,logfile)
        loglevel=config.getdefault(CFG_S_GLOBAL,'loglevel','info')
        if loglevel.lower() in loglevels:
@@ -131,12 +131,15 @@ class cfgreader:
        self.SITE_EMAIL=config.get(CFG_S_SITE,'email')
        self.SITE_MAINTITLE=config.get(CFG_S_SITE,'main_title')
 
-       CFG_S_DAEMON='scand'
-       self.SCAN_ON_START=config.getdefault_bool(CFG_S_DAEMON,'scan_on_start',True)
-       self.PID_FILE=config.getdefault(CFG_S_DAEMON,'pid_file',r'/tmp/sopds.pid')
-       self.DAY_OF_WEEK=config.getdefault_int(CFG_S_DAEMON,'scan_day_of_week',0)
-       self.SCAN_INTERVAL=config.getdefault_int(CFG_S_DAEMON,'scan_interval',0)
-       self.SCAN_TIME=config.getdefault(CFG_S_DAEMON,'scan_time','00:00')
+       CFG_S_SCAND='scand'
+       self.SCAN_ON_START=config.getdefault_bool(CFG_S_SCAND,'scan_on_start',True)
+       self.PID_FILE=config.getdefault(CFG_S_SCAND,'pid_file',r'/tmp/sopds.pid')
+       self.SCAN_DAEMON=config.getdefault_bool(CFG_S_SCAND,'daemon',True)
+       self.DAY_OF_WEEK=config.getdefault_int(CFG_S_SCAND,'scan_day_of_week',0)
+       self.SCAN_INTERVAL=config.getdefault_int(CFG_S_SCAND,'scan_interval',0)
+       self.SCAN_TIME=config.getdefault(CFG_S_SCAND,'scan_time','00:00')
+       scand_logfile=config.getdefault(CFG_S_SCAND,'logfile','sopds-scand.log')
+       self.SCAND_LOGFILE=os.path.join(LOG_PATH,scand_logfile)
        try:
           (scan_hour,scan_min)=self.SCAN_TIME.split(':')
           scan_hour=scan_hour.strip()
@@ -158,11 +161,11 @@ class cfgreader:
 
        CFG_S_HTTPD='httpd'
        self.HTTPD_PID_FILE=config.getdefault(CFG_S_HTTPD,'pid_file',r'/tmp/sopds-http.pid')
-       self.SERVER=config.getdefault_bool(CFG_S_HTTPD,'server',True)
+       self.HTTP_DAEMON=config.getdefault_bool(CFG_S_HTTPD,'daemon',True)
        self.PORT=config.getdefault_int(CFG_S_HTTPD,'port',8081)
        self.BIND_ADDRESS=config.getdefault(CFG_S_HTTPD,'bind_address','0.0.0.0')
        self.AUTH=config.getdefault_bool(CFG_S_HTTPD,'auth',False)
        self.ACCOUNTS=config.getdefault(CFG_S_HTTPD,'accounts','')
-       httpd_logfile=config.getdefault(CFG_S_HTTPD,'logfile','access.log')
+       httpd_logfile=config.getdefault(CFG_S_HTTPD,'logfile','sopds-httpd.log')
        self.HTTPD_LOGFILE=os.path.join(LOG_PATH,httpd_logfile)
 
