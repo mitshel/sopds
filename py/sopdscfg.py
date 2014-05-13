@@ -14,7 +14,6 @@ PY_PATH=os.path.dirname(os.path.abspath(__file__))
 CFG_FILENAME='sopds.conf'
 CFG_PATH_DEFAULT=ROOT_PATH+os.path.sep+'conf'+os.path.sep+CFG_FILENAME
 CFG_PATH=CFG_PATH_DEFAULT
-COVER_PATH=os.path.join(ROOT_PATH,'covers')
 NOCOVER_IMG='nocover.jpg'
 NOCOVER_PATH=os.path.join(PY_PATH,NOCOVER_IMG)
 LOG_PATH=os.path.join(ROOT_PATH,'logs')
@@ -69,9 +68,6 @@ class cfgreader:
        self.WSGI_PATH=config.getdefault(CFG_S_GLOBAL,'wsgi_path','sopds.wsgi')
        self.WSGI_PATH=os.path.normpath(self.WSGI_PATH)
 
-       self.COVER_PATH=config.getdefault(CFG_S_GLOBAL,'cover_path','../covers')
-       self.COVER_PATH=os.path.normpath(self.COVER_PATH)
-
        self.FB2TOEPUB_PATH=config.getdefault(CFG_S_GLOBAL,'fb2toepub',None)
        self.FB2TOEPUB=self.FB2TOEPUB_PATH!=None and os.path.isfile(self.FB2TOEPUB_PATH)
 
@@ -101,7 +97,6 @@ class cfgreader:
        self.FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
        self.ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
        self.ZIPRESCAN=config.getboolean(CFG_S_GLOBAL,'ziprescan')
-       self.COVER_EXTRACT=config.getboolean(CFG_S_GLOBAL,'cover_extract')
        self.DELETE_LOGICAL=config.getboolean(CFG_S_GLOBAL,'delete_logical')
        self.ZIPFILE_PATCH=config.getdefault_bool(CFG_S_GLOBAL,'zipfile_patch',False)
        self.SINGLE_COMMIT=config.getdefault_bool(CFG_S_GLOBAL,'single_commit',False)
@@ -116,7 +111,6 @@ class cfgreader:
        zip_codepage=config.getdefault(CFG_S_GLOBAL,'zip_codepage','cp866')
        self.BOOK_SHELF=config.getdefault_bool(CFG_S_GLOBAL,'book_shelf',True)
 
-       if self.COVER_EXTRACT: self.FB2SIZE=0
        self.EXT_LIST=self.FORMATS.lower().split()
 
        if zip_codepage.lower() in {'cp437','cp866','cp1251','utf-8'}: self.ZIP_CODEPAGE=zip_codepage.lower()

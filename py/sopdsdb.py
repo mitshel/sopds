@@ -144,27 +144,27 @@ class opdsDatabase:
        cursor.close()
        return book_id
 
-  def addbook(self, name, path, cat_id, exten, title, annotation, docdate, lang, size=0, archive=0, doublicates=0, fnpat='', ictype=''):
+  def addbook(self, name, path, cat_id, exten, title, annotation, docdate, lang, size=0, archive=0, doublicates=0):
     format=exten[1:]
     format=format.lower()
     if doublicates!=0:
        doublicat=self.finddouble(title,format,size)
     else:
        doublicat=0
-    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,doublicat,avail,cover,cover_type) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2, %s, %s)")
-    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,doublicat,fnpat,ictype)
+    sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
+    data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,doublicat)
     cursor=self.cnx.cursor()
     cursor.execute(sql_addbook,data_addbook)
     book_id=cursor.lastrowid
     cursor.close()
     return book_id
 
-  def addcover(self,book_id,fn,cover_type):
-    sql=("update "+TBL_BOOKS+" set cover=%s, cover_type=%s where book_id=%s")
-    data=(fn,cover_type,book_id)
-    cursor=self.cnx.cursor()
-    cursor.execute(sql,data)
-    cursor.close()
+#  def addcover(self,book_id,fn,cover_type):
+#    sql=("update "+TBL_BOOKS+" set cover=%s, cover_type=%s where book_id=%s")
+#    data=(fn,cover_type,book_id)
+#    cursor=self.cnx.cursor()
+#    cursor.execute(sql,data)
+#    cursor.close()
     
   def findauthor(self,first_name,last_name):
     sql_findauthor=("select author_id from "+TBL_AUTHORS+" where last_name=%s and first_name=%s LIMIT 1")

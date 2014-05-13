@@ -323,19 +323,11 @@ class opdsClient():
     def entry_covers(self,cover,cover_type,book_id):
         have_extracted_cover=0
         if self.cfg.COVER_SHOW!=0:
-           if self.cfg.COVER_SHOW!=2:
-              if cover!=None and cover!='':
-                 self.enc_print( '<link href="%s/%s" rel="http://opds-spec.org/image" type="%s" />'%(self.cfg.COVER_PATH,cover,cover_type) )
-                 self.enc_print( '<link href="%s/%s" rel="x-stanza-cover-image" type="%s" />'%(self.cfg.COVER_PATH,cover,cover_type) )
-                 self.enc_print( '<link href="%s/%s" rel="http://opds-spec.org/thumbnail" type="%s" />'%(self.cfg.COVER_PATH,cover,cover_type) )
-                 self.enc_print( '<link href="%s/%s" rel="x-stanza-cover-image-thumbnail" type="%s" />'%(self.cfg.COVER_PATH,cover,cover_type) )
-                 have_extracted_cover=1
-           if self.cfg.COVER_SHOW==2 or (self.cfg.COVER_SHOW==3 and have_extracted_cover==0):
-                 id='99'+str(book_id)
-                 self.enc_print( '<link href="%s?id=%s" rel="http://opds-spec.org/image" type="image/jpeg" />'%(self.modulePath,id) )
-                 self.enc_print( '<link href="%s?id=%s" rel="x-stanza-cover-image" type="image/jpeg" />'%(self.modulePath,id) )
-                 self.enc_print( '<link href="%s?id=%s" rel="http://opds-spec.org/thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
-                 self.enc_print( '<link href="%s?id=%s" rel="x-stanza-cover-image-thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
+             id='99'+str(book_id)
+             self.enc_print( '<link href="%s?id=%s" rel="http://opds-spec.org/image" type="image/jpeg" />'%(self.modulePath,id) )
+             self.enc_print( '<link href="%s?id=%s" rel="x-stanza-cover-image" type="image/jpeg" />'%(self.modulePath,id) )
+             self.enc_print( '<link href="%s?id=%s" rel="http://opds-spec.org/thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
+             self.enc_print( '<link href="%s?id=%s" rel="x-stanza-cover-image-thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
 
     def entry_content(self,e_content):
         self.enc_print('<content type="text">'+websym(e_content)+'</content>')
