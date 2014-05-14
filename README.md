@@ -1,7 +1,7 @@
-Simple OPDS Catalog  
-Простой OPDS Каталог  
-Author: Dmitry V.Shelepnev  
-Версия 0.19  
+### Simple OPDS Catalog  
+### Простой OPDS Каталог  
+### Author: Dmitry V.Shelepnev  
+### Версия 0.19  
 
 1. Установка Simple OPDS в Fedora, RedHat, CentOS:  
 -------------------------------------------------------------------------------------------------------
@@ -10,6 +10,7 @@ Author: Dmitry V.Shelepnev
 Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3)  
 
 Для работы проекта необходимо установить следующие зависимости:  
+
      yum install httpd  
      yum install mysql  
      yum install python3  
@@ -31,6 +32,7 @@ Author: Dmitry V.Shelepnev
 1.4 Инициализация базы данных.  
 Во первых для работы каталога необходимо создать базу данных "sopds" и пользователя с необходимыми правами,  
 например следующим образом:  
+
      mysql -uroot -proot_pass mysql  
      mysql > create database if not exists sopds default charset=utf8;  
      mysql > grant select,insert,update,delete,execute on sopds.* to 'sopds'@'localhost' identified by 'sopds';  
@@ -39,6 +41,7 @@ Author: Dmitry V.Shelepnev
 
 Далее в созданную базу данных необходимо загрузить структуру БД и заполненную таблицу жанров, например 
 следующим образом:  
+
      mysql -uroot -proot_pass sopds < ./db/tables.sql  
      mysql -uroot -proot_pass sopds < ./db/genres.sql  
 
@@ -46,6 +49,7 @@ Author: Dmitry V.Shelepnev
 
 1.5 Использование OPDS-сервера.  
 OPDS-Сервер запускается командой:  
+
      ./sopdsd.py start  
 
 Указанная команда запустит два процесса в режиме демона Linux: 
