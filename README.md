@@ -1,62 +1,62 @@
-Simple OPDS Catalog 
-Простой OPDS Каталог 
-Author: Dmitry V.Shelepnev 
-Версия 0.19 
+Simple OPDS Catalog  
+Простой OPDS Каталог  
+Author: Dmitry V.Shelepnev  
+Версия 0.19  
 
-1. Установка Simple OPDS в Fedora, RedHat, CentOS: 
+1. Установка Simple OPDS в Fedora, RedHat, CentOS:  
 -------------------------------------------------------------------------------------------------------
-1.1 Зависимости. 
-Требуется Mysql не ниже версии 5 (необходима поддержка хранимых процедур) 
-Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3) 
+1.1 Зависимости.  
+Требуется Mysql не ниже версии 5 (необходима поддержка хранимых процедур)  
+Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3)  
 
-Для работы проекта необходимо установить следующие зависимости: 
-     yum install httpd
-     yum install mysql
-     yum install python3
-     yum install mysql-connector-python3
+Для работы проекта необходимо установить следующие зависимости:  
+     yum install httpd  
+     yum install mysql  
+     yum install python3  
+     yum install mysql-connector-python3  
 
-1.2 Установка. 
-Загрузить проект можно с сайта www.sopds.ru. 
-Проект имеет следующую структуру: 
+1.2 Установка.  
+Загрузить проект можно с сайта www.sopds.ru.  
+Проект имеет следующую структуру:  
 
->opds			- каталог проекта (можно задать свое имя каталога) 
->    py			- каталог с программами на Python 
->    db			- каталог инициализационные скрипты для создания БД 
->    conf		- каталог с файлом конфигурации 
->    README.md		- файл README 
+>opds			- каталог проекта (можно задать свое имя каталога)  
+>    py			- каталог с программами на Python  
+>    db			- каталог инициализационные скрипты для создания БД  
+>    conf		- каталог с файлом конфигурации  
+>    README.md		- файл README  
 
-1.3 Конфигурационный файл. 
-Перед началом работы необходимо внести необходимые настройки в файл конфигурации ./conf/sopds.conf 
+1.3 Конфигурационный файл.  
+Перед началом работы необходимо внести необходимые настройки в файл конфигурации ./conf/sopds.conf  
 
-1.4 Инициализация базы данных. 
+1.4 Инициализация базы данных.  
 Во первых для работы каталога необходимо создать базу данных "sopds" и пользователя с необходимыми правами,  
-например следующим образом: 
-     mysql -uroot -proot_pass mysql
-     mysql > create database if not exists sopds default charset=utf8;
-     mysql > grant select,insert,update,delete,execute on sopds.* to 'sopds'@'localhost' identified by 'sopds';
-     mysql > commit;
-     mysql > ^C
+например следующим образом:  
+     mysql -uroot -proot_pass mysql  
+     mysql > create database if not exists sopds default charset=utf8;  
+     mysql > grant select,insert,update,delete,execute on sopds.* to 'sopds'@'localhost' identified by 'sopds';  
+     mysql > commit;  
+     mysql > ^C  
 
 Далее в созданную базу данных необходимо загрузить структуру БД и заполненную таблицу жанров, например 
-следующим образом: 
-     mysql -uroot -proot_pass sopds < ./db/tables.sql
-     mysql -uroot -proot_pass sopds < ./db/genres.sql
+следующим образом:  
+     mysql -uroot -proot_pass sopds < ./db/tables.sql  
+     mysql -uroot -proot_pass sopds < ./db/genres.sql  
 
-Все указанные выше процедуры могут быть выполнены при помощи скрипта ./db/db_create.sh суперпользователем root (для Fedora)
+Все указанные выше процедуры могут быть выполнены при помощи скрипта ./db/db_create.sh суперпользователем root (для Fedora)  
 
 1.5 Использование OPDS-сервера.  
 OPDS-Сервер запускается командой:  
-     ./sopdsd.py start
+     ./sopdsd.py start  
 
 Указанная команда запустит два процесса в режиме демона Linux: 
 - Демон сканирования, который будет производить периодическое сканирование Вашей коллекции книг на основании настроек в 
   секции [scand] конфигурационного файла  
 - Демон http-opds-сервера, который предоставит доступ к коллекции книг OPDS-клиентам (по умолчанию прослушивается порт 8081)
   на основании настроек в секции [httpd] конфигурационного файла. Доступ к OPDS-каталогу в этом случае можно получить 
-  по адресу http://<Ваш Сервер>:8081/ 
+  по адресу http://<Ваш Сервер>:8081/  
 
-  Команда ./sopdsd.py stop    - приведет к остановке обеих процессов
-  Команда ./sopdsd.py status  - покажет информацию о состоянии процессов
+> Команда ./sopdsd.py stop    - приведет к остановке обеих процессов
+> Команда ./sopdsd.py status  - покажет информацию о состоянии процессов
 
   Кроме того в пакете присутсвует программа однократного сканирования коллекции книг: sopds-scan.py
 
@@ -83,31 +83,33 @@ OPDS-Сервер запускается командой:
 - далее, компилируем проект командой make, в результате в папке  unix_dist появится исполняемый файл fb2toepub 
 - в конфигурационном файле sopds.conf необходимо задать путь к этому конвертеру, а также путь к временной папке, 
   куда будут помещаться сконвертированные файлы, например таким образом:  
-     fb2toepub=../fb2toepub/unix_dist/fb2toepub
-     temp_dir=/tmp
+>     fb2toepub=../fb2toepub/unix_dist/fb2toepub
+>     temp_dir=/tmp
 - В результате OPDS-клиенту будут предоставлятся ссылки на FB2-книгу в формате epub  
 
 2.2 Конвертер fb2epub http://code.google.com/p/epub-tools/ (конвертер написан на Java, так что в вашей системе должнен быть установлен как минимум JDK 1.5)  
 - также сначала скачать последнюю версию по ссылке выше (текущая уже находится в проекте)  
 - скопировать jar-файл например в каталог opds/fb2epub (Здесь уже лежит shell-скрипт для запуска jar-файла)  
 - Соответственно прописать пути в файле конфигурации sopds.conf к shell-скрипту fb2epub  
-     fb2toepub=../fb2epub/fb2epub
-     temp_dir=/tmp
+>     fb2toepub=../fb2epub/fb2epub
+>     temp_dir=/tmp
 
 2.3 Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447  
 - Необходимо установить python 2.7 и пакеты lxml, cssutils:  
+
      yum install python  
      yum install python-lxml  
      yum install python-cssutils  
+
 - скачать последнюю версию конвертера по ссылке выше (текущая уже находится в каталоге fb2conv проекта)  
 - скачать утилиту KindleGen с сайта Amazon http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 
   (текущая версия утилиты уже находится в каталоге fb2conv проекта)  
 - скопировать архив проекта в opds/fb2conv (Здесь уже подготовлены shell-скрипты для запуска конвертера) и разархивировать его  
 - Для конвертации в MOBI нужно архив с утилитой KindleGen положить в каталог с конвертером и разархивировать  
 - В конфигурационном файле sopds.conf задать пути к соответствующим скриптам:  
-     fb2toepub=../fb2conv/fb2epub  
-     fb2tomobi=../fb2conv/fb2mobi  
-     temp_dir=/tmp  
+>     fb2toepub=../fb2conv/fb2epub  
+>     fb2tomobi=../fb2conv/fb2mobi  
+>     temp_dir=/tmp  
 
 
 3. Базовая настройка CGI в сервере Apache  
