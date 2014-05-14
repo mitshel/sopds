@@ -800,10 +800,10 @@ class opdsClient():
         if self.cfg.BOOK_SHELF and self.user!=None: self.opdsdb.addbookshelf(self.user, self.slice_value)
         full_path=os.path.join(self.cfg.ROOT_LIB,book_path)
         (n,e)=os.path.splitext(book_name)
-        if type_value==93:
+        if self.type_value==93:
            convert_type='.epub'
            converter_path=self.cfg.FB2TOEPUB_PATH
-        elif type_value==94:
+        elif self.type_value==94:
            convert_type='.mobi'
            converter_path=self.cfg.FB2TOMOBI_PATH
         if self.cfg.TITLE_AS_FN: transname=translit(title)+convert_type

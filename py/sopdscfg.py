@@ -67,11 +67,19 @@ class cfgreader:
 
        self.WSGI_PATH=config.getdefault(CFG_S_GLOBAL,'wsgi_path','sopds.wsgi')
        self.WSGI_PATH=os.path.normpath(self.WSGI_PATH)
-
-       self.FB2TOEPUB_PATH=config.getdefault(CFG_S_GLOBAL,'fb2toepub',None)
+       
+       fb2toepub_path=config.getdefault(CFG_S_GLOBAL,'fb2toepub',None)
+       if fb2toepub_path:
+          self.FB2TOEPUB_PATH=os.path.normpath(os.path.join(PY_PATH,fb2toepub_path))
+       else:
+          self.FB2TOEPUB_PATH=None
        self.FB2TOEPUB=self.FB2TOEPUB_PATH!=None and os.path.isfile(self.FB2TOEPUB_PATH)
 
-       self.FB2TOMOBI_PATH=config.getdefault(CFG_S_GLOBAL,'fb2tomobi',None)
+       fb2tomobi_path=config.getdefault(CFG_S_GLOBAL,'fb2tomobi',None)
+       if fb2tomobi_path:
+          self.FB2TOMOBI_PATH=os.path.normpath(os.path.join(PY_PATH,fb2tomobi_path))
+       else:
+          self.FB2TOMOBI_PATH=None
        self.FB2TOMOBI=self.FB2TOMOBI_PATH!=None and os.path.isfile(self.FB2TOMOBI_PATH)
 
        self.TEMP_DIR=config.getdefault(CFG_S_GLOBAL,'temp_dir','/tmp')
