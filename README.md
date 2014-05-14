@@ -73,9 +73,9 @@ OPDS-Сервер запускается командой:
   ./db/db_create.sh либо выполнить рекомендации в п.4 
 - После пересоздания БД и, как следствие уничтожении сыллок из БД на извлеченные обложки стоит удалить со всем содержимым
   папку covers:   
-
+  
      rm -rf covers  
-
+  
 
 #### 2. Настройка конвертации fb2 в EPUB или MOBI (опционально, можно не настраивать)  
 
@@ -102,11 +102,11 @@ OPDS-Сервер запускается командой:
 
 2.3 Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447  
 - Необходимо установить python 2.7 и пакеты lxml, cssutils:  
-
+  
      yum install python  
      yum install python-lxml  
      yum install python-cssutils  
-
+  
 - скачать последнюю версию конвертера по ссылке выше (текущая уже находится в каталоге fb2conv проекта)  
 - скачать утилиту KindleGen с сайта Amazon http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 
   (текущая версия утилиты уже находится в каталоге fb2conv проекта)  
