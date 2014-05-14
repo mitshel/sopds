@@ -141,11 +141,9 @@ class opdsClient():
         self.user=user
 
     def enc_print(self, string='', encoding='utf8'):
-#        sys.stdout.buffer.write(string.encode(encoding) + b'\n')
         self.response_body+=[string.encode(encoding)]
 
     def bin_print(self, data):
-#        sys.stdout.buffer.write(data)
         self.response_body+=[data]
 
     def add_response_header(self,list):
@@ -170,8 +168,6 @@ class opdsClient():
         if h_title==None: h_title=self.cfg.SITE_TITLE
         if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru'
         self.add_response_header([('Content-Type','text/xml; charset='+charset)])
-#        self.enc_print('Content-Type: text/xml; charset='+charset)
-#        self.enc_print()
         self.enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
         self.enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
         self.enc_print('<id>%s</id>'%h_id)
@@ -740,31 +736,22 @@ class opdsClient():
         self.add_response_header([('Content-Type','application/octet-stream; name="'+transname+'"')])
         self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
         self.add_response_header([('Content-Transfer-Encoding','binary')])
-#        self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
-#        self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
-#        self.enc_print('Content-Transfer-Encoding: binary')
         if cat_type==sopdsdb.CAT_NORMAL:
            file_path=os.path.join(full_path,book_name)
            book_size=os.path.getsize(file_path.encode('utf-8'))
            self.add_response_header([('Content-Length',str(book_size))])
-#           self.enc_print('Content-Length: '+str(book_size))
-#           self.enc_print()
            fo=codecs.open(file_path.encode("utf-8"), "rb")
            s=fo.read()
            self.bin_print(s)
-#           sys.stdout.buffer.write(s)
            fo.close()
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            z = zipf.ZipFile(fz, 'r', allowZip64=True)
            book_size=z.getinfo(book_name).file_size
            self.add_response_header([('Content-Length',str(book_size))])
-#           self.enc_print('Content-Length: '+str(book_size))
-#           self.enc_print()
            fo= z.open(book_name)
            s=fo.read()
            self.bin_print(s)
-#           sys.stdout.buffer.write(s)
            fo.close()
            z.close()
            fz.close()
@@ -780,9 +767,6 @@ class opdsClient():
         self.add_response_header([('Content-Type','application/zip; name="'+transname+'"')])
         self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'.zip"')])
         self.add_response_header([('Content-Transfer-Encoding','binary')])
- #       self.enc_print('Content-Type:application/zip; name="'+transname+'"')
- #       self.enc_print('Content-Disposition: attachment; filename="'+transname+'.zip"')
- #       self.enc_print('Content-Transfer-Encoding: binary')
         if cat_type==sopdsdb.CAT_NORMAL:
            file_path=os.path.join(full_path,book_name)
            dio = io.BytesIO()
@@ -791,10 +775,7 @@ class opdsClient():
            z.close()
            buf = dio.getvalue()
            self.add_response_header([('Content-Length',str(len(buf)))])
-#           self.enc_print('Content-Length: %s'%len(buf))
-#           self.enc_print()
            self.bin_print(buf)
-#           sys.stdout.buffer.write(buf)
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            zi = zipf.ZipFile(fz, 'r', allowZip64=True)
@@ -811,10 +792,7 @@ class opdsClient():
 
            buf = dio.getvalue()
            self.add_response_header([('Content-Length',str(len(buf)))])
-#           self.enc_print('Content-Length: %s'%len(buf))
-#           self.enc_print()
            self.bin_print(buf)
-#           sys.stdout.buffer.write(buf)
 
     def response_book_convert(self):
         """ Выдача файла книги после конвертации в EPUB или mobi """
@@ -852,19 +830,10 @@ class opdsClient():
            self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
            self.add_response_header([('Content-Transfer-Encoding','binary')])
            self.add_response_header([('Content-Length',str(len(s)))])
-
- #          self.enc_print('Content-Type:application/octet-stream; name="'+transname+'"')
- #          self.enc_print('Content-Disposition: attachment; filename="'+transname+'"')
- #          self.enc_print('Content-Transfer-Encoding: binary')
- #          self.enc_print('Content-Length: %s'%len(s))
- #          self.enc_print()
            self.bin_print(s)
-#           sys.stdout.buffer.write(s)
            fo.close()
         else:
            self.set_response_status('404 Not Found')
-#           self.enc_print('Status: 404 Not Found')
-#           self.enc_print()
 
         try: os.remove(tmp_fb2_path.encode('utf-8'))
         except: pass
@@ -898,10 +867,7 @@ class opdsClient():
                 dstr=base64.b64decode(s)
                 ictype=fb2.cover_image.getattr('content-type')
                 self.add_response_header([('Content-Type',ictype)])
-#                self.enc_print('Content-Type:'+ictype)
-#                self.enc_print()
                 self.bin_print(dstr)
-#                sys.stdout.buffer.write(dstr)
                 c0=1
               except:
                 c0=0
@@ -909,16 +875,11 @@ class opdsClient():
         if c0==0:
            if os.path.exists(sopdscfg.NOCOVER_PATH):
               self.add_response_header([('Content-Type','image/jpeg')])
-#              self.enc_print('Content-Type: image/jpeg')
-#              self.enc_print()
               f=open(sopdscfg.NOCOVER_PATH,"rb")
               self.bin_print(f.read())
-#              sys.stdout.buffer.write(f.read())
               f.close()
            else:
               self.set_response_status('404 Not Found')
-#              self.enc_print('Status: 404 Not Found')
-#              self.enc_print()
 
     def response_search(self):
         self.add_response_header([('Content-Type','text/xml')])
