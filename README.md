@@ -101,7 +101,7 @@ OPDS-Сервер запускается командой:
 >     temp_dir=/tmp
 
 2.3 Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447  
-- Необходимо установить python 2.7 и пакеты lxml, cssutils:  
+- Необходимо установить python 2.7 и пакеты lxml, cssutils:   
   
        yum install python  
        yum install python-lxml  
@@ -139,9 +139,9 @@ OPDS-Сервер запускается командой:
        AddHandler cgi-script .cgi  
 
 - Для настройки аутентификации, создайте пользователя командой:  
-
+  
        htpasswd -c /home/www/opds/.htpasswd user  
-
+  
   и добавьте в .htaccess следующие строки:  
 
        AuthType Basic   
