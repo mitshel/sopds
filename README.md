@@ -103,9 +103,9 @@ OPDS-Сервер запускается командой:
 2.3 Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447  
 - Необходимо установить python 2.7 и пакеты lxml, cssutils:  
   
-     yum install python  
-     yum install python-lxml  
-     yum install python-cssutils  
+       yum install python  
+       yum install python-lxml  
+       yum install python-cssutils  
   
 - скачать последнюю версию конвертера по ссылке выше (текущая уже находится в каталоге fb2conv проекта)  
 - скачать утилиту KindleGen с сайта Amazon http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 
@@ -123,41 +123,43 @@ OPDS-Сервер запускается командой:
 - Для работы CGI-скрипта необходимо разрешить доступ к каталогу opds, например при помощи следующих директив конфигурационного 
   файла web-сервера Apache httpd.conf:  
 
-     <Directory "/home/www/opds">  
-        Options Indexes FollowSymLinks  
-        AllowOverride All  
-        Order allow,deny  
-        Allow from all  
-     </Directory>  
-     Alias   /opds           "/home/www/opds"  
+       <Directory "/home/www/opds">  
+          Options Indexes FollowSymLinks  
+          AllowOverride All  
+          Order allow,deny  
+          Allow from all  
+       </Directory>  
+       Alias   /opds           "/home/www/opds"  
 
 - Далее, необходимо разрешить запуск cgi-скрипта ./py/sopds.cgi
   при помощи директив, помещенных в файл .htaccess, который необходимо создать в корне пакета SOPDS
   (например: /home/www/opds/.htaccess)  
 
-     Options ExecCGI  
-     AddHandler cgi-script .cgi  
+       Options ExecCGI  
+       AddHandler cgi-script .cgi  
 
 - Для настройки аутентификации, создайте пользователя командой:  
 
-     htpasswd -c /home/www/opds/.htpasswd user  
+       htpasswd -c /home/www/opds/.htpasswd user  
 
   и добавьте в .htaccess следующие строки:  
 
-     AuthType Basic   
-     AuthName "SOPDS Library"  
-     AuthUserFile /home/www/opds/.htpasswd  
-     require valid-user  
+       AuthType Basic   
+       AuthName "SOPDS Library"  
+       AuthUserFile /home/www/opds/.htpasswd  
+       require valid-user  
   
 - при выполнении указанных выше процедур доступ к OPDS-каталогу можно получить по следующему адресу:  
-     http://<Ваш Сервер>/opds/py/sopds.cgi
+
+>      http://<Ваш Сервер>/opds/py/sopds.cgi
 
 - для сокращения URL доступа добавьте следующую директиву в файл .htaccess:  
 
-     DirectoryIndex index.xml py/sopds.cgi  
+       DirectoryIndex index.xml py/sopds.cgi  
 
   при использовании указанной директивы доступ к OPDS-каталогу можно получить по следующему адресу:  
-     http://<Ваш Сервер>/opds/
+
+>      http://<Ваш Сервер>/opds/
 
 
 #### 4. Базовая настройка WSGI в сервере Apache  
@@ -171,39 +173,42 @@ mod_wsgi.
   что нужный нам mod_wsgi должен быть скомпилирован для python3. Таких, уже готовых модулей я для своей системы не нашел, поэтому
   пришлось выполнить несложные шаги для компиляции нужного нам модуля:  
       
-      yum install hg                                     # Устанавливаем клинета для Mercurial на которой ведется разработка mod_wsgi  
-      hg clone https://code.google.com/p/modwsgi/        # Скачиваем исходники mod_wsgi  
-      cd ./modwsgi/mod_wsgi  
-      ./configure --with-python=/usr/bin/python3.3       # Конфигурим под наш Python3  
-      make                                               # Компилируем  
-      make install                                       # Устанавливаем  
+        yum install hg                                     # Устанавливаем клинета для Mercurial на которой ведется разработка mod_wsgi  
+        hg clone https://code.google.com/p/modwsgi/        # Скачиваем исходники mod_wsgi  
+        cd ./modwsgi/mod_wsgi  
+        ./configure --with-python=/usr/bin/python3.3       # Конфигурим под наш Python3  
+        make                                               # Компилируем  
+        make install                                       # Устанавливаем  
 
 - Прописываем в конфигурационный файл нашего сервера Apache следующую строку (Возможно она уже там есть)  
 
-      LoadModule wsgi_module modules/mod_wsgi.so  
+        LoadModule wsgi_module modules/mod_wsgi.so  
 
 4.2 Настройка разрешений на запуск wsgi-скрипта делается аналогично настройке для CGI скрипта, т.е необходимо добавить в
 файл .htaccess, следующие строки:  
 
-     Options ExecCGI  
-     AddHandler wsgi-script .wsgi  
+       Options ExecCGI  
+       AddHandler wsgi-script .wsgi  
 
 - при выполнении указанных выше процедур доступ к OPDS-каталогу можно получить по следующему адресу:  
-       http://<Ваш Сервер>/opds/py/sopds.wsgi  
+
+>      http://<Ваш Сервер>/opds/py/sopds.wsgi  
 
 - для сокращения URL доступа добавьте следующую директиву в файл .htaccess:  
 
        DirectoryIndex index.xml py/sopds.wsgi  
 
   при использовании указанной директивы доступ к OPDS-каталогу можно получить по следующему адресу:  
-       http://<Ваш Сервер>/opds/  
+
+>      http://<Ваш Сервер>/opds/  
 
 4.3 Возможные проблемы.  
 Одна из выявленных мной проблем совместимости скрипта sopds.wsgi с веб-сервером Apache состоит в том, что и SOPDS и Apache 
 используют библиотеку "libexpat". И если версия libexpat, загруженная сервером Apache сильно отличается от той, которую 
 нужна Питону, то происходит crash приложения sopds.wsgi.      
 Подробное описание этой проблемы и возможных путей решений находится здесь:  
-       https://code.google.com/p/modwsgi/wiki/IssuesWithExpatLibrary  
+
+>      https://code.google.com/p/modwsgi/wiki/IssuesWithExpatLibrary  
 
 Что в итоге сделал я:  
 Удалил сиволические ссылки на старую библиотеку libexpat из каталога модулей сервера Apache:  
