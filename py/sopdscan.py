@@ -164,8 +164,19 @@ class opdsScanner:
                    idx+=1
                for l in self.fb2parser.genre.getvalue():
                    self.opdsdb.addbgenre(book_id,self.opdsdb.addgenre(l.lower().strip(' \'\"')))
-               for l in self.fb2parser.series.getattrs('name'):
-                   self.opdsdb.addbseries(book_id,self.opdsdb.addseries(l.strip()))
+#               for l in self.fb2parser.series.getattrs('name'):
+#                   self.opdsdb.addbseries(book_id,self.opdsdb.addseries(l.strip()))
+               for l in self.fb2parser.series.attrss:
+                   ser_name=l.get('name')
+                   if ser_name:
+                      ser_id=self.opdsdb.addseries(ser_name.strip())
+                      sser_no=l.get('number','0').strip()
+                      if sser_no.isdigit():
+                         ser_no=int(sser_no)
+                      else:
+                         ser_no=0
+                      self.opdsdb.addbseries(book_id,ser_id,ser_no)
+
                if not self.cfg.SINGLE_COMMIT: self.opdsdb.commit()
 
             else:

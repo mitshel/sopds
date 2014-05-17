@@ -310,10 +310,12 @@ class opdsClient():
 
     def entry_series(self,book_id):
         series=""
-        for (ser,) in self.opdsdb.getseries(book_id):
+        for (ser,ser_no) in self.opdsdb.getseries(book_id):
             if len(series)>0:
                   series+=', '
             series+=ser
+            if ser_no > 0:
+                  series += ' #' + str(ser_no)
         return series
 
     def entry_covers(self,cover,cover_type,book_id):

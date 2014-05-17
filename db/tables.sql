@@ -87,6 +87,7 @@ drop table if exists bseries;
 create table bseries(
 ser_id INT not NULL,
 book_id INT not NULL,
+ser_no TINYINT UNSIGNED NOT NULL DEFAULT 0,
 PRIMARY KEY(book_id,ser_id),
 INDEX(ser_id));
 commit;
@@ -104,7 +105,7 @@ create table dbver(
 ver varchar(5));
 commit;
 
-insert into dbver(ver) values("0.19");
+insert into dbver(ver) values("0.20");
 commit;
 insert into authors(author_id,last_name,first_name) values(1,"Неизвестный Автор","");
 commit;

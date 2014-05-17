@@ -292,9 +292,9 @@ class opdsDatabase:
     cursor.close()
     return ser_id
 
-  def addbseries(self, book_id, ser_id):
-       sql=("insert into "+TBL_BSERIES+"(book_id,ser_id) VALUES(%s,%s)")
-       data=(book_id,ser_id)
+  def addbseries(self, book_id, ser_id, ser_no):
+       sql=("insert into "+TBL_BSERIES+"(book_id,ser_id,ser_no) VALUES(%s,%s,%s)")
+       data=(book_id,ser_id,ser_no)
        cursor=self.cnx.cursor()
        try:
          cursor.execute(sql,data)
@@ -421,7 +421,7 @@ class opdsDatabase:
     return rows
 
   def getseries(self,book_id):
-    sql=("select ser from "+TBL_SERIES+" a, "+TBL_BSERIES+" b where b.ser_id=a.ser_id and b.book_id="+str(book_id))
+    sql=("select a.ser, b.ser_no from "+TBL_SERIES+" a, "+TBL_BSERIES+" b where b.ser_id=a.ser_id and b.book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -566,7 +566,7 @@ class opdsDatabase:
        "from "+TBL_BOOKS+" a "
        "left join "+TBL_BAUTHORS+" b on a.book_id=b.book_id "
        "left join "+TBL_BSERIES +" c on a.book_id=c.book_id "
-       "where author_id=%s and ser_id=%s and a.avail!=0 "+dstr+" order by a.title "+limitstr)
+       "where author_id=%s and ser_id=%s and a.avail!=0 "+dstr+" order by c.ser_no, a.title "+limitstr)
        data=(author_id,ser_id)
     else:
        sql=("select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type "
@@ -646,7 +646,7 @@ class opdsDatabase:
     else: dstr=' and a.doublicat=0 '
     if new_period==0: period=''
     else: period=" and (registerdate>now()-INTERVAL %s DAY)"%new_period
-    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BSERIES+" b where a.book_id=b.book_id and b.ser_id="+str(ser_id)+" and a.avail!=0 "+dstr+period+" order by a.title "+limitstr
+    sql="select SQL_CALC_FOUND_ROWS a.book_id,a.filename,a.path,a.registerdate,a.title,a.annotation,a.docdate,a.format,a.filesize,a.cover,a.cover_type from "+TBL_BOOKS+" a, "+TBL_BSERIES+" b where a.book_id=b.book_id and b.ser_id="+str(ser_id)+" and a.avail!=0 "+dstr+period+" order by b.ser_no, a.title "+limitstr
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
