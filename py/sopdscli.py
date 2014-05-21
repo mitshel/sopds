@@ -140,10 +140,10 @@ class opdsClient():
     def setUser(self,user):
         self.user=user
 
-    def enc_print(self, string='', encoding='utf8'):
+    def add_response_body(self, string='', encoding='utf8'):
         self.response_body+=[string.encode(encoding)]
 
-    def bin_print(self, data):
+    def add_response_binary(self, data):
         self.response_body+=[data]
 
     def add_response_header(self,list):
@@ -168,141 +168,141 @@ class opdsClient():
         if h_title==None: h_title=self.cfg.SITE_TITLE
         if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru. Version '+sopdscfg.VERSION
         self.add_response_header([('Content-Type','text/xml; charset='+charset)])
-        self.enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
-        self.enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
-        self.enc_print('<id>%s</id>'%h_id)
-        self.enc_print('<title>%s</title>'%h_title)
-        self.enc_print('<subtitle>%s</subtitle>'%h_subtitle)
-        self.enc_print('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
-        self.enc_print('<icon>'+self.cfg.SITE_ICON+'</icon>')
-        self.enc_print('<author><name>'+self.cfg.SITE_AUTOR+'</name><uri>'+self.cfg.SITE_URL+'</uri><email>'+self.cfg.SITE_EMAIL+'</email></author>')
-        self.enc_print('<link type="application/atom+xml" rel="start" href="'+self.modulePath+'?id=00"/>')
+        self.add_response_body('<?xml version="1.0" encoding="'+charset+'"?>')
+        self.add_response_body('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
+        self.add_response_body('<id>%s</id>'%h_id)
+        self.add_response_body('<title>%s</title>'%h_title)
+        self.add_response_body('<subtitle>%s</subtitle>'%h_subtitle)
+        self.add_response_body('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
+        self.add_response_body('<icon>'+self.cfg.SITE_ICON+'</icon>')
+        self.add_response_body('<author><name>'+self.cfg.SITE_AUTOR+'</name><uri>'+self.cfg.SITE_URL+'</uri><email>'+self.cfg.SITE_EMAIL+'</email></author>')
+        self.add_response_body('<link type="application/atom+xml" rel="start" href="'+self.modulePath+'?id=00"/>')
 
     def footer(self):
-        self.enc_print('</feed>')
+        self.add_response_body('</feed>')
 
     def main_menu(self):
         if self.cfg.ALPHA: am='30'
         else: am=''
         dbinfo=self.opdsdb.getdbinfo(self.cfg.DUBLICATES_SHOW,self.cfg.BOOK_SHELF,self.user)
-        self.enc_print('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
-        self.enc_print('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
-        self.enc_print('<entry>')
-        self.enc_print('<title>По каталогам</title>')
-        self.enc_print('<content type="text">Каталогов: %s, книг: %s.</content>'%(dbinfo[2][1],dbinfo[0][1]))
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=01"/>')
-        self.enc_print('<id>id:01</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>По авторам</title>')
-        self.enc_print('<content type="text">Авторов: %s.</content>'%dbinfo[1][1])
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'02"/>')
-        self.enc_print('<id>id:02</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>По наименованию</title>')
-        self.enc_print('<content type="text">Книг: %s.</content>'%dbinfo[0][1])
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'03"/>')
-        self.enc_print('<id>id:03</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>По Жанрам</title>')
-        self.enc_print('<content type="text">Жанров: %s.</content>'%dbinfo[3][1])
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=04"/>')
-        self.enc_print('<id>id:04</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>По Сериям</title>')
-        self.enc_print('<content type="text">Серий: %s.</content>'%dbinfo[4][1])
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'06"/>')
-        self.enc_print('<id>id:06</id></entry>')
+        self.add_response_body('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
+        self.add_response_body('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>По каталогам</title>')
+        self.add_response_body('<content type="text">Каталогов: %s, книг: %s.</content>'%(dbinfo[2][1],dbinfo[0][1]))
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=01"/>')
+        self.add_response_body('<id>id:01</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>По авторам</title>')
+        self.add_response_body('<content type="text">Авторов: %s.</content>'%dbinfo[1][1])
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'02"/>')
+        self.add_response_body('<id>id:02</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>По наименованию</title>')
+        self.add_response_body('<content type="text">Книг: %s.</content>'%dbinfo[0][1])
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'03"/>')
+        self.add_response_body('<id>id:03</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>По Жанрам</title>')
+        self.add_response_body('<content type="text">Жанров: %s.</content>'%dbinfo[3][1])
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=04"/>')
+        self.add_response_body('<id>id:04</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>По Сериям</title>')
+        self.add_response_body('<content type="text">Серий: %s.</content>'%dbinfo[4][1])
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'06"/>')
+        self.add_response_body('<id>id:06</id></entry>')
         if self.cfg.NEW_PERIOD!=0:
-           self.enc_print('<entry>')
-           self.enc_print('<title>Новинки за %s суток</title>'%self.cfg.NEW_PERIOD)
-           self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=05"/>')
-           self.enc_print('<id>id:05</id></entry>')
+           self.add_response_body('<entry>')
+           self.add_response_body('<title>Новинки за %s суток</title>'%self.cfg.NEW_PERIOD)
+           self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=05"/>')
+           self.add_response_body('<id>id:05</id></entry>')
         if self.cfg.BOOK_SHELF and self.user!=None:
-           self.enc_print('<entry>')
-           self.enc_print('<title>Книжная полка для %s</title>'%self.user)
-           self.enc_print('<content type="text">Книг: %s.</content>'%dbinfo[5][1])
-           self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=08"/>')
-           self.enc_print('<id>id:08</id></entry>')
+           self.add_response_body('<entry>')
+           self.add_response_body('<title>Книжная полка для %s</title>'%self.user)
+           self.add_response_body('<content type="text">Книг: %s.</content>'%dbinfo[5][1])
+           self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=08"/>')
+           self.add_response_body('<id>id:08</id></entry>')
 
     def new_menu(self):
         if self.cfg.ALPHA: am='30'
         else: am=''
         newinfo=self.opdsdb.getnewinfo(self.cfg.DUBLICATES_SHOW,self.cfg.NEW_PERIOD)
-        self.enc_print('<entry>')
-        self.enc_print('<title>Все новинки за %s суток</title>'%self.cfg.NEW_PERIOD)
-        self.enc_print('<content type="text">Новых книг: %s.</content>'%newinfo[0][1])
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'03&amp;news=1"/>')
-        self.enc_print('<id>id:03:news</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>Новинки по авторам</title>')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'02&amp;news=1"/>')
-        self.enc_print('<id>id:02:news</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>Новинки по Жанрам</title>')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=04&amp;news=1"/>')
-        self.enc_print('<id>id:04:news</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>Новинки по Сериям</title>')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'06&amp;news=1"/>')
-        self.enc_print('<id>id:06:news</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>Все новинки за %s суток</title>'%self.cfg.NEW_PERIOD)
+        self.add_response_body('<content type="text">Новых книг: %s.</content>'%newinfo[0][1])
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'03&amp;news=1"/>')
+        self.add_response_body('<id>id:03:news</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>Новинки по авторам</title>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'02&amp;news=1"/>')
+        self.add_response_body('<id>id:02:news</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>Новинки по Жанрам</title>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=04&amp;news=1"/>')
+        self.add_response_body('<id>id:04:news</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>Новинки по Сериям</title>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+am+'06&amp;news=1"/>')
+        self.add_response_body('<id>id:06:news</id></entry>')
 
     def authors_submenu(self,author_id):
-        self.enc_print('<entry>')
-        self.enc_print('<title>Книги по сериям</title>')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=31'+str(author_id)+'"/>')
-        self.enc_print('<id>id:31:authors</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>Книги вне серий</title>')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=34'+str(author_id)+'"/>')
-        self.enc_print('<id>id:32:authors</id></entry>')
-        self.enc_print('<entry>')
-        self.enc_print('<title>Книги по алфавиту</title>')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=33'+str(author_id)+'"/>')
-        self.enc_print('<id>id:33:authors</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>Книги по сериям</title>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=31'+str(author_id)+'"/>')
+        self.add_response_body('<id>id:31:authors</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>Книги вне серий</title>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=34'+str(author_id)+'"/>')
+        self.add_response_body('<id>id:32:authors</id></entry>')
+        self.add_response_body('<entry>')
+        self.add_response_body('<title>Книги по алфавиту</title>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id=33'+str(author_id)+'"/>')
+        self.add_response_body('<id>id:33:authors</id></entry>')
 
     def entry_start(self):
-        self.enc_print('<entry>')
+        self.add_response_body('<entry>')
 
     def entry_head(self,e_title,e_date,e_id):
-        self.enc_print('<title>'+websym(e_title)+'</title>')
+        self.add_response_body('<title>'+websym(e_title)+'</title>')
         if e_date!=None:
-           self.enc_print('<updated>'+e_date.strftime("%Y-%m-%dT%H:%M:%S")+'</updated>')
-        self.enc_print('<id>id:'+e_id+'</id>')
+           self.add_response_body('<updated>'+e_date.strftime("%Y-%m-%dT%H:%M:%S")+'</updated>')
+        self.add_response_body('<id>id:'+e_id+'</id>')
 
     def entry_link_subsection(self,link_id):
-        self.enc_print('<link type="application/atom+xml" rel="alternate" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
+        self.add_response_body('<link type="application/atom+xml" rel="alternate" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="'+self.modulePath+'?id='+link_id+self.nl+'"/>')
 
     def entry_link_book(self,link_id,format):
         str_id=str(link_id)
-        self.enc_print('<link type="application/'+format+'" rel="alternate" href="'+self.modulePath+'?id=91'+str_id+'"/>')
+        self.add_response_body('<link type="application/'+format+'" rel="alternate" href="'+self.modulePath+'?id=91'+str_id+'"/>')
         if format.lower()=='fb2' and self.cfg.FB2TOEPUB:
-           self.enc_print('<link type="application/epub" href="'+self.modulePath+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
-           self.enc_print('<link type="application/epub+zip" href="'+self.modulePath+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+           self.add_response_body('<link type="application/epub" href="'+self.modulePath+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+           self.add_response_body('<link type="application/epub+zip" href="'+self.modulePath+'?id=93'+str_id+'" rel="http://opds-spec.org/acquisition" />')
         if format.lower()=='fb2' and self.cfg.FB2TOMOBI:
-           self.enc_print('<link type="application/mobi" href="'+self.modulePath+'?id=94'+str_id+'" rel="http://opds-spec.org/acquisition" />')
-           self.enc_print('<link type="application/mobi+zip" href="'+self.modulePath+'?id=94'+str_id+'" rel="http://opds-spec.org/acquisition" />')
-        self.enc_print('<link type="application/'+format+'" href="'+self.modulePath+'?id=91'+str_id+'" rel="http://opds-spec.org/acquisition" />')
-        self.enc_print('<link type="application/'+format+'+zip" href="'+self.modulePath+'?id=92'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+           self.add_response_body('<link type="application/mobi" href="'+self.modulePath+'?id=94'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+           self.add_response_body('<link type="application/mobi+zip" href="'+self.modulePath+'?id=94'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+        self.add_response_body('<link type="application/'+format+'" href="'+self.modulePath+'?id=91'+str_id+'" rel="http://opds-spec.org/acquisition" />')
+        self.add_response_body('<link type="application/'+format+'+zip" href="'+self.modulePath+'?id=92'+str_id+'" rel="http://opds-spec.org/acquisition" />')
 
     def entry_authors(self,book_id,link_show=False):
         authors=""
         for (author_id,first_name,last_name) in self.opdsdb.getauthors(book_id):
-            self.enc_print('<author><name>'+last_name+' '+first_name+'</name></author>')
+            self.add_response_body('<author><name>'+last_name+' '+first_name+'</name></author>')
             if len(authors)>0:
                authors+=', '
             authors+=last_name+' '+first_name
             if link_show:
                author_ref=self.modulePath+'?id=22'+str(author_id)
-               self.enc_print('<link href="'+author_ref+'" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги автора '+websym(last_name,True)+' '+websym(first_name,True)+'" />')
+               self.add_response_body('<link href="'+author_ref+'" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги автора '+websym(last_name,True)+' '+websym(first_name,True)+'" />')
             else:
-               self.enc_print('<content type="text">'+authors+'</content>')
+               self.add_response_body('<content type="text">'+authors+'</content>')
         return authors
 
     def entry_genres(self,book_id):
         genres=""
         for (section,genre) in self.opdsdb.getgenres(book_id):
-            self.enc_print('<category term="%s" label="%s" />'%(genre,genre))
+            self.add_response_body('<category term="%s" label="%s" />'%(genre,genre))
             if len(genres)>0:
                   genres+=', '
             genres+=genre
@@ -322,70 +322,70 @@ class opdsClient():
         have_extracted_cover=0
         if self.cfg.COVER_SHOW!=0:
              id='99'+str(book_id)
-             self.enc_print( '<link href="%s?id=%s" rel="http://opds-spec.org/image" type="image/jpeg" />'%(self.modulePath,id) )
-             self.enc_print( '<link href="%s?id=%s" rel="x-stanza-cover-image" type="image/jpeg" />'%(self.modulePath,id) )
-             self.enc_print( '<link href="%s?id=%s" rel="http://opds-spec.org/thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
-             self.enc_print( '<link href="%s?id=%s" rel="x-stanza-cover-image-thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
+             self.add_response_body( '<link href="%s?id=%s" rel="http://opds-spec.org/image" type="image/jpeg" />'%(self.modulePath,id) )
+             self.add_response_body( '<link href="%s?id=%s" rel="x-stanza-cover-image" type="image/jpeg" />'%(self.modulePath,id) )
+             self.add_response_body( '<link href="%s?id=%s" rel="http://opds-spec.org/thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
+             self.add_response_body( '<link href="%s?id=%s" rel="x-stanza-cover-image-thumbnail"  type="image/jpeg" />'%(self.modulePath,id) )
 
     def entry_content(self,e_content):
-        self.enc_print('<content type="text">'+websym(e_content)+'</content>')
+        self.add_response_body('<content type="text">'+websym(e_content)+'</content>')
 
     def entry_content2(self,annotation='',title='',authors='',genres='',filename='',filesize=0,docdate='',series=''):
-        self.enc_print('<content type="text/html">')
+        self.add_response_body('<content type="text/html">')
         if title!='':
-           self.enc_print('&lt;b&gt;Название книги:&lt;/b&gt; '+websym(title)+'&lt;br/&gt;')
+           self.add_response_body('&lt;b&gt;Название книги:&lt;/b&gt; '+websym(title)+'&lt;br/&gt;')
         if authors!='':
-           self.enc_print('&lt;b&gt;Авторы:&lt;/b&gt; '+websym(authors)+'&lt;br/&gt;')
+           self.add_response_body('&lt;b&gt;Авторы:&lt;/b&gt; '+websym(authors)+'&lt;br/&gt;')
         if genres!='':
-           self.enc_print('&lt;b&gt;Жанры:&lt;/b&gt; '+websym(genres)+'&lt;br/&gt;')
+           self.add_response_body('&lt;b&gt;Жанры:&lt;/b&gt; '+websym(genres)+'&lt;br/&gt;')
         if series!='':
-           self.enc_print('&lt;b&gt;Серии:&lt;/b&gt; '+websym(series)+'&lt;br/&gt;')
+           self.add_response_body('&lt;b&gt;Серии:&lt;/b&gt; '+websym(series)+'&lt;br/&gt;')
         if filename!='':
-           self.enc_print('&lt;b&gt;Файл:&lt;/b&gt; '+websym(filename)+'&lt;br/&gt;')
+           self.add_response_body('&lt;b&gt;Файл:&lt;/b&gt; '+websym(filename)+'&lt;br/&gt;')
         if filesize>0:
-           self.enc_print('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(filesize//1024)+'Кб.&lt;br/&gt;')
+           self.add_response_body('&lt;b&gt;Размер файла:&lt;/b&gt; '+str(filesize//1024)+'Кб.&lt;br/&gt;')
         if docdate!='':
-           self.enc_print('&lt;b&gt;Дата правки:&lt;/b&gt; '+docdate+'&lt;br/&gt;')
+           self.add_response_body('&lt;b&gt;Дата правки:&lt;/b&gt; '+docdate+'&lt;br/&gt;')
         if annotation!='':
-           self.enc_print('&lt;p class=book&gt;'+websym(annotation)+'&lt;/p&gt;')
-        self.enc_print('</content>')
+           self.add_response_body('&lt;p class=book&gt;'+websym(annotation)+'&lt;/p&gt;')
+        self.add_response_body('</content>')
 
     def entry_finish(self):
-        self.enc_print('</entry>')
+        self.add_response_body('</entry>')
 
     def page_control(self, page, link_id):
         if page>0:
            prev_href=self.modulePath+"?id="+link_id+"&amp;page="+str(page-1)
-           self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="prev" title="Previous Page" href="'+prev_href+'" />')
+           self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="prev" title="Previous Page" href="'+prev_href+'" />')
         if self.opdsdb.next_page:
            next_href=self.modulePath+"?id="+link_id+"&amp;page="+str(page+1)
-           self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="next" title="Next Page" href="'+next_href+'" />')
+           self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="next" title="Next Page" href="'+next_href+'" />')
 
     def alphabet_menu(self,iid_value):
         self.entry_start()
         self.entry_head('А..Я (РУС)', None, 'alpha:1')
         id=iid_value+'&amp;alpha=1'+self.nl
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
         self.entry_finish()
         self.entry_start()
         self.entry_head('0..9 (Цифры)', None, 'alpha:2')
         id=iid_value+'&amp;alpha=2'+self.nl
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
         self.entry_finish()
         self.entry_start()
         self.entry_head('A..Z (ENG)', None, 'alpha:3')
         id=iid_value+'&amp;alpha=3'+self.nl
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
         self.entry_finish()
         self.entry_start()
         self.entry_head('Другие Символы', None, 'alpha:4')
         id=iid_value+'&amp;alpha=4'+self.nl
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
         self.entry_finish()
         self.entry_start()
         self.entry_head('Показать всё', None, 'alpha:5')
         id=iid_value+self.nl
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="'+self.modulePath+'?id='+id+'"/>')
         self.entry_finish()
 
     def response_main(self):
@@ -572,22 +572,22 @@ class opdsClient():
     def response_search_type(self):
         """ Выбор типа поиска по автору или наименованию или серии """
         self.header('id:search:%s'%self.searchTerm,'Поиск %s'%self.searchTerm)
-        self.enc_print('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
-        self.enc_print('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
+        self.add_response_body('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
+        self.add_response_body('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
         self.entry_start()
         self.entry_head('Поиск книг',None,'71')
         self.entry_content('Поиск книги по ее наименованию')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=books&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=books&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
         self.entry_finish()
         self.entry_start()
         self.entry_head('Поиск авторов',None,'72')
         self.entry_content('Поиск авторов по имени')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=authors&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=authors&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
         self.entry_finish()
         self.entry_start()
         self.entry_head('Поиск серий',None,'73')
         self.entry_content('Поиск серий книг')
-        self.enc_print('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=series&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
+        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=series&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
         self.entry_finish()
         self.footer()
 
@@ -744,7 +744,7 @@ class opdsClient():
            self.add_response_header([('Content-Length',str(book_size))])
            fo=codecs.open(file_path.encode("utf-8"), "rb")
            s=fo.read()
-           self.bin_print(s)
+           self.add_response_binary(s)
            fo.close()
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
@@ -753,7 +753,7 @@ class opdsClient():
            self.add_response_header([('Content-Length',str(book_size))])
            fo= z.open(book_name)
            s=fo.read()
-           self.bin_print(s)
+           self.add_response_binary(s)
            fo.close()
            z.close()
            fz.close()
@@ -777,7 +777,7 @@ class opdsClient():
            z.close()
            buf = dio.getvalue()
            self.add_response_header([('Content-Length',str(len(buf)))])
-           self.bin_print(buf)
+           self.add_response_binary(buf)
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            zi = zipf.ZipFile(fz, 'r', allowZip64=True)
@@ -794,7 +794,7 @@ class opdsClient():
 
            buf = dio.getvalue()
            self.add_response_header([('Content-Length',str(len(buf)))])
-           self.bin_print(buf)
+           self.add_response_binary(buf)
 
     def response_book_convert(self):
         """ Выдача файла книги после конвертации в EPUB или mobi """
@@ -832,7 +832,7 @@ class opdsClient():
            self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
            self.add_response_header([('Content-Transfer-Encoding','binary')])
            self.add_response_header([('Content-Length',str(len(s)))])
-           self.bin_print(s)
+           self.add_response_binary(s)
            fo.close()
         else:
            self.set_response_status('404 Not Found')
@@ -869,7 +869,7 @@ class opdsClient():
                 dstr=base64.b64decode(s)
                 ictype=fb2.cover_image.getattr('content-type')
                 self.add_response_header([('Content-Type',ictype)])
-                self.bin_print(dstr)
+                self.add_response_binary(dstr)
                 c0=1
               except:
                 c0=0
@@ -878,14 +878,14 @@ class opdsClient():
            if os.path.exists(sopdscfg.NOCOVER_PATH):
               self.add_response_header([('Content-Type','image/jpeg')])
               f=open(sopdscfg.NOCOVER_PATH,"rb")
-              self.bin_print(f.read())
+              self.add_response_binary(f.read())
               f.close()
            else:
               self.set_response_status('404 Not Found')
 
     def response_search(self):
         self.add_response_header([('Content-Type','text/xml')])
-        self.enc_print(opensearch(self.modulePath))
+        self.add_response_body(opensearch(self.modulePath))
 
     def make_response(self):
         self.opdsdb.openDB()
