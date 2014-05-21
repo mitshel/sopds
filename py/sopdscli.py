@@ -166,7 +166,7 @@ class opdsClient():
     def header(self, h_id=None, h_title=None, h_subtitle=None,charset='utf-8'):
         if h_id==None: h_id=self.cfg.SITE_ID
         if h_title==None: h_title=self.cfg.SITE_TITLE
-        if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru'
+        if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru. Version '+sopdscfg.VERSION
         self.add_response_header([('Content-Type','text/xml; charset='+charset)])
         self.enc_print('<?xml version="1.0" encoding="'+charset+'"?>')
         self.enc_print('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
