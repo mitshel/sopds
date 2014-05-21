@@ -8,7 +8,7 @@ import logging
 ##########################################################################
 # Глобальные переменные
 #
-VERSION="0.19"
+VERSION="0.20"
 PY_PATH=os.path.dirname(os.path.abspath(__file__))
 (ROOT_PATH,tmp)=os.path.split(PY_PATH)
 CFG_FILENAME='sopds.conf'
