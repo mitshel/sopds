@@ -69,7 +69,7 @@ class opdsScanner:
         self.opdsdb.openDB()
         self.opdsdb.avail_check_prepare()
 
-        for full_path, dirs, files in os.walk(self.cfg.ROOT_LIB):
+        for full_path, dirs, files in os.walk(self.cfg.ROOT_LIB, followlinks=True):
             for name in files:
                 file=os.path.join(full_path,name)
                 (n,e)=os.path.splitext(name)
