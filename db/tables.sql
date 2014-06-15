@@ -105,7 +105,7 @@ create table dbver(
 ver varchar(5));
 commit;
 
-insert into dbver(ver) values("0.20");
+insert into dbver(ver) values("0.21");
 commit;
 insert into authors(author_id,last_name,first_name) values(1,"Неизвестный Автор","");
 commit;
@@ -136,9 +136,9 @@ BEGIN
   END IF;
 
   IF cmp_type=1 THEN
-     SET RESULT=CONCAT_WS(':',T,filesize,format);
+     SET RESULT=CONCAT_WS(':',T,AUTHORS);
   ELSEIF cmp_type=2 THEN
-     SET RESULT=CONCAT_WS(':',AUTHORS,T);
+     SET RESULT=CONCAT_WS(':',T,fsize,fmt);
   ELSE
      SET RESULT='';
   END IF;
@@ -152,61 +152,33 @@ BEGIN
   DECLARE idx,prev,current,orig_id INT;
   DECLARE ids VARCHAR(512);
   DECLARE cur CURSOR for select GROUP_CONCAT(DISTINCT book_id order by filesize DESC SEPARATOR ':') as ids 
-                         from books where avail<>0 group by BOOK_CMPSTR(book_id,cmp_type) having count(*)>1 and SUM(CASE WHEN 
-
-(doublicat=0) THEN 1 ELSE 0 END)<>1;
+                      from books where avail<>0 group by BOOK_CMPSTR(book_id,cmp_type) having count(*)>1 and SUM(CASE WHEN (doublicat=0) THEN 1 ELSE 0 END)<>1;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+  IF cmp_type!=0 THEN
+     OPEN cur;
 
-  OPEN cur;
-
-  WHILE done=0 DO
-    FETCH cur INTO ids;
-    IF done=0 THEN
-       set idx=0;
-       set prev=-1;
-       set current=0;
-       set orig_id=0;
-       WHILE prev<>current DO
-           set prev=current;
-           set idx=idx+1;
-           SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(ids,':',idx),':',-1) as INT) into current;
-           IF prev<>current THEN
-              UPDATE books SET doublicat=orig_id where book_id=current;
-              if orig_id=0 THEN SET orig_id=current; END IF;
-           END IF;
-       END WHILE;
-    END IF;
-  END WHILE;  
-
-  CLOSE cur;
-END //
-
-CREATE PROCEDURE sp_update_dbl()
-BEGIN
-  DECLARE done INT DEFAULT 0;
-  DECLARE id, dbl INT;
-  DECLARE dbl_sav, id_sav INT;
-  DECLARE cur CURSOR FOR select book_id, doublicat from books
-                         where doublicat!=0 and avail!=0 and doublicat not in
-                         (select book_id from books where doublicat=0 and avail=2) order by doublicat, book_id;
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
-
-  OPEN cur;
-
-  SET dbl_sav=0;
-  SET id_sav=0;
-  WHILE done=0 DO
-    FETCH cur INTO id, dbl;
-    IF dbl_sav!=dbl THEN
-       UPDATE books SET doublicat=0 WHERE book_id=id;
-       SET dbl_sav=dbl;
-       SET id_sav=id;
-    ELSE
-       UPDATE books SET doublicat=id_sav where book_id=id;
-    END IF;
-  END WHILE;
-
-  CLOSE cur;
+     WHILE done=0 DO
+       FETCH cur INTO ids;
+       IF done=0 THEN
+          set idx=0;
+          set prev=-1;
+          set current=0;
+          set orig_id=0;
+          WHILE prev<>current DO
+              set prev=current;
+              set idx=idx+1;
+              SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(ids,':',idx),':',-1) as INT) into current;
+              IF prev<>current THEN
+                 UPDATE books SET doublicat=orig_id where book_id=current;
+                 if orig_id=0 THEN SET orig_id=current; END IF;
+              END IF;
+          END WHILE;
+       END IF;
+     END WHILE;  
+     CLOSE cur;
+   ELSE
+     UPDATE books SET doublicat=0;
+   END IF;
 END //
 
 CREATE PROCEDURE sp_newinfo(period INT)

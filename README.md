@@ -1,6 +1,6 @@
 #### Simple OPDS Catalog - Простой OPDS Каталог  
 #### Author: Dmitry V.Shelepnev  
-#### Версия 0.20 
+#### Версия 0.21 
 
 #### 1. Установка Simple OPDS в Fedora, RedHat, CentOS:    
 

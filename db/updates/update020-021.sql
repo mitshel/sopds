@@ -24,9 +24,9 @@ BEGIN
   END IF;
 
   IF cmp_type=1 THEN
-     SET RESULT=CONCAT_WS(':',T,filesize,format);
+     SET RESULT=CONCAT_WS(':',T,AUTHORS);
   ELSEIF cmp_type=2 THEN
-     SET RESULT=CONCAT_WS(':',AUTHORS,T);
+     SET RESULT=CONCAT_WS(':',T,fsize,fmt);
   ELSE
      SET RESULT='';
   END IF;
@@ -40,33 +40,33 @@ BEGIN
   DECLARE idx,prev,current,orig_id INT;
   DECLARE ids VARCHAR(512);
   DECLARE cur CURSOR for select GROUP_CONCAT(DISTINCT book_id order by filesize DESC SEPARATOR ':') as ids 
-                         from books where avail<>0 group by BOOK_CMPSTR(book_id,cmp_type) having count(*)>1 and SUM(CASE WHEN 
-
-(doublicat=0) THEN 1 ELSE 0 END)<>1;
+                      from books where avail<>0 group by BOOK_CMPSTR(book_id,cmp_type) having count(*)>1 and SUM(CASE WHEN (doublicat=0) THEN 1 ELSE 0 END)<>1;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+  IF cmp_type!=0 THEN
+     OPEN cur;
 
-  OPEN cur;
-
-  WHILE done=0 DO
-    FETCH cur INTO ids;
-    IF done=0 THEN
-       set idx=0;
-       set prev=-1;
-       set current=0;
-       set orig_id=0;
-       WHILE prev<>current DO
-           set prev=current;
-           set idx=idx+1;
-           SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(ids,':',idx),':',-1) as INT) into current;
-           IF prev<>current THEN
-              UPDATE books SET doublicat=orig_id where book_id=current;
-              if orig_id=0 THEN SET orig_id=current; END IF;
-           END IF;
-       END WHILE;
-    END IF;
-  END WHILE;  
-
-  CLOSE cur;
+     WHILE done=0 DO
+       FETCH cur INTO ids;
+       IF done=0 THEN
+          set idx=0;
+          set prev=-1;
+          set current=0;
+          set orig_id=0;
+          WHILE prev<>current DO
+              set prev=current;
+              set idx=idx+1;
+              SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(ids,':',idx),':',-1) as INT) into current;
+              IF prev<>current THEN
+                 UPDATE books SET doublicat=orig_id where book_id=current;
+                 if orig_id=0 THEN SET orig_id=current; END IF;
+              END IF;
+          END WHILE;
+       END IF;
+     END WHILE;  
+     CLOSE cur;
+   ELSE
+     UPDATE books SET doublicat=0;
+   END IF;
 END //
 
 DELIMITER ;
