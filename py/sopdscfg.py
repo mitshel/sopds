@@ -100,7 +100,14 @@ class cfgreader:
        self.DB_CHARSET=config.get(CFG_S_GLOBAL,'db_charset')
        self.ROOT_LIB=os.path.abspath(config.get(CFG_S_GLOBAL,'root_lib'))
        self.FORMATS=config.get(CFG_S_GLOBAL,'formats')
-       self.DUBLICATES_FIND=config.getboolean(CFG_S_GLOBAL,'dublicates_find')
+       dublicates_find=config.getdefault(CFG_S_GLOBAL,'dublicates_find','yes').lower()
+       if dublicates_find=='yes':
+          self.DUBLICATES_FIND=1
+       elif dublicates_find=='strong':
+          self.DUBLICATES_FIND=2
+       else:
+          self.DUBLICATES_FIND=0
+      
        self.DUBLICATES_SHOW=config.getboolean(CFG_S_GLOBAL,'dublicates_show')
        self.FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
        self.ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')

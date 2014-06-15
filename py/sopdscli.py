@@ -299,6 +299,12 @@ class opdsClient():
                self.add_response_body('<content type="text">'+authors+'</content>')
         return authors
 
+    def entry_doubles(self,book_id):
+        dcount=self.opdsdb.getdoublecount(book_id)
+        if dcount>0:
+           doubles_ref=self.modulePath+'?id=23'+str(book_id)
+           self.add_response_body('<link href="'+doubles_ref+'" rel="related" type="application/atom+xml;profile=opds-catalog" title="Дубликаты книги" />')
+
     def entry_genres(self,book_id):
         genres=""
         for (section,genre) in self.opdsdb.getgenres(book_id):
@@ -516,10 +522,29 @@ class opdsClient():
             authors=self.entry_authors(book_id,True)
             genres=self.entry_genres(book_id)
             series=self.entry_series(book_id)
+            self.entry_doubles(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
         self.footer()
+
+    def response_doubles(self):
+        """ Вывод дубликатов для выбранной книги """
+        self.header('id:doubles:%s'%self.slice_value,'Дубликаты для книги id=%s'%self.slice_value)
+        for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getdoubles(self.slice_value,self.cfg.MAXITEMS,self.page_value):
+            id='90'+str(book_id)
+            self.entry_start()
+            self.entry_head(book_title, reg_date, 'book:'+str(book_id))
+            self.entry_link_book(book_id,format)
+            self.entry_covers(cover,cover_type,book_id)
+            authors=self.entry_authors(book_id,True)
+            genres=self.entry_genres(book_id)
+            series=self.entry_series(book_id)
+            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
+            self.entry_finish()
+        self.page_control(self.page_value,self.id_value)
+        self.footer()
+
 
     def response_genres_sections(self):
         """ Cортировка 'По жанрам' - показ секций """
@@ -558,6 +583,7 @@ class opdsClient():
             authors=self.entry_authors(book_id,True)
             genres=self.entry_genres(book_id)
             series=self.entry_series(book_id)
+            self.entry_doubles(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
@@ -603,6 +629,7 @@ class opdsClient():
             authors=self.entry_authors(book_id,True)
             genres=self.entry_genres(book_id)
             series=self.entry_series(book_id)
+            self.entry_doubles(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
@@ -686,6 +713,7 @@ class opdsClient():
             authors=self.entry_authors(book_id,True)
             genres=self.entry_genres(book_id)
             series=self.entry_series(book_id)
+            self.entry_doubles(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
@@ -704,6 +732,7 @@ class opdsClient():
             authors=self.entry_authors(book_id,True)
             genres=self.entry_genres(book_id)
             series=self.entry_series(book_id)
+            self.entry_doubles(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
@@ -722,6 +751,7 @@ class opdsClient():
             authors=self.entry_authors(book_id,True)
             genres=self.entry_genres(book_id)
             series=self.entry_series(book_id)
+            self.entry_doubles(book_id)
             self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
@@ -912,6 +942,8 @@ class opdsClient():
            self.response_titles()
         elif self.type_value==13 or self.type_value==71:
            self.response_titles_search()
+        elif self.type_value==23:
+           self.response_doubles()
 
         elif self.type_value==4:
            self.response_genres_sections()

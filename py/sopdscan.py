@@ -85,7 +85,9 @@ class opdsScanner:
            self.books_deleted=self.opdsdb.books_del_logical()
         else:
            self.books_deleted=self.opdsdb.books_del_phisical()
-        self.opdsdb.update_double()
+#        self.opdsdb.update_double()
+        if self.cfg.DUBLICATES_FIND!=0:
+           self.opdsdb.mark_double(self.cfg.DUBLICATES_FIND)
         self.opdsdb.closeDB()
         self.opdsdb=None
 

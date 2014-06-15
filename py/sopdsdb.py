@@ -27,6 +27,15 @@ CAT_ZIP=1
 CAT_GZ=2
 
 ##########################################################################
+# Как будем искать дубликаты
+#
+CMP_NONE=0
+CMP_NORMAL=1
+CMP_STRONG=2
+CMP_TITLE_FTYPE_FSIZE=2
+CMP_TITLE_AUTHORS=1
+
+##########################################################################
 # разные константы
 #
 unknown_genre='Неизвестный жанр'
@@ -107,18 +116,18 @@ class opdsDatabase:
           cursor.close()
     return book_id
 
-  def finddouble(self,title,format,file_size):
-    sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and avail!=0 and doublicat=0")
-    data_findbook=(title,format,file_size)
-    cursor=self.cnx.cursor()
-    cursor.execute(sql_findbook,data_findbook)
-    row=cursor.fetchone()
-    if row==None:
-       book_id=0
-    else:
-       book_id=row[0]
-    cursor.close()
-    return book_id
+#  def finddouble(self,title,format,file_size):
+#    sql_findbook=("select book_id from "+TBL_BOOKS+" where title=%s and format=%s and filesize=%s and avail!=0 and doublicat=0")
+#    data_findbook=(title,format,file_size)
+#    cursor=self.cnx.cursor()
+#    cursor.execute(sql_findbook,data_findbook)
+#    row=cursor.fetchone()
+#    if row==None:
+#       book_id=0
+#    else:
+#       book_id=row[0]
+#    cursor.close()
+#    return book_id
 
   def findbookshelf(self,user,book_id):
     sql=("select book_id from "+TBL_BOOKSHELF+" where user=%s and book_id=%s")
@@ -147,10 +156,10 @@ class opdsDatabase:
   def addbook(self, name, path, cat_id, exten, title, annotation, docdate, lang, size=0, archive=0, doublicates=0):
     format=exten[1:]
     format=format.lower()
-    if doublicates!=0:
-       doublicat=self.finddouble(title,format,size)
-    else:
-       doublicat=0
+#    if doublicates!=0:
+#       doublicat=self.finddouble(title,format,size)
+#    else:
+    doublicat=0
     sql_addbook=("insert into "+TBL_BOOKS+"(filename,path,cat_id,filesize,format,title,annotation,docdate,lang,cat_type,doublicat,avail) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)")
     data_addbook=(name,path,cat_id,size,format,title,annotation,docdate,lang,archive,doublicat)
     cursor=self.cnx.cursor()
@@ -510,6 +519,39 @@ class opdsDatabase:
     cursor.close
     return rows
 
+  def getdoublecount(self,id):
+    sql='select count(*) from '+TBL_BOOKS+' where doublicat=%s'
+    data=(id,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+
+    row=cursor.fetchone()
+    if row==None:
+       dcount=0
+    else:
+       dcount=row[0]
+    cursor.close()
+    return dcount
+
+  def getdoubles(self,id,limit=0,page=0):
+    if limit==0: limitstr=""
+    else: limitstr="limit "+str(limit*page)+","+str(limit)
+    sql="select SQL_CALC_FOUND_ROWS book_id,filename,path,registerdate,title,annotation,docdate,format,filesize,cover,cover_type from "+TBL_BOOKS+" where doublicat=%s and avail!=0 order by docdate "+limitstr
+    data=(id,)
+    cursor=self.cnx.cursor()
+    cursor.execute(sql,data)
+    rows=cursor.fetchall()
+
+    cursor.execute("SELECT FOUND_ROWS()")
+    found_rows=cursor.fetchone()
+    if found_rows[0]>limit*page+limit:
+       self.next_page=True
+    else:
+       self.next_page=False
+
+    cursor.close
+    return rows
+
   def getauthorsbyl(self,letters,limit=0,page=0,doublicates=True,new_period=0):
     if limit==0: limitstr=""
     else: limitstr="limit "+str(limit*page)+","+str(limit)
@@ -773,19 +815,9 @@ class opdsDatabase:
     else: period='and registerdate>now()-INTERVAL %s DAY'%new_period
 
     sql="select 1 s, count(avail) from %s where avail!=0 %s %s"%(TBL_BOOKS,dstr,period)
-#    sql2="select 2 s, count(*) from (select b.author_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.author_id) a1"%(TBL_BAUTHORS, TBL_BOOKS, period)
-#    sql3="select 3 s, count(*) from (select b.genre_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.genre_id) a2"%(TBL_BGENRES, TBL_BOOKS, period)
-#    sql4="select 4 s, count(*) from (select b.ser_id from %s b left join %s c on b.book_id=c.book_id where c.avail!=0 %s group by b.ser_id) a3"%(TBL_BSERIES, TBL_BOOKS, period)
-#    sql=sql1+" union all "+sql2+" union all "+sql3+" union all "+sql4+" order by s"
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
-
-#    sql="call sp_newinfo(%s)"%new_period
-#    cursor=self.cnx.cursor()
-#    cursor.callproc('sp_newinfo',(new_period,))
-#    for results in cursor.stored_results():
-#        rows=results.fetchall()
 
     cursor.close
     return rows
@@ -846,10 +878,18 @@ class opdsDatabase:
     cursor.close
     return row_count
 
-  def update_double(self):
-    sql='call sp_update_dbl()'
+#  def update_double(self):
+#    sql='call sp_update_dbl()'
+#    cursor=self.cnx.cursor()
+#    cursor.execute(sql)
+#    self.cnx.commit()
+#    cursor.close
+
+  def mark_double(self, cmp_type=CMP_NORMAL):
+    sql='call sp_mark_dbl(%s)'
+    data=(cmp_type,)
     cursor=self.cnx.cursor()
-    cursor.execute(sql)
+    cursor.execute(sql,data)
     self.cnx.commit()
     cursor.close
 
