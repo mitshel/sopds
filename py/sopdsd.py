@@ -315,10 +315,7 @@ class opdsDaemon(Daemon):
         while True:
             t=time.localtime()
             if (((self.cfg.DAY_OF_WEEK==0) or (self.cfg.DAY_OF_WEEK==t.tm_wday+1)) and (t.tm_hour*60+t.tm_min in self.cfg.SCAN_TIMES)) or (self.cfg.SCAN_ON_START and not self.start_scan):
-                  self.scanner.init_stats()
-                  self.scanner.log_options()
                   self.scanner.scan_all()
-                  self.scanner.log_stats()
             self.start_scan=True
             time.sleep(30)
 

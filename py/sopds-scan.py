@@ -37,7 +37,5 @@ if (__name__=="__main__"):
        logger.addHandler(ch)
 
     scanner=opdsScanner(cfg,logger)
-    scanner.log_options()
     scanner.scan_all()
-    scanner.log_stats()
 

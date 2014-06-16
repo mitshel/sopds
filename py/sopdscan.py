@@ -17,7 +17,6 @@ class opdsScanner:
         self.logger=logger
         self.opdsdb=None
         self.fb2parser=None
-        self.init_stats()
         self.init_parser()
         zipf.ZIP_CODEPAGE=self.cfg.ZIP_CODEPAGE
         self.extensions_set={x for x in self.cfg.EXT_LIST}
@@ -25,6 +24,7 @@ class opdsScanner:
     def init_stats(self):
         self.t1=datetime.timedelta(seconds=time.time())
         self.t2=self.t1
+        self.t3=self.t1
         self.books_added   = 0
         self.books_skipped = 0
         self.books_deleted = 0
@@ -64,7 +64,17 @@ class opdsScanner:
         hours=t.seconds//3600
         self.logger.info('Time estimated:'+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
 
+    def log_stats_dbl(self):
+        self.t3=datetime.timedelta(seconds=time.time())
+        t=self.t3-self.t2
+        seconds=t.seconds%60
+        minutes=((t.seconds-seconds)//60)%60
+        hours=t.seconds//3600
+        self.logger.info('Finishing mark_double proc in '+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
+
     def scan_all(self):
+        self.init_stats()
+        self.log_options()
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
         self.opdsdb.openDB()
         self.opdsdb.avail_check_prepare()
@@ -85,9 +95,13 @@ class opdsScanner:
            self.books_deleted=self.opdsdb.books_del_logical()
         else:
            self.books_deleted=self.opdsdb.books_del_phisical()
-#        self.opdsdb.update_double()
+        self.log_stats()
+         
         if self.cfg.DUBLICATES_FIND!=0:
+           self.logger.info('Starting mark_double proc with DUBLICATES_FIND param = %s'%self.cfg.DUBLICATES_FIND)
            self.opdsdb.mark_double(self.cfg.DUBLICATES_FIND)
+           self.log_stats_dbl()
+
         self.opdsdb.closeDB()
         self.opdsdb=None
 

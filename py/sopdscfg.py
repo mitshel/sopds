@@ -105,6 +105,8 @@ class cfgreader:
           self.DUBLICATES_FIND=1
        elif dublicates_find=='strong':
           self.DUBLICATES_FIND=2
+       elif dublicates_find=='clear':
+          self.DUBLICATES_FIND=3
        else:
           self.DUBLICATES_FIND=0
       
