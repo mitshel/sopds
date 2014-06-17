@@ -152,8 +152,9 @@ BEGIN
   DECLARE idx,prev,current,orig_id INT;
   DECLARE ids VARCHAR(512);
   DECLARE cur CURSOR for select GROUP_CONCAT(DISTINCT book_id order by filesize DESC SEPARATOR ':') as ids 
-                      from books where avail<>0 group by BOOK_CMPSTR(book_id,cmp_type) having count(*)>1 and SUM(CASE WHEN (doublicat=0) THEN 1 ELSE 0 END)<>1;
+                      from books where avail<>0 group by BOOK_CMPSTR(book_id,cmp_type) having SUM(IF(doublicat=0,1,0))<>1;
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
   IF cmp_type=1 or cmp_type=2 THEN
      OPEN cur;
 
@@ -176,11 +177,12 @@ BEGIN
        END IF;
      END WHILE;  
      CLOSE cur;
-   END IF;
+  END IF;
 
-   IF cmp_type=3 THEN
+  IF cmp_type=3 THEN
      UPDATE books SET doublicat=0;
-   END IF;
+  END IF;
+
 END //
 
 CREATE PROCEDURE sp_newinfo(period INT)
