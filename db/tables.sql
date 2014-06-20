@@ -168,7 +168,7 @@ BEGIN
           WHILE prev<>current DO
               set prev=current;
               set idx=idx+1;
-              SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(ids,':',idx),':',-1) as INT) into current;
+              SELECT CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(ids,':',idx),':',-1) as UNSIGNED) into current;
               IF prev<>current THEN
                  UPDATE books SET doublicat=orig_id where book_id=current;
                  if orig_id=0 THEN SET orig_id=current; END IF;
