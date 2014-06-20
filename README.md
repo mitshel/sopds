@@ -36,15 +36,15 @@
 
      mysql -uroot -proot_pass mysql  
      mysql > create database if not exists sopds default charset=utf8;  
-     mysql > grant select,insert,update,delete,execute on sopds.* to 'sopds'@'localhost' identified by 'sopds';  
+     mysql > grant all on sopds.* to 'sopds'@'localhost' identified by 'sopds';  
      mysql > commit;  
      mysql > ^C  
 
 Далее в созданную базу данных необходимо загрузить структуру БД и заполненную таблицу жанров, например 
 следующим образом:  
 
-     mysql -uroot -proot_pass sopds < ./db/tables.sql  
-     mysql -uroot -proot_pass sopds < ./db/genres.sql  
+     mysql -usopds -psopds sopds < ./db/tables.sql  
+     mysql -usopds -psopds sopds < ./db/genres.sql  
 
 Все указанные выше процедуры могут быть выполнены при помощи скрипта ./db/db_create.sh суперпользователем root (для Fedora)  
 
