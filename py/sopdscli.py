@@ -846,7 +846,7 @@ class opdsClient():
         elif cat_type==sopdsdb.CAT_ZIP:
            fz=codecs.open(full_path.encode("utf-8"), "rb")
            z = zipf.ZipFile(fz, 'r', allowZip64=True)
-           z.extract(book_name,'/tmp')
+           z.extract(book_name,self.cfg.TEMP_DIR)
            tmp_fb2_path=os.path.join(self.cfg.TEMP_DIR,book_name)
            file_path=tmp_fb2_path
 
