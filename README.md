@@ -161,6 +161,10 @@ OPDS-Сервер запускается командой:
 
 >      http://<Ваш Сервер>/opds/
 
+- для некоторых систем (например Ubuntu 12.04) возможно понадобится включить "CGI processing in Apache" командой:  
+
+         sudo a2enmod cgi
+
 
 #### 4. Базовая настройка WSGI в сервере Apache  
 WSGI - Web Server Gateway Interface - более эффективный стандарт взаимодействия Python программ с Веб сервером, чем CGI
