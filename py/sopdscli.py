@@ -764,8 +764,12 @@ class opdsClient():
         full_path=os.path.join(self.cfg.ROOT_LIB,book_path)
         if self.cfg.TITLE_AS_FN: transname=translit(title+'.'+format)
         else: transname=translit(book_name)
+        if format=="fb2":    content_type='text/xml'
+        elif format=="epub": content_type='application/epub+zip'
+        elif format=="mobi": content_type='application/x-mobipocket-ebook'
+        else:                content_type='application/octet-stream'
         # HTTP Header
-        self.add_response_header([('Content-Type','application/octet-stream; name="'+transname+'"')])
+        self.add_response_header([('Content-Type',content_type+'; name="'+transname+'"')])
         self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
         self.add_response_header([('Content-Transfer-Encoding','binary')])
         if cat_type==sopdsdb.CAT_NORMAL:
@@ -835,9 +839,13 @@ class opdsClient():
         if self.type_value==93:
            convert_type='.epub'
            converter_path=self.cfg.FB2TOEPUB_PATH
+           content_type='application/epub+zip'
         elif self.type_value==94:
            convert_type='.mobi'
            converter_path=self.cfg.FB2TOMOBI_PATH
+           content_type='application/x-mobipocket-ebook'
+        else:
+           content_type='application/octet-stream'
         if self.cfg.TITLE_AS_FN: transname=translit(title)+convert_type
         else: transname=translit(n)+convert_type
         if cat_type==sopdsdb.CAT_NORMAL:
@@ -858,7 +866,7 @@ class opdsClient():
            fo=codecs.open(tmp_conv_path, "rb")
            s=fo.read()
            # HTTP Header
-           self.add_response_header([('Content-Type','application/octet-stream; name="'+transname+'"')])
+           self.add_response_header([('Content-Type',content_type+'; name="'+transname+'"')])
            self.add_response_header([('Content-Disposition','attachment; filename="'+transname+'"')])
            self.add_response_header([('Content-Transfer-Encoding','binary')])
            self.add_response_header([('Content-Length',str(len(s)))])
