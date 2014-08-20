@@ -61,8 +61,8 @@ drop table if exists genres;
 create table genres(
 genre_id INT not null AUTO_INCREMENT,
 genre VARCHAR(32),
-section VARCHAR(32),
-subsection VARCHAR(32),
+section VARCHAR(64),
+subsection VARCHAR(100),
 PRIMARY KEY(genre_id),
 KEY(genre));
 commit;

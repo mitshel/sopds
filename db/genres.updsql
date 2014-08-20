@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "SET NAMES 'utf8';"
+echo "SET CHARACTER SET utf8;"
+echo
+
+cat genres.txt | grep -v '#' | awk -F'@' '{gsub(/^ +| +$/,"",$1)} {gsub(/^ +| +$/,"",$2)} {gsub(/^ +| +$/,"",$3)} {print "update genres set section=\""$3"\", subsection=\""$2"\" where genre=\""$1"\";"}'
+echo "commit;"
+
