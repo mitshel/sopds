@@ -34,11 +34,11 @@ def app(environ, start_response):
       user=authorized_user(cfg.ACCOUNTS,adata)
 
    if (user!=None) or not cfg.AUTH:
-      qs   = None
-      if 'QUERY_STRING' in environ:
-         qs = parse.parse_qs(environ['QUERY_STRING'])
       sopds.resetParams()
-      sopds.parseParams(qs)
+      query = ''
+      if 'QUERY_STRING' in environ:
+          query = environ['QUERY_STRING']
+      sopds.parseParams(query)
       sopds.setUser(user)
       sopds.make_response()
    else:
