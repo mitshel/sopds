@@ -13,6 +13,7 @@ import base64
 import subprocess
 import zipf
 from urllib import parse
+import html
 
 modeCGI  = 0
 modeWSGI = 1
@@ -170,12 +171,17 @@ class opdsClient():
         self.add_response_header([('Content-Type','text/xml; charset='+charset)])
         self.add_response_body('<?xml version="1.0" encoding="'+charset+'"?>')
         self.add_response_body('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
-        self.add_response_body('<id>%s</id>'%h_id)
-        self.add_response_body('<title>%s</title>'%h_title)
-        self.add_response_body('<subtitle>%s</subtitle>'%h_subtitle)
+        self.add_response_body('<id>%s</id>' % html.escape(h_id))
+        self.add_response_body('<title>%s</title>' % html.escape(h_title))
+        self.add_response_body('<subtitle>%s</subtitle>' % html.escape(h_subtitle))
         self.add_response_body('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
-        self.add_response_body('<icon>'+self.cfg.SITE_ICON+'</icon>')
-        self.add_response_body('<author><name>'+self.cfg.SITE_AUTOR+'</name><uri>'+self.cfg.SITE_URL+'</uri><email>'+self.cfg.SITE_EMAIL+'</email></author>')
+        self.add_response_body('<icon>'+html.escape(self.cfg.SITE_ICON)+'</icon>')
+        self.add_response_body('<author><name>%s</name><uri>%s</uri><email>%s</email></author>' % (
+            html.escape(self.cfg.SITE_AUTOR),
+            html.escape(self.cfg.SITE_URL),
+            html.escape(self.cfg.SITE_EMAIL)))
+        self.add_response_body('<link type="application/atom+xml" rel="start" href="%s?id=00"/>' % html.escape(self.modulePath))
+        linkInfo = self.link_info(self.type_value)
         self.add_response_body('<link type="application/atom+xml" rel="start" href="'+self.modulePath+'?id=00"/>')
 
     def footer(self):
@@ -590,7 +596,7 @@ class opdsClient():
         self.footer()
 
     def response_last(self):
-        """ Cортировка 'Последние поступления' """  
+        """ Cортировка 'Последние поступления' """
         self.header('id:news','Последние поступления за %s дней'%self.cfg.NEW_PERIOD)
         self.new_menu()
         self.footer()
@@ -988,6 +994,6 @@ class opdsClient():
            self.response_book_convert()
         elif self.type_value==99:
            self.response_book_cover()
-        
+
         self.opdsdb.closeDB()
 
