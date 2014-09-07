@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
+    </head>
+<body>
+
+<div class=page>
+    <div class=header>
+        <div class=menu>
+            <a href="/index.html">Home</a><a href=search.html>Поиск</a>
+        </div>
+    </div>
+
+    <h1>Поиск</h1>
+
+{% set searchTerm = opdsRequest('?searchTerm={searchTerms}') %}
+{% for entry in searchTerm.feed.entry %}
+    {{ entry.title }}
+    <form>
+        {% for field in parseSearchLink(entry.link) %}
+            <input name={{field.name}} value="{{field.value}}"
+            {{ 'type=hidden'   if field.fixed    else '' }}
+            {{ 'type=required' if field.required else '' }}
+            required
+            >
+        {% endfor %}
+        <button type=submit title="{{ entry.content }}">Искать</button>
+    </form>
+{% endfor %}
+
+
+{% if env.opds.query %}
+    <div class=searchResults>
+        {% set opds  = opdsRequest(env.opds.query) %}
+        {% if opds.feed.entry %}
+            {%for entry in opds.feed.entry %}
+                {% if opds.feed_kind == 'navigation'  %} {% include '_includes/navigation.html'  %} {% endif %}
+                {% if opds.feed_kind == 'acquisition' %} {% include '_includes/acquisition.html' %} {% endif %}
+            {% endfor %}
+            {% include '_includes/nav_links.html' %}
+        {% else  %}
+            Ничего не найдено.
+        {% endif %}
+    </div>
+{% endif %}
+
+
+
+    <div class=footer>
+        OPDS URL:<a href={{env.opds.url}}/{{ env.opds.query }}>{{env.opds.url}}/{{ env.opds.query }}</a>
+    </footer>
+    </div>
+</body>
+</html>

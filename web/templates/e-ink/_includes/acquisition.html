@@ -1,0 +1,14 @@
+<div class=acquisition_entry>
+<h2>{{ entry.title }}</b></h2>
+<i>{{ entry.content or '' }}</i>
+<div class=acquisition_downloads>
+Скачать:
+    {% for link in getDownloadLinks(entry) %}
+        <a href="{{link.href}}">{{link.type | 
+            replace("application/", "") | 
+            replace("epub+zip", "epub") |
+            replace("mobi+zip", "mobi") |
+            replace("fb2+zip",  "fb2.zip") }}</a>
+    {% endfor %}
+</div>
+</div>

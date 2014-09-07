@@ -1,0 +1,119 @@
+body {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 8pt;
+    color: #222;
+    max-width: 840px;
+    margin: 0;
+    padding: 0;
+}
+
+
+h1 {
+    font-size: 17pt;
+    margin-bottom: 30px;
+}
+
+
+h2 {
+    font-size: 11pt;
+}
+
+
+a {
+    color: #0F3253;
+}
+
+input, button{
+    qline-height: 20pt;
+    qheight: 20pt;
+    vertical-align: middle;
+    padding: 3pt 4pt;
+}
+
+input {
+    qborder-radius: 3px;
+    qborder: 1px solid #AAA;
+    qpadding: 2pt;
+}
+
+.header {
+    padding-bottom: 20px;
+    border-bottom: 3px dotted #CCCCCC;
+    margin-bottom: 20pt;
+}
+
+.header .menu, .header form, {
+    line-height: 22pt;
+    height: 22pt;
+}
+
+.header .menu {
+   font-size: 12pt;
+}
+
+.header .menu a {
+    margin-right: 10pt;
+    color: #000;
+    display: inline-block;
+}
+
+.page {
+    padding: 20px 40px;
+}
+
+.footer {
+    padding: 20px;
+    border-top: 3px dotted #CCCCCC;
+    margin-top: 20pt;
+}
+
+.quichSearch {
+    clear:both;
+    float:right;
+
+}
+
+
+
+.navigaion_entry h2 {
+    display: inline-block;
+    margin-right: 20pt;
+    margin-top: 2pt;
+    margin-bottom: 6pt;
+
+}
+
+.acquisition_entry {
+    margin-bottom: 40pt;
+    margin-left: 20pt;
+    padding-bottom: 10pt;
+    border-bottom: 1px dotted #DDD;
+}
+
+.acquisition_entry h2 {
+    margin-top: 30pt;
+    margin-bottom: 8pt;
+    margin-left: -20pt;
+}
+
+.acquisition_downloads {
+    margin-top: 8pt;
+    margin-left: 10pt;
+    font-weight: bold;
+}
+
+.acquisition_downloads a {
+    min-width: 30pt;
+    background-color: #0F3253;
+    color: #FFFFFF;
+    display: inline-block;
+    margin-left: 5pt;
+    padding: 2pt;
+    text-align: center;
+    text-decoration: none;
+}
+
+.navLink {
+    margin-top: 20px;
+    display: inline-block;
+}

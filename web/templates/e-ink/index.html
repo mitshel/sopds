@@ -1,0 +1,44 @@
+{% set opds  = opdsRequest(env.opds.query) %}
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
+    </head>
+<body>
+
+<div class=page>
+    <div class=header>
+        {% set entry = opdsRequest('?searchTerm={searchTerms}').feed.entry[0] %}
+        <form action="/search.html" class=quichSearch>
+            {% for field in parseSearchLink(entry.link) %}
+            <input name={{field.name}} value="{{field.value}}"
+                {{ 'type=hidden'   if field.fixed    else '' }}
+                {{ 'type=required' if field.required else '' }}
+                required
+            >
+            {% endfor %}
+            <button type=submit title="Поиск книги по ее наименованию"><img src="img/search.png"></button>
+         </form>
+
+        <div class=menu>
+            <a href="/index.html">Home</a><a href=search.html>Поиск</a>
+        </div>
+    </div>
+
+    <h1>{{ opds.feed.title }}</h1>
+
+{% if opds.feed.entry %}
+{%for entry in opds.feed.entry %}
+    {% if opds.feed_kind == 'navigation'  %} {% include '_includes/navigation.html'  %} {% endif %}
+    {% if opds.feed_kind == 'acquisition' %} {% include '_includes/acquisition.html' %} {% endif %}
+{% endfor %}
+{%endif%}
+
+{% include '_includes/nav_links.html' %}
+
+    <div class=footer>
+        OPDS URL:<a href={{env.opds.url}}/{{ env.opds.query }}>{{env.opds.url}}/{{ env.opds.query }}</a>
+    </footer>
+    </div>
+</body>
+</html>
+

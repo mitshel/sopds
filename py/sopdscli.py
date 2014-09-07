@@ -128,6 +128,7 @@ class opdsClient():
            if page.isdigit():
               self.page_value=int(page)
 
+        searchType=''
         if 'searchType' in qs:
            searchType=qs.get("searchType")[0].strip()
            if searchType=='books': self.type_value=71
@@ -139,6 +140,8 @@ class opdsClient():
            if self.type_value!=71 and self.type_value!=72 and self.type_value!=73: self.type_value=7
            self.slice_value=-1
            self.id_value='%02d&amp;searchTerm=%s'%(self.type_value,self.searchTerm)
+           if searchType:
+              self.id_value+="&amp;searchType=%s" % searchType
         else:
            self.searchTerm=''
 
