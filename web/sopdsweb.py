@@ -18,13 +18,15 @@ import xml.sax
 import re
 import jinja2
 import time
+import base64
 
 from pprint import pprint
 
 mime = mimetypes.MimeTypes()
 
+
 class OpdsDocument:
-    def __init__(self, url):
+    def __init__(self, url, user, password):
         """
         A simple function to converts XML data into native Python object.
         """
@@ -110,14 +112,21 @@ class OpdsDocument:
             def characters(self, content):
                 self.text_parts.append(content)
 
-        resp = urllib.request.urlopen(url)
-        builder = TreeBuilder()
+        self.variables = []
 
+        req = urllib.request.Request(url)
+        if user != '':
+            auth = base64.b64encode(("%s:%s" % (user, password)).encode('UTF-8'))
+            req.add_header('Authorization', "Basic %s" % auth.decode('latin-1'))
+
+        resp = urllib.request.urlopen(req)
+        self.status = resp.getcode()
+
+        builder = TreeBuilder()
         xml.sax.parseString(resp.read(), builder)
         self.variables = builder.root._attrs
-
-
         self.variables['feed_kind'] = self._getFeedKind()
+
 
     def _getFeedKind(self):
         for link in self.variables['feed']['link']:
@@ -192,6 +201,14 @@ class Response:
     #********************************************
     #
     #********************************************
+    def sendHttpError(self, error):
+        self.start_response('%s %s' % (error.code, error.msg), error.hdrs.items())
+        return [("%s %s" % (error.code, error.msg)).encode("utf-8")]
+
+
+    #********************************************
+    #
+    #********************************************
     def sendError(self, title, message):
         headers = [('Content-type', 'text/html; charset=utf-8')]
 
@@ -249,6 +266,7 @@ class Response:
         setup_testing_defaults(self.environ)
         status = '200 OK'
         headers = [('Content-type', 'text/plain; charset=utf-8')]
+
         self.start_response(status, headers)
 
         ret = [("%s: %s\n" % (key, value)).encode("utf-8")
@@ -325,6 +343,9 @@ class Response:
 
             res = jinjaTemplate.render(variables)
 
+        except urllib.error.HTTPError as e:
+            return self.sendHttpError(e)
+
         except jinja2.TemplateNotFound as e:
             traceback.print_exc()
             self.templateError()
@@ -343,6 +364,17 @@ class Response:
 
         return [res.encode('utf-8')]
 
+    #********************************************
+    #
+    #********************************************
+    def getUserPass(self):
+        if 'HTTP_AUTHORIZATION' in self.environ:
+            (type, b64) = self.environ['HTTP_AUTHORIZATION'].split(' ')
+            auth = base64.b64decode(b64.encode('latin-1')).decode('UTF-8')
+            return auth.split(":")
+
+        return ('', '')
+
 
     #********************************************
     #
@@ -353,7 +385,8 @@ class Response:
                                   config.OPDS_PORT,
                                   request)
 
-        opds = OpdsDocument(url)
+        (user, password) = self.getUserPass()
+        opds = OpdsDocument(url, user, password)
         return opds.variables
 
 
