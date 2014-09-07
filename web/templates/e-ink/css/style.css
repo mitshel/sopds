@@ -1,7 +1,7 @@
 body {
     font-family: Tahoma, Geneva, sans-serif;
     font-size: 8pt;
-    color: #222;
+    color: #000;
     max-width: 840px;
     margin: 0;
     padding: 0;
@@ -9,37 +9,50 @@ body {
 
 
 h1 {
-    font-size: 17pt;
+    font-size: 140%;
     margin-bottom: 30px;
 }
 
 
 h2 {
-    font-size: 11pt;
+    font-size: 120%;
 }
 
+h2 a {
+    color: #000;
+}
 
 a {
     color: #0F3253;
 }
 
-input, button{
-    qline-height: 20pt;
-    qheight: 20pt;
+
+input, button {
     vertical-align: middle;
-    padding: 3pt 4pt;
+    border-radius: 2pt;
 }
 
 input {
-    qborder-radius: 3px;
-    qborder: 1px solid #AAA;
-    qpadding: 2pt;
+    border: 1pt solid #676767;
+}
+
+button {
+    border: 1pt solid #676767;
+    background-color: #EEE;
+}
+
+
+/* Header *** */
+.header .menu, .header .quichSearch {
+    line-height: 16pt;
+    height: 16pt;
 }
 
 .header {
-    padding-bottom: 20px;
-    border-bottom: 3px dotted #CCCCCC;
-    margin-bottom: 20pt;
+    padding-top: 8pt;
+    padding-bottom: 8pt;
+    margin-bottom: 15pt;
+    border-bottom: 2pt dotted #AAA;
 }
 
 .header .menu, .header form, {
@@ -48,7 +61,7 @@ input {
 }
 
 .header .menu {
-   font-size: 12pt;
+   font-size: 100%;
 }
 
 .header .menu a {
@@ -57,60 +70,87 @@ input {
     display: inline-block;
 }
 
-.page {
-    padding: 20px 40px;
-}
-
-.footer {
-    padding: 20px;
-    border-top: 3px dotted #CCCCCC;
-    margin-top: 20pt;
-}
-
 .quichSearch {
     clear:both;
     float:right;
-
+    padding: 0;
+    margin: 0;
 }
 
+.quichSearch input{
+    height: 100%;
+    margin: 0;
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
 
+.quichSearch button {
+    height: 100%;
+    margin: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    width: 20pt;
+}
 
+/* Page *** */
+.page {
+    padding: 0 40px 20px 40px;
+}
+
+.footer {
+    padding-top: 15pt;
+    border-top: 2pt dotted #AAA;
+    margin-top: 20pt;
+}
+
+/* Navigation *** */
+.navigaion_entry {
+    margin-left: 20pt;
+}
 .navigaion_entry h2 {
     display: inline-block;
-    margin-right: 20pt;
-    margin-top: 2pt;
-    margin-bottom: 6pt;
-
+    margin: 2pt 20pt 6pt -15pt;
 }
 
+/* Acquisition *** */
 .acquisition_entry {
-    margin-bottom: 40pt;
+    margin-bottom: 20pt;
     margin-left: 20pt;
     padding-bottom: 10pt;
-    border-bottom: 1px dotted #DDD;
+    border-bottom: 1pt dotted #AAA;
 }
 
 .acquisition_entry h2 {
-    margin-top: 30pt;
+    margin-top: 20pt;
     margin-bottom: 8pt;
     margin-left: -20pt;
 }
 
+.acquisition_entry h2 .icon {
+    font-size: 60%;
+}
+
 .acquisition_downloads {
     margin-top: 8pt;
-    margin-left: 10pt;
-    font-weight: bold;
+    margin-left: 8pt;
 }
 
 .acquisition_downloads a {
     min-width: 30pt;
-    background-color: #0F3253;
-    color: #FFFFFF;
+/*    background-color: #0F3253;
+    color: #FFFFFF;*/
+    color: #000;
     display: inline-block;
-    margin-left: 5pt;
-    padding: 2pt;
+    margin-left: 3pt;
+    padding: 1pt;
     text-align: center;
-    text-decoration: none;
+    /*text-decoration: none;*/
+}
+
+.notFound {
+    margin: 40pt;
+    font-size: 120%;
 }
 
 .navLink {

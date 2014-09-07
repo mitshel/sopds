@@ -1,6 +1,9 @@
 <html>
     <head>
+        <title>Поиск</title>
         <link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
+        <link rel="stylesheet" type="text/css" media="all" href="css/icons.css" />
+        <script type="text/javascript" src="js/common.js"></script>
     </head>
 <body>
 
@@ -39,16 +42,13 @@
             {% endfor %}
             {% include '_includes/nav_links.html' %}
         {% else  %}
-            Ничего не найдено.
+            <div class=notFound>Ничего не найдено.</div>
         {% endif %}
     </div>
 {% endif %}
 
+{% include '_includes/footer.html' %}
 
-
-    <div class=footer>
-        OPDS URL:<a href={{env.opds.url}}/{{ env.opds.query }}>{{env.opds.url}}/{{ env.opds.query }}</a>
-    </footer>
-    </div>
+</div>
 </body>
 </html>

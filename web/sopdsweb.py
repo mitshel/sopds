@@ -17,6 +17,7 @@ import urllib.request
 import xml.sax
 import re
 import jinja2
+import time
 
 from pprint import pprint
 
@@ -217,6 +218,9 @@ class Response:
     #********************************************
     def process(self):
 
+        if self.url.startswith('_'):
+            return self.send404()
+
         if self.url == '/env.html':
             return self.sendEnv()
 
@@ -260,10 +264,18 @@ class Response:
         fileName = config.WEB_ROOT_DIR + "/" + self.templatePath + url
 
         (mimeType, mimeEncoding)  = mime.guess_type(fileName)
+
+        if mimeType == None:
+            mimeType = 'application/octet-stream'
+
+        if mimeEncoding == None:
+            mimeEncoding = 'binary'
+
         f = open(fileName, 'rb')
 
         headers = [('Content-type', mimeType),
-                   ('Content-Length', "%d" % os.path.getsize(fileName))
+                   ('Content-Length', "%d" % os.path.getsize(fileName)),
+                   ('Cache-control',  "private, max-age = 360000")
                   ]
 
         lines = f.readlines()
@@ -306,6 +318,9 @@ class Response:
             jinjaEnv.globals['urlQuote'] = urllib.parse.quote
             jinjaEnv.globals['urlUnquote'] = urllib.parse.unquote
 
+            jinjaEnv.filters['dateTimeFormat']  = self.jinjaDateTimeFormat
+            jinjaEnv.filters['strToDateTime']   = self.jinjaStrToDateTime
+
             jinjaTemplate = jinjaEnv.get_template(url)
 
             res = jinjaTemplate.render(variables)
@@ -317,7 +332,8 @@ class Response:
 
         except (jinja2.TemplateSyntaxError,
                 jinja2.UndefinedError,
-                TypeError
+                TypeError,
+                ValueError
                ) as e:
             traceback.print_exc()
             return self.sendError("Template error", "%s" % e)
@@ -337,7 +353,6 @@ class Response:
                                   config.OPDS_PORT,
                                   request)
 
-        print(url)
         opds = OpdsDocument(url)
         return opds.variables
 
@@ -357,7 +372,7 @@ class Response:
         def repl(template, key, value):
             if isinstance(value, list):
                 value = value[0]
-            print("* %s (%s), %s (%s)" % (key, type(key), value, type(value)))
+
             template = template.replace('{%s}'  % key, urllib.parse.quote(value))
             template = template.replace('{%s?}' % key, urllib.parse.quote(value))
             return template
@@ -380,8 +395,6 @@ class Response:
     #
     #********************************************
     def jinjaParseSearchLink(self, link):
-
-
         href = urllib.parse.unquote(link['href'])
         if href.startswith('?'):
             href = href[1:]
@@ -451,6 +464,18 @@ class Response:
         return result
 
 
+    #********************************************
+    #
+    #********************************************
+    def jinjaStrToDateTime(self, value, format='%Y-%m-%dT%H:%M:%SZ'):
+        return time.strptime(value, format)
+
+
+    #********************************************
+    #
+    #********************************************
+    def jinjaDateTimeFormat(self, value, format='%H:%M / %d-%m-%Y'):
+        return time.strftime(format, value)
 
 
 #************************************************
@@ -489,12 +514,10 @@ class Config:
         self.WEB_BIND_ADDRESS=""
         self.WEB_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
         self.WEB_THEME = 'e-ink'
-        self.WEB_INDEX_TEMPLATE = 'index.html'
 
         self.OPDS_PROTO     = 'http'
         self.OPDS_HOST      = 'localhost'
         self.OPDS_PORT      = 8081
-        self.OPDS_ROOT_LINK = "?00"
 
 
 config = Config()
