@@ -1,0 +1,6 @@
+<div class=footer>
+    {% if opds %}
+        {{ opds.feed.subtitle }}<p>
+        OPDS URL: <a href={{env.opds.url}}/{{ env.opds.query }}>{{env.opds.url}}/{{ env.opds.query }}</a>
+    {% endif %}
+</div>
