@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import base64
-#from urllib import parse
 from wsgiref.simple_server import make_server
 from wsgiref.simple_server import WSGIRequestHandler
-#import sopdscfg
+import sopdscfg
 from wsgiref.util import setup_testing_defaults
 import traceback
 
@@ -147,26 +146,35 @@ class OpdsDocument:
 
 
 
-class Response:
+class WebResponse:
     #********************************************
     #
     #********************************************
-    def __init__(self, environ, start_response):
+    def __init__(self, config, environ, start_response):
+        self.config = config
         self.environ = environ
         self.start_response = start_response
-        self.url = self.environ['PATH_INFO']
-        self.templatePath = "templates/" + config.WEB_THEME
-        self.parseQueryString(environ['QUERY_STRING'])
 
-        self.opdsHost = config.OPDS_HOST
+        self.opdsProto = 'http'
+        self.opdsPort = config.PORT
+        if config.BIND_ADDRESS == '0.0.0.0':
+            self.opdsHost = 'localhost'
+        else:
+            self.opdsHost = config.BIND_ADDRESS
+
         if ((self.opdsHost == 'localhost') or
             (self.opdsHost.startsWith("127."))):
             self.opdsHost = self.environ['HTTP_HOST'].replace(":%d" % config.WEB_PORT, '')
 
+        self.url = self.environ['PATH_INFO']
+        self.templatePath = os.path.join(config.WEB_TEMPLATES_DIR, config.WEB_THEME)
+        self.parseQueryString(environ['QUERY_STRING'])
+
+
         self.opdsUrl= "%s://%s:%d" % (
-                        config.OPDS_PROTO,
+                        self.opdsProto,
                         self.opdsHost,
-                        config.OPDS_PORT)
+                        self.opdsPort)
 
 
     #********************************************
@@ -242,15 +250,14 @@ class Response:
             return self.sendEnv()
 
         url = self.url
-        webRoot = config.WEB_ROOT_DIR + "/" + self.templatePath;
 
-        if os.path.isdir(webRoot  + url):
+        if os.path.isdir(self.templatePath + url):
             if url.endswith("/"):
                 url += "index.html"
             else:
                 url += "/index.html"
 
-        if os.path.isfile(webRoot + url):
+        if os.path.isfile(self.templatePath + url):
             if url.endswith(".html"):
                 return self.sendTemplate(url)
             else:
@@ -279,7 +286,7 @@ class Response:
     #
     #********************************************
     def sendStatic(self, url):
-        fileName = config.WEB_ROOT_DIR + "/" + self.templatePath + url
+        fileName = self.templatePath + url
 
         (mimeType, mimeEncoding)  = mime.guess_type(fileName)
 
@@ -318,13 +325,13 @@ class Response:
         variables['env']['opds'] = {}
 
         variables['env']['opds']['host']   = self.opdsHost
-        variables['env']['opds']['port']   = "%d" % config.OPDS_PORT
+        variables['env']['opds']['port']   = "%d" % self.opdsPort
         variables['env']['opds']['url']    = self.opdsUrl
         variables['env']['opds']['query']  = ("?" + self.environ['QUERY_STRING'], '') [self.environ['QUERY_STRING'] == ""]
 
         try:
             jinjaEnv = jinja2.Environment(
-                loader=jinja2.PackageLoader('sopdsweb', self.templatePath),
+                loader=jinja2.FileSystemLoader(self.templatePath),
                 undefined = jinja2.DebugUndefined
                 )
 
@@ -380,10 +387,10 @@ class Response:
     #
     #********************************************
     def opdsRequest(self, request):
-        url = "%s://%s:%d%s" % ( config.OPDS_PROTO,
-                                  config.OPDS_HOST,
-                                  config.OPDS_PORT,
-                                  request)
+        url = "%s://%s:%d%s" % ( self.opdsProto,
+                                 self.opdsHost,
+                                 self.opdsPort,
+                                 request)
 
         (user, password) = self.getUserPass()
         opds = OpdsDocument(url, user, password)
@@ -511,54 +518,58 @@ class Response:
         return time.strftime(format, value)
 
 
-#************************************************
-#
-#************************************************
-def serve(environ, start_response):
-    response = Response(environ, start_response)
-    return response.process();
-
 
 #************************************************
 #
 #************************************************
-def start_server(config):
+class WebServer:
 
-    try:
-       httpd = make_server(config.WEB_BIND_ADDRESS,
-                           config.WEB_PORT,
-                           serve)
+    #********************************************
+    #
+    #********************************************
+    def __init__(self, config):
+        self.config = config
 
-       print('Started Simple OPDS WEB server on port ', config.WEB_PORT)
-       httpd.serve_forever()
 
-    except KeyboardInterrupt:
-       print('^C received, shutting down the web server')
-       httpd.socket.close()
+    #********************************************
+    #
+    #********************************************
+    def serve(self, environ, start_response):
+        response = WebResponse(self.config, environ, start_response)
+        return response.process();
+
+
+    #********************************************
+    #
+    #********************************************
+    def start(self, ):
+        try:
+            httpd = make_server(self.config.WEB_BIND_ADDRESS,
+                                self.config.WEB_PORT,
+                                self.serve)
+
+            print('Started Simple OPDS WEB server on port ', self.config.WEB_PORT)
+            httpd.serve_forever()
+
+        except KeyboardInterrupt:
+            print('^C received, shutting down the web server')
+            httpd.socket.close()
 
 
 
 #************************************************
 #
 #************************************************
-class Config:
-    def __init__(self):
-        self.WEB_PORT = 8082
-        self.WEB_BIND_ADDRESS=""
-        self.WEB_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-        self.WEB_THEME = 'e-ink'
+def start_server(config = None):
+    if not config:
+        config=sopdscfg.cfgreader()
 
-        self.OPDS_PROTO     = 'http'
-        self.OPDS_HOST      = 'localhost'
-        self.OPDS_PORT      = 8081
+    server = WebServer(config)
+    server.start()
 
-
-config = Config()
 
 #************************************************
 #
 #************************************************
 if __name__ == "__main__":
-    #config=sopdscfg.cfgreader()
-    config = Config()
-    start_server(config)
+    start_server()
