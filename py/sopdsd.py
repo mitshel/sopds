@@ -338,8 +338,6 @@ class WebDaemon(Daemon):
 #*******************************************
 if __name__ == "__main__":
     cfg=sopdscfg.cfgreader()
-    cfg.HTTPD_PID_FILE = "/home/sokoloff/HTTPD_PID_FILE.pid"
-    cfg.PID_FILE = "/home/sokoloff/SCAN_PID_FILE.pid"
 
     daemonTool = DaemonTool(cfg)
 
