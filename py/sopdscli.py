@@ -13,6 +13,8 @@ import base64
 import subprocess
 import zipf
 from urllib import parse
+import urllib
+import html
 
 modeCGI  = 0
 modeWSGI = 1
@@ -62,6 +64,18 @@ def opensearch(script):
             </OpenSearchDescription>'''.format(script)
     return code
 
+
+#######################################################################
+#
+# Информация об OPDS ссылке
+#
+class opdsLinkInfo():
+    def __init__(self):
+        self.kind = ""
+        self.type = ""
+        self.responseProc = None
+
+
 #######################################################################
 #
 # Основной класс OPDS-клиента
@@ -78,6 +92,7 @@ class opdsClient():
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
 
     def resetParams(self):
+        self.query = ''
         self.id_value='0'
         self.type_value=0
         self.slice_value=0
@@ -93,7 +108,11 @@ class opdsClient():
         self.response_headers=[]
         self.response_body=[]
 
-    def parseParams(self,qs):
+    def parseParams(self,query):
+        self.query = query
+
+        qs = parse.parse_qs(query)
+
         if 'id' in qs:
            self.id_value=qs.get("id")[0]
         else:
@@ -109,6 +128,7 @@ class opdsClient():
            if page.isdigit():
               self.page_value=int(page)
 
+        searchType=''
         if 'searchType' in qs:
            searchType=qs.get("searchType")[0].strip()
            if searchType=='books': self.type_value=71
@@ -120,6 +140,8 @@ class opdsClient():
            if self.type_value!=71 and self.type_value!=72 and self.type_value!=73: self.type_value=7
            self.slice_value=-1
            self.id_value='%02d&amp;searchTerm=%s'%(self.type_value,self.searchTerm)
+           if searchType:
+              self.id_value+="&amp;searchType=%s" % searchType
         else:
            self.searchTerm=''
 
@@ -141,7 +163,7 @@ class opdsClient():
         self.user=user
 
     def add_response_body(self, string='', encoding='utf8'):
-        self.response_body+=[string.encode(encoding)]
+        self.response_body+=[(string + "\n").encode(encoding)]
 
     def add_response_binary(self, data):
         self.response_body+=[data]
@@ -170,13 +192,18 @@ class opdsClient():
         self.add_response_header([('Content-Type','text/xml; charset='+charset)])
         self.add_response_body('<?xml version="1.0" encoding="'+charset+'"?>')
         self.add_response_body('<feed xmlns="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/terms/" xmlns:os="http://a9.com/-/spec/opensearch/1.1/" xmlns:opds="http://opds-spec.org/2010/catalog">')
-        self.add_response_body('<id>%s</id>'%h_id)
-        self.add_response_body('<title>%s</title>'%h_title)
-        self.add_response_body('<subtitle>%s</subtitle>'%h_subtitle)
+        self.add_response_body('<id>%s</id>' % html.escape(h_id))
+        self.add_response_body('<title>%s</title>' % html.escape(h_title))
+        self.add_response_body('<subtitle>%s</subtitle>' % html.escape(h_subtitle))
         self.add_response_body('<updated>'+time.strftime("%Y-%m-%dT%H:%M:%SZ")+'</updated>')
-        self.add_response_body('<icon>'+self.cfg.SITE_ICON+'</icon>')
-        self.add_response_body('<author><name>'+self.cfg.SITE_AUTOR+'</name><uri>'+self.cfg.SITE_URL+'</uri><email>'+self.cfg.SITE_EMAIL+'</email></author>')
-        self.add_response_body('<link type="application/atom+xml" rel="start" href="'+self.modulePath+'?id=00"/>')
+        self.add_response_body('<icon>'+html.escape(self.cfg.SITE_ICON)+'</icon>')
+        self.add_response_body('<author><name>%s</name><uri>%s</uri><email>%s</email></author>' % (
+            html.escape(self.cfg.SITE_AUTOR),
+            html.escape(self.cfg.SITE_URL),
+            html.escape(self.cfg.SITE_EMAIL)))
+        self.add_response_body('<link type="application/atom+xml" rel="start" href="%s?id=00"/>' % html.escape(self.modulePath))
+        linkInfo = self.link_info(self.type_value)
+        self.add_response_body('<link rel="self" href="%s?%s" type="%s"/>' %(self.modulePath, urllib.parse.quote(self.query), linkInfo.type))
 
     def footer(self):
         self.add_response_body('</feed>')
@@ -590,7 +617,7 @@ class opdsClient():
         self.footer()
 
     def response_last(self):
-        """ Cортировка 'Последние поступления' """  
+        """ Cортировка 'Последние поступления' """
         self.header('id:news','Последние поступления за %s дней'%self.cfg.NEW_PERIOD)
         self.new_menu()
         self.footer()
@@ -830,6 +857,7 @@ class opdsClient():
            self.add_response_header([('Content-Length',str(len(buf)))])
            self.add_response_binary(buf)
 
+
     def response_book_convert(self):
         """ Выдача файла книги после конвертации в EPUB или mobi """
         (book_name,book_path,reg_date,format,title,annotation,docdate,cat_type,cover,cover_type,fsize)=self.opdsdb.getbook(self.slice_value)
@@ -859,7 +887,7 @@ class opdsClient():
            file_path=tmp_fb2_path
 
         tmp_conv_path=os.path.join(self.cfg.TEMP_DIR,transname)
-        proc = subprocess.Popen(("%s %s %s"%(converter_path,("\"%s\""%file_path),"\"%s\""%tmp_conv_path)).encode('utf8'), shell=True, stdout=subprocess.PIPE)
+        proc = subprocess.Popen("%s %s %s"%(converter_path,("\"%s\""%file_path),"\"%s\""%tmp_conv_path), shell=True, stdout=subprocess.PIPE)
         out = proc.stdout.readlines()
 
         if os.path.isfile(tmp_conv_path):
@@ -925,69 +953,172 @@ class opdsClient():
         self.add_response_header([('Content-Type','text/xml')])
         self.add_response_body(opensearch(self.modulePath))
 
+
+    def link_info(self, type_value):
+        result = opdsLinkInfo()
+
+        if type_value==0:
+            result.responseProc = self.response_main
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==1:
+            result.responseProc = self.response_catalogs
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        #...................................
+        elif type_value==2:
+            result.responseProc = self.response_authors
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==12 or type_value==72:
+            result.responseProc = self.response_authors_search
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==22 and self.np==0:
+            result.responseProc = self.response_authors_submenu
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==31:
+            result.responseProc = self.response_authors_series
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==33:
+            result.responseProc = self.response_authors_alpha
+            result.kind = "acquisition"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+
+        elif type_value==22 and self.np!=0:
+            result.responseProc = self.response_authors_alpha
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==34:
+            result.responseProc = self.response_authors_series_books
+            result.kind = "acquisition"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+
+
+        #...................................
+        elif type_value==3:
+            result.responseProc = self.response_titles
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==13 or type_value==71:
+            result.responseProc = self.response_titles_search
+            result.kind = "acquisition"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+
+        elif type_value==23:
+            result.responseProc = self.response_doubles
+            result.kind = "acquisition"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+
+
+        #...................................
+        elif type_value==4:
+            result.responseProc = self.response_genres_sections
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==14:
+            result.responseProc = self.response_genres_subsections
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==24:
+            result.responseProc = self.response_genres_books
+            result.kind = "acquisition"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+
+
+        #...................................
+        elif type_value==5:
+            result.responseProc = self.response_last
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+
+        #...................................
+        elif type_value==6:
+            result.responseProc = self.response_series
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==16 or type_value==73:
+            result.responseProc = self.response_series_search
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+        elif type_value==26:
+            result.responseProc = self.response_series_books
+            result.kind = "acquisition"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+
+
+        #...................................
+        elif type_value==7:
+            result.responseProc = self.response_search_type
+            result.kind = ""
+            result.type = "application/opensearchdescription+xml"
+
+        elif type_value==8:
+            result.responseProc = self.response_bookshelf
+            result.kind = "acquisition"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+
+        elif type_value==30:
+            result.responseProc = self.response_alpha
+            result.kind = "navigation"
+            result.type = "application/atom+xml;profile=opds-catalog;kind=navigation"
+
+
+        #...................................
+        elif type_value==9:
+            result.responseProc = self.response_search
+            result.kind = ""
+            result.type = "application/opensearchdescription+xml"
+
+
+        #...................................
+        elif type_value==91:
+            result.responseProc = self.response_book_file
+            result.kind = "download"
+            result.type = "application/fb2"
+
+        elif type_value==92:
+            result.responseProc = self.response_book_zip
+            result.kind = "download"
+            result.type = "application/fb2+zip"
+
+        elif type_value==93:
+            result.responseProc = self.response_book_convert
+            result.kind = "download"
+            result.type = "application/epub+zip"
+
+        elif type_value==94:
+            result.responseProc = self.response_book_convert
+            result.kind = "download"
+            result.type = "application/x-mobipocket-ebook"
+
+        elif type_value==99:
+            result.responseProc = self.response_book_cover
+            result.kind = "cover"
+            result.type = "image/jpeg"
+
+        return result
+
     def make_response(self):
         self.opdsdb.openDB()
 
-        if self.type_value==0:
-           self.response_main()
-        elif self.type_value==1:
-           self.response_catalogs()
+        linkInfo = self.link_info(self.type_value)
+        linkInfo.responseProc()
 
-        elif self.type_value==2:
-           self.response_authors()
-        elif self.type_value==12 or self.type_value==72:
-           self.response_authors_search()
-        elif self.type_value==22 and self.np==0:
-           self.response_authors_submenu()
-        elif self.type_value==31:
-           self.response_authors_series()
-        elif self.type_value==33 or (self.type_value==22 and self.np!=0):
-           self.response_authors_alpha()
-        elif self.type_value==34:
-           self.response_authors_series_books()
-
-        elif self.type_value==3:
-           self.response_titles()
-        elif self.type_value==13 or self.type_value==71:
-           self.response_titles_search()
-        elif self.type_value==23:
-           self.response_doubles()
-
-        elif self.type_value==4:
-           self.response_genres_sections()
-        elif self.type_value==14:
-           self.response_genres_subsections()
-        elif self.type_value==24:
-           self.response_genres_books()
-
-        elif self.type_value==5:
-           self.response_last()
-
-        elif self.type_value==6:
-           self.response_series()
-        elif self.type_value==16 or self.type_value==73:
-           self.response_series_search()
-        elif self.type_value==26:
-           self.response_series_books()
-
-        elif self.type_value==7:
-           self.response_search_type()
-        elif self.type_value==8:
-           self.response_bookshelf()
-        elif self.type_value==30:
-           self.response_alpha()
-
-        elif self.type_value==9:
-           self.response_search()
-
-        elif self.type_value==91:
-           self.response_book_file()
-        elif self.type_value==92:
-           self.response_book_zip()
-        elif self.type_value==93 or self.type_value==94:
-           self.response_book_convert()
-        elif self.type_value==99:
-           self.response_book_cover()
-        
         self.opdsdb.closeDB()
 

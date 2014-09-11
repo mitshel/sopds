@@ -1,0 +1,12 @@
+{% for link in opds.feed.link %}
+    {% if link.rel == "prev" %}
+        <a href="{{link.href}}" class="navLink prev">&lt;&lt; Предыдущая</a>
+    {% endif %}
+{% endfor %}
+&nbsp;&nbsp;
+{% for link in opds.feed.link %}
+    {% if link.rel == "next" %}
+        <a href="{{link.href}}" class="navLink next">Следующая &gt;&gt;</a>
+    {% endif %}
+{% endfor %}
+

@@ -1,0 +1,20 @@
+<div class=acquisition_entry>
+<h2><a onclick="showHide('content_{{entry.id}}');">{{ entry.title }}
+    <i id='content_{{entry.id}}_downbtn' class="icon icon-chevron-down"></i>
+    <i id='content_{{entry.id}}_upbtn'   class="icon icon-chevron-up" style='display: none;'></i>
+    </a></h2>
+{% if entry.author %}<div class="author"><b>Авторы:</b> {% for author in entry.author %}{{ author.name }} {%endfor %}</div>{%endif%}
+{% if entry.category %}<div class="category"><b>Жанры:</b> {% for category in entry.category %}{{ category.label or category.term }} {%endfor%}</div>{%endif%}
+<div id='content_{{entry.id}}' style="display: none;">{{ entry.content or '' }}</div>
+<div class=acquisition_downloads>
+<b>Скачать:</b>
+    {% for link in getDownloadLinks(entry) %}
+        <a href="{{link.href}}"><i class= "icon icon-download"></i>
+            {{link.type |
+            replace("application/", "") | 
+            replace("epub+zip", "epub") |
+            replace("mobi+zip", "mobi") |
+            replace("fb2+zip",  "fb2.zip") }}</a>
+    {% endfor %}
+</div>
+</div>
