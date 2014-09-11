@@ -46,8 +46,8 @@ def app(environ, start_response):
        sopds.add_response_header([('WWW-Authenticate', 'Basic realm=\"%s\"'%cfg.SITE_TITLE)])
        sopds.add_response_header([('Content-type', 'text/html')])
 
-   start_response(sopds.response_status, sopds.response_headers)
-   return sopds.response_body
+   start_response(sopds.get_response_status(), sopds.get_response_headers())
+   return sopds.get_response_body()
 
 def start_server(config):
     global sopds

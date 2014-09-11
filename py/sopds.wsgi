@@ -28,7 +28,7 @@ def app(environ, start_response):
    sopds.parseParams(qs)
    sopds.setUser(user)
    sopds.make_response()
-   start_response(sopds.response_status, sopds.response_headers)
-   return sopds.response_body
+   start_response(sopds.get_response_status(), sopds.get_response_headers())
+   return sopds.get_response_body()
 
 application = app
