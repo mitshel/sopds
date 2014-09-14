@@ -1,4 +1,5 @@
 import sopdscfg
+import datetime
 
 class opdsTemplate():
     def __init__(self, modulepath, charset='utf-8'):
@@ -13,9 +14,11 @@ class opdsTemplate():
                                <updated>%%(updated)s</updated>
                                <icon>%%(site_icon)s</icon>
                                <author><name>%%(site_author)s</name><uri>%%(site_url)s</uri><email>%%(site_email)s</email></author>
-                               <link type="application/atom+xml" rel="start" href="%(modulepath)s?id=00"/>'''%{'charset':self.charset,'modulepath':self.modulepath}
+                               <link type="application/atom+xml" rel="start" href="%(modulepath)s?id=00"/>
+                               '''%{'charset':self.charset,'modulepath':self.modulepath}
        self.document_footer='''</feed>'''
-       self.document_mainmenu_std='''<link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />
+       self.document_mainmenu_std='''
+                               <link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />
                                <link href="%(modulepath)s?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />
                                <entry>
                                <title>По каталогам</title>
@@ -41,33 +44,71 @@ class opdsTemplate():
                                <title>По Сериям</title>
                                <content type="text">Серий: %%(series_num)s.</content>
                                <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s06"/>
-                               <id>id:06</id></entry>'''%{'modulepath':self.modulepath}
-       self.document_mainmenu_new='''<entry>
+                               <id>id:06</id></entry>
+                               '''%{'modulepath':self.modulepath}
+       self.document_mainmenu_new='''
+                               <entry>
                                <title>Новинки за %%(new_period)s суток</title>
                                <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=05"/>
-                               <id>id:05</id></entry>'''%{'modulepath':self.modulepath}
-       self.document_mainmenu_shelf='''<entry>
+                               <id>id:05</id></entry>
+                               '''%{'modulepath':self.modulepath}
+       self.document_mainmenu_shelf='''
+                               <entry>
                                <title>Книжная полка для %%(user)s</title>
                                <content type="text">Книг: %%(book_num)s.</content>
                                <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=08"/>
-                               <id>id:08</id></entry>'''%{'modulepath':self.modulepath}
-       self.document_newmenu='''<entry>
-        <title>Все новинки за %%(new_period)s суток</title>
-        <content type="text">Новых книг: %%(newbook_num)s.</content>
-        <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s03&amp;news=1"/>
-        <id>id:03:news</id></entry>
-        <entry>
-        <title>Новинки по авторам</title>
-        <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s02&amp;news=1"/>
-        <id>id:02:news</id></entry>
-        <entry>
-        <title>Новинки по Жанрам</title>
-        <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=04&amp;news=1"/>
-        <id>id:04:news</id></entry>
-        <entry>
-        <title>Новинки по Сериям</title>
-        <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s06&amp;news=1"/>
-        <id>id:06:news</id></entry>'''%{'modulepath':self.modulepath}
+                               <id>id:08</id></entry>
+                               '''%{'modulepath':self.modulepath}
+       self.document_newmenu='''
+                               <entry>
+                               <title>Все новинки за %%(new_period)s суток</title>
+                               <content type="text">Новых книг: %%(newbook_num)s.</content>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s03&amp;news=1"/>
+                               <id>id:03:news</id></entry>
+                               <entry>
+                               <title>Новинки по авторам</title>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s02&amp;news=1"/>
+                               <id>id:02:news</id></entry>
+                               <entry>
+                               <title>Новинки по Жанрам</title>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=04&amp;news=1"/>
+                               <id>id:04:news</id></entry>
+                               <entry>
+                               <title>Новинки по Сериям</title>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s06&amp;news=1"/>
+                               <id>id:06:news</id></entry>
+                               '''%{'modulepath':self.modulepath}
+       self.document_authors_submenu='''
+                               <entry>
+                               <title>Книги по сериям</title>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=31%%(author_id)s"/>
+                               <id>id:31:authors</id></entry>
+                               <entry>
+                               <title>Книги вне серий</title>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=34%%(author_id)s"/>
+                               <id>id:32:authors</id></entry>
+                               <entry>
+                               <title>Книги по алфавиту</title>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=33%%(author_id)s"/>
+                               <id>id:33:authors</id></entry>
+                               '''%{'modulepath':self.modulepath}
+       self.document_entry_start='''<entry>'''
+       self.document_entry_finish='''</entry>'''
+       self.document_entry_head='''
+                               <title>%(e_title)s</title>
+                               <updated>%(e_date)s</updated>
+                               <id>id:%(e_id)s</id>
+                               '''
+       self.document_entry_link_subsection='''
+                               <link type="application/atom+xml" rel="alternate" href="%(modulepath)s?id=%%(link_id)s%%(nl)s"/>
+                               <link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="%(modulepath)s?id=%%(link_id)s%%(nl)s"/>
+                               '''%{'modulepath':self.modulepath}
+       self.document_entry_link_book_alternate='''
+                               <link type="application/%%(format)s" rel="alternate" href="%(modulepath)s?id=91%%(link_id)s"/>
+                               '''%{'modulepath':self.modulepath}
+       self.document_entry_link_book='''
+                               <link type="application/%%(format)s" href="%(modulepath)s?id=%%(id)s%%(link_id)s" rel="http://opds-spec.org/acquisition" />
+                               '''%{'modulepath':self.modulepath}
 
 
 
@@ -134,19 +175,27 @@ class baseWrapper():
         self.add_response_body(self.template.document_newmenu%{'new_period':self.cfg.NEW_PERIOD,'newbook_num':NEWINFO[0][1],'alphabet_id':am})
 
     def authors_submenu(self,author_id):
-        pass
+        self.add_response_body(self.template.document_authors_submenu%{'author_id':author_id})
 
     def entry_start(self):
-        pass
+        self.add_response_body(self.template.document_entry_start)
 
     def entry_head(self,e_title,e_date,e_id):
-        pass
+        if e_date==None:
+           e_date=datetime.datetime(2001,9,9,0,0,0)
+        self.add_response_body(self.template.document_entry_head%{'e_title':e_title,'e_date':e_date.strftime("%Y-%m-%dT%H:%M:%S"),'e_id':e_id})
 
-    def entry_link_subsection(self,link_id,modulePath):
-        pass
+    def entry_link_subsection(self,link_id,nl):
+        self.add_response_body(self.template.document_entry_link_subsection%{'link_id':link_id,'nl':nl})
 
-    def entry_link_book(self,link_id,format,modulePath):
-        pass
+    def entry_link_book(self,link_id,format):
+        self.add_response_body(self.template.document_entry_link_book_alternate%{'format':format,'link_id':link_id})
+        if format.lower()=='fb2' and self.cfg.FB2TOEPUB:
+           self.add_response_body(self.template.document_entry_link_book%{'id':93,'format':'epub','link_id':link_id})
+        if format.lower()=='fb2' and self.cfg.FB2TOMOBI:
+           self.add_response_body(self.template.document_entry_link_book%{'id':94,'format':'mobi','link_id':link_id})
+        self.add_response_body(self.template.document_entry_link_book%{'id':91,'format':format,'link_id':link_id})
+        self.add_response_body(self.template.document_entry_link_book%{'id':92,'format':format+'.zip','link_id':link_id})
 
     def entry_authors(self,book_id,tupleAITHORS,link_show=False):
         authors=''
@@ -173,7 +222,7 @@ class baseWrapper():
         pass
 
     def entry_finish(self):
-        pass
+        self.add_response_body(self.template.document_entry_finish)
 
     def page_control(self, page, link_id, modulePath):
         pass
