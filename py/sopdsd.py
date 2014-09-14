@@ -269,6 +269,7 @@ class ScanDaemon(Daemon):
         self.stdout  = self.cfg.SCAND_LOGFILE
         self.stderr  = self.cfg.SCAND_LOGFILE
         self.enabled = self.cfg.SCAN_DAEMON
+        self.start_scan=False
 
 
     #***************************************
