@@ -13,6 +13,7 @@ import base64
 import subprocess
 import zipf
 import sopdswrap
+import sopdstempl
 from urllib import parse
 
 modeCGI  = 0
@@ -78,7 +79,7 @@ class opdsClient():
            self.modulePath=self.cfg.CGI_PATH
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
 
-        self.template1=sopdswrap.opdsTemplate(self.modulePath)
+        self.template1=sopdstempl.opdsTemplate(self.modulePath)
         self.opdsWrapper=sopdswrap.baseWrapper(self.cfg, self.template1)
 
     def resetParams(self):
