@@ -143,9 +143,10 @@ class webTemplate(opdsTemplate):
                                '<title>%%(title)s/>%%(subtitle)s</title>'
                                '</head>'
                                '<body>'
-                               )%{'charset':self.charset,'modulepath':self.modulepath}
+                               )
        self.document_footer='</body>'
-       self.document_mainmenu_std=('<link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />'
+       self.document_mainmenu_std=('<
+                               ('<link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />'
                                '<link href="%(modulepath)s?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />'
                                '<entry>'
                                '<title>По каталогам</title>'
