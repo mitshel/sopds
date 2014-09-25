@@ -86,10 +86,13 @@ class baseWrapper():
            e_date=datetime.datetime(2001,9,9,0,0,0)
         self.add_response_body(self.template.document_entry_head%{'e_title':e_title,'e_date':e_date.strftime("%Y-%m-%dT%H:%M:%S"),'e_id':e_id})
 
-    def entry_link_subsection(self,link_id,nl):
-        self.add_response_body(self.template.document_entry_link_subsection%{'link_id':link_id,'nl':nl})
+    def entry_link_subsection(self,link_id,nl,e_title=None,e_date=None,e_id=None):
+        self.add_response_body(self.template.document_entry_link_subsection%{'link_id':link_id,'nl':nl,'e_title':e_title,'e_date':e_date,'e_id':e_id})
 
-    def entry_link_book(self,link_id,format):
+    def entry_link_book(self,link_id,format,e_title=None,e_date=None,e_id=None):
+        if e_date==None:
+           e_date=datetime.datetime(2001,9,9,0,0,0)
+        self.add_response_body(self.template.document_entry_book_head%{'e_title':e_title,'e_date':e_date.strftime("%Y-%m-%dT%H:%M:%S"),'e_id':e_id})
         self.add_response_body(self.template.document_entry_link_book_alternate%{'format':format,'link_id':link_id})
         if format.lower()=='fb2' and self.cfg.FB2TOEPUB:
            self.add_response_body(self.template.document_entry_link_book%{'id':93,'format':'epub','link_id':link_id})

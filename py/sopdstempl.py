@@ -92,6 +92,7 @@ class opdsTemplate():
        self.document_entry_link_subsection=('<link type="application/atom+xml" rel="alternate" href="%(modulepath)s?id=%%(link_id)s%%(nl)s"/>'
                                '<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="%(modulepath)s?id=%%(link_id)s%%(nl)s"/>'
                                )%{'modulepath':self.modulepath}
+       self.document_entry_book_head=''
        self.document_entry_link_book_alternate=('<link type="application/%%(format)s" rel="alternate" href="%(modulepath)s?id=91%%(link_id)s"/>'
                                )%{'modulepath':self.modulepath}
        self.document_entry_link_book=('<link type="application/%%(format)s" href="%(modulepath)s?id=%%(id)s%%(link_id)s" rel="http://opds-spec.org/acquisition" />'
@@ -199,15 +200,14 @@ class webTemplate(opdsTemplate):
                                )%{'modulepath':self.modulepath}
        self.document_entry_start='<div class=navigation_entry>'
        self.document_entry_finish='</div>'
-       self.document_entry_head=('<title>%(e_title)s</title>'
+       self.document_entry_head=('<!--<title>%(e_title)s</title>'
                                '<updated>%(e_date)s</updated>'
-                               '<id>id:%(e_id)s</id>')
-       self.document_entry_link_subsection=('<link type="application/atom+xml" rel="alternate" href="%(modulepath)s?id=%%(link_id)s%%(nl)s"/>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="%(modulepath)s?id=%%(link_id)s%%(nl)s"/>'
+                               '<id>id:%(e_id)s</id>-->')
+       self.document_entry_link_subsection=('<h2><a href="%(modulepath)s?id=%%(link_id)s%%(nl)s">%%(e_title)s</a></h2><i></i>'
                                )%{'modulepath':self.modulepath}
-       self.document_entry_link_book_alternate=('<link type="application/%%(format)s" rel="alternate" href="%(modulepath)s?id=91%%(link_id)s"/>'
-                               )%{'modulepath':self.modulepath}
-       self.document_entry_link_book=('<link type="application/%%(format)s" href="%(modulepath)s?id=%%(id)s%%(link_id)s" rel="http://opds-spec.org/acquisition" />'
+       self.document_entry_book_head=('<h2>%(e_title)s</h2>')
+       self.document_entry_link_book_alternate=''
+       self.document_entry_link_book=('<i><a href="%(modulepath)s?id=%%(id)s%%(link_id)s">%%(format)s</a></i>&nbsp;'
                                )%{'modulepath':self.modulepath}
        self.document_entry_authors=('<author><name>%%(last_name)s %%(first_name)s</name></author>'
                                '<link href="%(modulepath)s?id=22%%(author_id)s" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги %%(last_name)s %%(first_name)s" />'
