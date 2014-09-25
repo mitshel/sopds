@@ -137,53 +137,43 @@ class webTemplate(opdsTemplate):
     def __init__(self, modulepath, charset='utf-8'):
        self.charset=charset
        self.modulepath=modulepath
-       self.response_header=('Content-Type','text/xml; charset='+self.charset)
+       self.response_header=('Content-Type','text/html; charset='+self.charset)
+       self.document_style='''
+                           <style>
+                               body {font-family: Tahoma, Geneva, sans-serif; font-size: 8pt; color: #000; max-width: 840px; margin: 0; padding: 0; }
+                               h1 {font-size: 140%%; margin-bottom: 30px; }
+                               h2 {font-size: 120%%; }
+                               h2 a { color: #000; }
+                               a {color: #0F3253;}
+                               input, button {vertical-align: middle;border-radius: 2pt;}
+                               input {border: 1pt solid #676767;}
+                               button {border: 1pt solid #676767; background-color: #EEE; }
+                               .page { padding: 0 40px 20px 40px; }
+                               .footer {padding-top: 15pt; border-top: 2pt dotted #AAA; margin-top: 20pt; }
+                               .navigation_entry {margin-left: 20pt; }
+                               .navigation_entry h2 {display: inline-block;margin: 2pt 20pt 6pt -15pt; }
+                            </style>
+                            '''
        self.document_header=('<html>'
                                '<head>'
-                               '<title>%%(title)s/>%%(subtitle)s</title>'
+                               '<meta charset=%(charset)s>'
+                               '<title>%%(title)s</title>'
+                               '%(style)s'
                                '</head>'
                                '<body>'
-                               )
-       self.document_footer='</body>'
-       self.document_mainmenu_std=('<
-                               ('<link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />'
-                               '<link href="%(modulepath)s?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />'
-                               '<entry>'
-                               '<title>По каталогам</title>'
-                               '<content type="text">Каталогов: %%(cat_num)s, книг: %%(book_num)s.</content>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=01"/>'
-                               '<id>id:01</id></entry>'
-                               '<entry>'
-                               '<title>По авторам</title>'
-                               '<content type="text">Авторов: %%(author_num)s.</content>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s02"/>'
-                               '<id>id:02</id></entry>'
-                               '<entry>'
-                               '<title>По наименованию</title>'
-                               '<content type="text">Книг: %%(book_num)s.</content>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s03"/>'
-                               '<id>id:03</id></entry>'
-                               '<entry>'
-                               '<title>По Жанрам</title>'
-                               '<content type="text">Жанров: %%(genre_num)s.</content>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=04"/>'
-                               '<id>id:04</id></entry>'
-                               '<entry>'
-                               '<title>По Сериям</title>'
-                               '<content type="text">Серий: %%(series_num)s.</content>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s06"/>'
-                               '<id>id:06</id></entry>'
+                               '<div class=page>'
+                               '<h1>%%(subtitle)s</h1>'
+                               )%{'charset':self.charset,'style':self.document_style}
+       self.document_footer='</div></body>'
+       self.document_mainmenu_std=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=01">По каталогам</a></h2><i>Каталогов: %%(cat_num)s, книг: %%(book_num)s.</i></div>'
+                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(alphabet_id)s02">По авторам</a></h2><i>Авторов: %%(author_num)s.</i></div>'
+                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(alphabet_id)s03">По наименованию</a></h2><i>Книг: %%(book_num)s.</i></div>'
+                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=04">По жанрам</a></h2><i>Жанров: %%(genre_num)s.</i></div>'
+                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(alphabet_id)s06">По сериям</a></h2><i>Серий: %%(series_num)s.</i></div>'
                                )%{'modulepath':self.modulepath}
-       self.document_mainmenu_new=('<entry>'
-                               '<title>Новинки за %%(new_period)s суток</title>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=05"/>'
-                               '<id>id:05</id></entry>'
+       self.document_mainmenu_new=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=05">Новинки за %%(new_period)s суток.</a></h2><i></i></div>'
                                )%{'modulepath':self.modulepath}
-       self.document_mainmenu_shelf=('<entry>'
-                               '<title>Книжная полка для %%(user)s</title>'
-                               '<content type="text">Книг: %%(shelf_book_num)s.</content>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=08"/>'
-                               '<id>id:08</id></entry>'
+       self.document_mainmenu_shelf=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=08">Книжная полка для %%(user)s.</a></h2><i></i></div>'
                                )%{'modulepath':self.modulepath}
        self.document_newmenu=('<entry>'
                                '<title>Все новинки за %%(new_period)s суток</title>'
@@ -203,21 +193,12 @@ class webTemplate(opdsTemplate):
                                '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(alphabet_id)s06&amp;news=1"/>'
                                '<id>id:06:news</id></entry>'
                                )%{'modulepath':self.modulepath}
-       self.document_authors_submenu=('<entry>'
-                               '<title>Книги по сериям</title>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=31%%(author_id)s"/>'
-                               '<id>id:31:authors</id></entry>'
-                               '<entry>'
-                               '<title>Книги вне серий</title>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=34%%(author_id)s"/>'
-                               '<id>id:32:authors</id></entry>'
-                               '<entry>'
-                               '<title>Книги по алфавиту</title>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=33%%(author_id)s"/>'
-                               '<id>id:33:authors</id></entry>'
+       self.document_authors_submenu=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=31%%(author_id)s">Книги по сериям</a></h2><i></i></div>'
+                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=34%%(author_id)s">Книги вне серий</a></h2><i></i></div>'
+                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=33%%(author_id)s">Книги по алфавиту</a></h2><i></i></div>'
                                )%{'modulepath':self.modulepath}
-       self.document_entry_start='<entry>'
-       self.document_entry_finish='</entry>'
+       self.document_entry_start='<div class=navigation_entry>'
+       self.document_entry_finish='</div>'
        self.document_entry_head=('<title>%(e_title)s</title>'
                                '<updated>%(e_date)s</updated>'
                                '<id>id:%(e_id)s</id>')
@@ -253,11 +234,11 @@ class webTemplate(opdsTemplate):
        self.document_entry_content2_annotation='&lt;p class=book&gt; %(annotation)s&lt;/p&gt;'
        self.document_entry_content2_finish='</content>'
 
-       self.document_alphabet_menu=('<entry><title>А..Я (РУС)</title><id>alpha:1</id><link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(iid)s&amp;alpha=1%%(nl)s"/></entry>'
-                                    '<entry><title>0..9 (Цифры)</title><id>alpha:2</id><link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(iid)s&amp;alpha=2%%(nl)s"/></entry>'
-                                    '<entry><title>A..Z (ENG)</title><id>alpha:3</id><link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(iid)s&amp;alpha=3%%(nl)s"/></entry>'
-                                    '<entry><title>Другие Символы</title><id>alpha:4</id><link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(iid)s&amp;alpha=4%%(nl)s"/></entry>'
-                                    '<entry><title>Показать все</title><id>alpha:5</id><link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%%(iid)s&amp;alpha=5%%(nl)s"/></entry>'
+       self.document_alphabet_menu=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(iid)s&amp;alpha=1%%(nl)s">А..Я (РУС)</a></h2><i></i></div>'
+                                    '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(iid)s&amp;alpha=2%%(nl)s">0..9 (Цифры)</a></h2><i></i></div>'
+                                    '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(iid)s&amp;alpha=3%%(nl)s">A..Z (ENG)</a></h2><i></i></div>'
+                                    '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(iid)s&amp;alpha=4%%(nl)s">Другие символы</a></h2><i></i></div>'
+                                    '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(iid)s&amp;alpha=5%%(nl)s">Показать все</a></h2><i></i></div>'
                                     )%{'modulepath':self.modulepath}
 
        self.document_page_control_prev=('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="prev" title="Previous Page" href="%(modulepath)s?id=%%(link_id)s&amp;page=%%(page)s" />'

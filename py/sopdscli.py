@@ -82,6 +82,12 @@ class opdsClient():
         self.template1=sopdstempl.opdsTemplate(self.modulePath)
         self.opdsWrapper=sopdswrap.baseWrapper(self.cfg, self.template1)
 
+        self.template2=sopdstempl.webTemplate(self.modulePath)
+        self.webWrapper=sopdswrap.baseWrapper(self.cfg, self.template2)
+
+        self.Wrapper=self.opdsWrapper
+
+
     def resetParams(self):
         self.id_value='0'
         self.type_value=0
@@ -94,12 +100,15 @@ class opdsClient():
         self.nl=''
         self.searchTerm=''
         self.user=None
+        self.method=0
 #        self.response_status='200 Ok'
 #        self.response_headers=[]
 #        self.response_body=[]
         self.opdsWrapper.resetParams()
+        self.webWrapper.resetParams()
 
-    def parseParams(self,qs):
+    def parseParams(self,qs,method=0):
+        self.method=method
         if 'id' in qs:
            self.id_value=qs.get("id")[0]
         else:
@@ -143,101 +152,106 @@ class opdsClient():
            if ser.isdigit():
               self.ser_value=int(ser)
 
+        if self.method==1:
+           self.Wrapper=self.webWrapper
+        else:
+           self.Wrapper=self.opdsWrapper
+
     def setUser(self,user):
         self.user=user
 
     def add_response_body(self, string='', encoding='utf8'):
-        self.opdsWrapper.add_response_body(string,encoding)
+        self.Wrapper.add_response_body(string,encoding)
 
     def add_response_binary(self, data):
-        self.opdsWrapper.add_response_binary(data)
+        self.Wrapper.add_response_binary(data)
 
     def add_response_header(self,list):
-        self.opdsWrapper.add_response_header(list)
+        self.Wrapper.add_response_header(list)
 
     def set_response_status(self,status):
-        self.opdsWrapper.set_response_status(status)
+        self.Wrapper.set_response_status(status)
 
     def write_response_headers(self, encoding='utf8'):
-        self.opdsWrapper.write_response_headers(encoding)
+        self.Wrapper.write_response_headers(encoding)
 
     def write_response(self):
-        self.opdsWrapper.write_response()
+        self.Wrapper.write_response()
 
     def get_response_status(self):
-        return self.opdsWrapper.response_status
+        return self.Wrapper.response_status
 
     def get_response_headers(self):
-        return self.opdsWrapper.response_headers
+        return self.Wrapper.response_headers
 
     def get_response_body(self):
-        return self.opdsWrapper.response_body
+        return self.Wrapper.response_body
 
     def header(self, h_id=None, h_title=None, h_subtitle=None,charset='utf-8'):
         if h_id==None: h_id=self.cfg.SITE_ID
         if h_title==None: h_title=self.cfg.SITE_TITLE
         if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru. Version '+sopdscfg.VERSION
-        self.opdsWrapper.header(h_id,h_title,h_subtitle,time.strftime("%Y-%m-%dT%H:%M:%SZ"))
+        self.Wrapper.header(h_id,h_title,h_subtitle,time.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
     def footer(self):
-        self.opdsWrapper.footer()
+        self.Wrapper.footer()
 
     def main_menu(self):
         dbinfo=self.opdsdb.getdbinfo(self.cfg.DUBLICATES_SHOW,self.cfg.BOOK_SHELF,self.user)
-        self.opdsWrapper.main_menu(self.user,dbinfo)
+        self.Wrapper.main_menu(self.user,dbinfo)
 
     def new_menu(self):
         newinfo=self.opdsdb.getnewinfo(self.cfg.DUBLICATES_SHOW,self.cfg.NEW_PERIOD)
-        self.opdsWrapper.new_menu(newinfo)
+        self.Wrapper.new_menu(newinfo)
 
     def authors_submenu(self,author_id):
-        self.opdsWrapper.authors_submenu(author_id)
+        self.Wrapper.authors_submenu(author_id)
 
     def entry_start(self):
-        self.opdsWrapper.entry_start()
+        self.Wrapper.entry_start()
 
     def entry_head(self,e_title,e_date,e_id):
-        self.opdsWrapper.entry_head(e_title,e_date,e_id)
+        self.Wrapper.entry_head(e_title,e_date,e_id)
 
     def entry_link_subsection(self,link_id):
-         self.opdsWrapper.entry_link_subsection(link_id,self.nl)
+         self.Wrapper.entry_link_subsection(link_id,self.nl)
 
     def entry_link_book(self,link_id,format):
-         self.opdsWrapper.entry_link_book(link_id,format)
+         self.Wrapper.entry_link_book(link_id,format)
 
     def entry_authors(self,book_id,link_show=False):
-        return self.opdsWrapper.entry_authors(self.opdsdb.getauthors(book_id))
+        return self.Wrapper.entry_authors(self.opdsdb.getauthors(book_id))
 
     def entry_doubles(self,book_id):
-        self.opdsWrapper.entry_doubles(book_id,self.opdsdb.getdoublecount(book_id))
+        self.Wrapper.entry_doubles(book_id,self.opdsdb.getdoublecount(book_id))
 
     def entry_genres(self,book_id):
-        return self.opdsWrapper.entry_genres(self.opdsdb.getgenres(book_id))
+        return self.Wrapper.entry_genres(self.opdsdb.getgenres(book_id))
 
     def entry_series(self,book_id):
-        return self.opdsWrapper.entry_series(self.opdsdb.getseries(book_id))
+        return self.Wrapper.entry_series(self.opdsdb.getseries(book_id))
 
     def entry_covers(self,cover,cover_type,book_id):
         if self.cfg.COVER_SHOW!=0:
-           self.opdsWrapper.entry_covers(book_id)
+           self.Wrapper.entry_covers(book_id)
 
     def entry_content(self,e_content):
-        self.opdsWrapper.entry_content(e_content)
+        self.Wrapper.entry_content(e_content)
 
     def entry_content2(self,annotation='',title='',authors='',genres='',filename='',filesize=0,docdate='',series=''):
-         self.opdsWrapper.entry_content2(annotation,title,authors,genres,filename,filesize,docdate,series)
+         self.Wrapper.entry_content2(annotation,title,authors,genres,filename,filesize,docdate,series)
 
     def entry_finish(self):
-        self.opdsWrapper.entry_finish()
+        self.Wrapper.entry_finish()
 
     def page_control(self, page, link_id):
         if page>0:
-           self.opdsWrapper.page_control_prev(page,link_id)
+           self.Wrapper.page_control_prev(page,link_id)
         if self.opdsdb.next_page:
-           self.opdsWrapper.page_control_next(page,link_id)
+           self.Wrapper.page_control_next(page,link_id)
 
     def alphabet_menu(self,iid_value):
-        self.opdsWrapper.alphabet_menu(iid_value,self.nl) 
+        self.Wrapper.alphabet_menu(iid_value,self.nl) 
 
     def response_main(self):
         self.header()
