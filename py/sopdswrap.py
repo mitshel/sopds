@@ -110,6 +110,17 @@ class baseWrapper():
             authors+=last_name+' '+first_name
         return authors
 
+    def get_authors(self,tupleAUTHORS):
+        authors=""
+        authors_link=""
+        for (author_id,first_name,last_name) in tupleAUTHORS:
+            authors_link+=self.template.document_link_authors%{'author_id':author_id,'last_name':websym(last_name,True),'first_name':websym(first_name,True)}
+            if len(authors)>0:
+               authors+=', '
+            authors+=last_name+' '+first_name
+        return (authors, authors_link)
+
+
     def entry_doubles(self,book_id,dcount):
         if dcount>0:
            self.add_response_body(self.template.document_entry_doubles%{'book_id':book_id})
@@ -123,6 +134,15 @@ class baseWrapper():
             genres+=genre
         return genres
 
+    def get_genres(self,tupleGENRES):
+        genres=""
+        genres_link=""
+        for (section,genre) in tupleGENRES:
+            genres_link+=self.template.document_link_genres%{'genre':genre}
+            if len(genres)>0:
+                  genres+=', '
+            genres+=genre
+        return (genres, genres_link)
 
     def entry_series(self,tupleSERIES):
         series=""
@@ -134,6 +154,18 @@ class baseWrapper():
             if ser_no > 0:
                   series += ' #' + str(ser_no)
         return series
+
+    def get_series(self,tupleSERIES):
+        series=""
+        series_link=""
+        for (ser,ser_no) in tupleSERIES:
+            series_link+=self.template.document_link_series%{'ser':ser,'ser_no':ser_no}
+            if len(series)>0:
+                  series+=', '
+            series+=ser
+            if ser_no > 0:
+                  series += ' #' + str(ser_no)
+        return (series, series_link)
 
     def entry_covers(self,book_id):
         self.add_response_body(self.template.document_entry_covers%{'book_id':book_id})
@@ -161,9 +193,59 @@ class baseWrapper():
            self.add_response_body(self.template.document_entry_content2_annotation%{'annotation':websym(annotation)})
         self.add_response_body(self.template.document_entry_content2_finish)    
 
-
     def entry_finish(self):
         self.add_response_body(self.template.document_entry_finish)
+
+    def entry_acq_link_book(self,acq_data):
+        data=acq_data.copy()
+        if data['e_date']==None:
+           data['e_date']=datetime.datetime(2001,9,9,0,0,0)
+        self.add_response_body(self.template.document_entry_acq_book_title%data)
+        self.add_response_body(self.template.document_entry_acq_book_link_alternate%data)
+        data['id']=91
+        self.add_response_body(self.template.document_entry_acq_book_link%data)
+        data['id']=92
+        data['format']=data['format']+'.zip'
+        self.add_response_body(self.template.document_entry_acq_book_link%data)
+        if acq_data['format'].lower()=='fb2' and self.cfg.FB2TOEPUB:
+           data['id']=93
+           data['format']='epub'
+           self.add_response_body(self.template.document_entry_acq_book_link%data)
+        if acq_data['format'].lower()=='fb2' and self.cfg.FB2TOMOBI:
+           data['id']=94
+           data['format']='mobi'
+           self.add_response_body(self.template.document_entry_acq_book_link%data)
+
+    def entry_acq_info_book(self,acq_data):
+        self.add_response_body(self.template.document_entry_acq_infobook_start)
+        if acq_data['e_title']!='':
+           self.add_response_body(self.template.document_entry_acq_infobook_title%acq_data)
+        if acq_data['authors']!='':
+           self.add_response_body(self.template.document_entry_acq_infobook_authors%acq_data)
+        if acq_data['genres']!='':
+           self.add_response_body(self.template.document_entry_acq_infobook_genres%acq_data)
+        if acq_data['series']!='':
+           self.add_response_body(self.template.document_entry_acq_infobook_series%acq_data)
+        if acq_data['filename']!='':
+           self.add_response_body(self.template.document_entry_acq_infobook_filename%acq_data)
+        if acq_data['filesize']>0:
+           self.add_response_body(self.template.document_entry_acq_infobook_filesize%acq_data)
+        if acq_data['docdate']!='':
+           self.add_response_body(self.template.document_entry_acq_infobook_docdate%acq_data)
+        if acq_data['annotation']!='':
+           self.add_response_body(self.template.document_entry_acq_infobook_annotation%acq_data)
+        self.add_response_body(self.template.document_entry_acq_infobook_finish)
+
+    def entry_acquisition(self,acq_data):
+        self.add_response_body(self.template.document_entry_acq_start%acq_data)
+        self.add_response_body(self.template.document_entry_acq_link_start%acq_data)
+        self.entry_acq_link_book(acq_data)
+        self.add_response_body(self.template.document_entry_acq_link_finish%acq_data)
+        self.add_response_body(self.template.document_entry_acq_info_start%acq_data)
+        self.add_response_body(self.template.document_entry_acq_info_cover%acq_data)
+        self.entry_acq_info_book(acq_data)
+        self.add_response_body(self.template.document_entry_acq_info_finish%acq_data)
+        self.add_response_body(self.template.document_entry_acq_finish%acq_data)
 
     def page_control_prev(self, page, link_id):
            self.add_response_body(self.template.document_page_control_prev%{'link_id':link_id,'page':page-1})

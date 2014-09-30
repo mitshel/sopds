@@ -100,10 +100,13 @@ class opdsTemplate():
        self.document_entry_authors=('<author><name>%%(last_name)s %%(first_name)s</name></author>'
                                '<link href="%(modulepath)s?id=22%%(author_id)s" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги %%(last_name)s %%(first_name)s" />'
                                )%{'modulepath':self.modulepath}
+       self.document_link_authors=self.document_entry_authors
        self.document_entry_doubles=('<link href="%(modulepath)s?id=23%%(book_id)s" rel="related" type="application/atom+xml;profile=opds-catalog" title="Дубликаты книги" />'
                                )%{'modulepath':self.modulepath}
        self.document_entry_genres='<category term="%(genre)s" label="%(genre)s" />'
+       self.document_link_genres=self.document_entry_genres
        self.document_entry_series='' 
+       self.document_link_series=self.document_entry_series
        self.document_entry_covers=('<link href="%(modulepath)s?id=99%%(book_id)s" rel="http://opds-spec.org/image" type="image/jpeg" />'
                                '<link href="%(modulepath)s?id=99%%(book_id)s" rel="x-stanza-cover-image" type="image/jpeg" />'
                                '<link href="%(modulepath)s?id=99%%(book_id)s" rel="http://opds-spec.org/thumbnail"  type="image/jpeg" />'
@@ -151,19 +154,24 @@ class webTemplate(opdsTemplate):
                                button {border: 1pt solid #676767; background-color: #EEE; }
                                .page { padding: 0 40px 20px 40px; }
                                .footer {padding-top: 15pt; border-top: 2pt dotted #AAA; margin-top: 20pt; }
-                               .navigation_entry {margin-left: 20pt; }
+                               .navigation_entry {margin-left: 20pt;}
                                .navigation_entry h2 {display: inline-block;margin: 2pt 20pt 6pt -15pt; }
+                               .acquisition_entry { width: 100%% }
+                               .acq_link { clear: both; width: 100%%; }
+                               .acq_cover { float: left; width: 20%%; }
+                               .acq_infobook  { float: left; width: 80%%; }
+                               .acq_info_container { clear: both; width: 100%%; }
                             </style>
                             '''
        self.document_header=('<html>'
                                '<head>'
                                '<meta charset=%(charset)s>'
-                               '<title>%%(title)s</title>'
+                               '<title>%%(subtitle)s</title>'
                                '%(style)s'
                                '</head>'
                                '<body>'
                                '<div class=page>'
-                               '<h1>%%(subtitle)s</h1>'
+                               '<h1>%%(title)s</h1>'
                                )%{'charset':self.charset,'style':self.document_style}
        self.document_footer='</div></body>'
        self.document_mainmenu_std=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=01">По каталогам</a></h2><i>Каталогов: %%(cat_num)s, книг: %%(book_num)s.</i></div>'
@@ -205,34 +213,35 @@ class webTemplate(opdsTemplate):
                                '<id>id:%(e_id)s</id>-->')
        self.document_entry_link_subsection=('<h2><a href="%(modulepath)s?id=%%(link_id)s%%(nl)s">%%(e_title)s</a></h2><i></i>'
                                )%{'modulepath':self.modulepath}
-       self.document_entry_book_head=('<h2>%(e_title)s</h2>')
+       self.document_entry_book_head=('<h2>%(e_title)s</h2> <i>Скачать в формате: </i>')
        self.document_entry_link_book_alternate=''
        self.document_entry_link_book=('<i><a href="%(modulepath)s?id=%%(id)s%%(link_id)s">%%(format)s</a></i>&nbsp;'
                                )%{'modulepath':self.modulepath}
        self.document_entry_authors=('<author><name>%%(last_name)s %%(first_name)s</name></author>'
                                '<link href="%(modulepath)s?id=22%%(author_id)s" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги %%(last_name)s %%(first_name)s" />'
                                )%{'modulepath':self.modulepath}
+       self.document_link_authors=('<a href="%(modulepath)s?id=22%%(author_id)s">%%(last_name)s %%(first_name)s</a>'
+                               )%{'modulepath':self.modulepath}
        self.document_entry_doubles=('<link href="%(modulepath)s?id=23%%(book_id)s" rel="related" type="application/atom+xml;profile=opds-catalog" title="Дубликаты книги" />'
                                )%{'modulepath':self.modulepath}
-       self.document_entry_genres='<category term="%(genre)s" label="%(genre)s" />'
+       self.document_entry_genres=''
+       self.document_link_genres=''
        self.document_entry_series=''
-       self.document_entry_covers=('<link href="%(modulepath)s?id=99%%(book_id)s" rel="http://opds-spec.org/image" type="image/jpeg" />'
-                               '<link href="%(modulepath)s?id=99%%(book_id)s" rel="x-stanza-cover-image" type="image/jpeg" />'
-                               '<link href="%(modulepath)s?id=99%%(book_id)s" rel="http://opds-spec.org/thumbnail"  type="image/jpeg" />'
-                               '<link href="%(modulepath)s?id=99%%(book_id)s" rel="x-stanza-cover-image-thumbnail"  type="image/jpeg" />'
+       self.document_link_series=''
+       self.document_entry_covers=('<br><img src="%(modulepath)s?id=99%%(book_id)s" type="image/jpeg" width="80">'
                                )%{'modulepath':self.modulepath}
-       self.document_entry_content='<content type="text">%(e_content)s</content>'
-       self.document_entry_content2_start='<content type="text/html">'
-       self.document_entry_content2_title='&lt;b&gt;Название книги:&lt;/b&gt; %(title)s&lt;br/&gt;'
-       self.document_entry_content2_authors='&lt;b&gt;Авторы:&lt;/b&gt; %(authors)s&lt;br/&gt;'
-       self.document_entry_content2_genres='&lt;b&gt;Жанры:&lt;/b&gt; %(genres)s&lt;br/&gt;'
-       self.document_entry_content2_series='&lt;b&gt;Серии:&lt;/b&gt; %(series)s&lt;br/&gt;'
-       self.document_entry_content2_filename='&lt;b&gt;Файл:&lt;/b&gt; %(filename)s&lt;br/&gt;'
-       self.document_entry_content2_filename='&lt;b&gt;Файл:&lt;/b&gt; %(filename)s&lt;br/&gt;'
-       self.document_entry_content2_filesize='&lt;b&gt;Размер файла:&lt;/b&gt; %(filesize)sКб.&lt;br/&gt;'
-       self.document_entry_content2_docdate='&lt;b&gt;Дата правки:&lt;/b&gt; %(docdate)s&lt;br/&gt;'
-       self.document_entry_content2_annotation='&lt;p class=book&gt; %(annotation)s&lt;/p&gt;'
-       self.document_entry_content2_finish='</content>'
+       self.document_entry_content='<i>%(e_content)s</i>'
+       self.document_entry_content2_start='<div style="content">'
+       self.document_entry_content2_title='<b>Название книги:</b> %(title)s<br>'
+       self.document_entry_content2_authors='<b>Авторы:</b> %(authors)s<br>'
+       self.document_entry_content2_genres='<b>Жанры:</b> %(genres)s<br>'
+       self.document_entry_content2_series='<b>Серии:</b> %(series)s<br>'
+       self.document_entry_content2_filename='<b>Файл:</b> %(filename)s<br>'
+       self.document_entry_content2_filename='<b>Файл:</b> %(filename)s<br>'
+       self.document_entry_content2_filesize='<b>Размер файла:</b> %(filesize)sКб.<br>'
+       self.document_entry_content2_docdate='<b>Дата правки:</b> %(docdate)s<br>'
+       self.document_entry_content2_annotation='<p class="annotation">%(annotation)s</p>'
+       self.document_entry_content2_finish='</div>'
 
        self.document_alphabet_menu=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(iid)s&amp;alpha=1%%(nl)s">А..Я (РУС)</a></h2><i></i></div>'
                                     '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%%(iid)s&amp;alpha=2%%(nl)s">0..9 (Цифры)</a></h2><i></i></div>'
@@ -245,4 +254,33 @@ class webTemplate(opdsTemplate):
                                )%{'modulepath':self.modulepath}
        self.document_page_control_next=('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="next" title="Next Page" href="%(modulepath)s?id=%%(link_id)s&amp;page=%%(page)s" />'
                                )%{'modulepath':self.modulepath}
+
+
+       self.document_entry_acq_start='<br><div class=acquisition_entry>\n'
+       self.document_entry_acq_link_start='<div class=acq_link>'
+       self.document_entry_acq_book_title=('<h2>%(e_title)s</h2> <i>Скачать в формате: </i>')
+       self.document_entry_acq_book_link_alternate=''
+       self.document_entry_acq_book_link=('<i><a href="%(modulepath)s?id=%%(id)s%%(link_id)s">%%(format)s</a></i>&nbsp;'
+                               )%{'modulepath':self.modulepath}
+       self.document_entry_acq_link_finish='</div>'
+
+       self.document_entry_acq_info_start='<div class=acq_info_container>\n'
+
+       self.document_entry_acq_info_cover=('<div class=acq_cover><img src="%(modulepath)s?id=99%%(link_id)s" type="image/jpeg" width="80"></div>'
+                               )%{'modulepath':self.modulepath}
+
+       self.document_entry_acq_infobook_start='<div class=acq_infobook>'
+       self.document_entry_acq_infobook_title='<b>Название книги:</b> %(e_title)s<br>'
+       self.document_entry_acq_infobook_authors='<b>Авторы:</b> %(authors_link)s<br>'
+       self.document_entry_acq_infobook_genres='<b>Жанры:</b> %(genres)s<br>'
+       self.document_entry_acq_infobook_series='<b>Серии:</b> %(series)s<br>'
+       self.document_entry_acq_infobook_filename='<b>Файл:</b> %(filename)s<br>'
+       self.document_entry_acq_infobook_filesize='<b>Размер файла:</b> %(filesize)sКб.<br>'
+       self.document_entry_acq_infobook_docdate='<b>Дата правки:</b> %(docdate)s<br>'
+       self.document_entry_acq_infobook_annotation='<p class="annotation">%(annotation)s</p>'
+       self.document_entry_acq_infobook_finish='</div>'
+
+       self.document_entry_acq_info_finish='</div>'
+
+       self.document_entry_acq_finish='</div>'
 

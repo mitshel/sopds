@@ -222,18 +222,30 @@ class opdsClient():
     def entry_authors(self,book_id,link_show=False):
         return self.Wrapper.entry_authors(self.opdsdb.getauthors(book_id))
 
+    def get_authors(self,book_id):
+        return self.Wrapper.get_authors(self.opdsdb.getauthors(book_id))
+
     def entry_doubles(self,book_id):
         self.Wrapper.entry_doubles(book_id,self.opdsdb.getdoublecount(book_id))
 
     def entry_genres(self,book_id):
         return self.Wrapper.entry_genres(self.opdsdb.getgenres(book_id))
 
+    def get_genres(self,book_id):
+        return self.Wrapper.get_genres(self.opdsdb.getgenres(book_id))
+
     def entry_series(self,book_id):
         return self.Wrapper.entry_series(self.opdsdb.getseries(book_id))
+
+    def get_series(self,book_id):
+        return self.Wrapper.get_series(self.opdsdb.getseries(book_id))
 
     def entry_covers(self,cover,cover_type,book_id):
         if self.cfg.COVER_SHOW!=0:
            self.Wrapper.entry_covers(book_id)
+
+    def entry_acquisition(self,acq_data):
+        self.Wrapper.entry_acquisition(acq_data)
 
     def entry_content(self,e_content):
         self.Wrapper.entry_content(e_content)
@@ -269,12 +281,19 @@ class opdsClient():
                self.entry_link_subsection(id, item_title, reg_date, 'item:%s'%(item_id))
             if item_type==2:
                id='90'+str(item_id)
-               self.entry_link_book(item_id,format,item_title, reg_date, 'item:%s'%(item_id))
-               self.entry_covers(cover,cover_type,item_id)
-               authors=self.entry_authors(item_id,True)
-               genres=self.entry_genres(item_id)
-               series=self.entry_series(item_id)
-               self.entry_content2(annotation,item_title,authors,genres,item_name,fsize,docdate,series)
+#               self.entry_link_book(item_id,format,item_title, reg_date, 'item:%s'%(item_id))
+#               self.entry_covers(cover,cover_type,item_id)
+#               authors=self.entry_authors(item_id,True)
+#               genres=self.entry_genres(item_id)
+#               series=self.entry_series(item_id)
+#               self.entry_content2(annotation,item_title,authors,genres,item_name,fsize,docdate,series)
+               (authors, authors_link) = self.get_authors(item_id)
+               (genres,  genres_link)  = self.get_genres(item_id)
+               (series,  series_link)  = self.get_series(item_id)
+               acq_data={'link_id':item_id,'filename':item_name,'e_date':reg_date,'e_title':websym(item_title),'e_id':'item:%s'%(item_id),
+                         'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                         'authors':websym(authors),'genres':websym(genres),'series':websym(series),'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link}
+               self.entry_acquisition(acq_data)
             self.entry_finish()
         self.page_control(self.page_value,self.id_value)
         self.footer()
