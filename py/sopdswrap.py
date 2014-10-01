@@ -78,123 +78,47 @@ class baseWrapper():
     def authors_submenu(self,author_id):
         self.add_response_body(self.template.document_authors_submenu%{'author_id':author_id})
 
-    def entry_start(self):
-        self.add_response_body(self.template.document_entry_start)
-
-    def entry_head(self,e_title,e_date,e_id):
-        if e_date==None:
-           e_date=datetime.datetime(2001,9,9,0,0,0)
-        self.add_response_body(self.template.document_entry_head%{'e_title':e_title,'e_date':e_date.strftime("%Y-%m-%dT%H:%M:%S"),'e_id':e_id})
-
-    def entry_link_subsection(self,link_id,nl,e_title=None,e_date=None,e_id=None):
-        self.add_response_body(self.template.document_entry_link_subsection%{'link_id':link_id,'nl':nl,'e_title':e_title,'e_date':e_date,'e_id':e_id})
-
-    def entry_link_book(self,link_id,format,e_title=None,e_date=None,e_id=None):
-        if e_date==None:
-           e_date=datetime.datetime(2001,9,9,0,0,0)
-        self.add_response_body(self.template.document_entry_book_head%{'e_title':e_title,'e_date':e_date.strftime("%Y-%m-%dT%H:%M:%S"),'e_id':e_id})
-        self.add_response_body(self.template.document_entry_link_book_alternate%{'format':format,'link_id':link_id})
-        if format.lower()=='fb2' and self.cfg.FB2TOEPUB:
-           self.add_response_body(self.template.document_entry_link_book%{'id':93,'format':'epub','link_id':link_id})
-        if format.lower()=='fb2' and self.cfg.FB2TOMOBI:
-           self.add_response_body(self.template.document_entry_link_book%{'id':94,'format':'mobi','link_id':link_id})
-        self.add_response_body(self.template.document_entry_link_book%{'id':91,'format':format,'link_id':link_id})
-        self.add_response_body(self.template.document_entry_link_book%{'id':92,'format':format+'.zip','link_id':link_id})
-
-    def entry_authors(self,tupleAUTHORS):
-        authors=""
-        for (author_id,first_name,last_name) in tupleAUTHORS:
-            self.add_response_body(self.template.document_entry_authors%{'author_id':author_id,'last_name':websym(last_name,True),'first_name':websym(first_name,True)})
-            if len(authors)>0:
-               authors+=', '
-            authors+=last_name+' '+first_name
-        return authors
-
     def get_authors(self,tupleAUTHORS):
         authors=""
         authors_link=""
         for (author_id,first_name,last_name) in tupleAUTHORS:
-            authors_link+=self.template.document_link_authors%{'author_id':author_id,'last_name':websym(last_name,True),'first_name':websym(first_name,True)}
-            if len(authors)>0:
-               authors+=', '
-            authors+=last_name+' '+first_name
+            authors_link+=self.template.agregate_authors_link%{'author_id':author_id,'last_name':websym(last_name,True),'first_name':websym(first_name,True)}
+            authors+=self.template.agregate_authors%{'author_id':author_id,'last_name':websym(last_name,True),'first_name':websym(first_name,True)}
+#            if len(authors)>0:
+#               authors+=', '
+#            authors+=last_name+' '+first_name
         return (authors, authors_link)
-
-
-    def entry_doubles(self,book_id,dcount):
-        if dcount>0:
-           self.add_response_body(self.template.document_entry_doubles%{'book_id':book_id})
-
-    def entry_genres(self,tupleGENRES):
-        genres=""
-        for (section,genre) in tupleGENRES:
-            self.add_response_body(self.template.document_entry_genres%{'genre':genre})
-            if len(genres)>0:
-                  genres+=', '
-            genres+=genre
-        return genres
 
     def get_genres(self,tupleGENRES):
         genres=""
         genres_link=""
-        for (section,genre) in tupleGENRES:
-            genres_link+=self.template.document_link_genres%{'genre':genre}
-            if len(genres)>0:
-                  genres+=', '
-            genres+=genre
+        for (genre_id,section,genre) in tupleGENRES:
+            genres_link+=self.template.agregate_genres_link%{'genre_id':genre_id,'genre':websym(genre)}
+            genres+=self.template.agregate_genres%{'genre_id':genre_id,'genre':websym(genre)}
+#            if len(genres)>0:
+#                  genres+=', '
+#            genres+=genre
         return (genres, genres_link)
-
-    def entry_series(self,tupleSERIES):
-        series=""
-        for (ser,ser_no) in tupleSERIES:
-            self.add_response_body(self.template.document_entry_series%{'ser':ser,'ser_no':ser_no})
-            if len(series)>0:
-                  series+=', '
-            series+=ser
-            if ser_no > 0:
-                  series += ' #' + str(ser_no)
-        return series
 
     def get_series(self,tupleSERIES):
         series=""
         series_link=""
-        for (ser,ser_no) in tupleSERIES:
-            series_link+=self.template.document_link_series%{'ser':ser,'ser_no':ser_no}
-            if len(series)>0:
-                  series+=', '
-            series+=ser
-            if ser_no > 0:
-                  series += ' #' + str(ser_no)
+        for (ser_id,ser,ser_no) in tupleSERIES:
+            series_link+=self.template.agregate_series_link%{'ser_id':ser_id,'ser':websym(ser),'ser_no':ser_no}
+            series+=self.template.agregate_series%{'ser_id':ser_id,'ser':websym(ser),'ser_no':ser_no}
+#            if len(series)>0:
+#                  series+=', '
+#            series+=ser
+#            if ser_no > 0:
+#                  series += ' #' + str(ser_no)
         return (series, series_link)
 
-    def entry_covers(self,book_id):
-        self.add_response_body(self.template.document_entry_covers%{'book_id':book_id})
-
-    def entry_content(self,e_content):
-        self.add_response_body(self.template.document_entry_content%{'e_content':websym(e_content)})
-
-    def entry_content2(self,annotation='',title='',authors='',genres='',filename='',filesize=0,docdate='',series=''):
-        self.add_response_body(self.template.document_entry_content2_start)
-        if title!='':
-           self.add_response_body(self.template.document_entry_content2_title%{'title':websym(title)})
-        if authors!='':
-           self.add_response_body(self.template.document_entry_content2_authors%{'authors':websym(authors)})
-        if genres!='':
-           self.add_response_body(self.template.document_entry_content2_genres%{'genres':websym(genres)})
-        if series!='':
-           self.add_response_body(self.template.document_entry_content2_series%{'series':websym(series)})
-        if filename!='':
-           self.add_response_body(self.template.document_entry_content2_filename%{'filename':websym(filename)})
-        if filesize>0:
-           self.add_response_body(self.template.document_entry_content2_filesize%{'filesize':str(filesize//1024)})
-        if docdate!='':
-           self.add_response_body(self.template.document_entry_content2_docdate%{'docdate':docdate})
-        if annotation!='':
-           self.add_response_body(self.template.document_entry_content2_annotation%{'annotation':websym(annotation)})
-        self.add_response_body(self.template.document_entry_content2_finish)    
-
-    def entry_finish(self):
-        self.add_response_body(self.template.document_entry_finish)
+    def entry_navigation(self,nav_data):
+        self.add_response_body(self.template.document_entry_nav_start%nav_data)
+        self.add_response_body(self.template.document_entry_nav_title%nav_data)
+        self.add_response_body(self.template.document_entry_nav_link%nav_data)
+        self.add_response_body(self.template.document_entry_nav_info%nav_data)
+        self.add_response_body(self.template.document_entry_nav_finish%nav_data)
 
     def entry_acq_link_book(self,acq_data):
         data=acq_data.copy()
@@ -234,7 +158,12 @@ class baseWrapper():
            self.add_response_body(self.template.document_entry_acq_infobook_docdate%acq_data)
         if acq_data['annotation']!='':
            self.add_response_body(self.template.document_entry_acq_infobook_annotation%acq_data)
+        self.add_response_body(self.template.document_entry_acq_infobook_userdata%acq_data)
         self.add_response_body(self.template.document_entry_acq_infobook_finish)
+
+    def entry_acq_rel_doubles(self,acq_data):
+        if acq_data['dcount']>0:
+           self.add_response_body(self.template.document_entry_acq_rel_doubles%acq_data)
 
     def entry_acquisition(self,acq_data):
         self.add_response_body(self.template.document_entry_acq_start%acq_data)
@@ -244,6 +173,11 @@ class baseWrapper():
         self.add_response_body(self.template.document_entry_acq_info_start%acq_data)
         self.add_response_body(self.template.document_entry_acq_info_cover%acq_data)
         self.entry_acq_info_book(acq_data)
+        self.add_response_body(self.template.document_entry_acq_rel_start%acq_data)
+        self.entry_acq_rel_doubles(acq_data)
+        self.add_response_body(self.template.document_entry_acq_rel_authors%acq_data)
+        self.add_response_body(self.template.document_entry_acq_rel_genres%acq_data)
+        self.add_response_body(self.template.document_entry_acq_rel_finish%acq_data)
         self.add_response_body(self.template.document_entry_acq_info_finish%acq_data)
         self.add_response_body(self.template.document_entry_acq_finish%acq_data)
 
@@ -255,3 +189,4 @@ class baseWrapper():
 
     def alphabet_menu(self,iid_value,nl):
         self.add_response_body(self.template.document_alphabet_menu%{'iid':iid_value,'nl':nl})
+

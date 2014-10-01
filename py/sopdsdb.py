@@ -423,7 +423,7 @@ class opdsDatabase:
     return row
 
   def getgenres(self,book_id):
-    sql=("select section, subsection from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where b.genre_id=a.genre_id and b.book_id="+str(book_id))
+    sql=("select a.genre_id, section, subsection from "+TBL_GENRES+" a, "+TBL_BGENRES+" b where b.genre_id=a.genre_id and b.book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()
@@ -431,7 +431,7 @@ class opdsDatabase:
     return rows
 
   def getseries(self,book_id):
-    sql=("select a.ser, b.ser_no from "+TBL_SERIES+" a, "+TBL_BSERIES+" b where b.ser_id=a.ser_id and b.book_id="+str(book_id))
+    sql=("select a.ser_id, a.ser, b.ser_no from "+TBL_SERIES+" a, "+TBL_BSERIES+" b where b.ser_id=a.ser_id and b.book_id="+str(book_id))
     cursor=self.cnx.cursor()
     cursor.execute(sql)
     rows=cursor.fetchall()

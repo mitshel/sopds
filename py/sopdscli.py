@@ -207,54 +207,20 @@ class opdsClient():
     def authors_submenu(self,author_id):
         self.Wrapper.authors_submenu(author_id)
 
-    def entry_start(self):
-        self.Wrapper.entry_start()
-
-    def entry_head(self,e_title,e_date,e_id):
-        self.Wrapper.entry_head(e_title,e_date,e_id)
-
-    def entry_link_subsection(self,link_id,e_title,e_date,e_id):
-         self.Wrapper.entry_link_subsection(link_id,self.nl,e_title,e_date,e_id)
-
-    def entry_link_book(self,link_id,format,e_title,e_date,e_id):
-         self.Wrapper.entry_link_book(link_id,format,e_title,e_date,e_id)
-
-    def entry_authors(self,book_id,link_show=False):
-        return self.Wrapper.entry_authors(self.opdsdb.getauthors(book_id))
-
     def get_authors(self,book_id):
         return self.Wrapper.get_authors(self.opdsdb.getauthors(book_id))
-
-    def entry_doubles(self,book_id):
-        self.Wrapper.entry_doubles(book_id,self.opdsdb.getdoublecount(book_id))
-
-    def entry_genres(self,book_id):
-        return self.Wrapper.entry_genres(self.opdsdb.getgenres(book_id))
 
     def get_genres(self,book_id):
         return self.Wrapper.get_genres(self.opdsdb.getgenres(book_id))
 
-    def entry_series(self,book_id):
-        return self.Wrapper.entry_series(self.opdsdb.getseries(book_id))
-
     def get_series(self,book_id):
         return self.Wrapper.get_series(self.opdsdb.getseries(book_id))
 
-    def entry_covers(self,cover,cover_type,book_id):
-        if self.cfg.COVER_SHOW!=0:
-           self.Wrapper.entry_covers(book_id)
-
     def entry_acquisition(self,acq_data):
         self.Wrapper.entry_acquisition(acq_data)
-
-    def entry_content(self,e_content):
-        self.Wrapper.entry_content(e_content)
-
-    def entry_content2(self,annotation='',title='',authors='',genres='',filename='',filesize=0,docdate='',series=''):
-         self.Wrapper.entry_content2(annotation,title,authors,genres,filename,filesize,docdate,series)
-
-    def entry_finish(self):
-        self.Wrapper.entry_finish()
+  
+    def entry_navigation(self,nav_data):
+        self.Wrapper.entry_navigation(nav_data)
 
     def page_control(self, page, link_id):
         if page>0:
@@ -274,27 +240,21 @@ class opdsClient():
         """ Выбрана сортировка 'По каталогам' """
         self.header('id:catalogs','Сортировка по каталогам хранения')
         for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getitemsincat(self.slice_value,self.cfg.MAXITEMS,self.page_value):
-            self.entry_start()
-            self.entry_head(item_title, reg_date, 'item:%s'%(item_id))
             if item_type==1:
                id='01'+str(item_id)
-               self.entry_link_subsection(id, item_title, reg_date, 'item:%s'%(item_id))
+               nav_data={'link_id':id,'item_id':item_id,'e_date':reg_date,'e_title':websym(item_title),'e_id':'item:%s'%(item_id),'e_nav_info':'',
+                         'nl':self.nl}
+               self.entry_navigation(nav_data)
             if item_type==2:
                id='90'+str(item_id)
-#               self.entry_link_book(item_id,format,item_title, reg_date, 'item:%s'%(item_id))
-#               self.entry_covers(cover,cover_type,item_id)
-#               authors=self.entry_authors(item_id,True)
-#               genres=self.entry_genres(item_id)
-#               series=self.entry_series(item_id)
-#               self.entry_content2(annotation,item_title,authors,genres,item_name,fsize,docdate,series)
                (authors, authors_link) = self.get_authors(item_id)
                (genres,  genres_link)  = self.get_genres(item_id)
                (series,  series_link)  = self.get_series(item_id)
-               acq_data={'link_id':item_id,'filename':item_name,'e_date':reg_date,'e_title':websym(item_title),'e_id':'item:%s'%(item_id),
+               acq_data={'link_id':id,'item_id':item_id,'filename':item_name,'e_date':reg_date,'e_title':websym(item_title),'e_id':'item:%s'%(item_id),
                          'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
-                         'authors':websym(authors),'genres':websym(genres),'series':websym(series),'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link}
+                         'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                         'nl':self.nl, 'dcount':0}
                self.entry_acquisition(acq_data)
-            self.entry_finish()
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -322,11 +282,9 @@ class opdsClient():
             else:
                id='02'+id
 
-            self.entry_start()
-            self.entry_head(letters, None, id)
-            self.entry_link_subsection(id, letters, None, id)
-            self.entry_content('Всего: '+str(cnt)+' автора(ов).')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':letters,'e_id':id,'e_nav_info':('Всего: '+str(cnt)+' автора(ов).'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.footer()
 
     def response_series(self):
@@ -347,11 +305,9 @@ class opdsClient():
             else:
                id='06'+id
 
-            self.entry_start()
-            self.entry_head(letters, None, id)
-            self.entry_link_subsection(id, letters, None, id)
-            self.entry_content('Всего: '+str(cnt)+' серий.')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':letters,'e_id':id,'e_nav_info':('Всего: '+str(cnt)+' серий.'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.footer()
 
     def response_titles(self):
@@ -372,11 +328,9 @@ class opdsClient():
             else:
                id='03'+id
 
-            self.entry_start()
-            self.entry_head(letters, None, id)
-            self.entry_link_subsection(id, letters, None, id)
-            self.entry_content('Всего: '+str(cnt)+' наименований.')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':letters,'e_id':id,'e_nav_info':('Всего: '+str(cnt)+' наименований.'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.footer()
 
     def response_titles_search(self):
@@ -393,16 +347,14 @@ class opdsClient():
         self.header('id:title:%s'%letter,'Книги по наименованию "%s"'%letter)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksfortitle(letter,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
-            self.entry_start()
-            self.entry_head(book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_link_book(book_id,format,book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_covers(cover,cover_type,book_id)
-            authors=self.entry_authors(book_id,True)
-            genres=self.entry_genres(book_id)
-            series=self.entry_series(book_id)
-            self.entry_doubles(book_id)
-            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-            self.entry_finish()
+            (authors, authors_link) = self.get_authors(book_id)
+            (genres,  genres_link)  = self.get_genres(book_id)
+            (series,  series_link)  = self.get_series(book_id)
+            acq_data={'link_id':id,'item_id':book_id,'filename':book_name,'e_date':reg_date,'e_title':websym(book_title),'e_id':'item:%s'%(book_id),
+                      'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                      'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                      'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
+            self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -411,15 +363,14 @@ class opdsClient():
         self.header('id:doubles:%s'%self.slice_value,'Дубликаты для книги id=%s'%self.slice_value)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getdoubles(self.slice_value,self.cfg.MAXITEMS,self.page_value):
             id='90'+str(book_id)
-            self.entry_start()
-            self.entry_head(book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_link_book(book_id,format,book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_covers(cover,cover_type,book_id)
-            authors=self.entry_authors(book_id,True)
-            genres=self.entry_genres(book_id)
-            series=self.entry_series(book_id)
-            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-            self.entry_finish()
+            (authors, authors_link) = self.get_authors(book_id)
+            (genres,  genres_link)  = self.get_genres(book_id)
+            (series,  series_link)  = self.get_series(book_id)
+            acq_data={'link_id':id,'item_id':book_id,'filename':book_name,'e_date':reg_date,'e_title':websym(book_title),'e_id':'item:%s'%(book_id),
+                      'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                      'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                      'nl':self.nl,'dcount':self.opdsdb.getdoublecount(book_id)}
+            self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -429,11 +380,9 @@ class opdsClient():
         self.header('id:genre:sections','Список жанров')
         for (genre_id,genre_section,cnt) in self.opdsdb.getgenres_sections(self.cfg.DUBLICATES_SHOW,self.np):
             id='14'+str(genre_id)
-            self.entry_start()
-            self.entry_head(genre_section, None, 'genre:%s'%(genre_id))
-            self.entry_link_subsection(id, genre_section, None, 'genre:%s'%(genre_id))
-            self.entry_content('Всего: '+str(cnt)+' книг.')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':genre_section,'e_id':'genre:%s'%(genre_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.footer()
 
     def response_genres_subsections(self):
@@ -442,11 +391,9 @@ class opdsClient():
         for (genre_id,genre_subsection,cnt) in self.opdsdb.getgenres_subsections(self.slice_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='24'+str(genre_id)
             if self.cfg.ALPHA: id='30'+id
-            self.entry_start()
-            self.entry_head(genre_subsection, None, 'genre:%s'%(genre_id))
-            self.entry_link_subsection(id,genre_subsection, None, 'genre:%s'%(genre_id))
-            self.entry_content('Всего: '+str(cnt)+' книг.')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':genre_subsection,'e_id':'genre:%s'%(genre_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.footer()
 
     def response_genres_books(self):
@@ -454,16 +401,14 @@ class opdsClient():
         self.header('id:genres:%s'%self.slice_value,'Список книг по выбранному жанру')
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforgenre(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.alpha,self.np):
             id='90'+str(book_id)
-            self.entry_start()
-            self.entry_head(book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_link_book(book_id,format,book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_covers(cover,cover_type,book_id)
-            authors=self.entry_authors(book_id,True)
-            genres=self.entry_genres(book_id)
-            series=self.entry_series(book_id)
-            self.entry_doubles(book_id)
-            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-            self.entry_finish()
+            (authors, authors_link) = self.get_authors(book_id)
+            (genres,  genres_link)  = self.get_genres(book_id)
+            (series,  series_link)  = self.get_series(book_id)
+            acq_data={'link_id':id,'item_id':book_id,'filename':book_name,'e_date':reg_date,'e_title':websym(book_title),'e_id':'item:%s'%(book_id),
+                      'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                      'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                      'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
+            self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -478,21 +423,21 @@ class opdsClient():
         self.header('id:search:%s'%self.searchTerm,'Поиск %s'%self.searchTerm)
         self.add_response_body('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
         self.add_response_body('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
-        self.entry_start()
+#        self.entry_start()
         self.entry_head('Поиск книг',None,'71')
         self.entry_content('Поиск книги по ее наименованию')
         self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=books&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-        self.entry_finish()
-        self.entry_start()
+#        self.entry_finish()
+#        self.entry_start()
         self.entry_head('Поиск авторов',None,'72')
         self.entry_content('Поиск авторов по имени')
         self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=authors&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-        self.entry_finish()
-        self.entry_start()
+#        self.entry_finish()
+#        self.entry_start()
         self.entry_head('Поиск серий',None,'73')
         self.entry_content('Поиск серий книг')
         self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=series&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-        self.entry_finish()
+#        self.entry_finish()
         self.footer()
 
     def response_bookshelf(self):
@@ -500,16 +445,14 @@ class opdsClient():
         self.header('id:bookshelf:%s'%self.user,'Книги пользователя %s'%self.user)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforuser(self.user,self.cfg.MAXITEMS,self.page_value):
             id='90'+str(book_id)
-            self.entry_start()
-            self.entry_head(book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_link_book(book_id,format,book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_covers(cover,cover_type,book_id)
-            authors=self.entry_authors(book_id,True)
-            genres=self.entry_genres(book_id)
-            series=self.entry_series(book_id)
-            self.entry_doubles(book_id)
-            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-            self.entry_finish()
+            (authors, authors_link) = self.get_authors(book_id)
+            (genres,  genres_link)  = self.get_genres(book_id)
+            (series,  series_link)  = self.get_series(book_id)
+            acq_data={'link_id':id,'item_id':book_id,'filename':book_name,'e_date':reg_date,'e_title':websym(book_title),'e_id':'item:%s'%(book_id),
+                      'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                      'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                      'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
+            self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -527,11 +470,9 @@ class opdsClient():
         self.header('id:authors:%s'%letter,'Авторы по имени "%s"'%letter)
         for (author_id,first_name, last_name,cnt) in self.opdsdb.getauthorsbyl(letter,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='22'+str(author_id)
-            self.entry_start()
-            self.entry_head(last_name+' '+first_name, None, 'author:%s'%(author_id))
-            self.entry_link_subsection(id,last_name+' '+first_name, None, 'author:%s'%(author_id))
-            self.entry_content('Всего: '+str(cnt)+' книг.')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':(last_name+' '+first_name),'e_id':'author:%s'%(author_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -549,11 +490,9 @@ class opdsClient():
         self.header('id:series:%s'%letter,'Список серий книг "%s"'%letter)
         for (ser_id,ser,cnt) in self.opdsdb.getseriesbyl(letter,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='26'+str(ser_id)
-            self.entry_start()
-            self.entry_head(ser, None, 'series:%s'%(ser_id))
-            self.entry_link_subsection(id,ser, None, 'series:%s'%(ser_id))
-            self.entry_content('Всего: '+str(cnt)+' книг.')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':ser,'e_id':'series:%s'%(ser_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -570,11 +509,9 @@ class opdsClient():
         self.header('id:autorseries:%s %s'%(last_name,first_name),'Серии книг автора %s %s'%(last_name,first_name))
         for (ser_id,ser,cnt) in self.opdsdb.getseriesforauthor(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW):
             id='34'+str(self.slice_value)+'&amp;ser='+str(ser_id)
-            self.entry_start()
-            self.entry_head(ser, None, 'series:%s'%(ser_id))
-            self.entry_link_subsection(id,ser, None, 'series:%s'%(ser_id))
-            self.entry_content('Всего: '+str(cnt)+' книг.')
-            self.entry_finish()
+            nav_data={'link_id':id,'e_date':None,'e_title':ser,'e_id':'series:%s'%(ser_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
+                      'nl':self.nl}
+            self.entry_navigation(nav_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -584,16 +521,14 @@ class opdsClient():
         self.header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforautor(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
-            self.entry_start()
-            self.entry_head(book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_link_book(book_id,format,book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_covers(cover,cover_type,book_id)
-            authors=self.entry_authors(book_id,True)
-            genres=self.entry_genres(book_id)
-            series=self.entry_series(book_id)
-            self.entry_doubles(book_id)
-            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-            self.entry_finish()
+            (authors, authors_link) = self.get_authors(book_id)
+            (genres,  genres_link)  = self.get_genres(book_id)
+            (series,  series_link)  = self.get_series(book_id)
+            acq_data={'link_id':id,'item_id':book_id,'filename':book_name,'e_date':reg_date,'e_title':websym(book_title),'e_id':'item:%s'%(book_id),
+                      'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                      'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                      'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
+            self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -603,16 +538,14 @@ class opdsClient():
         self.header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforautorser(self.slice_value,self.ser_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW):
             id='90'+str(book_id)
-            self.entry_start()
-            self.entry_head(book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_link_book(book_id,format,book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_covers(cover,cover_type,book_id)
-            authors=self.entry_authors(book_id,True)
-            genres=self.entry_genres(book_id)
-            series=self.entry_series(book_id)
-            self.entry_doubles(book_id)
-            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-            self.entry_finish()
+            (authors, authors_link) = self.get_authors(book_id)
+            (genres,  genres_link)  = self.get_genres(book_id)
+            (series,  series_link)  = self.get_series(book_id)
+            acq_data={'link_id':id,'item_id':book_id,'filename':book_name,'e_date':reg_date,'e_title':websym(book_title),'e_id':'item:%s'%(book_id),
+                      'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                      'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                      'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
+            self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
@@ -622,16 +555,14 @@ class opdsClient():
         self.header('id:ser:%s'%ser_name,'Книги серии %s'%ser_name)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforser(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
-            self.entry_start()
-            self.entry_head(book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_link_book(book_id,format,book_title, reg_date, 'book:%s'%(book_id))
-            self.entry_covers(cover,cover_type,book_id)
-            authors=self.entry_authors(book_id,True)
-            genres=self.entry_genres(book_id)
-            series=self.entry_series(book_id)
-            self.entry_doubles(book_id)
-            self.entry_content2(annotation,book_title,authors,genres,book_name,fsize,docdate,series)
-            self.entry_finish()
+            (authors, authors_link) = self.get_authors(book_id)
+            (genres,  genres_link)  = self.get_genres(book_id)
+            (series,  series_link)  = self.get_series(book_id)
+            acq_data={'link_id':id,'item_id':book_id,'filename':book_name,'e_date':reg_date,'e_title':websym(book_title),'e_id':'item:%s'%(book_id),
+                      'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
+                      'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
+                      'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
+            self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
         self.footer()
 
