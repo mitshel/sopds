@@ -78,12 +78,13 @@ class opdsClient():
         else:
            self.modulePath=self.cfg.CGI_PATH
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
+        self.site_data={'site_title':self.cfg.SITE_TITLE, 'site_subtitle':'Simple OPDS Catalog by www.sopds.ru. Version '+sopdscfg.VERSION,'modulepath':self.modulePath,'site_icon':self.cfg.SITE_ICON,'site_author':self.cfg.SITE_AUTOR,'site_url':self.cfg.SITE_URL,'site_email':self.cfg.SITE_EMAIL, 'charset':'utf-8'}
 
-        self.template1=sopdstempl.opdsTemplate(self.modulePath)
-        self.opdsWrapper=sopdswrap.baseWrapper(self.cfg, self.template1)
+        self.template1=sopdstempl.opdsTemplate()
+        self.opdsWrapper=sopdswrap.baseWrapper(self.cfg, self.template1,self.site_data)
 
-        self.template2=sopdstempl.webTemplate(self.modulePath)
-        self.webWrapper=sopdswrap.baseWrapper(self.cfg, self.template2)
+        self.template2=sopdstempl.webTemplate()
+        self.webWrapper=sopdswrap.baseWrapper(self.cfg, self.template2,self.site_data)
 
         self.Wrapper=self.opdsWrapper
 
@@ -187,14 +188,11 @@ class opdsClient():
     def get_response_body(self):
         return self.Wrapper.response_body
 
-    def header(self, h_id=None, h_title=None, h_subtitle=None,charset='utf-8'):
-        if h_id==None: h_id=self.cfg.SITE_ID
-        if h_title==None: h_title=self.cfg.SITE_TITLE
-        if h_subtitle==None: h_subtitle='Simple OPDS Catalog by www.sopds.ru. Version '+sopdscfg.VERSION
-        self.Wrapper.header(h_id,h_title,h_subtitle,time.strftime("%Y-%m-%dT%H:%M:%SZ"))
+    def header(self, page_data):
+        self.Wrapper.header(page_data)
 
-    def footer(self):
-        self.Wrapper.footer()
+    def footer(self,page_data={}):
+        self.Wrapper.footer(page_data)
 
     def main_menu(self):
         dbinfo=self.opdsdb.getdbinfo(self.cfg.DUBLICATES_SHOW,self.cfg.BOOK_SHELF,self.user)
@@ -232,13 +230,15 @@ class opdsClient():
         self.Wrapper.alphabet_menu(iid_value,self.nl) 
 
     def response_main(self):
-        self.header()
+        page_data={'page_id':'id:main', 'page_title':'SOPDS|Главная', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         self.main_menu()
-        self.footer()
+        self.footer(page_data)
 
     def response_catalogs(self):
         """ Выбрана сортировка 'По каталогам' """
-        self.header('id:catalogs','Сортировка по каталогам хранения')
+        page_data={'page_id':'id:catalogs', 'page_title':'Сортировка по каталогам хранения', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getitemsincat(self.slice_value,self.cfg.MAXITEMS,self.page_value):
             if item_type==1:
                id='01'+str(item_id)
@@ -260,9 +260,10 @@ class opdsClient():
 
     def response_alpha(self):
         """ Вывод дополнительного меню алфавита для сортировок по Наименованиям, по Авторам и по Жанрам """
-        self.header()
+        page_data={'page_id':'id:alphabet', 'page_title':'SOPDS|Выбор языка', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         self.alphabet_menu(self.id_value[2:])
-        self.footer()
+        self.footer(page_data)
 
     def response_authors(self):
         """ Cортировка 'По авторам' - выбор по нескольким первым буквам автора """
@@ -271,7 +272,8 @@ class opdsClient():
         while i>0:
            letter=chr(i%10000)+letter
            i=i//10000
-        self.header('id:preauthors:%s'%letter,'Выбор авторов "%s"'%letter)
+        page_data={'page_id':'id:preauthors:%s'%letter,'page_title':'Выбор авторов "%s"'%letter, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (letters,cnt) in self.opdsdb.getauthor_2letters(letter,self.alpha,self.np):
             id=""
             for i in range(len(letters)):
@@ -285,7 +287,7 @@ class opdsClient():
             nav_data={'link_id':id,'e_date':None,'e_title':letters,'e_id':id,'e_nav_info':('Всего: '+str(cnt)+' автора(ов).'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.footer()
+        self.footer(page_data)
 
     def response_series(self):
         """ Cортировка 'По сериям' - выбор по нескольким первым буквам серии """
@@ -294,7 +296,8 @@ class opdsClient():
         while i>0:
            letter=chr(i%10000)+letter
            i=i//10000
-        self.header('id:preseries:%s'%letter,'Выбор серий "%s"'%letter)
+        page_data={'page_id':'id:preseries:%s'%letter,'page_title':'Выбор серий "%s"'%letter, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (letters,cnt) in self.opdsdb.getseries_2letters(letter,self.alpha,self.np):
             id=""
             for i in range(len(letters)):
@@ -308,7 +311,7 @@ class opdsClient():
             nav_data={'link_id':id,'e_date':None,'e_title':letters,'e_id':id,'e_nav_info':('Всего: '+str(cnt)+' серий.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.footer()
+        self.footer(page_data)
 
     def response_titles(self):
         """ Cортировка 'По наименованию' - выбор по нескольким первым буквам наименования """
@@ -317,7 +320,8 @@ class opdsClient():
         while i>0:
            letter=chr(i%10000)+letter
            i=i//10000
-        self.header('id:pretitle:%s'%letter,'Выбор наименований "%s"'%letter)
+        page_data={'page_id':'id:pretitle:%s'%letter,'page_title':'Выбор наименований "%s"'%letter, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (letters,cnt) in self.opdsdb.gettitle_2letters(letter,self.cfg.DUBLICATES_SHOW,self.alpha,self.np):
             id=""
             for i in range(len(letters)):
@@ -331,7 +335,7 @@ class opdsClient():
             nav_data={'link_id':id,'e_date':None,'e_title':letters,'e_id':id,'e_nav_info':('Всего: '+str(cnt)+' наименований.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.footer()
+        self.footer(page_data)
 
     def response_titles_search(self):
         """ Выдача списка книг по наименованию или на основании поискового запроса """
@@ -343,8 +347,8 @@ class opdsClient():
               i=i//10000
         else:
            letter="%"+self.searchTerm
-
-        self.header('id:title:%s'%letter,'Книги по наименованию "%s"'%letter)
+        page_data={'page_id':'id:title:%s'%letter,'page_title':'Книги по наименованию "%s"'%letter, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksfortitle(letter,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
             (authors, authors_link) = self.get_authors(book_id)
@@ -356,11 +360,12 @@ class opdsClient():
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_doubles(self):
         """ Вывод дубликатов для выбранной книги """
-        self.header('id:doubles:%s'%self.slice_value,'Дубликаты для книги id=%s'%self.slice_value)
+        page_data={'page_id':'id:doubles:%s'%self.slice_value,'page_title':'Дубликаты для книги id=%s'%self.slice_value, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getdoubles(self.slice_value,self.cfg.MAXITEMS,self.page_value):
             id='90'+str(book_id)
             (authors, authors_link) = self.get_authors(book_id)
@@ -372,33 +377,36 @@ class opdsClient():
                       'nl':self.nl,'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
 
     def response_genres_sections(self):
         """ Cортировка 'По жанрам' - показ секций """
-        self.header('id:genre:sections','Список жанров')
+        page_data={'page_id':'id:genre:sections','page_title':'Список жанров', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (genre_id,genre_section,cnt) in self.opdsdb.getgenres_sections(self.cfg.DUBLICATES_SHOW,self.np):
             id='14'+str(genre_id)
             nav_data={'link_id':id,'e_date':None,'e_title':genre_section,'e_id':'genre:%s'%(genre_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.footer()
+        self.footer(page_data)
 
     def response_genres_subsections(self):
         """ Cортировка 'По жанрам' - показ подсекций """
-        self.header('id:genre:subsections:%s'%self.slice_value,'Список жанров (уровень 2)')
+        page_data={'page_id':'id:genre:subsections:%s'%self.slice_value,'page_title':'Список жанров (уровень 2)', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (genre_id,genre_subsection,cnt) in self.opdsdb.getgenres_subsections(self.slice_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='24'+str(genre_id)
             if self.cfg.ALPHA: id='30'+id
             nav_data={'link_id':id,'e_date':None,'e_title':genre_subsection,'e_id':'genre:%s'%(genre_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.footer()
+        self.footer(page_data)
 
     def response_genres_books(self):
         """ Выдача списка книг по жанру """
-        self.header('id:genres:%s'%self.slice_value,'Список книг по выбранному жанру')
+        page_data={'page_id':'id:genres:%s'%self.slice_value,'page_title':'Список книг по выбранному жанру', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforgenre(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.alpha,self.np):
             id='90'+str(book_id)
             (authors, authors_link) = self.get_authors(book_id)
@@ -410,17 +418,19 @@ class opdsClient():
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_last(self):
         """ Cортировка 'Последние поступления' """  
-        self.header('id:news','Последние поступления за %s дней'%self.cfg.NEW_PERIOD)
+        page_data={'page_id':'id:news','page_title':'Последние поступления за %s дней'%self.cfg.NEW_PERIOD, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         self.new_menu()
-        self.footer()
+        self.footer(page_data)
 
     def response_search_type(self):
         """ Выбор типа поиска по автору или наименованию или серии """
-        self.header('id:search:%s'%self.searchTerm,'Поиск %s'%self.searchTerm)
+        page_data={'page_id':'id:search:%s'%self.searchTerm,'page_title':'Поиск %s'%self.searchTerm, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         self.add_response_body('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
         self.add_response_body('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
 #        self.entry_start()
@@ -438,11 +448,12 @@ class opdsClient():
         self.entry_content('Поиск серий книг')
         self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=series&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
 #        self.entry_finish()
-        self.footer()
+        self.footer(page_data)
 
     def response_bookshelf(self):
         """ Выдача списка книг на книжной полке """
-        self.header('id:bookshelf:%s'%self.user,'Книги пользователя %s'%self.user)
+        page_data={'page_id':'id:bookshelf:%s'%self.user,'page_title':'Книги пользователя %s'%self.user, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforuser(self.user,self.cfg.MAXITEMS,self.page_value):
             id='90'+str(book_id)
             (authors, authors_link) = self.get_authors(book_id)
@@ -454,7 +465,7 @@ class opdsClient():
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_authors_search(self):
         """ Выдача списка авторов по имени или на основании поиска """
@@ -467,14 +478,15 @@ class opdsClient():
         else:
            letter="%"+self.searchTerm
 
-        self.header('id:authors:%s'%letter,'Авторы по имени "%s"'%letter)
+        page_data={'page_id':'id:authors:%s'%letter,'page_title':'Авторы по имени "%s"'%letter, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (author_id,first_name, last_name,cnt) in self.opdsdb.getauthorsbyl(letter,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='22'+str(author_id)
             nav_data={'link_id':id,'e_date':None,'e_title':(last_name+' '+first_name),'e_id':'author:%s'%(author_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_series_search(self):
         """ Выдача списка серий по названию или на основании поиска """
@@ -487,38 +499,42 @@ class opdsClient():
         else:
            letter="%"+self.searchTerm
 
-        self.header('id:series:%s'%letter,'Список серий книг "%s"'%letter)
+        page_data={'page_id':'id:series:%s'%letter,'page_title':'Список серий книг "%s"'%letter, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (ser_id,ser,cnt) in self.opdsdb.getseriesbyl(letter,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='26'+str(ser_id)
             nav_data={'link_id':id,'e_date':None,'e_title':ser,'e_id':'series:%s'%(ser_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_authors_submenu(self):
         """ Выдача подменю вывода книг по автору - в случае флага новинок будет сразу переход к выдаче книг автора """
         (first_name,last_name)=self.opdsdb.getauthor_name(self.slice_value)
-        self.header('id:autor:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
+        page_data={'page_id':'id:autor:%s %s'%(last_name,first_name),'page_title':'Книги автора %s %s'%(last_name,first_name), 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         self.authors_submenu(self.slice_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_authors_series(self):
         """ Выдача серий по автору """
         (first_name,last_name)=self.opdsdb.getauthor_name(self.slice_value)
-        self.header('id:autorseries:%s %s'%(last_name,first_name),'Серии книг автора %s %s'%(last_name,first_name))
+        page_data={'page_id':'id:autorseries:%s %s'%(last_name,first_name),'page_title':'Серии книг автора %s %s'%(last_name,first_name), 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (ser_id,ser,cnt) in self.opdsdb.getseriesforauthor(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW):
             id='34'+str(self.slice_value)+'&amp;ser='+str(ser_id)
             nav_data={'link_id':id,'e_date':None,'e_title':ser,'e_id':'series:%s'%(ser_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_authors_alpha(self):
         """ Выдача списка книг по автору по алфавиту """
         (first_name,last_name)=self.opdsdb.getauthor_name(self.slice_value)
-        self.header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
+        page_data={'page_id':'id:autorbooks:%s %s'%(last_name,first_name),'page_title':'Книги автора %s %s'%(last_name,first_name), 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforautor(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
             (authors, authors_link) = self.get_authors(book_id)
@@ -530,12 +546,13 @@ class opdsClient():
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_authors_series_books(self):
         """ Выдача списка книг по автору по выбранной серии (или вне серий если ser_value==0) """
         (first_name,last_name)=self.opdsdb.getauthor_name(self.slice_value)
-        self.header('id:autorbooks:%s %s'%(last_name,first_name),'Книги автора %s %s'%(last_name,first_name))
+        page_data={'page_id':'id:autorbooks:%s %s'%(last_name,first_name),'page_title':'Книги автора %s %s'%(last_name,first_name), 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforautorser(self.slice_value,self.ser_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW):
             id='90'+str(book_id)
             (authors, authors_link) = self.get_authors(book_id)
@@ -547,12 +564,13 @@ class opdsClient():
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_series_books(self):
         """ Выдача списка книг по серии """
         (ser_name,)=self.opdsdb.getser_name(self.slice_value)
-        self.header('id:ser:%s'%ser_name,'Книги серии %s'%ser_name)
+        page_data={'page_id':'id:ser:%s'%ser_name,'page_title':'Книги серии %s'%ser_name, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        self.header(page_data)
         for (book_id,book_name,book_path,reg_date,book_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getbooksforser(self.slice_value,self.cfg.MAXITEMS,self.page_value,self.cfg.DUBLICATES_SHOW,self.np):
             id='90'+str(book_id)
             (authors, authors_link) = self.get_authors(book_id)
@@ -564,7 +582,7 @@ class opdsClient():
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
         self.page_control(self.page_value,self.id_value)
-        self.footer()
+        self.footer(page_data)
 
     def response_book_file(self):
         """ Выдача файла книги """
