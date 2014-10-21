@@ -78,14 +78,14 @@ class fb2cover(fb2tag):
    def __init__(self,tags):
        self.iscover=False
        self.cover_name=''
-       self.cover_data=''
+       self._cover_data=[]
        self.isfind=False
        fb2tag.__init__(self,tags)
 
    def reset(self):
        self.iscover=False
        self.cover_name=''
-       self.cover_data=''
+       self._cover_data=[]
        self.isfind=False
        fb2tag.reset(self)
 
@@ -113,7 +113,15 @@ class fb2cover(fb2tag):
    def add_data(self,data):
        if self.iscover:
           if data!='\\n':
-             self.cover_data+=data
+             self._cover_data.append(data)
+
+   @property
+   def cover_data(self):
+       return ''.join(self._cover_data)
+
+   @cover_data.setter
+   def cover_data(self, value):
+       self._cover_data = [value]
 
 class fb2parser:
    def __init__(self, readcover=0):

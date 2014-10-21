@@ -45,25 +45,6 @@ def websym(s,attr=False):
         result = result.replace(k,table[k])
     return result;
 
-def opensearch(script):
-    code='''<?xml version="1.0" encoding="utf-8"?>
-            <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
-            <ShortName>SimpleOPDS</ShortName>
-            <LongName>SimpleOPDS</LongName>
-            <Url type="application/atom+xml" template="{0}?searchTerm={{searchTerms}}" />
-            <Image width="16" height="16">http://www.sopds.ru/favicon.ico</Image>
-            <Tags />
-            <Contact />
-            <Developer />
-            <Attribution />
-            <SyndicationRight>open</SyndicationRight>
-            <AdultContent>false</AdultContent>
-            <Language>*</Language>
-            <OutputEncoding>UTF-8</OutputEncoding>
-            <InputEncoding>UTF-8</InputEncoding>
-            </OpenSearchDescription>'''.format(script)
-    return code
-
 #######################################################################
 #
 # Основной класс OPDS-клиента
@@ -205,6 +186,12 @@ class opdsClient():
     def authors_submenu(self,author_id):
         self.Wrapper.authors_submenu(author_id)
 
+    def opensearch_links(self,page_data):
+        self.Wrapper.opensearch_links(page_data)
+
+    def opensearch_forms(self,page_data):
+        self.Wrapper.opensearch_forms(page_data)
+
     def get_authors(self,book_id):
         return self.Wrapper.get_authors(self.opdsdb.getauthors(book_id))
 
@@ -220,18 +207,30 @@ class opdsClient():
     def entry_navigation(self,nav_data):
         self.Wrapper.entry_navigation(nav_data)
 
-    def page_control(self, page, link_id):
-        if page>0:
-           self.Wrapper.page_control_prev(page,link_id)
+    def page_control(self, page_data):
+        data=page_data.copy()
+        data['link_id']=self.id_value
+        data['page']=self.page_value
+        if self.page_value>0:
+           data['page_prev']=self.page_value-1
+        else:
+           data['page_prev']=-1
         if self.opdsdb.next_page:
-           self.Wrapper.page_control_next(page,link_id)
+           data['page_next']=self.page_value+1
+        else:
+           data['page_next']=-1;
+        self.Wrapper.page_control(data)
 
     def alphabet_menu(self,iid_value):
         self.Wrapper.alphabet_menu(iid_value,self.nl) 
 
+    def response_search(self):
+        self.Wrapper.opensearch()
+
     def response_main(self):
         page_data={'page_id':'id:main', 'page_title':'SOPDS|Главная', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
         self.header(page_data)
+        self.opensearch_links(page_data)
         self.main_menu()
         self.footer(page_data)
 
@@ -255,7 +254,7 @@ class opdsClient():
                          'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                          'nl':self.nl, 'dcount':0}
                self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer()
 
     def response_alpha(self):
@@ -359,7 +358,7 @@ class opdsClient():
                       'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_doubles(self):
@@ -376,7 +375,7 @@ class opdsClient():
                       'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                       'nl':self.nl,'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
 
@@ -417,7 +416,7 @@ class opdsClient():
                       'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_last(self):
@@ -427,27 +426,34 @@ class opdsClient():
         self.new_menu()
         self.footer(page_data)
 
+#    def response_search_type(self):
+#        """ Выбор типа поиска по автору или наименованию или серии """
+#        page_data={'page_id':'id:search:%s'%self.searchTerm,'page_title':'Поиск %s'%self.searchTerm, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+#        self.header(page_data)
+#        self.add_response_body('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
+#        self.add_response_body('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
+#        self.entry_start()
+#        self.entry_head('Поиск книг',None,'71')
+#        self.entry_content('Поиск книги по ее наименованию')
+#        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=books&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
+#        self.entry_finish()
+#        self.entry_start()
+#        self.entry_head('Поиск авторов',None,'72')
+#        self.entry_content('Поиск авторов по имени')
+#        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=authors&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
+#        self.entry_finish()
+#        self.entry_start()
+#        self.entry_head('Поиск серий',None,'73')
+#        self.entry_content('Поиск серий книг')
+#        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=series&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
+#        self.entry_finish()
+#        self.footer(page_data)
+
     def response_search_type(self):
-        """ Выбор типа поиска по автору или наименованию или серии """
-        page_data={'page_id':'id:search:%s'%self.searchTerm,'page_title':'Поиск %s'%self.searchTerm, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        page_data={'page_id':'id:search:%s'%self.searchTerm,'page_title':'Поиск %s'%self.searchTerm, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ"),'searchterm':parse.quote(self.searchTerm)}
         self.header(page_data)
-        self.add_response_body('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
-        self.add_response_body('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
-#        self.entry_start()
-        self.entry_head('Поиск книг',None,'71')
-        self.entry_content('Поиск книги по ее наименованию')
-        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=books&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-#        self.entry_finish()
-#        self.entry_start()
-        self.entry_head('Поиск авторов',None,'72')
-        self.entry_content('Поиск авторов по имени')
-        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=authors&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-#        self.entry_finish()
-#        self.entry_start()
-        self.entry_head('Поиск серий',None,'73')
-        self.entry_content('Поиск серий книг')
-        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=series&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-#        self.entry_finish()
+        self.opensearch_links(page_data)
+        self.opensearch_forms(page_data)
         self.footer(page_data)
 
     def response_bookshelf(self):
@@ -464,7 +470,7 @@ class opdsClient():
                       'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_authors_search(self):
@@ -485,7 +491,7 @@ class opdsClient():
             nav_data={'link_id':id,'e_date':None,'e_title':(last_name+' '+first_name),'e_id':'author:%s'%(author_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_series_search(self):
@@ -506,7 +512,7 @@ class opdsClient():
             nav_data={'link_id':id,'e_date':None,'e_title':ser,'e_id':'series:%s'%(ser_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_authors_submenu(self):
@@ -527,7 +533,7 @@ class opdsClient():
             nav_data={'link_id':id,'e_date':None,'e_title':ser,'e_id':'series:%s'%(ser_id),'e_nav_info':('Всего: '+str(cnt)+' книг.'),
                       'nl':self.nl}
             self.entry_navigation(nav_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_authors_alpha(self):
@@ -545,7 +551,7 @@ class opdsClient():
                       'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_authors_series_books(self):
@@ -563,7 +569,7 @@ class opdsClient():
                       'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_series_books(self):
@@ -581,7 +587,7 @@ class opdsClient():
                       'authors':authors,'genres':genres,'series':series,'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
                       'nl':self.nl, 'dcount':self.opdsdb.getdoublecount(book_id)}
             self.entry_acquisition(acq_data)
-        self.page_control(self.page_value,self.id_value)
+        self.page_control(page_data)
         self.footer(page_data)
 
     def response_book_file(self):
@@ -747,10 +753,6 @@ class opdsClient():
               f.close()
            else:
               self.set_response_status('404 Not Found')
-
-    def response_search(self):
-        self.add_response_header([('Content-Type','text/xml')])
-        self.add_response_body(opensearch(self.modulePath))
 
     def make_response(self):
         self.opdsdb.openDB()

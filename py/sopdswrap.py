@@ -181,12 +181,25 @@ class baseWrapper():
         self.add_response_body(self.template.document_entry_acq_info_finish%data)
         self.add_response_body(self.template.document_entry_acq_finish%data)
 
-    def page_control_prev(self, page, link_id):
-           self.add_response_body(self.template.document_page_control_prev%dictmerge(self.site_data,{'link_id':link_id,'page':page-1}))
-
-    def page_control_next(self, page, link_id):
-           self.add_response_body(self.template.document_page_control_next%dictmerge(self.site_data,{'link_id':link_id,'page':page+1}))
+    def page_control(self, page_data):
+        self.add_response_body(self.template.document_page_control_start%dictmerge(self.site_data,page_data))
+        if page_data['page_prev']>=0:
+           self.add_response_body(self.template.document_page_control_prev%dictmerge(self.site_data,page_data))
+        if page_data['page_next']>=0:
+           self.add_response_body(self.template.document_page_control_next%dictmerge(self.site_data,page_data))
+        self.add_response_body(self.template.document_page_control_finish%dictmerge(self.site_data,page_data))
 
     def alphabet_menu(self,iid_value,nl):
         self.add_response_body(self.template.document_alphabet_menu%dictmerge(self.site_data,{'iid':iid_value,'nl':nl}))
+
+    def opensearch(self):
+        self.add_response_header([self.template.response_header])
+        self.add_response_body(self.template.opensearch%self.site_data)
+
+    def opensearch_links(self, page_data):
+        self.add_response_body(self.template.opensearch_links%dictmerge(self.site_data,page_data))
+
+    def opensearch_forms(self, page_data):
+        self.add_response_body(self.template.opensearch_forms%dictmerge(self.site_data,page_data))
+
 
