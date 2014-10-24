@@ -269,6 +269,9 @@ class ScanDaemon(Daemon):
         self.stdout  = self.cfg.SCAND_LOGFILE
         self.stderr  = self.cfg.SCAND_LOGFILE
         self.enabled = self.cfg.SCAN_DAEMON
+        self.start_scan = False
+
+        self.scanner=opdsScanner(self.cfg, self.logger)
 
 
     #***************************************
@@ -281,6 +284,7 @@ class ScanDaemon(Daemon):
             t=time.localtime()
             if (((self.cfg.DAY_OF_WEEK==0) or (self.cfg.DAY_OF_WEEK==t.tm_wday+1)) and (t.tm_hour*60+t.tm_min in self.cfg.SCAN_TIMES)) or (self.cfg.SCAN_ON_START and not self.start_scan):
                   self.scanner.scan_all()
+
             self.start_scan=True
             time.sleep(30)
 
