@@ -67,7 +67,7 @@ class cfgreader:
 
        self.WSGI_PATH=config.getdefault(CFG_S_GLOBAL,'wsgi_path','sopds.wsgi')
        self.WSGI_PATH=os.path.normpath(self.WSGI_PATH)
-       
+
        fb2toepub_path=config.getdefault(CFG_S_GLOBAL,'fb2toepub',None)
        if fb2toepub_path:
           self.FB2TOEPUB_PATH=os.path.normpath(os.path.join(PY_PATH,fb2toepub_path))
@@ -84,7 +84,7 @@ class cfgreader:
 
        self.TEMP_DIR=config.getdefault(CFG_S_GLOBAL,'temp_dir','/tmp')
        self.TEMP_DIR=os.path.normpath(self.TEMP_DIR)
-       
+
        logfile=config.getdefault(CFG_S_GLOBAL,'logfile','scan.log')
        self.LOGFILE=os.path.join(LOG_PATH,logfile)
        loglevel=config.getdefault(CFG_S_GLOBAL,'loglevel','info')
@@ -92,7 +92,7 @@ class cfgreader:
            self.LOGLEVEL=loglevels[loglevel.lower()]
        else:
            self.LOGLEVEL=logging.NOTSET
-   
+
        self.DB_NAME=config.get(CFG_S_GLOBAL,'db_name')
        self.DB_USER=config.get(CFG_S_GLOBAL,'db_user')
        self.DB_PASS=config.get(CFG_S_GLOBAL,'db_pass')
@@ -109,7 +109,7 @@ class cfgreader:
           self.DUBLICATES_FIND=3
        else:
           self.DUBLICATES_FIND=0
-      
+
        self.DUBLICATES_SHOW=config.getboolean(CFG_S_GLOBAL,'dublicates_show')
        self.FB2PARSE=config.getboolean(CFG_S_GLOBAL,'fb2parse')
        self.ZIPSCAN=config.getboolean(CFG_S_GLOBAL,'zipscan')
@@ -122,7 +122,7 @@ class cfgreader:
        self.FB2HSIZE=config.getdefault_int(CFG_S_GLOBAL,'fb2hsize',0)
        self.MAXITEMS=config.getdefault_int(CFG_S_GLOBAL,'maxitems',50)
        self.SPLITAUTHORS=config.getdefault_int(CFG_S_GLOBAL,'splitauthors',0)
-       self.SPLITTITLES=config.getdefault_int(CFG_S_GLOBAL,'splittitles',0)       
+       self.SPLITTITLES=config.getdefault_int(CFG_S_GLOBAL,'splittitles',0)
        self.COVER_SHOW=config.getdefault_int(CFG_S_GLOBAL,'cover_show',0)
        self.NEW_PERIOD=config.getdefault_int(CFG_S_GLOBAL,'new_period',7)
        zip_codepage=config.getdefault(CFG_S_GLOBAL,'zip_codepage','cp866')
@@ -180,3 +180,14 @@ class cfgreader:
        httpd_logfile=config.getdefault(CFG_S_HTTPD,'logfile','sopds-httpd.log')
        self.HTTPD_LOGFILE=os.path.join(LOG_PATH,httpd_logfile)
 
+       CFG_S_HTTPD='web'
+       self.WEB_PID_FILE=config.getdefault(CFG_S_HTTPD, 'pid_file', r'/tmp/sopds-web.pid')
+       self.WEB_DAEMON=config.getdefault_bool(CFG_S_HTTPD, 'daemon', True)
+       self.WEB_PORT=config.getdefault_int(CFG_S_HTTPD, 'port', 8082)
+       self.WEB_BIND_ADDRESS=config.getdefault(CFG_S_HTTPD,'bind_address', '0.0.0.0')
+       web_logfile=config.getdefault(CFG_S_HTTPD, 'logfile', 'sopds-web.log')
+       self.WEB_LOGFILE=os.path.join(LOG_PATH, web_logfile)
+
+       web_templates_dir = config.getdefault(CFG_S_GLOBAL, 'templates_dir', "../webtemplates")
+       self.WEB_TEMPLATES_DIR=os.path.normpath(os.path.join(PY_PATH, web_templates_dir))
+       self.WEB_THEME = config.getdefault(CFG_S_GLOBAL, 'theme', "e-ink")

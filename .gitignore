@@ -2,7 +2,7 @@ covers/*
 *.fb2
 *.log
 *.swp
-py/__pycache__/*
+__pycache__
 py/ziptest.py
 py/fb2parse.py
 py/b64decode.py
@@ -16,3 +16,4 @@ fb2conv/*
 testinfo/*
 speed
 .htaccess
+*~
