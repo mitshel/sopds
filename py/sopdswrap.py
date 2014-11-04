@@ -60,12 +60,40 @@ class baseWrapper():
         for element in self.response_body:
             sys.stdout.buffer.write(element + b'\n')
 
-    def header(self, page_data):
+    def document_header(self,page_data):
         self.add_response_header([self.template.response_header])
-        self.add_response_body(self.template.document_page_header%dictmerge(self.site_data, page_data, {'style':self.template.document_page_header_style}))
+        self.add_response_body(self.template.document_header%dictmerge(self.site_data, page_data, {'style':self.template.document_style}))
 
-    def footer(self, page_data):
-        self.add_response_body(self.template.document_page_footer%dictmerge(self.site_data,page_data))
+    def document_footer(self,page_data):
+        self.add_response_body(self.template.document_footer%dictmerge(self.site_data,page_data))
+
+    def page_top(self, page_data):
+        data=dictmerge(self.site_data,page_data)
+        self.add_response_body(self.template.page_top_start%data)
+        self.add_response_body(self.template.page_top_linkstart%data)
+        self.add_response_body(self.template.page_top_linkself%data)
+        self.add_response_body(self.template.page_top_linksearch%data)
+        self.add_response_body(self.template.page_top_finish%data)
+
+    def page_bottom(self, page_data):
+        data=dictmerge(self.site_data,page_data)
+        self.add_response_body(self.template.page_bottom_start%data)
+        self.add_response_body(self.template.page_bottom_info%data)
+        self.add_response_body(self.template.page_bottom_finish%data)
+
+    def page_title(self, page_data):
+        data=dictmerge(self.site_data,page_data)
+        self.add_response_body(self.template.page_title_start%data)
+        self.add_response_body(self.template.page_title_info%data)
+        self.add_response_body(self.template.page_title_finish%data)
+
+
+#    def  header(self, page_data):
+#        self.add_response_header([self.template.response_header])
+#        self.add_response_body(self.template.document_page_header%dictmerge(self.site_data, page_data, {'style':self.template.document_page_header_style}))
+
+#    def footer(self, page_data):
+#        self.add_response_body(self.template.document_page_footer%dictmerge(self.site_data,page_data))
 
     def main_menu(self,USER,DBINFO):
         if self.cfg.ALPHA: am='30'
@@ -196,8 +224,8 @@ class baseWrapper():
         self.add_response_header([self.template.response_header])
         self.add_response_body(self.template.opensearch%self.site_data)
 
-    def opensearch_links(self, page_data):
-        self.add_response_body(self.template.opensearch_links%dictmerge(self.site_data,page_data))
+#    def opensearch_links(self, page_data):
+#        self.add_response_body(self.template.opensearch_links%dictmerge(self.site_data,page_data))
 
     def opensearch_forms(self, page_data):
         self.add_response_body(self.template.opensearch_forms%dictmerge(self.site_data,page_data))

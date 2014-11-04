@@ -170,10 +170,15 @@ class opdsClient():
         return self.Wrapper.response_body
 
     def header(self, page_data):
-        self.Wrapper.header(page_data)
+        self.Wrapper.document_header(page_data)
+        self.Wrapper.page_top(page_data)
+        self.Wrapper.page_title(page_data)
+#        self.Wrapper.header(page_data)
 
     def footer(self,page_data={}):
-        self.Wrapper.footer(page_data)
+        self.Wrapper.page_bottom(page_data)
+        self.Wrapper.document_footer(page_data)
+#        self.Wrapper.footer(page_data)
 
     def main_menu(self):
         dbinfo=self.opdsdb.getdbinfo(self.cfg.DUBLICATES_SHOW,self.cfg.BOOK_SHELF,self.user)
@@ -230,7 +235,7 @@ class opdsClient():
     def response_main(self):
         page_data={'page_id':'id:main', 'page_title':'SOPDS|Главная', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
         self.header(page_data)
-        self.opensearch_links(page_data)
+#        self.opensearch_links(page_data)
         self.main_menu()
         self.footer(page_data)
 
@@ -452,7 +457,7 @@ class opdsClient():
     def response_search_type(self):
         page_data={'page_id':'id:search:%s'%self.searchTerm,'page_title':'Поиск %s'%self.searchTerm, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ"),'searchterm':parse.quote(self.searchTerm)}
         self.header(page_data)
-        self.opensearch_links(page_data)
+#        self.opensearch_links(page_data)
         self.opensearch_forms(page_data)
         self.footer(page_data)
 
