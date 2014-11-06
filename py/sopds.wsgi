@@ -3,7 +3,6 @@
 
 import sys
 import os
-from urllib import parse
 
 PY_PATH=os.path.dirname(os.path.abspath(__file__))
 sys.path.append(PY_PATH)
@@ -18,14 +17,11 @@ sopds = sopdscli.opdsClient(cfg,sopdscli.modeWSGI)
 
 def app(environ, start_response):
    user = None
-   qs   = None
    if 'REMOTE_USER' in environ:
       user = environ['REMOTE_USER']
-   if 'QUERY_STRING' in environ:
-      qs = parse.parse_qs(environ['QUERY_STRING'])
 
    sopds.resetParams()
-   sopds.parseParams(qs)
+   sopds.parseParams(environ)
    sopds.setUser(user)
    sopds.make_response()
    start_response(sopds.get_response_status(), sopds.get_response_headers())

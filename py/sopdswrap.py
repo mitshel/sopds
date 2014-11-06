@@ -1,3 +1,4 @@
+import sys
 import sopdscfg
 import sopdstempl
 import datetime

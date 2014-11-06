@@ -88,9 +88,24 @@ class opdsClient():
 #        self.response_body=[]
         self.opdsWrapper.resetParams()
         self.webWrapper.resetParams()
+        self.Wrapper=self.opdsWrapper
 
-    def parseParams(self,qs,method=0):
-        self.method=method
+    def parseParams(self,environ):
+        self.environ=environ
+        qs   = None
+        
+        if 'QUERY_STRING' in environ:
+           qs = parse.parse_qs(environ['QUERY_STRING'])
+        if 'REQUEST_URI' in environ:
+           URI=environ['REQUEST_URI']
+        else:
+           URI=environ['PATH_INFO']
+
+        if self.cfg.WEB_PREFIX in URI:
+           self.Wrapper=self.webWrapper        
+        if self.cfg.OPDS_PREFIX in URI:
+           self.Wrapper=self.opdsWrapper
+
         if 'id' in qs:
            self.id_value=qs.get("id")[0]
         else:
@@ -134,11 +149,6 @@ class opdsClient():
            if ser.isdigit():
               self.ser_value=int(ser)
 
-        if self.method==1:
-           self.Wrapper=self.webWrapper
-        else:
-           self.Wrapper=self.opdsWrapper
-
     def setUser(self,user):
         self.user=user
 
@@ -173,12 +183,13 @@ class opdsClient():
         self.Wrapper.document_header(page_data)
         self.Wrapper.page_top(page_data)
         self.Wrapper.page_title(page_data)
-#        self.Wrapper.header(page_data)
 
     def footer(self,page_data={}):
+#        Debug output commented
+#        for key in self.environ.keys():
+#            self.add_response_body("{0}:{1}".format(key,self.environ[key], end=" "))
         self.Wrapper.page_bottom(page_data)
         self.Wrapper.document_footer(page_data)
-#        self.Wrapper.footer(page_data)
 
     def main_menu(self):
         dbinfo=self.opdsdb.getdbinfo(self.cfg.DUBLICATES_SHOW,self.cfg.BOOK_SHELF,self.user)
@@ -235,7 +246,6 @@ class opdsClient():
     def response_main(self):
         page_data={'page_id':'id:main', 'page_title':'SOPDS|Главная', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
         self.header(page_data)
-#        self.opensearch_links(page_data)
         self.main_menu()
         self.footer(page_data)
 

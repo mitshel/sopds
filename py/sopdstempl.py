@@ -196,7 +196,6 @@ class opdsTemplate():
        self.document_entry_acq_finish='</entry>'
 
 
-
 class webTemplate(opdsTemplate):
     def __init__(self,charset='utf-8'):
        self.response_header=('Content-Type','text/html; charset='+charset)
@@ -210,7 +209,10 @@ class webTemplate(opdsTemplate):
 
        self.opensearch=''
 #       self.opensearch_links='<a href="%(modulepath)s?id=07">Поиск</a>'
-       self.opensearch_forms=''
+       self.opensearch_forms=('Поиск книг<form><input name=searchType value="books" type=hidden required><input name=searchTerm value="" type=required required><button type=submit title="Поиск книги по наименованию">Искать</button></form>'
+                             'Поиск авторов<form><input name=searchType value="authors" type=hidden required><input name=searchTerm value="" type=required required><button type=submit title="Поиск книги по наименованию">Искать</button></form>'
+                             'Поиск серий<form><input name=searchType value="series" type=hidden required><input name=searchTerm value="" type=required required><button type=submit title="Поиск книги по наименованию">Искать</button></form>')
+
        self.agregate_authors=('%(last_name)s %(first_name)s, ')
        self.agregate_authors_link=('<a href="%(modulepath)s?id=22%(author_id)s">%(last_name)s %(first_name)s, </a>'
                                )
@@ -254,9 +256,9 @@ class webTemplate(opdsTemplate):
        self.document_footer='<div class=footer>%(site_subtitle)s</div></body>'
 
        self.page_top_start='<div class=page>'
-       self.page_top_linkstart='<a href="%(modulepath)s?id=00">В начало</a>&nbsp;'
+       self.page_top_linkstart='<a href="%(modulepath)s?id=00">Главнaя</a>&nbsp;'
        self.page_top_linkself=''
-       self.page_top_linksearch='<a href="%(modulepath)s?id=09">Поиск</a>&nbsp;'
+       self.page_top_linksearch='<a href="%(modulepath)s?id=07">Поиск</a>&nbsp;'
        self.page_top_finish=''
 
        self.page_bottom_start=''

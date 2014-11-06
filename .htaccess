@@ -1,5 +1,7 @@
-DirectoryIndex index.xml py/sopds.wsgi
-AddHandler wsgi-script .wsgi
+#DirectoryIndex index.xml py/sopds.wsgi
+#AddHandler wsgi-script .wsgi
+DirectoryIndex index.xml py/sopds.cgi
+AddHandler cgi-script .cgi
 Options ExecCGI
 AuthType Basic
 AuthName "SOPDS Library"

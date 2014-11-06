@@ -171,6 +171,8 @@ class cfgreader:
           self.SCAN_TIMES=[self.SCAN_HOUR*60+self.SCAN_MIN]
 
        CFG_S_HTTPD='httpd'
+       self.OPDS_PREFIX=config.getdefault(CFG_S_HTTPD,'opds_prefix',r'/opds')
+       self.WEB_PREFIX=config.getdefault(CFG_S_HTTPD,'web_prefix',r'/web')
        self.HTTPD_PID_FILE=config.getdefault(CFG_S_HTTPD,'pid_file',r'/tmp/sopds-http.pid')
        self.HTTP_DAEMON=config.getdefault_bool(CFG_S_HTTPD,'daemon',True)
        self.PORT=config.getdefault_int(CFG_S_HTTPD,'port',8081)

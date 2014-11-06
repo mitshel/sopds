@@ -34,16 +34,8 @@ def app(environ, start_response):
       user=authorized_user(cfg.ACCOUNTS,adata)
 
    if (user!=None) or not cfg.AUTH:
-      qs   = None
-      method = 0 
-      if 'QUERY_STRING' in environ:
-         qs = parse.parse_qs(environ['QUERY_STRING'])
-      if 'PATH_INFO' in environ:
-         if '/web' in environ['PATH_INFO']:
-            method = 1
-
       sopds.resetParams()
-      sopds.parseParams(qs,method)
+      sopds.parseParams(environ)
       sopds.setUser(user)
       sopds.make_response()
    else:
