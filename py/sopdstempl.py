@@ -256,7 +256,7 @@ class webTemplate(opdsTemplate):
        self.document_footer='<div class=footer>%(site_subtitle)s</div></body>'
 
        self.page_top_start='<div class=page>'
-       self.page_top_linkstart='<a href="%(modulepath)s?id=00">Главнaя</a>&nbsp;'
+       self.page_top_linkstart='<a href="http://www.sopds.ru/">SOPDS.RU</a>&nbsp;<a href="%(modulepath)s?id=00">Главнaя</a>&nbsp;'
        self.page_top_linkself=''
        self.page_top_linksearch='<a href="%(modulepath)s?id=07">Поиск</a>&nbsp;'
        self.page_top_finish=''
