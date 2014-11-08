@@ -17,8 +17,6 @@ class opdsTemplate():
                         '<OutputEncoding>UTF-8</OutputEncoding>'
                         '<InputEncoding>UTF-8</InputEncoding>'
                         '</OpenSearchDescription>')
-#       self.opensearch_links=('<link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />'
-#                              '<link href="%(modulepath)s?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')   
        self.opensearch_forms=('<entry><title>Поиск книг</title><id>id:search:71</id><content type="text">Поиск книги по ее наименованию</content>'
                               '<link type="application/atom+xml;profile=opds-catalog" href="%(modulepath)s?searchType=books&amp;searchTerm=%(searchterm)s" />'
                               '</entry>'
@@ -45,7 +43,6 @@ class opdsTemplate():
                              '<updated>%(page_updated)s</updated>'
                              '<icon>%(site_icon)s</icon>'
                              '<author><name>%(site_author)s</name><uri>%(site_url)s</uri><email>%(site_email)s</email></author>')
-#                             '<link type="application/atom+xml" rel="start" href="%(modulepath)s?id=00"/>')
        self.document_footer='</feed>'
 
        self.page_top_start=''
@@ -200,18 +197,14 @@ class webTemplate(opdsTemplate):
     def __init__(self,charset='utf-8'):
        self.response_header=('Content-Type','text/html; charset='+charset)
 
-###################################################################################################################################
-# 
-# Шаблоны для Агрегации внутри Acquisition Entry
-#
-# 
-
-
        self.opensearch=''
-#       self.opensearch_links='<a href="%(modulepath)s?id=07">Поиск</a>'
        self.opensearch_forms=('Поиск книг<form><input name=searchType value="books" type=hidden required><input name=searchTerm value="" type=required required><button type=submit title="Поиск книги по наименованию">Искать</button></form>'
                              'Поиск авторов<form><input name=searchType value="authors" type=hidden required><input name=searchTerm value="" type=required required><button type=submit title="Поиск книги по наименованию">Искать</button></form>'
                              'Поиск серий<form><input name=searchType value="series" type=hidden required><input name=searchTerm value="" type=required required><button type=submit title="Поиск книги по наименованию">Искать</button></form>')
+
+###################################################################################################################################
+# Шаблоны для Агрегации внутри Acquisition Entry
+#
 
        self.agregate_authors=('%(last_name)s %(first_name)s, ')
        self.agregate_authors_link=('<a href="%(modulepath)s?id=22%(author_id)s">%(last_name)s %(first_name)s, </a>'
@@ -304,34 +297,12 @@ class webTemplate(opdsTemplate):
                                )
        self.document_page_control_finish='</div>'
 
-###############################################################################################################################
-#
-# Navigation Entry.
-#
-# В Каждый элемент передаются следующие параметры:
-#
-# nav_data={'link_id':id,'item_id':item_id,'e_date':reg_date,'e_title':websym(item_title),'e_id':'item:%s'%(item_id),'e_nav_info':'',
-#           'nl':self.nl}
-
-
        self.document_entry_nav_start='<div class=navigation_entry>\n'
        self.document_entry_nav_title=''
        self.document_entry_nav_link=('<h2><a href="%(modulepath)s?id=%(link_id)s%(nl)s">%(e_title)s</a></h2>'
                                )
        self.document_entry_nav_info=('<i>&nbsp;&nbsp;%(e_nav_info)s</i>')
        self.document_entry_nav_finish='</div>'
-
-###############################################################################################################################
-#
-# Acquisition Entry.
-# 
-# В Каждый элемент передаются следующие параметры:
-#
-# acq_data={'link_id':id,'item_id':item_id,'filename':item_name,'e_date':reg_date,'e_title':websym(item_title),'e_id':'item:%s'%(item_id),
-#           'annotation':websym(annotation), 'docdate':docdate, 'format':format,'cover':cover,'cover_type':cover_type,'filesize':fsize//1024,
-#           'authors':websym(authors),'genres':websym(genres),'series':websym(series),'authors_link':authors_link,'genres_link':genres_link, 'series_link':series_link,
-#           'nl':self.nl}
-
 
 
        self.document_entry_acq_start='<br><div class=acquisition_entry>\n'

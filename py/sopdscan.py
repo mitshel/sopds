@@ -160,7 +160,11 @@ class opdsScanner:
                      docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
                   if self.fb2parser.parse_error!=0:
-                     self.logger.warning(rel_path+' - '+name+' fb2 parse warning ['+self.fb2parser.parse_errormsg+']')
+                     if isinstance(self.fb2parser.parse_errormsg,str):
+                        errormsg=self.fb2parser.parse_errormsg
+                     else:
+                        errormsg='Unknown error message (convert error).'
+                     self.logger.warning(rel_path+' - '+name+' fb2 parse warning ['+errormsg+']')
 
                if title=='': title=n
 

@@ -88,14 +88,6 @@ class baseWrapper():
         self.add_response_body(self.template.page_title_info%data)
         self.add_response_body(self.template.page_title_finish%data)
 
-
-#    def  header(self, page_data):
-#        self.add_response_header([self.template.response_header])
-#        self.add_response_body(self.template.document_page_header%dictmerge(self.site_data, page_data, {'style':self.template.document_page_header_style}))
-
-#    def footer(self, page_data):
-#        self.add_response_body(self.template.document_page_footer%dictmerge(self.site_data,page_data))
-
     def main_menu(self,USER,DBINFO):
         if self.cfg.ALPHA: am='30'
         else: am=''
@@ -104,7 +96,6 @@ class baseWrapper():
            self.add_response_body(self.template.document_mainmenu_new%dictmerge(self.site_data,{'new_period':self.cfg.NEW_PERIOD}))
         if self.cfg.BOOK_SHELF and USER!=None:
            self.add_response_body(self.template.document_mainmenu_shelf%dictmerge(self.site_data,{'user':USER,'shelf_book_num':DBINFO[5][1]}))
-
 
     def new_menu(self,NEWINFO):
         if self.cfg.ALPHA: am='30'
@@ -225,10 +216,5 @@ class baseWrapper():
         self.add_response_header([self.template.response_header])
         self.add_response_body(self.template.opensearch%self.site_data)
 
-#    def opensearch_links(self, page_data):
-#        self.add_response_body(self.template.opensearch_links%dictmerge(self.site_data,page_data))
-
     def opensearch_forms(self, page_data):
         self.add_response_body(self.template.opensearch_forms%dictmerge(self.site_data,page_data))
-
-

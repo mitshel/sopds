@@ -83,9 +83,6 @@ class opdsClient():
         self.searchTerm=''
         self.user=None
         self.method=0
-#        self.response_status='200 Ok'
-#        self.response_headers=[]
-#        self.response_body=[]
         self.opdsWrapper.resetParams()
         self.webWrapper.resetParams()
         self.Wrapper=self.opdsWrapper
@@ -441,33 +438,9 @@ class opdsClient():
         self.new_menu()
         self.footer(page_data)
 
-#    def response_search_type(self):
-#        """ Выбор типа поиска по автору или наименованию или серии """
-#        page_data={'page_id':'id:search:%s'%self.searchTerm,'page_title':'Поиск %s'%self.searchTerm, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
-#        self.header(page_data)
-#        self.add_response_body('<link href="'+self.modulePath+'?id=09" rel="search" type="application/opensearchdescription+xml" />')
-#        self.add_response_body('<link href="'+self.modulePath+'?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
-#        self.entry_start()
-#        self.entry_head('Поиск книг',None,'71')
-#        self.entry_content('Поиск книги по ее наименованию')
-#        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=books&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-#        self.entry_finish()
-#        self.entry_start()
-#        self.entry_head('Поиск авторов',None,'72')
-#        self.entry_content('Поиск авторов по имени')
-#        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=authors&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-#        self.entry_finish()
-#        self.entry_start()
-#        self.entry_head('Поиск серий',None,'73')
-#        self.entry_content('Поиск серий книг')
-#        self.add_response_body('<link type="application/atom+xml;profile=opds-catalog" href="'+self.modulePath+'?searchType=series&amp;searchTerm='+parse.quote(self.searchTerm)+'" />')
-#        self.entry_finish()
-#        self.footer(page_data)
-
     def response_search_type(self):
         page_data={'page_id':'id:search:%s'%self.searchTerm,'page_title':'Поиск %s'%self.searchTerm, 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ"),'searchterm':parse.quote(self.searchTerm)}
         self.header(page_data)
-#        self.opensearch_links(page_data)
         self.opensearch_forms(page_data)
         self.footer(page_data)
 
