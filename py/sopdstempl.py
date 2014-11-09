@@ -160,7 +160,7 @@ class opdsTemplate():
                                '<id>id:%(e_id)s</id>')
        self.document_entry_acq_book_link_alternate=('<link type="application/%(format)s" rel="alternate" href="%(modulepath)s?id=91%(item_id)s"/>'
                                )
-       self.document_entry_acq_book_link=('<link type="application/%(format)s" href="%(modulepath)s?id=%(id)s%(item_id)s" rel="http://opds-spec.org/acquisition" />'
+       self.document_entry_acq_book_link=('<link type="application/%(format)s" href="%(modulepath)s?id=%(id)s%(item_id)s" rel="http://opds-spec.org/acquisition/open-access" />'
                                )
        self.document_entry_acq_link_finish=''
 

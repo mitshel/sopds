@@ -39,7 +39,7 @@ class baseWrapper():
         self.response_body=[]
 
     def add_response_body(self, string='', encoding='utf8'):
-        self.response_body+=[string.encode(encoding)]
+        self.response_body+=[(string + "\n").encode(encoding)]
 
     def add_response_binary(self, data):
         self.response_body+=[data]
@@ -146,7 +146,7 @@ class baseWrapper():
         data['id']=91
         self.add_response_body(self.template.document_entry_acq_book_link%data)
         data['id']=92
-        data['format']=data['format']+'.zip'
+        data['format']=data['format']+'+zip'
         self.add_response_body(self.template.document_entry_acq_book_link%data)
         if acq_data['format'].lower()=='fb2' and self.cfg.FB2TOEPUB:
            data['id']=93

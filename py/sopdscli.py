@@ -55,7 +55,7 @@ class opdsClient():
         if mode==modeWSGI:
            self.modulePath=self.cfg.WSGI_PATH
         elif mode==modeINT:
-           self.modulePath=''
+           self.modulePath='/'
         else:
            self.modulePath=self.cfg.CGI_PATH
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
