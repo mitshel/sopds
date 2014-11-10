@@ -53,11 +53,12 @@ class opdsClient():
     def __init__(self,cfg,mode=modeCGI):
         self.cfg=cfg
         if mode==modeWSGI:
-           self.modulePath=self.cfg.WSGI_PATH
+           self.moduleFile=self.cfg.WSGI_PATH
         elif mode==modeINT:
-           self.modulePath=''
+           self.moduleFile=''
         else:
-           self.modulePath=self.cfg.CGI_PATH
+           self.moduleFile=self.cfg.CGI_PATH
+        self.modulePath=self.moduleFile
         self.opdsdb=sopdsdb.opdsDatabase(self.cfg.DB_NAME,self.cfg.DB_USER,self.cfg.DB_PASS,self.cfg.DB_HOST,self.cfg.ROOT_LIB)
         self.site_data={'site_title':self.cfg.SITE_TITLE, 'site_subtitle':'Simple OPDS Catalog by www.sopds.ru. Version '+sopdscfg.VERSION,'modulepath':self.modulePath,'site_icon':self.cfg.SITE_ICON,'site_author':self.cfg.SITE_AUTOR,'site_url':self.cfg.SITE_URL,'site_email':self.cfg.SITE_EMAIL, 'charset':'utf-8'}
 
@@ -100,8 +101,11 @@ class opdsClient():
 
         if self.cfg.WEB_PREFIX in URI:
            self.Wrapper=self.webWrapper        
+           self.modulePath=os.path.join(self.cfg.WEB_PREFIX,self.moduleFile)
         if self.cfg.OPDS_PREFIX in URI:
            self.Wrapper=self.opdsWrapper
+           self.modulePath=os.path.join(self.cfg.OPDS_PREFIX,self.moduleFile)
+        self.modulePath=os.path.normpath(self.modulePath)
 
         if 'id' in qs:
            self.id_value=qs.get("id")[0]
