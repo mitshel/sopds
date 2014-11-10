@@ -748,69 +748,67 @@ class opdsClient():
 
     def make_response(self):
         self.opdsdb.openDB()
+        if self.opdsdb.errcode==0 or self.opdsdb.errcode==4:
+            if self.type_value==0:
+               self.response_main()
+            elif self.type_value==1:
+               self.response_catalogs()
 
-        if self.type_value==0:
-           self.response_main()
-        elif self.type_value==1:
-           self.response_catalogs()
+            elif self.type_value==2:
+               self.response_authors()
+            elif self.type_value==12 or self.type_value==72:
+               self.response_authors_search()
+            elif self.type_value==22 and self.np==0:
+               self.response_authors_submenu()
+            elif self.type_value==31:
+               self.response_authors_series()
+            elif self.type_value==33 or (self.type_value==22 and self.np!=0):
+               self.response_authors_alpha()
+            elif self.type_value==34:
+               self.response_authors_series_books()
 
-        elif self.type_value==2:
-           self.response_authors()
-        elif self.type_value==12 or self.type_value==72:
-           self.response_authors_search()
-        elif self.type_value==22 and self.np==0:
-           self.response_authors_submenu()
-        elif self.type_value==31:
-           self.response_authors_series()
-        elif self.type_value==33 or (self.type_value==22 and self.np!=0):
-           self.response_authors_alpha()
-        elif self.type_value==34:
-           self.response_authors_series_books()
+            elif self.type_value==3:
+               self.response_titles()
+            elif self.type_value==13 or self.type_value==71:
+               self.response_titles_search()
+            elif self.type_value==23:
+               self.response_doubles()
 
-        elif self.type_value==3:
-           self.response_titles()
-        elif self.type_value==13 or self.type_value==71:
-           self.response_titles_search()
-        elif self.type_value==23:
-           self.response_doubles()
+            elif self.type_value==4:
+               self.response_genres_sections()
+            elif self.type_value==14:
+               self.response_genres_subsections()
+            elif self.type_value==24:
+               self.response_genres_books()
 
-        elif self.type_value==4:
-           self.response_genres_sections()
-        elif self.type_value==14:
-           self.response_genres_subsections()
-        elif self.type_value==24:
-           self.response_genres_books()
+            elif self.type_value==5:
+               self.response_last()
 
-        elif self.type_value==5:
-           self.response_last()
+            elif self.type_value==6:
+               self.response_series()
+            elif self.type_value==16 or self.type_value==73:
+               self.response_series_search()
+            elif self.type_value==26:
+               self.response_series_books()
 
-        elif self.type_value==6:
-           self.response_series()
-        elif self.type_value==16 or self.type_value==73:
-           self.response_series_search()
-        elif self.type_value==26:
-           self.response_series_books()
+            elif self.type_value==7:
+               self.response_search_type()
+            elif self.type_value==8:
+               self.response_bookshelf()
+            elif self.type_value==30:
+               self.response_alpha()
 
-        elif self.type_value==7:
-           self.response_search_type()
-        elif self.type_value==8:
-           self.response_bookshelf()
-        elif self.type_value==30:
-           self.response_alpha()
+            elif self.type_value==9:
+               self.response_search()
 
-        elif self.type_value==9:
-           self.response_search()
-
-        elif self.type_value==91:
-           self.response_book_file()
-        elif self.type_value==92:
-           self.response_book_zip()
-        elif self.type_value==93 or self.type_value==94:
-           self.response_book_convert()
-        elif self.type_value==99:
-           self.response_book_cover()
+            elif self.type_value==91:
+               self.response_book_file()
+            elif self.type_value==92:
+               self.response_book_zip()
+            elif self.type_value==93 or self.type_value==94:
+               self.response_book_convert()
+            elif self.type_value==99:
+               self.response_book_cover()
         
         self.opdsdb.closeDB()
-
-
 

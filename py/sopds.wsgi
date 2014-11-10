@@ -13,13 +13,13 @@ import zipf
 
 cfg=sopdscfg.cfgreader()
 zipf.ZIP_CODEPAGE=cfg.ZIP_CODEPAGE
-sopds = sopdscli.opdsClient(cfg,sopdscli.modeWSGI)
 
 def app(environ, start_response):
    user = None
    if 'REMOTE_USER' in environ:
       user = environ['REMOTE_USER']
 
+   sopds = sopdscli.opdsClient(cfg,sopdscli.modeWSGI)
    sopds.resetParams()
    sopds.parseParams(environ)
    sopds.setUser(user)
