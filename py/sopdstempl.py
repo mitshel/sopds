@@ -213,7 +213,7 @@ class webTemplate(opdsTemplate):
        self.agregate_genres_link=('<a href="%(modulepath)s?id=24%(genre_id)s">%(genre)s</a>, '
                               )
        self.agregate_series='%(ser)s #%(ser_no)s, '
-       self.agregate_series_link=('<a href="%(modulepath)s?id=26%(ser_id)s">%%(ser)s</a> #%(ser_no)s, '
+       self.agregate_series_link=('<a href="%(modulepath)s?id=26%(ser_id)s">%(ser)s</a> #%(ser_no)s, '
                               )
 
        self.document_style='''
