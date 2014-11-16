@@ -28,7 +28,7 @@ class opdsTemplate():
                               '</entry>')
 
        self.agregate_authors=('<author><name>%(last_name)s %(first_name)s</name></author>')
-       self.agregate_authors_link=('<link href="%(modulepath)s?id=22%(author_id)s" rel="related" type="application/atom+xml;profile=opds-catalog" title="Все книги %(last_name)s %(first_name)s" />')
+       self.agregate_authors_link=('<link href="%(modulepath)s?id=22%(author_id)s" rel="related" type="application/atom+xml;profile=opds-catalog;kind=navigation" title="Все книги %(last_name)s %(first_name)s" />')
        self.agregate_genres='<category term="%(genre)s" label="%(genre)s" />'
        self.agregate_genres_link=''
        self.agregate_series=''
@@ -137,9 +137,9 @@ class opdsTemplate():
                                     '<entry><title>Показать все</title><id>alpha:5</id><link type="application/atom+xml;profile=opds-catalog;kind=navigation" href="%(modulepath)s?id=%(iid)s&amp;alpha=5%(nl)s"/></entry>'
                                     )
        self.document_page_control_start=''
-       self.document_page_control_prev=('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="prev" title="Previous Page" href="%(modulepath)s?id=%(link_id)s&amp;page=%(page_prev)s" />'
+       self.document_page_control_prev=('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="prev" title="Previous Page" href="%(modulepath)s?id=%(link_id)s&amp;page=%(page_prev)s" />'
                                )
-       self.document_page_control_next=('<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="next" title="Next Page" href="%(modulepath)s?id=%(link_id)s&amp;page=%(page_next)s" />'
+       self.document_page_control_next=('<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="next" title="Next Page" href="%(modulepath)s?id=%(link_id)s&amp;page=%(page_next)s" />'
                                )
        self.document_page_control_finish=''
 
@@ -148,7 +148,7 @@ class opdsTemplate():
                                '<updated>%(e_date)s</updated>'
                                '<id>id:%(e_id)s</id>')
        self.document_entry_nav_link=('<link type="application/atom+xml" rel="alternate" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=acquisition" rel="subsection" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
+                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="subsection" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
                                )
        self.document_entry_nav_info=('<content type="text">%(e_nav_info)s</content>')
        self.document_entry_nav_finish='</entry>>'
@@ -184,7 +184,7 @@ class opdsTemplate():
        self.document_entry_acq_infobook_userdata=''
        self.document_entry_acq_infobook_finish='</content>'
        self.document_entry_acq_rel_start=''
-       self.document_entry_acq_rel_doubles=('<link href="%(modulepath)s?id=23%(item_id)s" rel="related" type="application/atom+xml;profile=opds-catalog" title="Дубликаты книги" />'
+       self.document_entry_acq_rel_doubles=('<link href="%(modulepath)s?id=23%(item_id)s" rel="related" type="application/atom+xml;profile=opds-catalog;kind=acquisition" title="Дубликаты книги" />'
                                )
        self.document_entry_acq_rel_authors='%(authors)s %(authors_link)s'
        self.document_entry_acq_rel_genres='%(genres)s'
@@ -263,7 +263,7 @@ class webTemplate(opdsTemplate):
        self.page_title_finish=''
 
 
-       self.document_mainmenu_std=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=01">По каталогам</a></h2><i>&nbsp;&nbsp;Каталогов: %(cat_num)s, книг: %%(book_num)s.</i></div>'
+       self.document_mainmenu_std=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=01">По каталогам</a></h2><i>&nbsp;&nbsp;Каталогов: %(cat_num)s, книг: %(book_num)s.</i></div>'
                                '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%(alphabet_id)s02">По авторам</a></h2><i>&nbsp;&nbsp;Авторов: %(author_num)s.</i></div>'
                                '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%(alphabet_id)s03">По наименованию</a></h2><i>&nbsp;&nbsp;Книг: %(book_num)s.</i></div>'
                                '<div class=navigation_entry><h2><a href="%(modulepath)s?id=04">По жанрам</a></h2><i>&nbsp;&nbsp;Жанров: %(genre_num)s.</i></div>'
@@ -276,7 +276,7 @@ class webTemplate(opdsTemplate):
        self.document_newmenu=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=%(alphabet_id)s03&amp;news=1">Все новинки за %(new_period)s суток</a></h2></div>'
                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%(alphabet_id)s02&amp;news=1">Новинки по авторам</a></h2></div>'
                               '<div class=navigation_entry><h2><a href="%(modulepath)s?id=04&amp;news=1">Новинки по Жанрам</a></h2></div>'
-                              '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%(alphabet_id)s02&amp;news=1">Новинки по Сериям</a></h2></div>'
+                              '<div class=navigation_entry><h2><a href="%(modulepath)s?id=%(alphabet_id)s06&amp;news=1">Новинки по Сериям</a></h2></div>'
                                )
        self.document_authors_submenu=('<div class=navigation_entry><h2><a href="%(modulepath)s?id=31%(author_id)s">Книги по сериям</a></h2><i></i></div>'
                                '<div class=navigation_entry><h2><a href="%(modulepath)s?id=34%(author_id)s">Книги вне серий</a></h2><i></i></div>'
