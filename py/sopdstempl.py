@@ -147,8 +147,8 @@ class opdsTemplate():
        self.document_entry_nav_title=('<title>%(e_title)s</title>'
                                '<updated>%(e_date)s</updated>'
                                '<id>id:%(e_id)s</id>')
-       self.document_entry_nav_link=('<link type="application/atom+xml" rel="alternate" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
-                               '<link type="application/atom+xml;profile=opds-catalog" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
+       self.document_entry_nav_link=('<link type="application/atom+xml;profile=opds-catalog" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
+#                                     '<link type="application/atom+xml" rel="alternate" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
                                )
        self.document_entry_nav_info=('<content type="text">%(e_nav_info)s</content>')
        self.document_entry_nav_finish='</entry>>'
@@ -158,8 +158,9 @@ class opdsTemplate():
        self.document_entry_acq_book_title=('<title>%(e_title)s</title>'
                                '<updated>%(e_date)s</updated>'
                                '<id>id:%(e_id)s</id>')
-       self.document_entry_acq_book_link_alternate=('<link type="application/%(format)s" rel="alternate" href="%(modulepath)s?id=91%(item_id)s"/>'
-                               )
+       self.document_entry_acq_book_link_alternate=''
+#                              ('<link type="application/%(format)s" rel="alternate" href="%(modulepath)s?id=91%(item_id)s"/>'
+#                               )
        self.document_entry_acq_book_link=('<link type="application/%(format)s" href="%(modulepath)s?id=%(id)s%(item_id)s" rel="http://opds-spec.org/acquisition/open-access" />'
                                )
        self.document_entry_acq_link_finish=''
