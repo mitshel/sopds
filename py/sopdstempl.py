@@ -5,7 +5,7 @@ class opdsTemplate():
                         '<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">'
                         '<ShortName>SimpleOPDS</ShortName>'
                         '<LongName>SimpleOPDS</LongName>'
-                        '<Url type="application/atom+xml" template="%(modulepath)s?searchTerm={searchTerms}" />'
+                        '<Url type="application/atom+xml" template="%(modulepath)s?searchTerm={searchTerms}&searchType={searchType}" />'
                         '<Image width="16" height="16">http://www.sopds.ru/favicon.ico</Image>'
                         '<Tags />'
                         '<Contact />'
