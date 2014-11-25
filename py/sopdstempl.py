@@ -148,7 +148,7 @@ class opdsTemplate():
                                '<updated>%(e_date)s</updated>'
                                '<id>id:%(e_id)s</id>')
        self.document_entry_nav_link=('<link type="application/atom+xml" rel="alternate" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
-                               '<link type="application/atom+xml;profile=opds-catalog;kind=navigation" rel="subsection" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
+                               '<link type="application/atom+xml;profile=opds-catalog" rel="subsection" href="%(modulepath)s?id=%(link_id)s%(nl)s"/>'
                                )
        self.document_entry_nav_info=('<content type="text">%(e_nav_info)s</content>')
        self.document_entry_nav_finish='</entry>>'
