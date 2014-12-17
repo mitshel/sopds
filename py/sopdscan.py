@@ -160,7 +160,8 @@ class opdsScanner:
                      docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
                   if self.fb2parser.parse_error!=0:
-                     errormsg=error.message(self.fb2parser.parse_errormsg.code)
+#                     errormsg=error.message(self.fb2parser.parse_errormsg.code)
+                     errormsg=''
                      self.logger.warning(rel_path+' - '+name+' fb2 parse error ['+errormsg+']')
 
                if title=='': title=n
