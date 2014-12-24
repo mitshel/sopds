@@ -145,7 +145,8 @@ class baseWrapper():
         self.add_response_body(self.template.document_entry_acq_book_link_alternate%data)
         data['id']=91
         self.add_response_body(self.template.document_entry_acq_book_link%data)
-        data['id']=92
+        if data['format']!='epub':
+           data['id']=92
         data['format']=data['format']+'+zip'
         self.add_response_body(self.template.document_entry_acq_book_link%data)
         if acq_data['format'].lower()=='fb2' and self.cfg.FB2TOEPUB:
