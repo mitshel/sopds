@@ -145,7 +145,7 @@ class baseWrapper():
         self.add_response_body(self.template.document_entry_acq_book_link_alternate%data)
         data['id']=91
         self.add_response_body(self.template.document_entry_acq_book_link%data)
-        if data['format']!='epub':
+        if data['format'].lower()!='epub':
            data['id']=92
         data['format']=data['format']+'+zip'
         self.add_response_body(self.template.document_entry_acq_book_link%data)
