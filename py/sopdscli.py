@@ -245,14 +245,14 @@ class opdsClient():
         self.Wrapper.opensearch()
 
     def response_main(self):
-        page_data={'page_id':'id:main', 'page_title':'SOPDS|Главная', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        page_data={'page_id':'id:main', 'page_title':'SOPDS|Главная', 'page_updated':time.strftime("%Y-%m-%d %H:%M:%S")}
         self.header(page_data)
         self.main_menu()
         self.footer(page_data)
 
     def response_catalogs(self):
         """ Выбрана сортировка 'По каталогам' """
-        page_data={'page_id':'id:catalogs', 'page_title':'Сортировка по каталогам хранения', 'page_updated':time.strftime("%Y-%m-%dT%H:%M:%SZ")}
+        page_data={'page_id':'id:catalogs', 'page_title':'Сортировка по каталогам хранения', 'page_updated':time.strftime("%Y-%m-%d %H:%M:%S")}
         self.header(page_data)
         for (item_type,item_id,item_name,item_path,reg_date,item_title,annotation,docdate,format,fsize,cover,cover_type) in self.opdsdb.getitemsincat(self.slice_value,self.cfg.MAXITEMS,self.page_value):
             if item_type==1:
