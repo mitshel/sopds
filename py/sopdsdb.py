@@ -448,7 +448,7 @@ class opdsDatabase:
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
     if new_period==0: period=''
     else: period="and author_id in (select b.author_id from bauthors b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.author_id)"%new_period
-    sql="select UPPER(substring(CONCAT(last_name,' ',first_name),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where CONCAT(last_name,' ',first_name) like %s "+period+" group by 1"+having+" order by 1"
+    sql="select UPPER(substring(CONCAT(last_name,' ',first_name),1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_AUTHORS+" where CONCAT(last_name,' ',first_name) like %s "+period+" group by CONCAT(letters,'-')"+having+" order by 1"
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
@@ -469,7 +469,7 @@ class opdsDatabase:
        elif alpha==3: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZ',letters)>0 and letters!=''"
        elif alpha==4: having=" having INSTR('ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ0123456789',letters)=0 and letters!=''"
 
-    sql="select UPPER(substring(title,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where title like %s and avail!=0 "+dstr+period+" group by 1"+having+" order by 1"
+    sql="select UPPER(substring(title,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_BOOKS+" where title like %s and avail!=0 "+dstr+period+" group by CONCAT(letters,'-')"+having+" order by 1"
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
@@ -488,7 +488,7 @@ class opdsDatabase:
     if new_period==0: period=''
     else: period="and ser_id in (select b.ser_id from bseries b left join books c on b.book_id=c.book_id where registerdate>now()-INTERVAL %s DAY group by b.ser_id)"%new_period
 
-    sql="select UPPER(substring(ser,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where ser like %s "+period+" group by 1"+having+" order by 1"
+    sql="select UPPER(substring(ser,1,"+str(lc)+")) as letters, count(*) as cnt from "+TBL_SERIES+" where ser like %s "+period+" group by CONCAT(letters,'-')"+having+" order by 1"
     data=(letters+'%',)
     cursor=self.cnx.cursor()
     cursor.execute(sql,data)
