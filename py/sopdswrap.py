@@ -7,7 +7,7 @@ def websym(s,attr=False):
     """Replace special web-symbols"""
     result = s
     if attr:
-        table = {'"':'\''}
+        table = {'"':'\'','&':'&amp;'}
     else:
         table = {'&':'&amp;','<':'&lt;'}
     for k in table.keys():
