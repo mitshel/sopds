@@ -1,7 +1,9 @@
-from django.core.management.base import BaseCommand, CommandError
-#from photogal.models import Setting, PhotoAlbums, PhotoImages, addimage
-from django.utils import timezone
+# -*- coding: utf-8 -*-
+
 import os
+from django.core.management.base import BaseCommand, CommandError
+
+from opds_catalog.sopdscan import opdsScanner
 
 class Command(BaseCommand):
     help = 'Scan Books Collection.'
@@ -14,5 +16,6 @@ class Command(BaseCommand):
         self.scan(options['verbose'])
 
     def scan(self,verbose=False):
-        pass
+        scanner=opdsScanner()
+        scanner.scan_all()
 

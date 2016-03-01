@@ -8,7 +8,7 @@ class Book(models.Model):
     path = models.CharField(max_length=1024)
     filesize = models.IntegerField(null=False, default=0)
     format = models.CharField(max_length=8)
-    cat_id = models.ForeignKey('Catalog')
+    catalog = models.ForeignKey('Catalog')
     cat_type = models.IntegerField(null=False, default=0)
     registerdate = models.DateTimeField(null=False, default=utils.timezone.now)
     docdate = models.CharField(max_length=20)
@@ -20,8 +20,8 @@ class Book(models.Model):
     cover_type = models.CharField(max_length=32)
     doublicat = models.IntegerField(null=False, default=0)
     avail = models.IntegerField(null=False, default=0)
-    author = models.ManyToManyField('Author')
-    genre = models.ManyToManyField('Genre')
+    authors = models.ManyToManyField('Author')
+    genres = models.ManyToManyField('Genre')
     series = models.ManyToManyField('Series', through='bseries')
 
 class Catalog(models.Model):

@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import os
 import time
 import datetime
 import base64
+#import opds_catalog.zipf as zipfile
 import zipfile
 import logging
 
@@ -52,7 +55,7 @@ class opdsScanner:
                         self.processzip(name,full_path,file)
                 else:
                     file_size=os.path.getsize(file)
-                    self.processfile(name,full_path,file,0,file_size)
+                    self.processfile(name,full_path,file,None,0,file_size)
 
         if settings.DELETE_LOGICAL:
            self.books_deleted=opdsdb.books_del_logical()
@@ -71,7 +74,7 @@ class opdsScanner:
     def processzip(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
         if settings.ZIPRESCAN or opdsdb.zipisscanned(rel_file,1)==None:
-            cat_id=opdsdb.addcattree(rel_file,1)
+            cat=opdsdb.addcattree(rel_file,1)
             try:
                 z = zipfile.ZipFile(file, 'r', allowZip64=True)
                 filelist = z.namelist()
@@ -79,7 +82,7 @@ class opdsScanner:
                     try:
                         print('Start process ZIP file = '+file+' book file = '+n)
                         file_size=z.getinfo(n).file_size
-                        self.processfile(n,file,z.open(n),1,file_size,cat_id=cat_id)
+                        self.processfile(n,file,z.open(n),cat,1,file_size)
                     except:
                         print('Error processing ZIP file = '+file+' book file = '+n)
                 z.close()
@@ -91,15 +94,16 @@ class opdsScanner:
             self.arch_skipped+=1
             print('Skip ZIP archive '+rel_file+'. Already scanned.')
 
-    def processfile(self,name,full_path,file,archive=0,file_size=0,cat_id=0):
+    def processfile(self,name,full_path,file,cat,archive=0,file_size=0):
         (n,e)=os.path.splitext(name)
         if e.lower() in settings.BOOK_EXTENSIONS:
             rel_path=os.path.relpath(full_path,settings.ROOT_LIB)
             print("Attempt to add book "+rel_path+"/"+name)
+
             self.fb2parser.reset()
             if opdsdb.findbook(name,rel_path,1)==None:
                if archive==0:
-                  catalog=opdsdb.addcattree(rel_path,archive)
+                  cat=opdsdb.addcattree(rel_path,archive)
                title=''
                lang=''
                annotation=''
@@ -123,13 +127,12 @@ class opdsScanner:
                      docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
                   if self.fb2parser.parse_error!=0:
-#                     errormsg=error.message(self.fb2parser.parse_errormsg.code)
                      errormsg=''
                      print(rel_path+' - '+name+' fb2 parse error ['+errormsg+']')
 
                if title=='': title=n
 
-               book_id=self.opdsdb.addbook(name,rel_path,cat_id,e,title,annotation,docdate,lang,file_size,archive,settings.DUBLICATES_FIND)
+               book=opdsdb.addbook(name,rel_path,cat,e,title,annotation,docdate,lang,file_size,archive)
                self.books_added+=1
 
                if archive==1:
@@ -140,21 +143,21 @@ class opdsScanner:
                for l in self.fb2parser.author_last.getvalue():
                    last_name=l.strip(' \'\"\&-.#\\\`')
                    first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \'\"\&-.#\\\`')
-                   author_id=self.opdsdb.addauthor(first_name,last_name)
-                   self.opdsdb.addbauthor(book_id,author_id)
+                   author=opdsdb.addauthor(first_name,last_name)
+                   opdsdb.addbauthor(book,author)
                    idx+=1
                for l in self.fb2parser.genre.getvalue():
-                   self.opdsdb.addbgenre(book_id,self.opdsdb.addgenre(l.lower().strip(' \'\"')))
+                   opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(' \'\"')))
                for l in self.fb2parser.series.attrss:
                    ser_name=l.get('name')
                    if ser_name:
-                      ser_id=self.opdsdb.addseries(ser_name.strip())
+                      ser=opdsdb.addseries(ser_name.strip())
                       sser_no=l.get('number','0').strip()
                       if sser_no.isdigit():
                          ser_no=int(sser_no)
                       else:
                          ser_no=0
-                      self.opdsdb.addbseries(book_id,ser_id,ser_no)
+                      opdsdb.addbseries(book,ser,ser_no)
 
             else:
                self.books_skipped+=1
