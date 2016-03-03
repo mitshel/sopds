@@ -5,16 +5,17 @@ import time
 import datetime
 import base64
 #import opds_catalog.zipf as zipfile
-import zipfile
+import opds_catalog.zipf as zipfile
 import logging
 
 from opds_catalog import fb2parse, settings, opdsdb
 
 
 class opdsScanner:
-    def __init__(self):
+    def __init__(self, logger):
         self.fb2parser=None
         self.init_parser()
+        self.logger = logger
 
     def init_stats(self):
         self.t1=datetime.timedelta(seconds=time.time())
@@ -32,13 +33,39 @@ class opdsScanner:
         self.fb2parser=fb2parse.fb2parser(False)
 
     def log_options(self):
-        pass
+        self.logger.info(' ***** Starting sopds-scan...')
+        self.logger.debug('OPTIONS SET')
+        if settings.ROOT_LIB!=None:       self.logger.debug('root_lib = '+settings.ROOT_LIB)
+        if settings.FB2TOEPUB!=None: self.logger.debug('fb2toepub = '+settings.FB2TOEPUB)
+        if settings.FB2TOMOBI!=None: self.logger.debug('fb2tomobi = '+settings.FB2TOMOBI)
+        if settings.TEMP_DIR!=None:       self.logger.debug('temp_dir = '+settings.TEMP_DIR)
 
     def log_stats(self):
-        pass
+        self.t2=datetime.timedelta(seconds=time.time())
+        self.logger.info('Books added      : '+str(self.books_added))
+        self.logger.info('Books skipped    : '+str(self.books_skipped))
+        if settings.DELETE_LOGICAL:
+            self.logger.info('Books deleted    : '+str(self.books_deleted))
+        else:
+            self.logger.info('Books DB entries deleted : '+str(self.books_deleted))
+        self.logger.info('Books in archives: '+str(self.books_in_archives))
+        self.logger.info('Archives scanned : '+str(self.arch_scanned))
+        self.logger.info('Archives skipped : '+str(self.arch_skipped))
+        self.logger.info('Bad archives     : '+str(self.bad_archives))
+
+        t=self.t2-self.t1
+        seconds=t.seconds%60
+        minutes=((t.seconds-seconds)//60)%60
+        hours=t.seconds//3600
+        self.logger.info('Time estimated:'+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
 
     def log_stats_dbl(self):
-        pass
+        self.t3=datetime.timedelta(seconds=time.time())
+        t=self.t3-self.t2
+        seconds=t.seconds%60
+        minutes=((t.seconds-seconds)//60)%60
+        hours=t.seconds//3600
+        self.logger.info('Finishing mark_double proc in '+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
 
     def scan_all(self):
         self.init_stats()
@@ -73,32 +100,34 @@ class opdsScanner:
 
     def processzip(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
-        if settings.ZIPRESCAN or opdsdb.zipisscanned(rel_file,1)==None:
+        if settings.ZIPRESCAN or (not opdsdb.zipisscanned(rel_file,1)):
             cat=opdsdb.addcattree(rel_file,1)
             try:
                 z = zipfile.ZipFile(file, 'r', allowZip64=True)
                 filelist = z.namelist()
                 for n in filelist:
                     try:
-                        print('Start process ZIP file = '+file+' book file = '+n)
+                        self.logger.debug('Start process ZIP file = '+file+' book file = '+n)
                         file_size=z.getinfo(n).file_size
                         self.processfile(n,file,z.open(n),cat,1,file_size)
                     except:
-                        print('Error processing ZIP file = '+file+' book file = '+n)
+                        self.logger.error('Error processing ZIP file = '+file+' book file = '+n)
+                        raise
                 z.close()
                 self.arch_scanned+=1
             except:
-                print('Error while read ZIP archive. File '+file+' corrupt.')
+                self.logger.error('Error while read ZIP archive. File '+file+' corrupt.')
                 self.bad_archives+=1
+                raise
         else:
             self.arch_skipped+=1
-            print('Skip ZIP archive '+rel_file+'. Already scanned.')
+            self.logger.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
 
     def processfile(self,name,full_path,file,cat,archive=0,file_size=0):
         (n,e)=os.path.splitext(name)
         if e.lower() in settings.BOOK_EXTENSIONS:
             rel_path=os.path.relpath(full_path,settings.ROOT_LIB)
-            print("Attempt to add book "+rel_path+"/"+name)
+            self.logger.debug("Attempt to add book "+rel_path+"/"+name)
 
             self.fb2parser.reset()
             if opdsdb.findbook(name,rel_path,1)==None:
@@ -128,7 +157,7 @@ class opdsScanner:
 
                   if self.fb2parser.parse_error!=0:
                      errormsg=''
-                     print(rel_path+' - '+name+' fb2 parse error ['+errormsg+']')
+                     self.logger.warning(rel_path+' - '+name+' fb2 parse error ['+errormsg+']')
 
                if title=='': title=n
 
@@ -137,7 +166,7 @@ class opdsScanner:
 
                if archive==1:
                   self.books_in_archives+=1
-               print("Book "+rel_path+"/"+name+" Added ok.")
+               self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
 
                idx=0
                for l in self.fb2parser.author_last.getvalue():
@@ -161,4 +190,4 @@ class opdsScanner:
 
             else:
                self.books_skipped+=1
-               print("Book "+rel_path+"/"+name+" Already in DB.")
+               self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")

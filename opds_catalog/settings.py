@@ -1,4 +1,7 @@
+import logging
 from django.conf import settings
+
+loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
 
 # Main SOPDS Book Collection Directory
 ROOT_LIB = getattr(settings, "SOPDS_ROOT_LIB", "books/")
@@ -23,3 +26,10 @@ SINGLE_COMMIT = getattr(settings, "SOPDS_SINGLE_COMMIT", True)
 TITLE_AS_FILENAME = getattr(settings, "SOPDS_TITLE_AS_FILENAME", True)
 ALPHABET_MENU = getattr(settings, "SOPDS_ALPHABET_MENU", True)
 BOOK_SHELF = getattr(settings, "SOPDS_BOOK_SHELF", True)
+
+LOGFILE = getattr(settings, "SOPDS_LOGFILE", "scan.log")
+loglevel = getattr(settings, "SOPDS_LOGLEVEL", "info")
+if loglevel.lower() in loglevels:
+   LOGLEVEL=loglevels[loglevel.lower()]
+else:
+   LOGLEVEL=logging.NOTSET

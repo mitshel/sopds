@@ -44,7 +44,7 @@ class Series(models.Model):
 
 class bseries(models.Model):
     book = models.ForeignKey(Book)
-    series = models.ForeignKey(Series)
+    ser = models.ForeignKey(Series)
     ser_no = models.IntegerField(null=False, default=0)
 
 class bookshelf(models.Model):

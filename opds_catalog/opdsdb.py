@@ -26,6 +26,15 @@ CMP_TITLE_AUTHORS=1
 #
 unknown_genre='Неизвестный жанр'
 
+
+def clear_all():
+    Book.objects.all().delete()
+    Catalog.objects.all().delete()
+    Author.objects.all().delete()
+    Genre.objects.all().delete()
+    Series.objects.all().delete()
+    bseries.objects.all().delete()
+
 # Книги где avail=0 уже известно что удалены
 # Книги где avail=2 это только что прверенные существующие книги
 # Устанавливаем avail=1 для книг которые не удалены. Во время проверки
@@ -50,15 +59,8 @@ def books_del_phisical():
     return row_count
 
 def zipisscanned(zipname,setavail=0):
-    try:
-        catalog = Book.objects.get(path=zipname)
-    except Book.DoesNotExist:
-        catalog = None
-
-    if catalog!=None and setavail:
-        Book.objects.filter(catalog=catalog).update(avail=2)
-
-    return catalog
+    row_count = Book.objects.filter(path=zipname).update(avail=2)
+    return row_count
 
 def findcat(cat_name):
     (head,tail)=os.path.split(cat_name)
