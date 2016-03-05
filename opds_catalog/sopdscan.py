@@ -102,6 +102,7 @@ class opdsScanner:
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
         if settings.ZIPRESCAN or (not opdsdb.zipisscanned(rel_file,1)):
             cat=opdsdb.addcattree(rel_file,1)
+            zip_process_error = 0
             try:
                 z = zipfile.ZipFile(file, 'r', allowZip64=True)
                 filelist = z.namelist()
@@ -112,11 +113,13 @@ class opdsScanner:
                         self.processfile(n,file,z.open(n),cat,1,file_size)
                     except zipfile.BadZipFile:
                         self.logger.error('Error processing ZIP file = '+file+' book file = '+n)
+                        zip_process_error = 1
                 z.close()
                 self.arch_scanned+=1
             except zipfile.BadZipFile:
                 self.logger.error('Error while read ZIP archive. File '+file+' corrupt.')
-                self.bad_archives+=1
+                zip_process_error = 1
+            self.bad_archives+=zip_process_error
         else:
             self.arch_skipped+=1
             self.logger.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
