@@ -115,10 +115,9 @@ class opdsScanner:
                         raise
                 z.close()
                 self.arch_scanned+=1
-            except:
+            except zipfile.BadZipfile:
                 self.logger.error('Error while read ZIP archive. File '+file+' corrupt.')
                 self.bad_archives+=1
-                raise
         else:
             self.arch_skipped+=1
             self.logger.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
