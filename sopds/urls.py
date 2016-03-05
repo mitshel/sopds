@@ -17,6 +17,6 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^opds/', include('opds_catalog.urls')),
+    url(r'^opds/', include('opds_catalog.urls', namespace='opds', app_name='opds_catalog')),
     url(r'^admin/', admin.site.urls),
 ]

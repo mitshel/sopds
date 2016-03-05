@@ -1,6 +1,7 @@
 import logging
 from django.conf import settings
 
+sopds_version = '0.30a'
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
 
 # Main SOPDS Book Collection Directory
@@ -26,6 +27,10 @@ SINGLE_COMMIT = getattr(settings, "SOPDS_SINGLE_COMMIT", True)
 TITLE_AS_FILENAME = getattr(settings, "SOPDS_TITLE_AS_FILENAME", True)
 ALPHABET_MENU = getattr(settings, "SOPDS_ALPHABET_MENU", True)
 BOOK_SHELF = getattr(settings, "SOPDS_BOOK_SHELF", True)
+
+TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
+SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%sopds_version)
+ICON = getattr(settings, "SOPDS_ICONE", "http://sopds.ru/favicon.ico")
 
 LOGFILE = getattr(settings, "SOPDS_LOGFILE", "scan.log")
 loglevel = getattr(settings, "SOPDS_LOGLEVEL", "info")

@@ -79,8 +79,7 @@ def addcattree(cat_name, archive=0):
         return None
     (head,tail)=os.path.split(cat_name)
     parent=addcattree(head)
-    new_cat = Catalog(parent=parent, cat_name=tail, path=cat_name, cat_type=archive)
-    new_cat.save()
+    new_cat = Catalog.objects.create(parent=parent, cat_name=tail, path=cat_name, cat_type=archive)
 
     return new_cat
 
@@ -102,11 +101,9 @@ def findbook(name, path, setavail=0):
 def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, archive=0):
     format=exten[1:]
     format=format.lower()
-    book = Book(filename=name,path=path,catalog=cat,filesize=size,format=format,
+    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=format,
                 title=title,annotation=annotation,docdate=docdate,lang=lang,
                 cat_type=archive,doublicat=0,avail=2)
-    book.save()
-
     return book
 
 def findauthor(first_name,last_name):
