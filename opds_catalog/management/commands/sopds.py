@@ -1,5 +1,6 @@
 import logging
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 
 from opds_catalog.sopdscan import opdsScanner
 from opds_catalog import opdsdb, settings
@@ -41,7 +42,8 @@ class Command(BaseCommand):
 
     def scan(self, logger, verbose=False):
         scanner=opdsScanner(logger)
-        scanner.scan_all()
+        with transaction.atomic():
+            scanner.scan_all()
 
     def clear(self,verbose=False):
         opdsdb.clear_all()
