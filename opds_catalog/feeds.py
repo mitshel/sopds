@@ -2,7 +2,7 @@ from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
-from opds_catalog.models import Book
+from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf
 from opds_catalog import settings
 
 class opdsFeed(Atom1Feed):
@@ -15,26 +15,40 @@ class opdsFeed(Atom1Feed):
     def add_root_elements(self, handler):
         super(opdsFeed, self).add_root_elements(handler)
         handler.addQuickElement('icon', settings.ICON)
+        if self.feed['search_url'] is not None:
+            handler.addQuickElement('link', "", {"href":self.feed["search_url"],"rel":"search","type":"application/opensearchdescription+xml"})
+        if self.feed['searchTerm_url'] is not None:
+            handler.addQuickElement('link', "", {"href":self.feed["searchTerm_url"],"rel":"search","type":"application/atom+xml"})
 
     def add_item_elements(self, handler, item):
         super(opdsFeed, self).add_item_elements(handler, item)
         handler.addQuickElement('content', item['content'], {'type': 'text'})
 
 
-class MainEntries(Feed):
+class MainFeed(Feed):
     feed_type = opdsFeed
     title = settings.TITLE
     subtitle = settings.SUBTITLE
-    link = "/opds/"
+    guid_prefix = "m:"
+
+    def link(self):
+        return reverse("opds:main")
+
+    def feed_url(self):
+        return reverse("opds:main")
+
+    def feed_extra_kwargs(self, obj):
+        return {"search_url":"sopds.wsgi?id=09",
+                "searchTerm_url":"sopds.wsgi?searchTerm={searchTerms}"}
 
     def items(self):
         return (
-               {'title':_('By catalogs'), 'link':'opds:catalogs'},
-               {'title':_('By authors'), 'link':'opds:authors'},
-               {'title':_('By titles'), 'link':'opds:titles'},
-               {'title':_('By genres'), 'link':'opds:genres'},
-               {'title':_('By series'), 'link':'opds:series'},
-               {'title':_('Book shelf'), 'link':'opds:bookshelf'},
+               {"id":1, "title":_("By catalogs"), "link":"opds:catalogs", "content": _("Catalogs: %s, books: %s.")},
+               {"id":2, "title":_("By authors"), "link":"opds:authors", "content": _("Authors: %s.")},
+               {"id":3, "title":_("By titles"), "link":"opds:titles", "content": _("Books: %s.")},
+               {"id":4, "title":_("By genres"), "link":"opds:genres", "content": _("Genres: %s.")},
+               {"id":5, "title":_("By series"), "link":"opds:series", "content": _("Series: %s.")},
+               {"id":6, "title":_("Book shelf"), "link":"opds:bookshelf", "content": _("Readed books: %s.")},
         )
 
     def item_link(self, item):
@@ -46,10 +60,31 @@ class MainEntries(Feed):
     def item_description(self, item):
         return None
 
-    def item_extra_kwargs(self, item):
-        return {"content":item["title"]}
+    def item_guid(self, item):
+        return "%s%s"%(self.guid_prefix,item["id"])
 
-class BooksEntries(Feed):
+    def item_extra_kwargs(self, item):
+        content = None
+        if item["id"]:
+            if item["id"]==1:
+                content = item["content"]%(Catalog.objects.count(),Book.objects.count())
+            elif item["id"]==2:
+                content = item["content"]%(Author.objects.count())
+            elif item["id"]==3:
+                content = item["content"]%(Book.objects.count())
+            elif item["id"]==4:
+                content = item["content"]%(Genre.objects.count())
+            elif item["id"]==5:
+                content = item["content"]%(Series.objects.count())
+            elif item["id"]==6:
+                content = item["content"]%(bookshelf.objects.count())
+        return {"content": content}
+
+
+class CatalogsFeed(Feed):
+    pass
+
+class BooksFeed(Feed):
     feed_type = opdsFeed
     title = "Мои книги"
     subtitle = settings.SUBTITLE
