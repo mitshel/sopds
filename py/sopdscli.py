@@ -245,7 +245,7 @@ class opdsClient():
         self.Wrapper.opensearch()
 
     def response_main(self):
-        page_data={'page_id':'id:main', 'page_title':'SOPDS|Главная', 'page_updated':time.strftime("%Y-%m-%d %H:%M:%S")}
+        page_data={'page_id':'id:main', 'page_title':self.cfg.SITE_TITLE, 'page_updated':time.strftime("%Y-%m-%d %H:%M:%S")}
         self.header(page_data)
         self.main_menu()
         self.footer(page_data)
