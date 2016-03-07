@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, connection
 from django import utils
 from django.contrib.auth.models import User
 
@@ -51,3 +51,8 @@ class bookshelf(models.Model):
     user = models.ForeignKey(User)
     book = models.ForeignKey(Book)
     readtime = models.DateTimeField(null=False, default=utils.timezone.now)
+
+#class CatalogManager(models.Manager):
+#    def catalogs_and_files(self, cat):
+
+

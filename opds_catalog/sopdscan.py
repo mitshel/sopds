@@ -129,6 +129,10 @@ class opdsScanner:
         if e.lower() in settings.BOOK_EXTENSIONS:
             rel_path=os.path.relpath(full_path,settings.ROOT_LIB)
             self.logger.debug("Attempt to add book "+rel_path+"/"+name)
+            #self.logger.debug("   full_path = "+full_path)
+            #self.logger.debug("   settings.ROOT_LIB = "+settings.ROOT_LIB)
+            #self.logger.debug("   rel_path = "+rel_path)
+
 
             self.fb2parser.reset()
             if opdsdb.findbook(name,rel_path,1)==None:

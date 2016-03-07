@@ -43,12 +43,12 @@ class MainFeed(Feed):
 
     def items(self):
         return (
-               {"id":1, "title":_("By catalogs"), "link":"opds:catalogs", "content": _("Catalogs: %s, books: %s.")},
-               {"id":2, "title":_("By authors"), "link":"opds:authors", "content": _("Authors: %s.")},
-               {"id":3, "title":_("By titles"), "link":"opds:titles", "content": _("Books: %s.")},
-               {"id":4, "title":_("By genres"), "link":"opds:genres", "content": _("Genres: %s.")},
-               {"id":5, "title":_("By series"), "link":"opds:series", "content": _("Series: %s.")},
-               {"id":6, "title":_("Book shelf"), "link":"opds:bookshelf", "content": _("Readed books: %s.")},
+               {"id":1, "title":_("By catalogs"), "link":"opds:catalogs", "content": _("Catalogs: %(catalogs)s, books: %(books)s.")},
+               {"id":2, "title":_("By authors"), "link":"opds:authors", "content": _("Authors: %(authors)s.")},
+               {"id":3, "title":_("By titles"), "link":"opds:titles", "content": _("Books: %(books)s.")},
+               {"id":4, "title":_("By genres"), "link":"opds:genres", "content": _("Genres: %(genres)s.")},
+               {"id":5, "title":_("By series"), "link":"opds:series", "content": _("Series: %(series)s.")},
+               {"id":6, "title":_("Book shelf"), "link":"opds:bookshelf", "content": _("Books readed: %(bookshelf)s.")},
         )
 
     def item_link(self, item):
@@ -67,22 +67,62 @@ class MainFeed(Feed):
         content = None
         if item["id"]:
             if item["id"]==1:
-                content = item["content"]%(Catalog.objects.count(),Book.objects.count())
+                content = item["content"]%{"catalogs":Catalog.objects.count(),"books":Book.objects.count()}
             elif item["id"]==2:
-                content = item["content"]%(Author.objects.count())
+                content = item["content"]%{"authors":Author.objects.count()}
             elif item["id"]==3:
-                content = item["content"]%(Book.objects.count())
+                content = item["content"]%{"books":Book.objects.count()}
             elif item["id"]==4:
-                content = item["content"]%(Genre.objects.count())
+                content = item["content"]%{"genres":Genre.objects.count()}
             elif item["id"]==5:
-                content = item["content"]%(Series.objects.count())
+                content = item["content"]%{"series":Series.objects.count()}
             elif item["id"]==6:
-                content = item["content"]%(bookshelf.objects.count())
+                content = item["content"]%{"bookshelf":bookshelf.objects.count()}
         return {"content": content}
 
 
 class CatalogsFeed(Feed):
-    pass
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+    guid_prefix = "с:"
+
+    def get_object(self, request, cat_id=None):
+
+        if cat_id is not None:
+            return Catalog.objects.get(id=cat_id)
+        else:
+            return Catalog.objects.get(parent__id=cat_id)
+
+    def title(self, obj):
+        if obj.parent:
+            return "%s | %s | %s"%(settings.TITLE,_("By catalogs"), obj.path)
+        else:
+            return "%s | %s"%(settings.TITLE,_("By catalogs"))
+
+    def link(self, obj):
+            return reverse("opds:cat_tree", kwargs={"cat_id":obj.id})
+
+    def feed_extra_kwargs(self, obj):
+        return {"search_url":"sopds.wsgi?id=09",
+                "searchTerm_url":"sopds.wsgi?searchTerm={searchTerms}"}
+
+    def items(self, obj):
+        return Catalog.objects.filter(parent=obj).order_by("cat_type","cat_name")
+
+    def item_title(self, item):
+        return item.cat_name
+
+    def item_description(self, item):
+        return None
+
+    def item_guid(self, item):
+        return "%s%s"%(self.guid_prefix,item.id)
+
+    def item_link(self, item):
+        return reverse("opds:cat_tree", kwargs={"cat_id":item.id})
+
+    def item_extra_kwargs(self, item):
+        return {"content": item.path}
 
 class BooksFeed(Feed):
     feed_type = opdsFeed

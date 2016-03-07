@@ -76,7 +76,7 @@ def addcattree(cat_name, archive=0):
     if catalog:
         return catalog
     if cat_name=="":
-        return None
+        return Catalog.objects.get_or_create(cat_name=".", path=".", cat_type=archive)[0]
     (head,tail)=os.path.split(cat_name)
     parent=addcattree(head)
     new_cat = Catalog.objects.create(parent=parent, cat_name=tail, path=cat_name, cat_type=archive)
