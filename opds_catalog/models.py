@@ -52,7 +52,8 @@ class bookshelf(models.Model):
     book = models.ForeignKey(Book)
     readtime = models.DateTimeField(null=False, default=utils.timezone.now)
 
-#class CatalogManager(models.Manager):
-#    def catalogs_and_files(self, cat):
-
+class Catalog_Book_Serialiser(models.Model):
+    pass
+#    query = 'select 1 as t,cat_id,cat_name,path,now(),cat_name as title,'' as docdate,'' as annotation,'cat' as format, 0 as filesize, '' as cover, '' as cover_type from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
+#    "select 2,book_id,filename,path,registerdate,title,annotation,docdate,format,filesize,cover,cover_type from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" and avail!=0 order by 1,6 "+limitstr)
 

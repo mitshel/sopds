@@ -4,6 +4,7 @@ from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf
 from opds_catalog import settings
+from itertools import chain
 
 class opdsFeed(Atom1Feed):
     def root_attributes(self):
@@ -15,15 +16,34 @@ class opdsFeed(Atom1Feed):
     def add_root_elements(self, handler):
         super(opdsFeed, self).add_root_elements(handler)
         handler.addQuickElement('icon', settings.ICON)
-        if self.feed['search_url'] is not None:
+        if self.feed.get('search_url') is not None:
             handler.addQuickElement('link', "", {"href":self.feed["search_url"],"rel":"search","type":"application/opensearchdescription+xml"})
-        if self.feed['searchTerm_url'] is not None:
+        if self.feed.get('searchTerm_url') is not None:
             handler.addQuickElement('link', "", {"href":self.feed["searchTerm_url"],"rel":"search","type":"application/atom+xml"})
 
     def add_item_elements(self, handler, item):
-        super(opdsFeed, self).add_item_elements(handler, item)
-        handler.addQuickElement('content', item['content'], {'type': 'text'})
+        handler.addQuickElement("title", item['title'])
+        handler.addQuickElement("id", item['unique_id'])
+        handler.addQuickElement("link", "", {"href": item['link'], "rel": "alternate"})
 
+        if item.get("nav_link") is not None:
+            handler.addQuickElement("link", "", {"href":item["nav_link"],
+                                                 "type":"application/atom+xml;profile=opds-catalog"})
+        if item.get("acq_fb2_link") is not None:
+            handler.addQuickElement("link", "", {"href":item["acq_fb2_link"],
+                                                 "rel":"http://opds-spec.org/acquisition/open-access",
+                                                 "type":"application/fb2"})
+        if item.get("acq_fb2zip_link") is not None:
+            handler.addQuickElement("link", "", {"href":item["acq_fb2zip_link"],
+                                                 "rel":"http://opds-spec.org/acquisition/open-access",
+                                                 "type":"application/fb2+zip"})
+        if item.get("acq_cover_link") is not None:
+            handler.addQuickElement("link", "", {"href":item["acq_cover_link"],
+                                                 "rel":"http://opds-spec.org/image",
+                                                 "type":item["acq_cover_type"]})
+
+        if item.get("description") is not None:
+            handler.addQuickElement("content", item["description"], {"type": "text"})
 
 class MainFeed(Feed):
     feed_type = opdsFeed
@@ -43,12 +63,12 @@ class MainFeed(Feed):
 
     def items(self):
         return (
-               {"id":1, "title":_("By catalogs"), "link":"opds:catalogs", "content": _("Catalogs: %(catalogs)s, books: %(books)s.")},
-               {"id":2, "title":_("By authors"), "link":"opds:authors", "content": _("Authors: %(authors)s.")},
-               {"id":3, "title":_("By titles"), "link":"opds:titles", "content": _("Books: %(books)s.")},
-               {"id":4, "title":_("By genres"), "link":"opds:genres", "content": _("Genres: %(genres)s.")},
-               {"id":5, "title":_("By series"), "link":"opds:series", "content": _("Series: %(series)s.")},
-               {"id":6, "title":_("Book shelf"), "link":"opds:bookshelf", "content": _("Books readed: %(bookshelf)s.")},
+               {"id":1, "title":_("By catalogs"), "link":"opds:catalogs", "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")},
+               {"id":2, "title":_("By authors"), "link":"opds:authors", "descr": _("Authors: %(authors)s.")},
+               {"id":3, "title":_("By titles"), "link":"opds:titles", "descr": _("Books: %(books)s.")},
+               {"id":4, "title":_("By genres"), "link":"opds:genres", "descr": _("Genres: %(genres)s.")},
+               {"id":5, "title":_("By series"), "link":"opds:series", "descr": _("Series: %(series)s.")},
+               {"id":6, "title":_("Book shelf"), "link":"opds:bookshelf", "descr": _("Books readed: %(bookshelf)s.")},
         )
 
     def item_link(self, item):
@@ -58,28 +78,24 @@ class MainFeed(Feed):
         return item['title']
 
     def item_description(self, item):
-        return None
+        descr = None
+        if item["id"]:
+            if item["id"]==1:
+                content = item["descr"]%{"catalogs":Catalog.objects.count(),"books":Book.objects.count()}
+            elif item["id"]==2:
+                content = item["descr"]%{"authors":Author.objects.count()}
+            elif item["id"]==3:
+                content = item["descr"]%{"books":Book.objects.count()}
+            elif item["id"]==4:
+                content = item["descr"]%{"genres":Genre.objects.count()}
+            elif item["id"]==5:
+                content = item["descr"]%{"series":Series.objects.count()}
+            elif item["id"]==6:
+                content = item["descr"]%{"bookshelf":bookshelf.objects.count()}
+        return descr
 
     def item_guid(self, item):
         return "%s%s"%(self.guid_prefix,item["id"])
-
-    def item_extra_kwargs(self, item):
-        content = None
-        if item["id"]:
-            if item["id"]==1:
-                content = item["content"]%{"catalogs":Catalog.objects.count(),"books":Book.objects.count()}
-            elif item["id"]==2:
-                content = item["content"]%{"authors":Author.objects.count()}
-            elif item["id"]==3:
-                content = item["content"]%{"books":Book.objects.count()}
-            elif item["id"]==4:
-                content = item["content"]%{"genres":Genre.objects.count()}
-            elif item["id"]==5:
-                content = item["content"]%{"series":Series.objects.count()}
-            elif item["id"]==6:
-                content = item["content"]%{"bookshelf":bookshelf.objects.count()}
-        return {"content": content}
-
 
 class CatalogsFeed(Feed):
     feed_type = opdsFeed
@@ -87,7 +103,6 @@ class CatalogsFeed(Feed):
     guid_prefix = "с:"
 
     def get_object(self, request, cat_id=None):
-
         if cat_id is not None:
             return Catalog.objects.get(id=cat_id)
         else:
@@ -107,22 +122,43 @@ class CatalogsFeed(Feed):
                 "searchTerm_url":"sopds.wsgi?searchTerm={searchTerms}"}
 
     def items(self, obj):
-        return Catalog.objects.filter(parent=obj).order_by("cat_type","cat_name")
+        catalogs_list = Catalog.objects.filter(parent=obj).order_by("cat_type","cat_name")
+        books_list = Book.objects.filter(catalog=obj).order_by("title")
+        return list(chain(catalogs_list,books_list))
 
     def item_title(self, item):
-        return item.cat_name
+        if isinstance(item, Catalog):
+            return item.cat_name
+        else:
+            return item.title
 
     def item_description(self, item):
-        return None
+        if isinstance(item, Catalog):
+            return item.path
+        else:
+            return item.annotation
 
     def item_guid(self, item):
-        return "%s%s"%(self.guid_prefix,item.id)
+        if isinstance(item, Catalog):
+            gp = self.guid_prefix
+        else:
+            gp = 'b:'
+        return "%s%s"%(gp,item.id)
 
     def item_link(self, item):
-        return reverse("opds:cat_tree", kwargs={"cat_id":item.id})
+        if isinstance(item, Catalog):
+            return reverse("opds:cat_tree", kwargs={"cat_id":item.id})
+        else:
+            return reverse("opds:titles")
 
     def item_extra_kwargs(self, item):
-        return {"content": item.path}
+        if isinstance(item, Catalog):
+            return {"nav_link":reverse("opds:cat_tree", kwargs={"cat_id":item.id})}
+        else:
+            return {"acq_fb2_link":"#",
+                    "acq_fb2zip_link":"#",
+                    "acq_cover_link":"#",
+                    "acq_cover_type":"#"}
 
 class BooksFeed(Feed):
     feed_type = opdsFeed
