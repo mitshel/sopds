@@ -1,11 +1,15 @@
+from itertools import chain
+
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
+from django.utils.xmlutils import SimplerXMLGenerator
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
+
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf
 from opds_catalog import settings
-from itertools import chain
-from xml.sax.saxutils import XMLGenerator
+
 
 
 class opdsEnclosure(Enclosure):
@@ -14,31 +18,54 @@ class opdsEnclosure(Enclosure):
         super(opdsEnclosure,self).__init__(url, 0, mime_type)
 
 class opdsFeed(Atom1Feed):
+    content_type = 'text/xml; charset=utf-8'
+
     def root_attributes(self):
-        attrs = super(opdsFeed, self).root_attributes()
+        attrs = {}
+        #attrs = super(opdsFeed, self).root_attributes()
         attrs['xmlns'] = 'http://www.w3.org/2005/Atom'
         attrs['xmlns:dcterms'] = 'http://purl.org/dc/terms'
-        attrs['xmlns:os'] = "http://a9.com/-/spec/opensearch/1.1/"
-        attrs['xmlns:opds'] = "http://opds-spec.org/2010/catalog"
+        #attrs['xmlns:os'] = "http://a9.com/-/spec/opensearch/1.1/"
+        #attrs['xmlns:opds'] = "http://opds-spec.org/2010/catalog"
         return attrs
 
     def add_root_elements(self, handler):
         handler._short_empty_elements = True
-        super(opdsFeed, self).add_root_elements(handler)
-        handler.addQuickElement('icon', settings.ICON)
-
+        #super(opdsFeed, self).add_root_elements(handler)
+        handler.characters("\n")
+        handler.addQuickElement("id", self.feed['id'])
+        handler.characters("\n")
+        if self.feed.get('feed_url') is not None:
+            handler.addQuickElement('link', None, {"href":self.feed["feed_url"],"rel":"self","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
+            handler.characters("\n")
         if self.feed.get('start_url') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["start_url"],"rel":"start","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
+            handler.characters("\n")
+        handler.addQuickElement('icon', settings.ICON)
+        handler.characters("\n")
+        handler.addQuickElement("title", self.feed['title'])
+        handler.characters("\n")
+        if self.feed.get('subtitle') is not None:
+            handler.addQuickElement("subtitle", self.feed['subtitle'])
+            handler.characters("\n")
+        handler.addQuickElement("updated", rfc3339_date(self.latest_post_date()))
+        handler.characters("\n")
         if self.feed.get('search_url') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["search_url"],"rel":"search","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
+            handler.characters("\n")
         if self.feed.get('searchTerm_url') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["searchTerm_url"],"rel":"search","type":"application/atom+xml"})
+            handler.characters("\n")
+
 
     def add_item_elements(self, handler, item):
-        handler.addQuickElement("title", item['title'])
+        handler.characters("\n")
         handler.addQuickElement("id", item['unique_id'])
+        handler.characters("\n")
+        handler.addQuickElement("title", item['title'])
+        handler.characters("\n")
         handler.addQuickElement("link", "", {"href": item['link'], "rel": "alternate"})
-
+        handler.characters("\n")
         # Enclosures.
         for enclosure in item['enclosures']:
             enclosure = enclosure
@@ -47,6 +74,11 @@ class opdsFeed(Atom1Feed):
                 'href': enclosure.url,
                 'type': enclosure.mime_type,
             })
+            handler.characters("\n")
+
+        if item.get('updateddate') is not None:
+            handler.addQuickElement('updated', rfc3339_date(item['updateddate']))
+            handler.characters("\n")
 
         if self.feed.get("description_mime_type") is not None:
             content_type = self.feed["description_mime_type"]
@@ -54,9 +86,7 @@ class opdsFeed(Atom1Feed):
             content_type = "text/html"
         if item.get("description") is not None:
             handler.addQuickElement("content", item["description"], {"type": content_type})
-
-        if item.get('updateddate') is not None:
-            handler.addQuickElement('updated', rfc3339_date(item['updateddate']))
+            handler.characters("\n")
 
 class MainFeed(Feed):
     feed_type = opdsFeed
@@ -86,10 +116,12 @@ class MainFeed(Feed):
         return reverse("opds_catalog:main")
 
     def feed_extra_kwargs(self, obj):
-        return {"search_url":"sopds.wsgi?id=09",
+        return {
+                #"search_url":"sopds.wsgi?id=09",
                 "searchTerm_url":"sopds.wsgi?searchTerm={searchTerms}",
                 "start_url":reverse("opds_catalog:main"),
-                "description_mime_type":"text"}
+                "description_mime_type":"text",
+        }
 
     def item_link(self, item):
         return reverse(item['link'])
@@ -102,6 +134,12 @@ class MainFeed(Feed):
 
     def item_guid(self, item):
         return "%s%s"%(self.guid_prefix,item["id"])
+
+    def item_updateddate(self):
+        return timezone.now()
+
+    def item_enclosures(self, item):
+        return (opdsEnclosure(reverse(item['link']),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
 
 class CatalogsFeed(Feed):
     feed_type = opdsFeed
@@ -165,7 +203,7 @@ class CatalogsFeed(Feed):
 
     def item_enclosures(self, item):
         if isinstance(item, Catalog):
-            return (opdsEnclosure("#","application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+            return (opdsEnclosure(reverse("opds:cat_tree", kwargs={"cat_id":item.id}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
         else:
             return (
                 opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),

@@ -1,11 +1,13 @@
+{% load i18n %}
+
 {% if obj.cat_name %}
     {{ obj.cat_name }}
 {% else %}
-    <b>Название книги:</b>{{ obj.title }}<br/>
-    <b>Авторы:</b>{% for a in obj.authors.all %}{{ a.last_name }} {{ a.first_name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br/>
-    <b>Жанры:</b>{% for g in obj.genres.all %}{{ g.subsection }}{% if not forloop.last %}, {% endif %}{% endfor %}<br/>
-    <b>Файл:</b>{{ obj.filename }}<br/>
-    <b>Размер файла:</b>{{ obj.filesize }}<br/>
-    <b>Дата правки:</b>{{ obj.docdate }}<br/>
+    <b>{% trans "Book name:" %} </b>{{ obj.title }}<br/>
+    <b>{% trans "Authors:" %} </b>{% for a in obj.authors.all %}{{ a.last_name }} {{ a.first_name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br/>
+    <b>{% trans "Genres:" %} </b>{% for g in obj.genres.all %}{{ g.subsection }}{% if not forloop.last %}, {% endif %}{% endfor %}<br/>
+    <b>{% trans "File:" %} </b>{{ obj.filename }}<br/>
+    <b>{% trans "File size:" %} </b>{{ obj.filesize }}<br/>
+    <b>{% trans "Changes date:" %} </b>{{ obj.docdate }}<br/>
     <p class=book">{{ obj.annotation }}</p>
 {% endif %}
