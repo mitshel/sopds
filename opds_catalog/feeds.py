@@ -41,8 +41,9 @@ class opdsFeed(Atom1Feed):
         if self.feed.get('start_url') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["start_url"],"rel":"start","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
             handler.characters("\n")
-        handler.addQuickElement('icon', settings.ICON)
-        handler.characters("\n")
+        if self.feed.get('icon') is not None:
+            handler.addQuickElement('icon', settings.ICON)
+            handler.characters("\n")
         handler.addQuickElement("title", self.feed['title'])
         handler.characters("\n")
         if self.feed.get('subtitle') is not None:
