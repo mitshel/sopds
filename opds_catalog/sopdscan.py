@@ -4,7 +4,6 @@ import os
 import time
 import datetime
 import base64
-#import opds_catalog.zipf as zipfile
 import opds_catalog.zipf as zipfile
 import logging
 

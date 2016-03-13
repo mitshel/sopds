@@ -27,6 +27,7 @@ SINGLE_COMMIT = getattr(settings, "SOPDS_SINGLE_COMMIT", True)
 TITLE_AS_FILENAME = getattr(settings, "SOPDS_TITLE_AS_FILENAME", True)
 ALPHABET_MENU = getattr(settings, "SOPDS_ALPHABET_MENU", True)
 BOOK_SHELF = getattr(settings, "SOPDS_BOOK_SHELF", True)
+NOCOVER_PATH = getattr(settings, "SOPDS_NOCOVER_PATH", "")
 
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
 SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%sopds_version)
