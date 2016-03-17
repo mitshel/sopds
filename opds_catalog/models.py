@@ -4,13 +4,13 @@ from django.contrib.auth.models import User
 
 
 class Book(models.Model):
-    filename = models.CharField(max_length=256)
-    path = models.CharField(max_length=1024)
+    filename = models.CharField(db_index=True, max_length=256)
+    path = models.CharField(db_index=True, max_length=1024)
     filesize = models.IntegerField(null=False, default=0)
     format = models.CharField(max_length=8)
-    catalog = models.ForeignKey('Catalog')
+    catalog = models.ForeignKey('Catalog',db_index=True)
     cat_type = models.IntegerField(null=False, default=0)
-    registerdate = models.DateTimeField(null=False, default=utils.timezone.now)
+    registerdate = models.DateTimeField(db_index=True, null=False, default=utils.timezone.now)
     docdate = models.CharField(max_length=20)
     favorite = models.IntegerField(null=False, default=0)
     lang = models.CharField(max_length=16)
@@ -20,9 +20,15 @@ class Book(models.Model):
     cover_type = models.CharField(max_length=32)
     doublicat = models.IntegerField(null=False, default=0)
     avail = models.IntegerField(null=False, default=0)
-    authors = models.ManyToManyField('Author')
-    genres = models.ManyToManyField('Genre')
+    authors = models.ManyToManyField('Author', through='bauthor')
+    genres = models.ManyToManyField('Genre', through='bgenre')
     series = models.ManyToManyField('Series', through='bseries')
+
+    class Meta:
+        index_together = [
+            ["title", "format", "filesize"],
+            ["avail", "doublicat"],
+        ]
 
 class Catalog(models.Model):
     parent = models.ForeignKey('self', null=True)
@@ -30,22 +36,54 @@ class Catalog(models.Model):
     path = models.CharField(max_length=1024)
     cat_type = models.IntegerField(null=False, default=0)
 
+    class Meta:
+        index_together = [
+            ["cat_name", "path"],
+        ]
+
 class Author(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
 
+    class Meta:
+        index_together = [
+            ["last_name", "first_name"],
+        ]
+
+class bauthor(models.Model):
+    book = models.ForeignKey(Book)
+    author = models.ForeignKey(Author)
+    class Meta:
+        index_together = [
+            ["book", "author"],
+        ]
+
 class Genre(models.Model):
-    genre = models.CharField(max_length=32)
+    genre = models.CharField(db_index=True, max_length=32)
     section = models.CharField(max_length=64)
     subsection = models.CharField(max_length=100)
 
+class bgenre(models.Model):
+    book = models.ForeignKey(Book)
+    genre = models.ForeignKey(Genre)
+
+    class Meta:
+        index_together = [
+            ["book", "genre"],
+        ]
+
 class Series(models.Model):
-    ser = models.CharField(max_length=64)
+    ser = models.CharField(db_index=True, max_length=64)
 
 class bseries(models.Model):
     book = models.ForeignKey(Book)
     ser = models.ForeignKey(Series)
     ser_no = models.IntegerField(null=False, default=0)
+
+    class Meta:
+        index_together = [
+            ["book", "ser"],
+        ]
 
 class bookshelf(models.Model):
     user = models.ForeignKey(User)
