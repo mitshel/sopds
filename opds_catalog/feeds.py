@@ -73,14 +73,14 @@ class opdsFeed(Atom1Feed):
         handler.addQuickElement("link", "", {"href": item['link'], "rel": "alternate"})
         handler.characters("\n")
         # Enclosures.
-        for enclosure in item['enclosures']:
-            enclosure = enclosure
-            handler.addQuickElement('link', '', {
-                'rel': enclosure.rel,
-                'href': enclosure.url,
-                'type': enclosure.mime_type,
-            })
-            handler.characters("\n")
+        if item.get('enclosures') is not None:
+            for enclosure in item['enclosures']:
+                handler.addQuickElement('link', '', {
+                    'rel': enclosure.rel,
+                    'href': enclosure.url,
+                    'type': enclosure.mime_type,
+                })
+                handler.characters("\n")
 
         if item.get('updateddate') is not None:
             handler.addQuickElement('updated', rfc3339_date(item['updateddate']))
@@ -98,7 +98,6 @@ class MainFeed(Feed):
     feed_type = opdsFeed
     title = settings.TITLE
     subtitle = settings.SUBTITLE
-    guid_prefix = "m:"
 
     items = [
        {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs", "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Catalog.objects.count(),"books":Book.objects.count()}},
@@ -139,7 +138,7 @@ class MainFeed(Feed):
         return item['descr']
 
     def item_guid(self, item):
-        return "%s%s"%(self.guid_prefix,item["id"])
+        return "m:%s"%item["id"]
 
     def item_updateddate(self):
         return timezone.now()
@@ -151,7 +150,6 @@ class CatalogsFeed(Feed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
     description_template = "book_description.html"
-    guid_prefix = "с:"
 
     def get_object(self, request, cat_id=None, page=1):
         if not isinstance(page, int):
@@ -225,7 +223,7 @@ class CatalogsFeed(Feed):
 
     def item_guid(self, item):
         if isinstance(item, Catalog):
-            gp = self.guid_prefix
+            gp = 'c:'
         else:
             gp = 'b:'
         return "%s%s"%(gp,item.id)
