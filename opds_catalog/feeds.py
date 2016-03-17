@@ -6,11 +6,10 @@ from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf
 from opds_catalog import settings
-
-
 
 class opdsEnclosure(Enclosure):
     def __init__(self, url, mime_type, rel):
@@ -51,6 +50,12 @@ class opdsFeed(Atom1Feed):
             handler.characters("\n")
         handler.addQuickElement("updated", rfc3339_date(self.latest_post_date()))
         handler.characters("\n")
+        if self.feed.get('prev_url') is not None:
+            handler.addQuickElement('link', None, {"href":self.feed["prev_url"],"rel":"prev","title":"Previous Page","type":"application/atom+xml;profile=opds-catalog"})
+            handler.characters("\n")
+        if self.feed.get('next_url') is not None:
+            handler.addQuickElement('link', None, {"href":self.feed["next_url"],"rel":"next","title":"Next Page","type":"application/atom+xml;profile=opds-catalog"})
+            handler.characters("\n")
         if self.feed.get('search_url') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["search_url"],"rel":"search","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
             handler.characters("\n")
@@ -148,15 +153,19 @@ class CatalogsFeed(Feed):
     description_template = "book_description.html"
     guid_prefix = "с:"
 
-    def get_object(self, request, cat_id=None):
+    def get_object(self, request, cat_id=None, page=1):
+        if not isinstance(page, int):
+            page = int(page)
+
         if cat_id is not None:
-            return Catalog.objects.get(id=cat_id)
+            return (Catalog.objects.get(id=cat_id), page)
         else:
-            return Catalog.objects.get(parent__id=cat_id)
+            return (Catalog.objects.get(parent__id=cat_id), page)
 
     def title(self, obj):
-        if obj.parent:
-            return "%s | %s | %s"%(settings.TITLE,_("By catalogs"), obj.path)
+        cat, current_page = obj
+        if cat.parent:
+            return "%s | %s | %s"%(settings.TITLE,_("By catalogs"), cat.path)
         else:
             return "%s | %s"%(settings.TITLE,_("By catalogs"))
 
@@ -164,24 +173,49 @@ class CatalogsFeed(Feed):
         """
         Return link for rel="alternate"
         """
-        return reverse("opds:cat_tree", kwargs={"cat_id":obj.id})
+        cat, current_page = obj
+        return reverse("opds:cat_page", kwargs={"cat_id":cat.id, "page":current_page})
 
     def feed_url(self, obj):
         """
         Return link for rel="self"
         """
-        return reverse("opds:cat_tree", kwargs={"cat_id":obj.id})
+        cat, current_page = obj
+        return reverse("opds:cat_page", kwargs={"cat_id":cat.id,"page":current_page})
 
     def feed_extra_kwargs(self, obj):
+        cat, current_page = obj
+        start_url = reverse("opds_catalog:main")
+        if current_page != 1:
+            prev_url = reverse("opds:cat_page", kwargs={"cat_id":cat.id,"page":(current_page-1)})
+        else:
+            prev_url  = None
+
+        if current_page*settings.MAXITEMS<Catalog.objects.filter(parent=cat).count() + Book.objects.filter(catalog=cat).count():
+            next_url = reverse("opds:cat_page", kwargs={"cat_id":cat.id,"page":(current_page+1)})
+        else:
+            next_url  = None
+
         return {
                 #"search_url":"sopds.wsgi?id=09",
                 #"searchTerm_url":"sopds.wsgi?searchTerm={searchTerms}",
-                "start_url":reverse("opds_catalog:main"),}
+                "start_url":start_url,
+                "prev_url":prev_url,
+                "next_url":next_url,
+        }
 
     def items(self, obj):
-        catalogs_list = Catalog.objects.filter(parent=obj).order_by("cat_type","cat_name")
-        books_list = Book.objects.filter(catalog=obj).order_by("title")
-        return list(chain(catalogs_list,books_list))
+        cat, current_page = obj
+        catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_type","cat_name")
+        books_list = Book.objects.filter(catalog=cat).order_by("title")
+        union_list = list(chain(catalogs_list,books_list))
+        paginator = Paginator(union_list,settings.MAXITEMS)
+        try:
+            page = paginator.page(current_page)
+        except EmptyPage:
+            page = paginator.page(paginator.num_pages)
+
+        return page
 
     def item_title(self, item):
         if isinstance(item, Catalog):

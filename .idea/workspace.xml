@@ -2,16 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a18ea2b9-bbc4-496b-b324-f0c9ff012408" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/opds_catalog/dl.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/opds_catalog/utils.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/feeds.py" afterPath="$PROJECT_DIR$/opds_catalog/feeds.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/locale/ru/LC_MESSAGES/django.po" afterPath="$PROJECT_DIR$/opds_catalog/locale/ru/LC_MESSAGES/django.po" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/settings.py" afterPath="$PROJECT_DIR$/opds_catalog/settings.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/sopdscan.py" afterPath="$PROJECT_DIR$/opds_catalog/sopdscan.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/templates/book_description.html" afterPath="$PROJECT_DIR$/opds_catalog/templates/book_description.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/urls.py" afterPath="$PROJECT_DIR$/opds_catalog/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/views.py" afterPath="$PROJECT_DIR$/opds_catalog/views.py" />
     </list>
     <ignored path="sopds.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -42,10 +36,6 @@
         <option name="myItemId" />
         <option name="myItemType" value="com.intellij.database.view.DatabaseStructure$Root" />
       </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="db" />
-        <option name="myItemType" value="com.intellij.database.view.DbNodeDescriptor" />
-      </PATH_ELEMENT>
     </PATH>
   </component>
   <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
@@ -57,11 +47,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="feeds.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="feeds.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/opds_catalog/feeds.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.551724">
-              <caret line="198" column="37" selection-start-line="198" selection-start-column="37" selection-end-line="198" selection-end-column="37" />
+            <state vertical-scroll-proportion="0.6365055">
+              <caret line="158" column="12" selection-start-line="158" selection-start-column="12" selection-end-line="158" selection-end-column="12" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -69,43 +59,145 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="django.po" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/opds_catalog/locale/ru/LC_MESSAGES/django.po">
+      <file leaf-file-name="opdsdb.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/opds_catalog/opdsdb.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.68075114">
-              <caret line="104" column="20" selection-start-line="104" selection-start-column="20" selection-end-line="104" selection-end-column="20" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="models.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/opds_catalog/models.py">
+      <file leaf-file-name="sopdscli.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/py/sopdscli.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="24" />
+              <caret line="597" column="32" selection-start-line="597" selection-start-column="13" selection-end-line="597" selection-end-column="32" />
               <folding>
-                <marker date="1457633159286" expanded="true" signature="2121:2311" placeholder="select SQL_C... missing_value" />
-                <marker date="1457633159286" expanded="true" signature="2121:2521" placeholder="select SQL_C... " />
-                <marker date="1457633159286" expanded="true" signature="2345:2521" placeholder="select 2,boo... missing_value" />
+                <element signature="e#48#58#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sopdsdb.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/py/sopdsdb.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-8.5172415">
+              <caret line="385" column="21" selection-start-line="385" selection-start-column="12" selection-end-line="385" selection-end-column="21" />
+              <folding>
+                <marker date="1456767834018" expanded="true" signature="2872:2935" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="3851:3917" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="4230:4288" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="4769:4941" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="5491:5573" placeholder="select autho... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="5904:5974" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="6350:6413" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="6676:6737" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="6992:7051" placeholder="select genre... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="7295:7363" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="7656:7725" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="7948:8007" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="8227:8273" placeholder="select ser_i... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="8531:8597" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="8880:8922" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="9127:9194" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="9468:9533" placeholder="select cat_i... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="10016:10101" placeholder="insert into missing_value... " />
+                <marker date="1456767834018" expanded="true" signature="10465:10563" placeholder="select cat_i... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="10869:10992" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="11299:11504" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="11299:11713" placeholder="select SQL_C... " />
+                <marker date="1456767834018" expanded="true" signature="12081:12253" placeholder="select filen... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="12418:12545" placeholder="select a.aut... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="12724:12791" placeholder="select first... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="12976:13022" placeholder="select ser f... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="13202:13324" placeholder="select a.gen... " />
+                <marker date="1456767834018" expanded="true" signature="13495:13607" placeholder="select a.ser... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="17393:17595" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="17970:18023" placeholder="select count... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="18367:18555" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="19400:19705" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="20391:20683" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="21255:21646" placeholder="select SQL_C... " />
+                <marker date="1456767834018" expanded="true" signature="21712:22104" placeholder="select SQL_C... " />
+                <marker date="1456767834018" expanded="true" signature="22685:23007" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="23852:24091" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="24772:25067" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="25499:25660" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="26050:26207" placeholder="select min(a... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="26231:26460" placeholder="select min(a... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="26855:27103" placeholder="select a.gen... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="27127:27448" placeholder="select a.gen... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="28364:28668" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="29120:29382" placeholder="select SQL_C... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="29988:30233" placeholder="select 1 s, missing_value" />
+                <marker date="1456767834018" expanded="true" signature="30643:30694" placeholder="select 1 s, missing_value" />
+                <marker date="1456767834018" expanded="true" signature="30893:30958" placeholder="select cat_i... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="32298:32394" placeholder="delete from " />
+                <marker date="1456767834018" expanded="true" signature="32345:32393" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="32429:32524" placeholder="delete from " />
+                <marker date="1456767834018" expanded="true" signature="32475:32523" placeholder="select book_... missing_value" />
+                <marker date="1456767834018" expanded="true" signature="32560:32600" placeholder="delete from " />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sopdswrap.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/py/sopdswrap.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="64" column="32" selection-start-line="64" selection-start-column="13" selection-end-line="64" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sopdstempl.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/py/sopdstempl.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="139" column="128" selection-start-line="139" selection-start-column="107" selection-end-line="139" selection-end-column="128" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="settings.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/opds_catalog/settings.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-3.148148">
+              <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sopds.conf" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/conf/sopds.conf">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-2.125">
+              <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="46" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="my_notes.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/my_notes.md">
+          <provider editor-type-id="MultiMarkdownFxPreviewEditor">
+            <state />
+          </provider>
           <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
             <state split_layout="FIRST">
-              <first_editor vertical-scroll-proportion="0.26198632">
+              <first_editor vertical-scroll-proportion="0.0">
                 <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="52" />
                 <folding />
               </first_editor>
               <second_editor />
             </state>
-          </provider>
-          <provider editor-type-id="MultiMarkdownFxPreviewEditor">
-            <state />
           </provider>
         </entry>
       </file>
@@ -113,7 +205,7 @@
         <entry file="file://$PROJECT_DIR$/opds_catalog/urls.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+              <caret line="7" column="95" selection-start-line="7" selection-start-column="95" selection-end-line="7" selection-end-column="95" />
               <folding>
                 <element signature="e#1#33#0" expanded="true" />
               </folding>
@@ -155,12 +247,12 @@
         <option value="$PROJECT_DIR$/opds_catalog/utils.py" />
         <option value="$PROJECT_DIR$/opds_catalog/sopdscan.py" />
         <option value="$PROJECT_DIR$/opds_catalog/views.py" />
-        <option value="$PROJECT_DIR$/opds_catalog/settings.py" />
-        <option value="$PROJECT_DIR$/opds_catalog/urls.py" />
         <option value="$PROJECT_DIR$/opds_catalog/dl.py" />
-        <option value="$PROJECT_DIR$/opds_catalog/feeds.py" />
         <option value="$PROJECT_DIR$/opds_catalog/templates/book_description.html" />
         <option value="$PROJECT_DIR$/opds_catalog/locale/ru/LC_MESSAGES/django.po" />
+        <option value="$PROJECT_DIR$/opds_catalog/settings.py" />
+        <option value="$PROJECT_DIR$/opds_catalog/urls.py" />
+        <option value="$PROJECT_DIR$/opds_catalog/feeds.py" />
       </list>
     </option>
   </component>
@@ -200,6 +292,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -343,7 +436,6 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -632,17 +724,17 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24786781" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25053304" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1401919" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.836403" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13542795" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936078" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46478873" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27735645" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2751896" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3997833" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -708,6 +800,9 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README-0.23.4-1.md">
+      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
         <state split_layout="FIRST">
           <first_editor vertical-scroll-proportion="0.0">
@@ -715,9 +810,6 @@
           </first_editor>
           <second_editor />
         </state>
-      </provider>
-      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/opds_catalog/apps.py">
@@ -769,24 +861,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/conf/sopds.conf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/db/tables.sql">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.36391437">
           <caret line="40" column="7" selection-start-line="40" selection-start-column="7" selection-end-line="40" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/py/sopdsdb.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.54141104">
-          <caret line="833" column="9" selection-start-line="833" selection-start-column="9" selection-end-line="833" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -822,6 +900,9 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
+      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
         <state split_layout="FIRST">
           <first_editor vertical-scroll-proportion="0.0">
@@ -829,9 +910,6 @@
           </first_editor>
           <second_editor />
         </state>
-      </provider>
-      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
-        <state />
       </provider>
     </entry>
     <entry file="dbDummy://dbtable:/969a8559/283b7468-e73d-4870-b736-6befce21aadb/opds_catalog_book_genres">
@@ -931,14 +1009,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="21" column="84" selection-start-line="21" selection-start-column="61" selection-end-line="21" selection-end-column="84" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/opds_catalog/opdsdb.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="77" column="20" selection-start-line="77" selection-start-column="20" selection-end-line="77" selection-end-column="20" />
         </state>
       </provider>
     </entry>
@@ -960,7 +1030,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="12" column="9" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -968,7 +1037,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="1" column="0" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -988,17 +1056,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="31" column="32" selection-start-line="31" selection-start-column="32" selection-end-line="31" selection-end-column="32" />
-          <folding>
-            <element signature="e#25#34#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/opds_catalog/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="29" column="58" selection-start-line="29" selection-start-column="58" selection-end-line="29" selection-end-column="58" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1006,7 +1063,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.44851258">
           <caret line="123" column="34" selection-start-line="123" selection-start-column="13" selection-end-line="123" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1014,17 +1070,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/opds_catalog/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="e#1#33#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1040,9 +1085,69 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/my_notes.md">
+      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
+        <state split_layout="FIRST">
+          <first_editor vertical-scroll-proportion="0.0">
+            <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="52" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/opds_catalog/templates/book_description.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.24959217">
+          <caret line="9" column="35" selection-start-line="9" selection-start-column="35" selection-end-line="9" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/opds_catalog/locale/ru/LC_MESSAGES/django.po">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.17527387">
+          <caret line="76" column="51" selection-start-line="76" selection-start-column="51" selection-end-line="76" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conf/sopds.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-2.125">
+          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/opds_catalog/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.148148">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/py/sopdswrap.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="64" column="32" selection-start-line="64" selection-start-column="13" selection-end-line="64" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/opds_catalog/opdsdb.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/py/sopdscli.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.0">
+        <state vertical-scroll-proportion="0.0">
           <caret line="597" column="32" selection-start-line="597" selection-start-column="13" selection-end-line="597" selection-end-column="32" />
           <folding>
             <element signature="e#48#58#0" expanded="true" />
@@ -1050,59 +1155,93 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/py/sopdswrap.py">
+    <entry file="file://$PROJECT_DIR$/py/sopdsdb.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.0">
-          <caret line="64" column="32" selection-start-line="64" selection-start-column="13" selection-end-line="64" selection-end-column="32" />
-          <folding />
+        <state vertical-scroll-proportion="-8.5172415">
+          <caret line="385" column="21" selection-start-line="385" selection-start-column="12" selection-end-line="385" selection-end-column="21" />
+          <folding>
+            <marker date="1456767834018" expanded="true" signature="2872:2935" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="3851:3917" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="4230:4288" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="4769:4941" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="5491:5573" placeholder="select autho... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="5904:5974" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="6350:6413" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="6676:6737" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="6992:7051" placeholder="select genre... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="7295:7363" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="7656:7725" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="7948:8007" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="8227:8273" placeholder="select ser_i... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="8531:8597" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="8880:8922" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="9127:9194" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="9468:9533" placeholder="select cat_i... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="10016:10101" placeholder="insert into missing_value... " />
+            <marker date="1456767834018" expanded="true" signature="10465:10563" placeholder="select cat_i... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="10869:10992" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="11299:11504" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="11299:11713" placeholder="select SQL_C... " />
+            <marker date="1456767834018" expanded="true" signature="12081:12253" placeholder="select filen... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="12418:12545" placeholder="select a.aut... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="12724:12791" placeholder="select first... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="12976:13022" placeholder="select ser f... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="13202:13324" placeholder="select a.gen... " />
+            <marker date="1456767834018" expanded="true" signature="13495:13607" placeholder="select a.ser... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="17393:17595" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="17970:18023" placeholder="select count... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="18367:18555" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="19400:19705" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="20391:20683" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="21255:21646" placeholder="select SQL_C... " />
+            <marker date="1456767834018" expanded="true" signature="21712:22104" placeholder="select SQL_C... " />
+            <marker date="1456767834018" expanded="true" signature="22685:23007" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="23852:24091" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="24772:25067" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="25499:25660" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="26050:26207" placeholder="select min(a... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="26231:26460" placeholder="select min(a... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="26855:27103" placeholder="select a.gen... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="27127:27448" placeholder="select a.gen... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="28364:28668" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="29120:29382" placeholder="select SQL_C... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="29988:30233" placeholder="select 1 s, missing_value" />
+            <marker date="1456767834018" expanded="true" signature="30643:30694" placeholder="select 1 s, missing_value" />
+            <marker date="1456767834018" expanded="true" signature="30893:30958" placeholder="select cat_i... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="32298:32394" placeholder="delete from " />
+            <marker date="1456767834018" expanded="true" signature="32345:32393" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="32429:32524" placeholder="delete from " />
+            <marker date="1456767834018" expanded="true" signature="32475:32523" placeholder="select book_... missing_value" />
+            <marker date="1456767834018" expanded="true" signature="32560:32600" placeholder="delete from " />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/py/sopdstempl.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="76" column="45" selection-start-line="76" selection-start-column="45" selection-end-line="76" selection-end-column="45" />
+          <caret line="139" column="128" selection-start-line="139" selection-start-column="107" selection-end-line="139" selection-end-column="128" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/my_notes.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
-        <state split_layout="FIRST">
-          <first_editor vertical-scroll-proportion="0.26198632">
-            <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="52" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/opds_catalog/templates/book_description.html">
+    <entry file="file://$PROJECT_DIR$/opds_catalog/urls.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24959217">
-          <caret line="9" column="35" selection-start-line="9" selection-start-column="35" selection-end-line="9" selection-end-column="35" />
-          <folding />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="7" column="95" selection-start-line="7" selection-start-column="95" selection-end-line="7" selection-end-column="95" />
+          <folding>
+            <element signature="e#1#33#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/opds_catalog/feeds.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.551724">
-          <caret line="198" column="37" selection-start-line="198" selection-start-column="37" selection-end-line="198" selection-end-column="37" />
+        <state vertical-scroll-proportion="0.6365055">
+          <caret line="158" column="12" selection-start-line="158" selection-start-column="12" selection-end-line="158" selection-end-column="12" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/opds_catalog/locale/ru/LC_MESSAGES/django.po">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.68075114">
-          <caret line="104" column="20" selection-start-line="104" selection-start-column="20" selection-end-line="104" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>

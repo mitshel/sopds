@@ -7,6 +7,8 @@ loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'
 # Main SOPDS Book Collection Directory
 ROOT_LIB = getattr(settings, "SOPDS_ROOT_LIB", "books/")
 BOOK_EXTENSIONS = getattr(settings, "SOPDS_BOOK_EXTESIONS", ['.pdf', '.djvu', '.fb2', '.epub'])
+
+# Количество выдаваемых строк на одну страницу
 MAXITEMS = getattr(settings, "SOPDS_MAXITEMS", 60)
 DUBLICATES_FIND = getattr(settings, "SOPDS_DUBLICATES_FIND", True)
 DUBLICATES_SHOW = getattr(settings, "SOPDS_DUBLICATES_SHOW", False)
