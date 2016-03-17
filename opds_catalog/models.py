@@ -1,7 +1,6 @@
-from django.db import models, connection
-from django import utils
+from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils import timezone
 
 class Book(models.Model):
     filename = models.CharField(db_index=True, max_length=256)
@@ -10,7 +9,7 @@ class Book(models.Model):
     format = models.CharField(max_length=8)
     catalog = models.ForeignKey('Catalog',db_index=True)
     cat_type = models.IntegerField(null=False, default=0)
-    registerdate = models.DateTimeField(db_index=True, null=False, default=utils.timezone.now)
+    registerdate = models.DateTimeField(db_index=True, null=False, default=timezone.now)
     docdate = models.CharField(max_length=20)
     favorite = models.IntegerField(null=False, default=0)
     lang = models.CharField(max_length=16)
@@ -51,8 +50,8 @@ class Author(models.Model):
         ]
 
 class bauthor(models.Model):
-    book = models.ForeignKey(Book)
-    author = models.ForeignKey(Author)
+    book = models.ForeignKey('Book')
+    author = models.ForeignKey('Author')
     class Meta:
         index_together = [
             ["book", "author"],
@@ -64,8 +63,8 @@ class Genre(models.Model):
     subsection = models.CharField(max_length=100)
 
 class bgenre(models.Model):
-    book = models.ForeignKey(Book)
-    genre = models.ForeignKey(Genre)
+    book = models.ForeignKey('Book')
+    genre = models.ForeignKey('Genre')
 
     class Meta:
         index_together = [
@@ -76,8 +75,8 @@ class Series(models.Model):
     ser = models.CharField(db_index=True, max_length=64)
 
 class bseries(models.Model):
-    book = models.ForeignKey(Book)
-    ser = models.ForeignKey(Series)
+    book = models.ForeignKey('Book')
+    ser = models.ForeignKey('Series')
     ser_no = models.IntegerField(null=False, default=0)
 
     class Meta:
@@ -88,10 +87,5 @@ class bseries(models.Model):
 class bookshelf(models.Model):
     user = models.ForeignKey(User)
     book = models.ForeignKey(Book)
-    readtime = models.DateTimeField(null=False, default=utils.timezone.now)
-
-class Catalog_Book_Serialiser(models.Model):
-    pass
-#    query = 'select 1 as t,cat_id,cat_name,path,now(),cat_name as title,'' as docdate,'' as annotation,'cat' as format, 0 as filesize, '' as cover, '' as cover_type from "+TBL_CATALOGS+" where parent_id="+str(cat_id)+" union all "
-#    "select 2,book_id,filename,path,registerdate,title,annotation,docdate,format,filesize,cover,cover_type from "+TBL_BOOKS+" where cat_id="+str(cat_id)+" and avail!=0 order by 1,6 "+limitstr)
+    readtime = models.DateTimeField(null=False, default=timezone.now)
 

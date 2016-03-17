@@ -2,7 +2,7 @@ import os
 
 from django.db.models import Q
 
-from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries
+from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -34,6 +34,9 @@ def clear_all():
     Genre.objects.all().delete()
     Series.objects.all().delete()
     bseries.objects.all().delete()
+    bauthor.objects.all().delete()
+    bseries.objects.all().delete()
+    bookshelf.objects.all().delete()
 
 # Книги где avail=0 уже известно что удалены
 # Книги где avail=2 это только что прверенные существующие книги
@@ -119,14 +122,18 @@ def addauthor(first_name, last_name):
     return author
 
 def addbauthor(book, author):
-    book.authors.add(author)
+    ba = bauthor(book=book, author=author)
+    ba.save()
+    #book.authors.add(author)
 
 def addgenre(genre):
     genre, created = Genre.objects.get_or_create(genre=genre, defaults={'section':unknown_genre, 'subsection':genre})
     return genre
 
 def addbgenre(book, genre):
-    book.genres.add(genre)
+    bg = bgenre(book=book, genre=genre)
+    bg.save()
+    #book.genres.add(genre)
 
 def addseries(ser):
     series, created = Series.objects.get_or_create(ser=ser)
