@@ -7,6 +7,7 @@ from django.utils.xmlutils import SimplerXMLGenerator
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf
 from opds_catalog import settings
@@ -34,8 +35,8 @@ class opdsFeed(Atom1Feed):
         handler.characters("\n")
         handler.addQuickElement("id", self.feed['id'])
         handler.characters("\n")
-        if self.feed.get('feed_url') is not None:
-            handler.addQuickElement('link', None, {"href":self.feed["feed_url"],"rel":"self","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
+        if self.feed.get('link') is not None:
+            handler.addQuickElement('link', None, {"href":self.feed["link"],"rel":"self","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
             handler.characters("\n")
         if self.feed.get('start_url') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["start_url"],"rel":"start","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
@@ -99,6 +100,16 @@ class MainFeed(Feed):
     title = settings.TITLE
     subtitle = settings.SUBTITLE
 
+    def link(self):
+        return reverse("opds_catalog:main")
+
+    def feed_extra_kwargs(self, obj):
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text",
+        }
+
     def items(self):
         return [
                     {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs", "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Catalog.objects.count(),"books":Book.objects.count()}},
@@ -108,26 +119,6 @@ class MainFeed(Feed):
                     {"id":5, "title":_("By series"), "link":"opds_catalog:series", "descr": _("Series: %(series)s.")%{"series":Series.objects.count()}},
                     {"id":6, "title":_("Book shelf"), "link":"opds_catalog:bookshelf", "descr": _("Books readed: %(bookshelf)s.")%{"bookshelf":bookshelf.objects.count()}},
         ]
-
-    def link(self):
-        """
-        Return link for rel="alternate"
-        """
-        return reverse("opds_catalog:main")
-
-    def feed_url(self):
-        """
-        Return link for rel="self"
-        """
-        return reverse("opds_catalog:main")
-
-    def feed_extra_kwargs(self, obj):
-        return {
-                #"search_url":"sopds.wsgi?id=09",
-                "searchTerm_url":"sopds.wsgi?searchTerm={searchTerms}",
-                "start_url":reverse("opds_catalog:main"),
-                "description_mime_type":"text",
-        }
 
     def item_link(self, item):
         return reverse(item['link'])
@@ -146,6 +137,123 @@ class MainFeed(Feed):
 
     def item_enclosures(self, item):
         return (opdsEnclosure(reverse(item['link']),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+
+def Search(request):
+    """
+    Выводим шаблон поиска
+    """
+    return render(request, 'opensearch.html')
+
+class SearchTypesFeed(Feed):
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+
+    def get_object(self, request, searchterms=""):
+        return searchterms
+
+    def link(self, obj):
+        return "/opds/search/{searchTerms}/"
+
+    def feed_extra_kwargs(self, obj):
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text",
+        }
+
+    def items(self, obj):
+        return [
+                    {"id":1, "title":_("Search by titles"), "type":"titles", "term":obj, "descr": _("Search books by title")},
+                    {"id":2, "title":_("Search by authors"), "type":"authors", "term":obj, "descr": _("Search authors by name")},
+                    {"id":3, "title":_("Search genres"), "type":"genres", "term":obj, "descr": _("Search genres")},
+        ]
+
+    def item_link(self, item):
+        return reverse("opds_catalog:searchterms", kwargs={"searchtype":item["type"], "searchterms":item["term"]})
+
+    def item_title(self, item):
+        return item['title']
+
+    def item_description(self, item):
+        return item['descr']
+
+    def item_guid(self, item):
+        return "st:%s"%item["id"]
+
+    def item_updateddate(self):
+        return timezone.now()
+
+    def item_enclosures(self, item):
+        return (opdsEnclosure(reverse("opds_catalog:searchterms", kwargs={"searchtype":item["type"], "searchterms":item["term"]}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+
+
+class SearchBooksFeed(Feed):
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+    description_template = "book_description.html"
+
+    def get_object(self, request, searchterms, searchtype, page=1):
+        if not isinstance(page, int):
+            page = int(page)
+
+        if searchtype == 'authors':
+            # TODO: Переделать на поиск авторов
+            books = Book.objects.filter(authors__last_name__contains=searchterms)
+        elif searchtype == 'genres':
+            # TODO: Переделать на поиск жанров
+            books = Book.objects.filter(genres__section__contains=searchterms)
+        else:
+            books = Book.objects.filter(title__contains=searchterms)
+
+        return {"books":books, "searchterms":searchterms, "searchtype":searchtype, "page":page}
+
+    def link(self, obj):
+        return reverse("opds_catalog:searchterms", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]})
+
+    def feed_extra_kwargs(self, obj):
+        if obj["page"] != 1:
+            prev_url = reverse("opds_catalog:searchterms", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]-1)})
+        else:
+            prev_url  = None
+
+        if obj["page"]*settings.MAXITEMS<obj["books"].count():
+            next_url = reverse("opds_catalog:searchterms", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]+1)})
+        else:
+            next_url  = None
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text/html",
+                "prev_url":prev_url,
+                "next_url":next_url,
+        }
+
+    def items(self, obj):
+        books_list = obj["books"].order_by("title")
+
+        paginator = Paginator(books_list,settings.MAXITEMS)
+        try:
+            page = paginator.page(obj["page"])
+        except EmptyPage:
+            page = paginator.page(paginator.num_pages)
+
+        return page
+
+    def item_title(self, item):
+        return item.title
+
+    def item_guid(self, item):
+        return "b:%s"%(item.id)
+
+    def item_link(self, item):
+        return reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0})
+
+    def item_enclosures(self, item):
+        return (
+            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
+            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
+            opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item.id}),"image/jpeg", "http://opds-spec.org/image"),
+        )
 
 class CatalogsFeed(Feed):
     feed_type = opdsFeed
@@ -169,18 +277,8 @@ class CatalogsFeed(Feed):
             return "%s | %s"%(settings.TITLE,_("By catalogs"))
 
     def link(self, obj):
-        """
-        Return link for rel="alternate"
-        """
         cat, current_page = obj
         return reverse("opds:cat_page", kwargs={"cat_id":cat.id, "page":current_page})
-
-    def feed_url(self, obj):
-        """
-        Return link for rel="self"
-        """
-        cat, current_page = obj
-        return reverse("opds:cat_page", kwargs={"cat_id":cat.id,"page":current_page})
 
     def feed_extra_kwargs(self, obj):
         cat, current_page = obj
@@ -197,7 +295,7 @@ class CatalogsFeed(Feed):
 
         return {
                 #"search_url":"sopds.wsgi?id=09",
-                #"searchTerm_url":"sopds.wsgi?searchTerm={searchTerms}",
+                "searchTerm_url":"/opds/search/{searchTerms}/",
                 "start_url":start_url,
                 "prev_url":prev_url,
                 "next_url":next_url,
