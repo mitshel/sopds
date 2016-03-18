@@ -106,6 +106,7 @@ class MainFeed(Feed):
     def feed_extra_kwargs(self, obj):
         return {
                 "searchTerm_url":"/opds/search/{searchTerms}/",
+                #"searchTerm_url":reverse("opds_catalog:searchtypes",kwargs={"searchterms":"{searchTerms}"}),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
@@ -138,7 +139,7 @@ class MainFeed(Feed):
     def item_enclosures(self, item):
         return (opdsEnclosure(reverse(item['link']),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
 
-def Search(request):
+def OpenSearch(request):
     """
     Выводим шаблон поиска
     """

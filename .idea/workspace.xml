@@ -4,7 +4,6 @@
     <list default="true" id="a18ea2b9-bbc4-496b-b324-f0c9ff012408" name="Default" comment="">
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/opds_catalog/templates/opensearch.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/my_notes.md" afterPath="$PROJECT_DIR$/my_notes.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/feeds.py" afterPath="$PROJECT_DIR$/opds_catalog/feeds.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/urls.py" afterPath="$PROJECT_DIR$/opds_catalog/urls.py" />
     </list>
@@ -51,8 +50,8 @@
       <file leaf-file-name="feeds.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/opds_catalog/feeds.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5413153">
-              <caret line="244" column="30" selection-start-line="244" selection-start-column="30" selection-end-line="244" selection-end-column="30" />
+            <state vertical-scroll-proportion="0.311973">
+              <caret line="107" column="16" selection-start-line="107" selection-start-column="16" selection-end-line="107" selection-end-column="16" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -128,7 +127,7 @@
         <entry file="file://$PROJECT_DIR$/opds_catalog/urls.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="15" column="18" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
+              <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
               <folding>
                 <element signature="e#1#33#0" expanded="true" />
               </folding>
@@ -1134,16 +1133,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/opds_catalog/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="15" column="18" selection-start-line="15" selection-start-column="18" selection-end-line="15" selection-end-column="18" />
-          <folding>
-            <element signature="e#1#33#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/my_notes.md">
       <provider editor-type-id="MultiMarkdownFxPreviewEditor">
         <state />
@@ -1158,10 +1147,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/opds_catalog/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+          <folding>
+            <element signature="e#1#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/opds_catalog/feeds.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5413153">
-          <caret line="244" column="30" selection-start-line="244" selection-start-column="30" selection-end-line="244" selection-end-column="30" />
+        <state vertical-scroll-proportion="0.311973">
+          <caret line="107" column="16" selection-start-line="107" selection-start-column="16" selection-end-line="107" selection-end-column="16" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
