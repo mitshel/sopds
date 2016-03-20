@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-13 12:46+0300\n"
+"POT-Creation-Date: 2016-03-20 19:47+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,60 +19,80 @@ msgstr ""
 "10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%"
 "100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: .\opds_catalog\feeds.py:98 .\opds_catalog\feeds.py:158
-#: .\opds_catalog\feeds.py:160
+#: .\opds_catalog\feeds.py:117 .\opds_catalog\feeds.py:283
+#: .\opds_catalog\feeds.py:285
 msgid "By catalogs"
 msgstr "По каталогам"
 
-#: .\opds_catalog\feeds.py:98
+#: .\opds_catalog\feeds.py:118
 #, python-format
 msgid "Catalogs: %(catalogs)s, books: %(books)s."
 msgstr "Каталогов: %(catalogs)s, книг: %(books)s."
 
-#: .\opds_catalog\feeds.py:99
+#: .\opds_catalog\feeds.py:119
 msgid "By authors"
 msgstr "По авторам"
 
-#: .\opds_catalog\feeds.py:99
+#: .\opds_catalog\feeds.py:120
 #, python-format
 msgid "Authors: %(authors)s."
 msgstr "Авторов: %(authors)s."
 
-#: .\opds_catalog\feeds.py:100
+#: .\opds_catalog\feeds.py:121
 msgid "By titles"
 msgstr "По наименованиям"
 
-#: .\opds_catalog\feeds.py:100
+#: .\opds_catalog\feeds.py:122
 #, python-format
 msgid "Books: %(books)s."
 msgstr "Книг: %(books)s."
 
-#: .\opds_catalog\feeds.py:101
+#: .\opds_catalog\feeds.py:123
 msgid "By genres"
 msgstr "По жанрам"
 
-#: .\opds_catalog\feeds.py:101
+#: .\opds_catalog\feeds.py:124
 #, python-format
 msgid "Genres: %(genres)s."
 msgstr "Жанров: %(genres)s."
 
-#: .\opds_catalog\feeds.py:102
+#: .\opds_catalog\feeds.py:125
 msgid "By series"
 msgstr "По сериям"
 
-#: .\opds_catalog\feeds.py:102
+#: .\opds_catalog\feeds.py:126
 #, python-format
 msgid "Series: %(series)s."
 msgstr "Серий: %(series)s."
 
-#: .\opds_catalog\feeds.py:103
+#: .\opds_catalog\feeds.py:127
 msgid "Book shelf"
 msgstr "Книжная полка"
 
-#: .\opds_catalog\feeds.py:103
+#: .\opds_catalog\feeds.py:128
 #, python-format
 msgid "Books readed: %(bookshelf)s."
 msgstr "Книг прочитано: %(bookshelf)s."
+
+#: .\opds_catalog\feeds.py:174
+msgid "Search by titles"
+msgstr "Поиск по наименованиям"
+
+#: .\opds_catalog\feeds.py:174
+msgid "Search books by title"
+msgstr "Поиск книг по наименованию"
+
+#: .\opds_catalog\feeds.py:175
+msgid "Search by authors"
+msgstr "Поиск авторов"
+
+#: .\opds_catalog\feeds.py:175
+msgid "Search authors by name"
+msgstr "Поиск авторов по имени"
+
+#: .\opds_catalog\feeds.py:176
+msgid "Search genres"
+msgstr "Поиск жанров"
 
 #: .\opds_catalog\templates\book_description.html:6
 msgid "Book name:"

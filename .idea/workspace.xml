@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="a18ea2b9-bbc4-496b-b324-f0c9ff012408" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/my_notes.md" afterPath="$PROJECT_DIR$/my_notes.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/opds_catalog/feeds.py" afterPath="$PROJECT_DIR$/opds_catalog/feeds.py" />
     </list>
     <ignored path="sopds.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -48,11 +50,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="feeds.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="feeds.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/opds_catalog/feeds.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="3.1590552">
-              <caret line="125" column="117" selection-start-line="125" selection-start-column="117" selection-end-line="125" selection-end-column="117" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="117" column="204" selection-start-line="117" selection-start-column="204" selection-end-line="117" selection-end-column="204" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -141,12 +143,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="my_notes.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="my_notes.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/my_notes.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
             <state split_layout="FIRST">
-              <first_editor vertical-scroll-proportion="0.0">
-                <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="62" />
+              <first_editor vertical-scroll-proportion="0.3810345">
+                <caret line="13" column="10" selection-start-line="13" selection-start-column="10" selection-end-line="13" selection-end-column="10" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -202,14 +204,14 @@
         <option value="$PROJECT_DIR$/opds_catalog/settings.py" />
         <option value="$PROJECT_DIR$/opds_catalog/migrations/__init__.py" />
         <option value="$PROJECT_DIR$/scan.log" />
-        <option value="$PROJECT_DIR$/my_notes.md" />
         <option value="$PROJECT_DIR$/opds_catalog/templates/search.html" />
         <option value="$PROJECT_DIR$/opds_catalog/templates/opensearch.html" />
         <option value="$PROJECT_DIR$/opds_catalog/urls.py" />
         <option value="$PROJECT_DIR$/opds_catalog/opdsdb.py" />
         <option value="$PROJECT_DIR$/opds_catalog/management/commands/sopds.py" />
-        <option value="$PROJECT_DIR$/opds_catalog/feeds.py" />
         <option value="$PROJECT_DIR$/opds_catalog/models.py" />
+        <option value="$PROJECT_DIR$/opds_catalog/feeds.py" />
+        <option value="$PROJECT_DIR$/my_notes.md" />
       </list>
     </option>
   </component>
@@ -697,7 +699,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="7" column="95" selection-start-line="7" selection-start-column="95" selection-end-line="7" selection-end-column="95" />
           <folding>
-            <element signature="e#1#33#0" expanded="true" />
+            <element signature="e#1#33#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -979,23 +981,9 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
           <folding>
-            <element signature="e#1#33#0" expanded="true" />
+            <element signature="e#1#33#0" expanded="false" />
           </folding>
         </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/my_notes.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
-        <state split_layout="FIRST">
-          <first_editor vertical-scroll-proportion="0.0">
-            <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="62" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/sopds/urls.py">
@@ -1062,16 +1050,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/opds_catalog/models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="90" column="9" selection-start-line="90" selection-start-column="9" selection-end-line="90" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/opds_catalog/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1082,12 +1060,36 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/opds_catalog/feeds.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.1590552">
-          <caret line="125" column="117" selection-start-line="125" selection-start-column="117" selection-end-line="125" selection-end-column="117" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="117" column="204" selection-start-line="117" selection-start-column="204" selection-end-line="117" selection-end-column="204" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/opds_catalog/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="90" column="9" selection-start-line="90" selection-start-column="9" selection-end-line="90" selection-end-column="9" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/my_notes.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;MultiMarkdownPreviewEditor]">
+        <state split_layout="FIRST">
+          <first_editor vertical-scroll-proportion="0.3810345">
+            <caret line="13" column="10" selection-start-line="13" selection-start-column="10" selection-end-line="13" selection-end-column="10" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+      <provider editor-type-id="MultiMarkdownFxPreviewEditor">
+        <state />
       </provider>
     </entry>
   </component>
