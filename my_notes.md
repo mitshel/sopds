@@ -26,3 +26,10 @@ File /mnt/SATA1TB-1/КНИГИ/BOOKS/Художественная литерат
 
 ## Регулярные выражения re-module
 https://docs.python.org/2/library/re.html
+
+## test django superuser
+mitshel:madlenka
+
+## Basic Authorizaton Django
+- http://www.idiotinside.com/2015/09/21/basic-auth-in-django-flask/
+- https://djangosnippets.org/snippets/2468/

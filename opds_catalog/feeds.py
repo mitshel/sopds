@@ -3,15 +3,22 @@ from itertools import chain
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
-from django.utils.xmlutils import SimplerXMLGenerator
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
+from django.contrib import auth
+from django.http import HttpResponse
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
 from opds_catalog import models
 from opds_catalog import settings
+
+class AuthFeed(Feed):
+    request = None
+    def __call__(self,request,*args,**kwargs):
+        self.request = request
+        return super().__call__(request,*args,**kwargs)
 
 class opdsEnclosure(Enclosure):
     def __init__(self, url, mime_type, rel):
@@ -96,7 +103,7 @@ class opdsFeed(Atom1Feed):
             handler.addQuickElement("content", item["description"], {"type": content_type})
             handler.characters("\n")
 
-class MainFeed(Feed):
+class MainFeed(AuthFeed):
     feed_type = opdsFeed
     title = settings.TITLE
     subtitle = settings.SUBTITLE
@@ -113,7 +120,7 @@ class MainFeed(Feed):
         }
 
     def items(self):
-        return [
+        mainitems = [
                     {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs",
                      "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Counter.objects.get_counter(models.counter_allcatalogs),"books":Counter.objects.get_counter(models.counter_allbooks)}},
                     {"id":2, "title":_("By authors"), "link":"opds_catalog:authors",
@@ -124,9 +131,14 @@ class MainFeed(Feed):
                      "descr": _("Genres: %(genres)s.")%{"genres":Counter.objects.get_counter(models.counter_allgenres)}},
                     {"id":5, "title":_("By series"), "link":"opds_catalog:series",
                      "descr": _("Series: %(series)s.")%{"series":Counter.objects.get_counter(models.counter_allseries)}},
-                    {"id":6, "title":_("Book shelf"), "link":"opds_catalog:bookshelf",
-                     "descr": _("Books readed: %(bookshelf)s.")%{"bookshelf":bookshelf.objects.count()}},
         ]
+        if settings.AUTH and self.request.user.is_authenticated():
+            mainitems += [
+                        {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
+                         "descr":_("%(username)s books readed: %(bookshelf)s.")%{"bookshelf":bookshelf.objects.count(),"username":self.request.user.username}},
+            ]
+
+        return mainitems
 
     def item_link(self, item):
         return reverse(item['link'])

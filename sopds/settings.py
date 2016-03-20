@@ -45,6 +45,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'opds_catalog.opds_middleware.BasicAuthMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -123,4 +124,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\ruszip\\'
+SOPDS_AUTH = False
 
