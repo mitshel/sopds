@@ -115,7 +115,7 @@ class MainFeed(Feed):
     def items(self):
         return [
                     {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs",
-                     "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Counter.objects.get_counter(models.counter_allbooks),"books":Counter.objects.get_counter(models.counter_allcatalogs)}},
+                     "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Counter.objects.get_counter(models.counter_allcatalogs),"books":Counter.objects.get_counter(models.counter_allbooks)}},
                     {"id":2, "title":_("By authors"), "link":"opds_catalog:authors",
                      "descr": _("Authors: %(authors)s.")%{"authors":Counter.objects.get_counter(models.counter_allauthors)}},
                     {"id":3, "title":_("By titles"), "link":"opds_catalog:titles",
