@@ -2,6 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+counter_allbooks = 'allbooks'
+counter_allcatalogs = 'allcatalogs'
+counter_allauthors = 'allauthors'
+counter_allgenres = 'allgenres'
+counter_allseries = 'allseries'
+
 class Book(models.Model):
     filename = models.CharField(db_index=True, max_length=256)
     path = models.CharField(db_index=True, max_length=1024)
@@ -88,4 +94,27 @@ class bookshelf(models.Model):
     user = models.ForeignKey(User)
     book = models.ForeignKey(Book)
     readtime = models.DateTimeField(null=False, default=timezone.now)
+
+
+class CounterManager(models.Manager):
+    def update(self, counter_name, counter_value):
+        self.update_or_create(name=counter_name, defaults = {"value":counter_value, "update_time":timezone.now()})
+
+    def update_known_counters(self):
+        self.update(counter_allbooks, Book.objects.all().count())
+        self.update(counter_allcatalogs, Catalog.objects.all().count())
+        self.update(counter_allauthors, Author.objects.all().count())
+        self.update(counter_allgenres, Genre.objects.all().count())
+        self.update(counter_allseries, Series.objects.all().count())
+
+    def get_counter(self, counter_name):
+        return self.get(name=counter_name).value
+
+class Counter(models.Model):
+    name = models.CharField(primary_key=True, null=False, blank=False, max_length=16)
+    value = models.IntegerField(null=False, default=0)
+    update_time = models.DateTimeField(null=False, default=timezone.now)
+    objects = CounterManager()
+
+
 

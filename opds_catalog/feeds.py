@@ -9,7 +9,8 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 
-from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf
+from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
+from opds_catalog import models
 from opds_catalog import settings
 
 class opdsEnclosure(Enclosure):
@@ -113,12 +114,18 @@ class MainFeed(Feed):
 
     def items(self):
         return [
-                    {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs", "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Catalog.objects.count(),"books":Book.objects.count()}},
-                    {"id":2, "title":_("By authors"), "link":"opds_catalog:authors", "descr": _("Authors: %(authors)s.")%{"authors":Author.objects.count()}},
-                    {"id":3, "title":_("By titles"), "link":"opds_catalog:titles", "descr": _("Books: %(books)s.")%{"books":Book.objects.count()}},
-                    {"id":4, "title":_("By genres"), "link":"opds_catalog:genres", "descr": _("Genres: %(genres)s.")%{"genres":Genre.objects.count()}},
-                    {"id":5, "title":_("By series"), "link":"opds_catalog:series", "descr": _("Series: %(series)s.")%{"series":Series.objects.count()}},
-                    {"id":6, "title":_("Book shelf"), "link":"opds_catalog:bookshelf", "descr": _("Books readed: %(bookshelf)s.")%{"bookshelf":bookshelf.objects.count()}},
+                    {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs",
+                     "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Counter.objects.get_counter(models.counter_allbooks),"books":Counter.objects.get_counter(models.counter_allcatalogs)}},
+                    {"id":2, "title":_("By authors"), "link":"opds_catalog:authors",
+                     "descr": _("Authors: %(authors)s.")%{"authors":Counter.objects.get_counter(models.counter_allauthors)}},
+                    {"id":3, "title":_("By titles"), "link":"opds_catalog:titles",
+                     "descr": _("Books: %(books)s.")%{"books":Counter.objects.get_counter(models.counter_allbooks)}},
+                    {"id":4, "title":_("By genres"), "link":"opds_catalog:genres",
+                     "descr": _("Genres: %(genres)s.")%{"genres":Counter.objects.get_counter(models.counter_allgenres)}},
+                    {"id":5, "title":_("By series"), "link":"opds_catalog:series",
+                     "descr": _("Series: %(series)s.")%{"series":Counter.objects.get_counter(models.counter_allseries)}},
+                    {"id":6, "title":_("Book shelf"), "link":"opds_catalog:bookshelf",
+                     "descr": _("Books readed: %(bookshelf)s.")%{"bookshelf":bookshelf.objects.count()}},
         ]
 
     def item_link(self, item):

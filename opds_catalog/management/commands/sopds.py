@@ -1,6 +1,7 @@
 import logging
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from opds_catalog.models import Counter
 
 from opds_catalog.sopdscan import opdsScanner
 from opds_catalog import opdsdb, settings
@@ -40,10 +41,15 @@ class Command(BaseCommand):
             self.stdout.write('Clear book database.')
             self.clear(options['verbose'])
 
+        self.update_counters(logger)
+
     def scan(self, logger, verbose=False):
         scanner=opdsScanner(logger)
         with transaction.atomic():
             scanner.scan_all()
+
+    def update_counters(self, logger):
+        Counter.objects.update_known_counters()
 
     def clear(self,verbose=False):
         opdsdb.clear_all()

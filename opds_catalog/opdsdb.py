@@ -2,7 +2,7 @@ import os
 
 from django.db.models import Q
 
-from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf
+from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -37,6 +37,7 @@ def clear_all():
     bauthor.objects.all().delete()
     bseries.objects.all().delete()
     bookshelf.objects.all().delete()
+    Counter.objects.all().delete()
 
 # Книги где avail=0 уже известно что удалены
 # Книги где avail=2 это только что прверенные существующие книги
