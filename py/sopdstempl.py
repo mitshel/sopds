@@ -48,7 +48,8 @@ class opdsTemplate():
        self.page_top_start=''
        self.page_top_linkstart='<link type="application/atom+xml" rel="start" href="%(modulepath)s?id=00"/>'
        self.page_top_linkself=''
-       self.page_top_linksearch=('<link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />'
+       self.page_top_linksearch=(
+#                                 '<link href="%(modulepath)s?id=09" rel="search" type="application/opensearchdescription+xml" />'
                                  '<link href="%(modulepath)s?searchTerm={searchTerms}" rel="search" type="application/atom+xml" />')
        self.page_top_finish=''
 
