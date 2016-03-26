@@ -11,5 +11,5 @@ script:
 
 branches:
     only:
-        - django-add
+        - v0.3-devel
 
