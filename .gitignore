@@ -1,8 +1,7 @@
-covers/*
-*.fb2
 *.log
 *.swp
 py
+db
 fb2toepub/*
 !fb2toepub/*.zip
 fb2conv/*
@@ -10,8 +9,6 @@ fb2conv/*
 !fb2conv/*.gz
 !fb2conv/fb2epub
 !fb2conv/fb2mobi
-testinfo/*
-speed
 .htaccess
 db.sqlite3
 .idea/*
