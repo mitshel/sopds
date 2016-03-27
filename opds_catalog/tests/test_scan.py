@@ -96,6 +96,7 @@ class scanTestCase(TestCase):
         scanner = opdsScanner()
         scanner.scan_all()
         self.assertEquals(scanner.books_added, 4)
+        self.assertEquals(scanner.bad_books, 1)
         self.assertEquals(Book.objects.all().count(), 4)
         self.assertEquals(Author.objects.all().count(), 4)
         self.assertEquals(Genre.objects.all().count(), 4)

@@ -26,12 +26,13 @@ class opdsScanner:
         self.t1=datetime.timedelta(seconds=time.time())
         self.t2=self.t1
         self.t3=self.t1
-        self.books_added   = 0
+        self.books_added = 0
         self.books_skipped = 0
         self.books_deleted = 0
         self.arch_scanned = 0
         self.arch_skipped = 0
         self.bad_archives = 0
+        self.bad_books = 0
         self.books_in_archives = 0
 
     def init_parser(self):
@@ -49,6 +50,7 @@ class opdsScanner:
         self.t2=datetime.timedelta(seconds=time.time())
         self.logger.info('Books added      : '+str(self.books_added))
         self.logger.info('Books skipped    : '+str(self.books_skipped))
+        self.logger.info('Bad books        : '+str(self.bad_books))
         if settings.DELETE_LOGICAL:
             self.logger.info('Books deleted    : '+str(self.books_deleted))
         else:
@@ -141,62 +143,66 @@ class opdsScanner:
 
             self.fb2parser.reset()
             if opdsdb.findbook(name,rel_path,1)==None:
-               if archive==0:
-                  cat=opdsdb.addcattree(rel_path,archive)
-               title=''
-               lang=''
-               annotation=''
-               docdate=''
+                if archive==0:
+                    cat=opdsdb.addcattree(rel_path,archive)
+                title=''
+                lang=''
+                annotation=''
+                docdate=''
+                book_is_valid = True
 
-               if e.lower()=='.fb2' and settings.FB2PARSE:
-                  if isinstance(file, str):
-                     f=open(file,'rb')
-                  else:
-                     f=file
-                  self.fb2parser.parse(f,settings.FB2HSIZE)
-                  f.close()
+                if e.lower()=='.fb2' and settings.FB2PARSE:
+                    if isinstance(file, str):
+                        f=open(file,'rb')
+                    else:
+                        f=file
+                    self.fb2parser.parse(f,settings.FB2HSIZE)
+                    f.close()
 
-                  if len(self.fb2parser.lang.getvalue())>0:
-                     lang=self.fb2parser.lang.getvalue()[0].strip(' \'\"')
-                  if len(self.fb2parser.book_title.getvalue())>0:
-                     title=self.fb2parser.book_title.getvalue()[0].strip(' \'\"\&-.#\\\`')
-                  if len(self.fb2parser.annotation.getvalue())>0:
-                     annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:10000]
-                  if len(self.fb2parser.docdate.getvalue())>0:
-                     docdate=self.fb2parser.docdate.getvalue()[0].strip();
+                    if len(self.fb2parser.lang.getvalue())>0:
+                        lang=self.fb2parser.lang.getvalue()[0].strip(' \'\"')
+                    if len(self.fb2parser.book_title.getvalue())>0:
+                        title=self.fb2parser.book_title.getvalue()[0].strip(' \'\"\&-.#\\\`')
+                    if len(self.fb2parser.annotation.getvalue())>0:
+                        annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:10000]
+                    if len(self.fb2parser.docdate.getvalue())>0:
+                        docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
-                  if self.fb2parser.parse_error!=0:
-                     errormsg=''
-                     self.logger.warning(rel_path+' - '+name+' fb2 parse error ['+errormsg+']')
+                    if self.fb2parser.parse_error!=0:
+                        errormsg=''
+                        self.logger.warning(rel_path+' - '+name+' fb2 parse error ['+errormsg+']')
+                        book_is_valid = False
+                        self.bad_books+=1
 
-               if title=='': title=n
+                if book_is_valid:
+                   if title=='': title=n
 
-               book=opdsdb.addbook(name,rel_path,cat,e,title,annotation,docdate,lang,file_size,archive)
-               self.books_added+=1
+                   book=opdsdb.addbook(name,rel_path,cat,e,title,annotation,docdate,lang,file_size,archive)
+                   self.books_added+=1
 
-               if archive==1:
-                  self.books_in_archives+=1
-               self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
+                   if archive==1:
+                      self.books_in_archives+=1
+                   self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
 
-               idx=0
-               for l in self.fb2parser.author_last.getvalue():
-                   last_name=l.strip(' \'\"\&-.#\\\`')
-                   first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \'\"\&-.#\\\`')
-                   author=opdsdb.addauthor(first_name,last_name)
-                   opdsdb.addbauthor(book,author)
-                   idx+=1
-               for l in self.fb2parser.genre.getvalue():
-                   opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(' \'\"')))
-               for l in self.fb2parser.series.attrss:
-                   ser_name=l.get('name')
-                   if ser_name:
-                      ser=opdsdb.addseries(ser_name.strip())
-                      sser_no=l.get('number','0').strip()
-                      if sser_no.isdigit():
-                         ser_no=int(sser_no)
-                      else:
-                         ser_no=0
-                      opdsdb.addbseries(book,ser,ser_no)
+                   idx=0
+                   for l in self.fb2parser.author_last.getvalue():
+                       last_name=l.strip(' \'\"\&-.#\\\`')
+                       first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \'\"\&-.#\\\`')
+                       author=opdsdb.addauthor(first_name,last_name)
+                       opdsdb.addbauthor(book,author)
+                       idx+=1
+                   for l in self.fb2parser.genre.getvalue():
+                       opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(' \'\"')))
+                   for l in self.fb2parser.series.attrss:
+                       ser_name=l.get('name')
+                       if ser_name:
+                          ser=opdsdb.addseries(ser_name.strip())
+                          sser_no=l.get('number','0').strip()
+                          if sser_no.isdigit():
+                             ser_no=int(sser_no)
+                          else:
+                             ser_no=0
+                          opdsdb.addbseries(book,ser,ser_no)
 
             else:
                self.books_skipped+=1
