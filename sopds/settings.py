@@ -123,6 +123,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\ruszip\\'
+SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\ruszip\\test\\'
 SOPDS_AUTH = False
 

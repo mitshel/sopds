@@ -11,15 +11,16 @@ from opds_catalog import fb2parse, settings, opdsdb
 
 
 class opdsScanner:
-    def __init__(self, logger):
+    def __init__(self, logger=None):
         self.fb2parser=None
         self.init_parser()
-        # TODO: Внести изменения, чтобы сделать возможным указывать вместо logger NULL (тогда либо логгер по умолчанию, либо просто логи будут отстутсвовать)
+
         if logger:
             self.logger = logger
         else:
             self.logger = logging.getLogger('')
             self.logger.setLevel(logging.NOTSET)
+        self.init_stats()
 
     def init_stats(self):
         self.t1=datetime.timedelta(seconds=time.time())

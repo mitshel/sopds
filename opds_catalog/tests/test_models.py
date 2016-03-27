@@ -7,6 +7,7 @@ from django.conf import settings
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, bauthor, bgenre, bseries
 from opds_catalog import models
+from opds_catalog import opdsdb
 
 class ModelsTestCase(TestCase):
     testdatetime = datetime(2016, 1, 1, 0, 0)
@@ -14,6 +15,7 @@ class ModelsTestCase(TestCase):
         testdatetime = testdatetime.replace(tzinfo=timezone.get_current_timezone())
 
     def setUp(self):
+        opdsdb.clear_all()
         book = Book.objects.create(filename="testbook.fb2", path=".", filesize=500, format="fb2", cat_type=0, registerdate=self.testdatetime,
                             docdate="01.01.2016", favorite=0, lang="ru", title="Книга", annotation="Аннотация", cover="", cover_type="",
                             doublicat=0, avail=2,

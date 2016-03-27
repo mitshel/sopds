@@ -13,6 +13,7 @@ class opdsdbTestCase(TestCase):
         opdsdb.addbgenre(book, opdsdb.addgenre("fantastic"))
         opdsdb.addbseries(book, opdsdb.addseries("mywork"), 1)
 
+
     def test_cat_fn(self):
         """ Тестирование функций addcattree, findcat """
         self.assertEqual(Catalog.objects.filter(parent=None).count(), 1)
