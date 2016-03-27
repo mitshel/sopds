@@ -119,12 +119,12 @@ class opdsScanner:
                         file_size=z.getinfo(n).file_size
                         self.processfile(n,file,z.open(n),cat,1,file_size)
                     except zipfile.BadZipFile:
-                        self.logger.error('Error processing ZIP file = '+file+' book file = '+n)
+                        self.logger.warning('Error processing ZIP file = '+file+' book file = '+n)
                         zip_process_error = 1
                 z.close()
                 self.arch_scanned+=1
             except zipfile.BadZipFile:
-                self.logger.error('Error while read ZIP archive. File '+file+' corrupt.')
+                self.logger.warning('Error while read ZIP archive. File '+file+' corrupt.')
                 zip_process_error = 1
             self.bad_archives+=zip_process_error
         else:
