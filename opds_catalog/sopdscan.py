@@ -15,7 +15,11 @@ class opdsScanner:
         self.fb2parser=None
         self.init_parser()
         # TODO: Внести изменения, чтобы сделать возможным указывать вместо logger NULL (тогда либо логгер по умолчанию, либо просто логи будут отстутсвовать)
-        self.logger = logger
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger('')
+            self.logger.setLevel(logging.NOTSET)
 
     def init_stats(self):
         self.t1=datetime.timedelta(seconds=time.time())
