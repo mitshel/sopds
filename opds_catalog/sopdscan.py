@@ -108,11 +108,11 @@ class opdsScanner:
     def processzip(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
         if settings.ZIPRESCAN or (not opdsdb.zipisscanned(rel_file,1)):
-            cat=opdsdb.addcattree(rel_file,1)
             zip_process_error = 0
             try:
                 z = zipfile.ZipFile(file, 'r', allowZip64=True)
                 filelist = z.namelist()
+                cat = opdsdb.addcattree(rel_file, 1)
                 for n in filelist:
                     try:
                         self.logger.debug('Start process ZIP file = '+file+' book file = '+n)
