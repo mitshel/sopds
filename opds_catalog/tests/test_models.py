@@ -1,12 +1,20 @@
+from datetime import datetime
+
 from django.test import TestCase
 from django.utils import timezone
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import User
+from django.conf import settings
+
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, bauthor, bgenre, bseries
 from opds_catalog import models
 
-class DBStructTestCase(TestCase):
+class ModelsTestCase(TestCase):
+    testdatetime = datetime(2016, 1, 1, 0, 0)
+    if settings.USE_TZ:
+        testdatetime = testdatetime.replace(tzinfo=timezone.get_current_timezone())
+
     def setUp(self):
-        book = Book.objects.create(filename="testbook.fb2", path=".", filesize=500, format="fb2", cat_type=0, registerdate=timezone.now(),
+        book = Book.objects.create(filename="testbook.fb2", path=".", filesize=500, format="fb2", cat_type=0, registerdate=self.testdatetime,
                             docdate="01.01.2016", favorite=0, lang="ru", title="Книга", annotation="Аннотация", cover="", cover_type="",
                             doublicat=0, avail=2,
                             catalog=Catalog.objects.create(parent=None, cat_name=".", path=".", cat_type=0)
@@ -17,8 +25,10 @@ class DBStructTestCase(TestCase):
         ba = bauthor.objects.create(book=book, author=author)
         bg = bgenre.objects.create(book=book, genre=genre)
         bs = bseries.objects.create(book=book, ser=series, ser_no=1)
-#        bshelf = bookshelf.objects.create(user=AnonymousUser, book=book, readtime=timezone.now())
+        user = User.objects.create_user("testuser","testuser@sopds.ru", "testpassword", first_name="Test", last_name="User")
+        bshelf = bookshelf.objects.create(user=user, book=book, readtime=self.testdatetime)
         Counter.objects.update_known_counters()
+
 
     def test_Book(self):
         """ Тестирование соответствия структуры модели Book и работоспособности БД """
@@ -28,7 +38,7 @@ class DBStructTestCase(TestCase):
         self.assertEqual(book.filesize, 500)
         self.assertEqual(book.format, "fb2")
         self.assertEqual(book.cat_type, 0)
-#        self.assertEqual(book.registerdate, "testbook.fb2")
+        self.assertEqual(book.registerdate, self.testdatetime)
         self.assertEqual(book.docdate, "01.01.2016")
         self.assertEqual(book.favorite, 0)
         self.assertEqual(book.lang, "ru")
@@ -63,6 +73,13 @@ class DBStructTestCase(TestCase):
         ser = book.series.all()[0]
         self.assertEqual(ser.ser,"mywork")
         self.assertEqual(bseries.objects.get(ser=ser).ser_no, 1)
+
+    def test_bookshelf(self):
+        """ Тестирование соответствия структуры модели bookshelf и работоспособности БД """
+        user = User.objects.get(username="testuser")
+        self.assertEqual(bookshelf.objects.all().count(), 1)
+        self.assertEqual(bookshelf.objects.filter(user=user).count(), 1)
+        self.assertEqual(bookshelf.objects.get(user=user).book.title, "Книга")
 
     def test_Counter(self):
         """ Тестирование соответствия структуры модели Counter, менеджера CounterManager и работоспособности БД """

@@ -14,6 +14,7 @@ class opdsScanner:
     def __init__(self, logger):
         self.fb2parser=None
         self.init_parser()
+        # TODO: Внести изменения, чтобы сделать возможным указывать вместо logger NULL (тогда либо логгер по умолчанию, либо просто логи будут отстутсвовать)
         self.logger = logger
 
     def init_stats(self):
