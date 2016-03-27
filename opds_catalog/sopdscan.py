@@ -19,7 +19,7 @@ class opdsScanner:
             self.logger = logger
         else:
             self.logger = logging.getLogger('')
-            self.logger.setLevel(logging.NOTSET)
+            self.logger.setLevel(logging.CRITICAL)
         self.init_stats()
 
     def init_stats(self):

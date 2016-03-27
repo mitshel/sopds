@@ -14,7 +14,7 @@ class scanTestCase(TestCase):
         pass
 
     def test_fb2parse_valid(self):
-        """ Тестирование класса fb2parser валидного fb2 """
+        """ Тестирование класса fb2parser - разбор валидного fb2 """
         parser = fb2parser()
         parser.reset()
         f = open(os.path.join(self.test_ROOTLIB, self.test_fb2), 'rb')
@@ -28,10 +28,19 @@ class scanTestCase(TestCase):
         self.assertEquals(parser.parse_error, 0)
 
     def test_fb2parse_novalid(self):
-        """ Тестирование класса fb2parser валидного fb2 """
+        """ Тестирование класса fb2parser - разбор невалидного fb2 """
         parser = fb2parser()
         parser.reset()
         f = open(os.path.join(self.test_ROOTLIB, self.test_bad_fb2), 'rb')
         parser.parse(f)
         self.assertNotEquals(parser.parse_error, 0)
 
+    def test_fb2parse_cover(self):
+        """ Тестирование класса fb2parser - извлечение обдложки из fb2 """
+        parser = fb2parser(True)
+        parser.reset()
+        f = open(os.path.join(self.test_ROOTLIB, self.test_fb2), 'rb')
+        parser.parse(f)
+        self.assertEquals(parser.parse_error, 0)
+        self.assertEquals(len(parser.cover_image.cover_data), 76207)
+        self.assertEquals(parser.cover_image.getattr('content-type'), "image/jpeg")
