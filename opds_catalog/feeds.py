@@ -5,10 +5,8 @@ from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
-from django.contrib import auth
-from django.http import HttpResponse
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
 from opds_catalog import models

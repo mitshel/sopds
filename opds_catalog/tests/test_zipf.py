@@ -27,7 +27,7 @@ class scanTestCase(TestCase):
     def test_zip_novalid(self):
         bad_file_count = 0
         try:
-            z = zipfile.ZipFile(os.path.join(self.test_ROOTLIB, self.test_bad_zip), 'r', allowZip64=True)
+            zipfile.ZipFile(os.path.join(self.test_ROOTLIB, self.test_bad_zip), 'r', allowZip64=True)
         except zipfile.BadZipFile:
             bad_file_count = 1
 

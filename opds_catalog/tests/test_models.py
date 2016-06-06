@@ -24,11 +24,11 @@ class ModelsTestCase(TestCase):
         author = Author.objects.create(first_name="Дмитрий", last_name="Шелепнев")
         genre = Genre.objects.create(genre="fantastic0", section="fantastic1", subsection="fantastic2")
         series = Series.objects.create(ser="mywork")
-        ba = bauthor.objects.create(book=book, author=author)
-        bg = bgenre.objects.create(book=book, genre=genre)
-        bs = bseries.objects.create(book=book, ser=series, ser_no=1)
+        bauthor.objects.create(book=book, author=author)
+        bgenre.objects.create(book=book, genre=genre)
+        bseries.objects.create(book=book, ser=series, ser_no=1)
         user = User.objects.create_user("testuser","testuser@sopds.ru", "testpassword", first_name="Test", last_name="User")
-        bshelf = bookshelf.objects.create(user=user, book=book, readtime=self.testdatetime)
+        bookshelf.objects.create(user=user, book=book, readtime=self.testdatetime)
         Counter.objects.update_known_counters()
 
 
