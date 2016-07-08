@@ -7,10 +7,12 @@ from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
 from opds_catalog import models
 from opds_catalog import settings
+from test.support import disable_gc
 
 class AuthFeed(Feed):
     request = None
@@ -71,23 +73,26 @@ class opdsFeed(Atom1Feed):
             handler.characters("\n")
 
 
-    def add_item_elements(self, handler, item):
+    def add_item_elements(self, handler, item):        
+        disable_item_links = item.get('disable_item_links')    
         handler.characters("\n")
         handler.addQuickElement("id", item['unique_id'])
         handler.characters("\n")
         handler.addQuickElement("title", item['title'])
         handler.characters("\n")
-        handler.addQuickElement("link", "", {"href": item['link'], "rel": "alternate"})
-        handler.characters("\n")
+        if not disable_item_links:
+            handler.addQuickElement("link", "", {"href": item['link'], "rel": "alternate"})
+            handler.characters("\n")
         # Enclosures.
-        if item.get('enclosures') is not None:
-            for enclosure in item['enclosures']:
-                handler.addQuickElement('link', '', {
-                    'rel': enclosure.rel,
-                    'href': enclosure.url,
-                    'type': enclosure.mime_type,
-                })
-                handler.characters("\n")
+        if not disable_item_links:
+            if item.get('enclosures') is not None:
+                for enclosure in item['enclosures']:
+                    handler.addQuickElement('link', '', {
+                        'rel': enclosure.rel,
+                        'href': enclosure.url,
+                        'type': enclosure.mime_type,
+                    })
+                    handler.characters("\n")
 
         if item.get('updateddate') is not None:
             handler.addQuickElement('updated', rfc3339_date(item['updateddate']))
@@ -120,20 +125,20 @@ class MainFeed(AuthFeed):
     def items(self):
         mainitems = [
                     {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs",
-                     "descr": _("Catalogs: %(catalogs)s, books: %(books)s.")%{"catalogs":Counter.objects.get_counter(models.counter_allcatalogs),"books":Counter.objects.get_counter(models.counter_allbooks)}},
+                     "descr": _("Catalogs: %(catalogs)s, books: %(books)s."),"counters":{"catalogs":Counter.objects.get_counter(models.counter_allcatalogs),"books":Counter.objects.get_counter(models.counter_allbooks)}},
                     {"id":2, "title":_("By authors"), "link":"opds_catalog:authors",
-                     "descr": _("Authors: %(authors)s.")%{"authors":Counter.objects.get_counter(models.counter_allauthors)}},
+                     "descr": _("Authors: %(authors)s."),"counters":{"authors":Counter.objects.get_counter(models.counter_allauthors)}},
                     {"id":3, "title":_("By titles"), "link":"opds_catalog:titles",
-                     "descr": _("Books: %(books)s.")%{"books":Counter.objects.get_counter(models.counter_allbooks)}},
+                     "descr": _("Books: %(books)s."),"counters":{"books":Counter.objects.get_counter(models.counter_allbooks)}},
                     {"id":4, "title":_("By genres"), "link":"opds_catalog:genres",
-                     "descr": _("Genres: %(genres)s.")%{"genres":Counter.objects.get_counter(models.counter_allgenres)}},
+                     "descr": _("Genres: %(genres)s."),"counters":{"genres":Counter.objects.get_counter(models.counter_allgenres)}},
                     {"id":5, "title":_("By series"), "link":"opds_catalog:series",
-                     "descr": _("Series: %(series)s.")%{"series":Counter.objects.get_counter(models.counter_allseries)}},
+                     "descr": _("Series: %(series)s."),"counters":{"series":Counter.objects.get_counter(models.counter_allseries)}},
         ]
         if settings.AUTH and self.request.user.is_authenticated():
             mainitems += [
                         {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
-                         "descr":_("%(username)s books readed: %(bookshelf)s.")%{"bookshelf":bookshelf.objects.count(),"username":self.request.user.username}},
+                         "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.count(),"username":self.request.user.username}},
             ]
 
         return mainitems
@@ -145,7 +150,7 @@ class MainFeed(AuthFeed):
         return item['title']
 
     def item_description(self, item):
-        return item['descr']
+        return item['descr']%item['counters']
 
     def item_guid(self, item):
         return "m:%s"%item["id"]
@@ -156,6 +161,10 @@ class MainFeed(AuthFeed):
     def item_enclosures(self, item):
         return (opdsEnclosure(reverse(item['link']),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
 
+    def item_extra_kwargs(self, item):
+        disable_item_links = (list(item['counters'].values())[0]==0)   
+        return {'disable_item_links':disable_item_links}      
+                
 def OpenSearch(request):
     """
     Выводим шаблон поиска

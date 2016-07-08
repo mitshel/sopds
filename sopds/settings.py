@@ -123,6 +123,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\ruszip\\test\\'
+#SOPDS_ROOT_LIB = 'D:\\Projects\\Books\\'
+SOPDS_ROOT_LIB = 'C:\\Users\\shelepnevdv\\git\\sopds\\opds_catalog\\tests\\data\\'
 SOPDS_AUTH = False
 

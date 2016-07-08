@@ -1,8 +1,9 @@
+{% autoescape off %}
 <?xml version="1.0" encoding="utf-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
     <ShortName>SimpleOPDS</ShortName>
     <LongName>SimpleOPDS</LongName>
-    <Url type="application/atom+xml" template="{% url "opds:search" "{searchTerms}" %}" />
+    <Url type="application/atom+xml" template="/opds/search/{searchTerms}/" />
     <Image width="16" height="16">http://www.sopds.ru/favicon.ico</Image>
     <Tags />
     <Contact />
@@ -14,3 +15,4 @@
     <OutputEncoding>UTF-8</OutputEncoding>
     <InputEncoding>UTF-8</InputEncoding>
 </OpenSearchDescription>
+{% endautoescape %}
