@@ -48,10 +48,25 @@ class ModelsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertIn('www.sopds.ru', response.content.decode())
         
-    def test_SearchTypes(self):
+    def test_SearchTerms(self):
         c = Client()
-        response = c.get('/opds/search/')
+        response = c.get('/opds/search/Драк/')
         self.assertEquals(response.status_code, 200)
-        self.assertIn('www.sopds.ru', response.content.decode())
+        self.assertIn(_("Search by titles"), response.content.decode())
+        
+        response = c.get('/opds/search/titles/Драк/')
+        self.assertEquals(response.status_code, 200)
+        self.assertIn("Драконьи Услуги", response.content.decode())
+        self.assertIn("Куприянов Денис", response.content.decode())
+        
+        response = c.get('/opds/search/authors/Логинов/')
+        self.assertEquals(response.status_code, 200)
+        self.assertIn("Любовь в жизни Обломова", response.content.decode())
+        self.assertIn("Логинов Святослав", response.content.decode())     
+        
+        response = c.get('/opds/search/genres/antiq/')
+        self.assertEquals(response.status_code, 200)
+        self.assertIn("The Sanctuary Sparrow", response.content.decode())
+        self.assertIn("Peters Ellis", response.content.decode())    
         
           

@@ -227,8 +227,8 @@ class SearchBooksFeed(Feed):
             # TODO: Переделать на поиск авторов
             books = Book.objects.filter(authors__last_name__contains=searchterms)
         elif searchtype == 'genres':
-            # TODO: Переделать на поиск жанров
-            books = Book.objects.filter(genres__section__contains=searchterms)
+            # TODO: Переделать на поиск жанров (genre нужно заменить на section нужно скорее всего)
+            books = Book.objects.filter(genres__genre__contains=searchterms)
         else:
             books = Book.objects.filter(title__contains=searchterms)
 
