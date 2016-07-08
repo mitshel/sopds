@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 counter_allbooks = 'allbooks'
 counter_allcatalogs = 'allcatalogs'
@@ -108,7 +109,12 @@ class CounterManager(models.Manager):
         self.update(counter_allseries, Series.objects.all().count())
 
     def get_counter(self, counter_name):
-        return self.get(name=counter_name).value
+        try:
+            counter = self.get(name=counter_name).value
+        except ObjectDoesNotExist:
+            counter = 0
+            
+        return counter
 
 class Counter(models.Model):
     name = models.CharField(primary_key=True, null=False, blank=False, max_length=16)
