@@ -171,7 +171,7 @@ def OpenSearch(request):
     """
     return render(request, 'opensearch.html')
 
-class SearchTypesFeed(Feed):
+class SearchTypesFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
 
@@ -214,7 +214,7 @@ class SearchTypesFeed(Feed):
         return (opdsEnclosure(reverse("opds_catalog:searchterms", kwargs={"searchtype":item["type"], "searchterms":item["term"]}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
 
 
-class SearchBooksFeed(Feed):
+class SearchBooksFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
     description_template = "book_description.html"
@@ -282,7 +282,7 @@ class SearchBooksFeed(Feed):
             opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item.id}),"image/jpeg", "http://opds-spec.org/image"),
         )
 
-class CatalogsFeed(Feed):
+class CatalogsFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
     description_template = "book_description.html"
@@ -373,11 +373,13 @@ class CatalogsFeed(Feed):
     #def item_pubdate(self, item):
     #    return item.registerdate
 
-class BooksFeed(Feed):
+class BooksFeed(AuthFeed):
     feed_type = opdsFeed
-    title = "Мои книги"
     subtitle = settings.SUBTITLE
     link = "/opds/books/"
+    
+    def title(self, obj):
+        return "%s | %s"%(settings.TITLE,_("By titles"))
 
     def items(self):
         return Book.objects.all()[:15]
