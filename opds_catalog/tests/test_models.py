@@ -9,7 +9,7 @@ from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf,
 from opds_catalog import models
 from opds_catalog import opdsdb
 
-class ModelsTestCase(TestCase):
+class modelsTestCase(TestCase):
     testdatetime = datetime(2016, 1, 1, 0, 0)
     if settings.USE_TZ:
         testdatetime = testdatetime.replace(tzinfo=timezone.get_current_timezone())

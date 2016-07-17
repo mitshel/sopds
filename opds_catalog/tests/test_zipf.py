@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from opds_catalog import zipf as zipfile
 
-class scanTestCase(TestCase):
+class zipTestCase(TestCase):
     test_module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     test_ROOTLIB = os.path.join(test_module_path, 'tests/data')
     test_zip = "books.zip"
