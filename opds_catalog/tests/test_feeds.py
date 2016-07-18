@@ -5,7 +5,7 @@ from django.test import TestCase, Client
 from django.utils.translation import ugettext as _
 
 
-class ModelsTestCase(TestCase):
+class feedsTestCase(TestCase):
     fixtures = ['testdb.json']
     
     def setUp(self):
@@ -29,8 +29,7 @@ class ModelsTestCase(TestCase):
         response = c.get(reverse('opds:catalogs'));
         self.assertEquals(response.status_code, 200)  
         self.assertIn('books.zip', response.content.decode())
-        self.assertIn('The Sanctuary Sparrow', response.content.decode())           
-        
+        self.assertIn('The Sanctuary Sparrow', response.content.decode())                   
        
     def test_CatalogsFeedTree(self):
         c = Client()
