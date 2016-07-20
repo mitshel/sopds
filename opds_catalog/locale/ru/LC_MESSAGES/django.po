@@ -8,16 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-17 21:34+0300\n"
+"POT-Creation-Date: 2016-07-19 13:10+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%"
-"100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #: .\opds_catalog\feeds.py:127 .\opds_catalog\feeds.py:302
 #: .\opds_catalog\feeds.py:304 .\opds_catalog\tests\test_feeds.py:20
@@ -38,7 +39,7 @@ msgstr "По авторам"
 msgid "Authors: %(authors)s."
 msgstr "Авторов: %(authors)s."
 
-#: .\opds_catalog\feeds.py:131 .\opds_catalog\feeds.py:382
+#: .\opds_catalog\feeds.py:131 .\opds_catalog\feeds.py:426
 msgid "By titles"
 msgstr "По наименованиям"
 
@@ -96,6 +97,30 @@ msgstr "Поиск авторов по имени"
 #: .\opds_catalog\feeds.py:195
 msgid "Search genres"
 msgstr "Поиск жанров"
+
+#: .\opds_catalog\feeds.py:382
+msgid "Select language"
+msgstr "Выбор алфавита"
+
+#: .\opds_catalog\feeds.py:393
+msgid "Cyrillic"
+msgstr "Кириллица (РУС)"
+
+#: .\opds_catalog\feeds.py:394
+msgid "Latin"
+msgstr "Латинница (LAT)"
+
+#: .\opds_catalog\feeds.py:395
+msgid "Digits"
+msgstr "Цифры (0..9)"
+
+#: .\opds_catalog\feeds.py:396
+msgid "Other symbols"
+msgstr "Другие символы"
+
+#: .\opds_catalog\feeds.py:397
+msgid "Show all"
+msgstr "Показать все"
 
 #: .\opds_catalog\templates\book_description.html:6
 msgid "Book name:"

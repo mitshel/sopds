@@ -162,7 +162,7 @@ class opdsScanner:
                     if len(self.fb2parser.lang.getvalue())>0:
                         lang=self.fb2parser.lang.getvalue()[0].strip(' \'\"')
                     if len(self.fb2parser.book_title.getvalue())>0:
-                        title=self.fb2parser.book_title.getvalue()[0].strip(' \'\"\&-.#\\\`')
+                        title=self.fb2parser.book_title.getvalue()[0].strip(' »«\'\"\&\n-.#\\\`')
                     if len(self.fb2parser.annotation.getvalue())>0:
                         annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:10000]
                     if len(self.fb2parser.docdate.getvalue())>0:

@@ -6,15 +6,31 @@ urlpatterns = [
     url(r'^catalogs/$',feeds.CatalogsFeed(), name='catalogs'),
     url(r'^catalogs/(?P<cat_id>[0-9]+)/$',feeds.CatalogsFeed(), name='cat_tree'),
     url(r'^catalogs/(?P<cat_id>[0-9]+)/(?P<page>[0-9]+)/$',feeds.CatalogsFeed(), name='cat_page'),
-    url(r'^authors/',feeds.MainFeed(), name='authors'),
-    url(r'^titles/',feeds.BooksFeed(), name='titles'),
+    
+    url(r'^books/$',feeds.LangFeed(), name='lang_books'),
+    url(r'^books/0/$',feeds.BooksFeed(), name='nolang_books'), 
+    url(r'^books/(?P<lang_code>[0-9])/$',feeds.BooksFeed(), name='char_books'), 
+    url(r'^books/(?P<lang_code>[0-9])/(?P<chars>.+)/$',feeds.BooksFeed(), name='chars_books'),  
+    
+    url(r'^authors/$',feeds.LangFeed(), name='lang_authors'),    
+    url(r'^authors/0/$',feeds.AuthorsFeed(), name='nolang_authors'),     
+    url(r'^authors/(?P<lang_code>[0-9])/$',feeds.AuthorsFeed(), name='char_authors'), 
+    url(r'^authors/(?P<lang_code>[0-9])/(?P<chars>.+)/$',feeds.AuthorsFeed(), name='chars_authors'), 
+         
     url(r'^genres/',feeds.MainFeed(), name='genres'),
     url(r'^series/',feeds.MainFeed(), name='series'),
     url(r'^bookshelf/',feeds.MainFeed(), name='bookshelf'),
     url(r'^search/$',feeds.OpenSearch, name='opensearch'),
-    url(r'^search/(?P<searchtype>\w+)/(?P<searchterms>[\w ]+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchterms'),
-    url(r'^search/(?P<searchtype>\w+)/(?P<searchterms>[\w ]+)/',feeds.SearchBooksFeed(), name='searchterms'),
-    url(r'^search/(?P<searchterms>[\S ]+)/',feeds.SearchTypesFeed(), name='searchtypes'),
+    #url(r'^search/(?P<searchtype>\w+)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchterms'),
+    #url(r'^search/(?P<searchtype>\w+)/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchterms'),
+    url(r'^search/(?P<searchtype>.*books)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
+    url(r'^search/(?P<searchtype>.*books)/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
+    
+    url(r'^search/(?P<searchtype>.*authors)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
+    url(r'^search/(?P<searchtype>.*authors)/(?P<searchterms>.+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),       
+    
+    url(r'^search/(?P<searchterms>.+)/',feeds.SearchTypesFeed(), name='searchtypes'),
+    
     url(r'^download/(?P<book_id>[0-9]+)/(?P<zip>[0-1])/$',dl.Download, name='download'),
     url(r'^cover/(?P<book_id>[0-9]+)/$',dl.Cover, name='cover'),
     url(r'^',feeds.MainFeed(), name='main'),

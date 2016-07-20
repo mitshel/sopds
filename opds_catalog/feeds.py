@@ -8,11 +8,14 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.functions import Substr, Upper
+from django.db.models import Count
+from django.utils.encoding import escape_uri_path
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
 from opds_catalog import models
 from opds_catalog import settings
-from test.support import disable_gc
+from django.http.response import Http404
 
 class AuthFeed(Feed):
     request = None
@@ -126,9 +129,9 @@ class MainFeed(AuthFeed):
         mainitems = [
                     {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs",
                      "descr": _("Catalogs: %(catalogs)s, books: %(books)s."),"counters":{"catalogs":Counter.objects.get_counter(models.counter_allcatalogs),"books":Counter.objects.get_counter(models.counter_allbooks)}},
-                    {"id":2, "title":_("By authors"), "link":"opds_catalog:authors",
+                    {"id":2, "title":_("By authors"), "link":("opds_catalog:lang_authors" if settings.ALPHABET_MENU else "opds_catalog:nolang_authors"),
                      "descr": _("Authors: %(authors)s."),"counters":{"authors":Counter.objects.get_counter(models.counter_allauthors)}},
-                    {"id":3, "title":_("By titles"), "link":"opds_catalog:titles",
+                    {"id":3, "title":_("By titles"), "link":("opds_catalog:lang_books" if settings.ALPHABET_MENU else "opds_catalog:nolang_books"),
                      "descr": _("Books: %(books)s."),"counters":{"books":Counter.objects.get_counter(models.counter_allbooks)}},
                     {"id":4, "title":_("By genres"), "link":"opds_catalog:genres",
                      "descr": _("Genres: %(genres)s."),"counters":{"genres":Counter.objects.get_counter(models.counter_allgenres)}},
@@ -165,123 +168,6 @@ class MainFeed(AuthFeed):
         disable_item_links = (list(item['counters'].values())[0]==0)   
         return {'disable_item_links':disable_item_links}      
                 
-def OpenSearch(request):
-    """
-    Выводим шаблон поиска
-    """
-    return render(request, 'opensearch.html')
-
-class SearchTypesFeed(AuthFeed):
-    feed_type = opdsFeed
-    subtitle = settings.SUBTITLE
-
-    def get_object(self, request, searchterms=""):
-        return searchterms
-
-    def link(self, obj):
-        return "/opds/search/{searchTerms}/"
-
-    def feed_extra_kwargs(self, obj):
-        return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
-                "start_url":reverse("opds_catalog:main"),
-                "description_mime_type":"text",
-        }
-
-    def items(self, obj):
-        return [
-                    {"id":1, "title":_("Search by titles"), "type":"titles", "term":obj, "descr": _("Search books by title")},
-                    {"id":2, "title":_("Search by authors"), "type":"authors", "term":obj, "descr": _("Search authors by name")},
-                    {"id":3, "title":_("Search genres"), "type":"genres", "term":obj, "descr": _("Search genres")},
-        ]
-
-    def item_link(self, item):
-        return reverse("opds_catalog:searchterms", kwargs={"searchtype":item["type"], "searchterms":item["term"]})
-
-    def item_title(self, item):
-        return item['title']
-
-    def item_description(self, item):
-        return item['descr']
-
-    def item_guid(self, item):
-        return "st:%s"%item["id"]
-
-    def item_updateddate(self):
-        return timezone.now()
-
-    def item_enclosures(self, item):
-        return (opdsEnclosure(reverse("opds_catalog:searchterms", kwargs={"searchtype":item["type"], "searchterms":item["term"]}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
-
-
-class SearchBooksFeed(AuthFeed):
-    feed_type = opdsFeed
-    subtitle = settings.SUBTITLE
-    description_template = "book_description.html"
-
-    def get_object(self, request, searchterms, searchtype, page=1):
-        if not isinstance(page, int):
-            page = int(page)
-
-        if searchtype == 'authors':
-            # TODO: Переделать на поиск авторов
-            books = Book.objects.filter(authors__last_name__contains=searchterms)
-        elif searchtype == 'genres':
-            # TODO: Переделать на поиск жанров (genre нужно заменить на section нужно скорее всего)
-            books = Book.objects.filter(genres__genre__contains=searchterms)
-        else:
-            books = Book.objects.filter(title__contains=searchterms)
-
-        return {"books":books, "searchterms":searchterms, "searchtype":searchtype, "page":page}
-
-    def link(self, obj):
-        return reverse("opds_catalog:searchterms", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]})
-
-    def feed_extra_kwargs(self, obj):
-        if obj["page"] != 1:
-            prev_url = reverse("opds_catalog:searchterms", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]-1)})
-        else:
-            prev_url  = None
-
-        if obj["page"]*settings.MAXITEMS<obj["books"].count():
-            next_url = reverse("opds_catalog:searchterms", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]+1)})
-        else:
-            next_url  = None
-        return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
-                "start_url":reverse("opds_catalog:main"),
-                "description_mime_type":"text/html",
-                "prev_url":prev_url,
-                "next_url":next_url,
-        }
-
-    def items(self, obj):
-        books_list = obj["books"].order_by("title")
-
-        paginator = Paginator(books_list,settings.MAXITEMS)
-        try:
-            page = paginator.page(obj["page"])
-        except EmptyPage:
-            page = paginator.page(paginator.num_pages)
-
-        return page
-
-    def item_title(self, item):
-        return item.title
-
-    def item_guid(self, item):
-        return "b:%s"%(item.id)
-
-    def item_link(self, item):
-        return reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0})
-
-    def item_enclosures(self, item):
-        return (
-            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
-            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
-            opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item.id}),"image/jpeg", "http://opds-spec.org/image"),
-        )
-
 class CatalogsFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
@@ -305,23 +191,22 @@ class CatalogsFeed(AuthFeed):
 
     def link(self, obj):
         cat, current_page = obj
-        return reverse("opds:cat_page", kwargs={"cat_id":cat.id, "page":current_page})
+        return reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id, "page":current_page})
 
     def feed_extra_kwargs(self, obj):
         cat, current_page = obj
         start_url = reverse("opds_catalog:main")
         if current_page != 1:
-            prev_url = reverse("opds:cat_page", kwargs={"cat_id":cat.id,"page":(current_page-1)})
+            prev_url = reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id,"page":(current_page-1)})
         else:
             prev_url  = None
 
         if current_page*settings.MAXITEMS<Catalog.objects.filter(parent=cat).count() + Book.objects.filter(catalog=cat).count():
-            next_url = reverse("opds:cat_page", kwargs={"cat_id":cat.id,"page":(current_page+1)})
+            next_url = reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id,"page":(current_page+1)})
         else:
             next_url  = None
 
         return {
-                #"search_url":"sopds.wsgi?id=09",
                 "searchTerm_url":"/opds/search/{searchTerms}/",
                 "start_url":start_url,
                 "prev_url":prev_url,
@@ -356,40 +241,370 @@ class CatalogsFeed(AuthFeed):
 
     def item_link(self, item):
         if isinstance(item, Catalog):
-            return reverse("opds:cat_tree", kwargs={"cat_id":item.id})
+            return reverse("opds_catalog:cat_tree", kwargs={"cat_id":item.id})
         else:
             return reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0})
 
     def item_enclosures(self, item):
         if isinstance(item, Catalog):
-            return (opdsEnclosure(reverse("opds:cat_tree", kwargs={"cat_id":item.id}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+            return (opdsEnclosure(reverse("opds_catalog:cat_tree", kwargs={"cat_id":item.id}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
         else:
             return (
                 opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
                 opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
                 opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item.id}),"image/jpeg", "http://opds-spec.org/image"),
             )
+                            
+def OpenSearch(request):
+    """
+    Выводим шаблон поиска
+    """
+    return render(request, 'opensearch.html')
 
-    #def item_pubdate(self, item):
-    #    return item.registerdate
-
-class BooksFeed(AuthFeed):
+class SearchTypesFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
-    link = "/opds/books/"
+
+    def get_object(self, request, searchterms=""):
+        return searchterms
+
+    def link(self, obj):
+        return "/opds/search/{searchTerms}/"
+
+    def feed_extra_kwargs(self, obj):
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text",
+        }
+
+    def items(self, obj):
+        return [
+                    {"id":1, "title":_("Search by titles"), "term":obj, "descr": _("Search books by title")},
+                    {"id":2, "title":_("Search by authors"), "term":obj, "descr": _("Search authors by name")},
+                    {"id":3, "title":_("Search genres"), "term":obj, "descr": _("Search genres")},
+        ]
+
+    def item_link(self, item):
+        if item["id"] == 1:
+           return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"books", "searchterms":item["term"]})
+        elif item["id"] == 2:
+           return reverse("opds_catalog:searchauthors", kwargs={"searchtype":"authors", "searchterms":item["term"]})
+        #elif item["id"] == 3:
+        #   return reverse("opds_catalog:searchgenres", kwargs={"searchtype":"genres", "searchterms":item["term"]})
+        return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"books", "searchterms":item["term"]})
+             
+    def item_title(self, item):
+        return item['title']
+
+    def item_description(self, item):
+        return item['descr']
+
+    def item_guid(self, item):
+        return "st:%s"%item["id"]
+
+    def item_updateddate(self):
+        return timezone.now()
+
+    def item_enclosures(self, item):
+        return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+
+
+class SearchBooksFeed(AuthFeed):
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+    description_template = "book_description.html"
     
     def title(self, obj):
-        return "%s | %s"%(settings.TITLE,_("By titles"))
+        return "%s | %s"%(settings.TITLE,_("Books found"))    
 
-    def items(self):
-        return Book.objects.all()[:15]
+    def get_object(self, request, searchterms, searchtype, page=1):
+        if not isinstance(page, int):
+            page = int(page)
+
+        if  searchtype == 'books':
+            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()])
+        elif searchtype == 'sbooks':
+            books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()])
+        elif searchtype == 'abooks':
+            try:
+                author_id = int(searchterms)
+            except:
+                author_id = 0
+            books = Book.objects.filter(authors=author_id)
+            
+        return {"books":books, "searchterms":searchterms, "searchtype":searchtype, "page":page}
+
+    def link(self, obj):
+        return reverse("opds_catalog:searchbooks", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]})
+
+    def feed_extra_kwargs(self, obj):
+        if obj["page"] != 1:
+            prev_url = reverse("opds_catalog:searchbooks", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]-1)})
+        else:
+            prev_url  = None
+
+        if obj["page"]*settings.MAXITEMS<obj["books"].count():
+            next_url = reverse("opds_catalog:searchbooks", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]+1)})
+        else:
+            next_url  = None
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text/html",
+                "prev_url":prev_url,
+                "next_url":next_url,
+        }
+
+    def items(self, obj):
+        books_list = obj["books"].order_by("title")
+
+        paginator = Paginator(books_list,settings.MAXITEMS)
+        try:
+            page = paginator.page(obj["page"])
+        except EmptyPage:
+            page = paginator.page(paginator.num_pages)
+
+        return page
 
     def item_title(self, item):
         return item.title
 
-    def item_description(self, item):
-        return item.annotation
+    def item_guid(self, item):
+        return "b:%s"%(item.id)
 
     def item_link(self, item):
-        return '/%s'%item.filename
+        return reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0})
+  
+    def item_updateddate(self, item):
+        return item.registerdate    
 
+    def item_enclosures(self, item):
+        return (
+            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
+            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
+            opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item.id}),"image/jpeg", "http://opds-spec.org/image"),
+        )
+        
+class SearchAuthorsFeed(AuthFeed):
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+    #description_template = "autor_description.html"
+    
+    def title(self, obj):
+        return "%s | %s"%(settings.TITLE,_("Authors found"))    
+
+    def get_object(self, request, searchterms, searchtype, page=1):
+        if not isinstance(page, int):
+            page = int(page)
+
+        if searchtype == 'authors':
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper()])
+        elif searchtype == 'sauthors':
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])            
+
+        return {"authors":authors, "searchterms":searchterms, "searchtype":searchtype, "page":page}
+
+    def link(self, obj):
+        return reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]})
+
+    def feed_extra_kwargs(self, obj):
+        if obj["page"] != 1:
+            prev_url = reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]-1)})
+        else:
+            prev_url  = None
+
+        if obj["page"]*settings.MAXITEMS<obj["authors"].count():
+            next_url = reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]+1)})
+        else:
+            next_url  = None
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text/html",
+                "prev_url":prev_url,
+                "next_url":next_url,
+        }
+
+    def items(self, obj):
+        authors_list = obj["authors"].order_by("last_name","first_name")
+
+        paginator = Paginator(authors_list,settings.MAXITEMS)
+        try:
+            page = paginator.page(obj["page"])
+        except EmptyPage:
+            page = paginator.page(paginator.num_pages)
+
+        return page
+
+    def item_title(self, item):
+        return "%s %s"%(item.last_name,item.first_name)
+
+    def item_guid(self, item):
+        return "a:%s"%(item.id)
+
+    def item_link(self, item):
+        return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'abooks', "searchterms":item.id}) 
+
+    def item_enclosures(self, item):
+        return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+    
+class LangFeed(AuthFeed):
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+
+    def link(self, obj):
+        return self.request.path
+        
+    def title(self, obj):
+        return "%s | %s"%(settings.TITLE,_("Select language"))    
+    
+    def feed_extra_kwargs(self, obj):
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text",
+        }
+        
+    def items(self):
+        langitems = [
+                    {"id":1, "title":_("Cyrillic")},
+                    {"id":2, "title":_("Latin")},
+                    {"id":3, "title":_("Digits")},
+                    {"id":9, "title":_("Other symbols")},
+                    {"id":0, "title":_("Show all")}
+        ]
+        return langitems
+    
+    def item_link(self, item):
+        return self.request.path+str(item["id"])+'/'
+
+    def item_title(self, item):
+        return item['title']
+
+    def item_description(self, item):
+        return None
+    
+    def item_guid(self, item):
+        return "l:%s"%item["id"]
+
+    def item_updateddate(self):
+        return timezone.now()
+
+    def item_enclosures(self, item):
+        return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+
+class BooksFeed(AuthFeed):
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+
+    def link(self, obj):
+        return self.request.path
+        
+    def title(self, obj):
+        return "%s | %s"%(settings.TITLE,_("Select books by substring"))    
+    
+    def feed_extra_kwargs(self, obj):
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text",
+        }
+
+    def get_object(self, request, lang_code=0, chars = None):    
+        self.lang_code = int(lang_code)
+        if chars==None:
+            chars=''
+        return (len(chars)+1, chars.upper())
+        
+    def items(self, obj):
+        length, chars = obj
+        if self.lang_code:
+            sql="""select upper(substr(title,1,%(length)s)) as id, count(*) as cnt 
+                   from opds_catalog_book 
+                   where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%'
+                   group by upper(substr(title,1,%(length)s)) 
+                   order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
+        else:
+            sql="""select upper(substr(title,1,%(length)s)) as id, count(*) as cnt 
+                   from opds_catalog_book 
+                   where upper(title) like '%(chars)s%%'
+                   group by upper(substr(title,1,%(length)s)) 
+                   order by id"""%{'length':length,'chars':chars}
+          
+        dataset = Book.objects.raw(sql)
+        return dataset
+
+    def item_title(self, item):
+        return "%s"%item.id
+    
+    def item_description(self, item):
+        return _("Found: %s books")%item.cnt    
+
+    def item_link(self, item):
+        if item.cnt>=settings.SPLITBOOKS:
+            return reverse("opds_catalog:chars_books", kwargs={"lang_code":self.lang_code,"chars":item.id})
+        else:
+            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'sbooks', "searchterms":item.id})
+        
+    def item_enclosures(self, item):
+        return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+    
+
+class AuthorsFeed(AuthFeed):
+    feed_type = opdsFeed
+    subtitle = settings.SUBTITLE
+
+    def link(self, obj):
+        return self.request.path
+        
+    def title(self, obj):
+        return "%s | %s"%(settings.TITLE,_("Select authorss by substring"))    
+    
+    def feed_extra_kwargs(self, obj):
+        return {
+                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "start_url":reverse("opds_catalog:main"),
+                "description_mime_type":"text",
+        }
+
+    def get_object(self, request, lang_code=0, chars = None):    
+        self.lang_code = int(lang_code)
+        if chars==None:
+            chars=''
+        return (len(chars)+1, chars.upper())
+        
+    def items(self, obj):
+        length, chars = obj
+        if self.lang_code:
+            sql="""select upper(substr(last_name,1,%(length)s)) as id, count(*) as cnt 
+                   from opds_catalog_author 
+                   where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%'
+                   group by upper(substr(last_name,1,%(length)s)) 
+                   order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
+        else:
+            sql="""select upper(substr(last_name,1,%(length)s)) as id, count(*) as cnt 
+                   from opds_catalog_author 
+                   where upper(last_name) like '%(chars)s%%'
+                   group by upper(substr(last_name,1,%(length)s)) 
+                   order by id"""%{'length':length,'chars':chars}
+          
+        dataset = Author.objects.raw(sql)
+        return dataset
+
+    def item_title(self, item):
+        return "%s"%item.id
+    
+    def item_description(self, item):
+        return _("Found: %s authors")%item.cnt    
+
+    def item_link(self, item):
+        if item.cnt>=settings.SPLITAUTHORS:
+            return reverse("opds_catalog:chars_authors", kwargs={"lang_code":self.lang_code,"chars":item.id})
+        else:
+            return reverse("opds_catalog:searchauthors", kwargs={"searchtype":'sauthors', "searchterms":item.id})
+        
+    def item_enclosures(self, item):
+        return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+    
+    

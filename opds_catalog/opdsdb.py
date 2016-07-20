@@ -2,7 +2,7 @@ import os
 
 from django.db.models import Q
 
-from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter
+from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -48,6 +48,16 @@ def clear_all():
 # три позиции (0,1,2) сделаны для того чтобы сделать возможным корректную работу
 # cgi-скрипта во время сканирования библиотеки
 #
+def getlangcode(s):
+    langcode = 9
+    if len(s)==0:
+        return langcode 
+    for k in LangCodes.keys():
+        if s[0] in LangCodes[k]:
+            langcode = k
+    
+    return langcode
+    
 def avail_check_prepare():
     Book.objects.filter(~Q(avail=0)).update(avail=1)
 
@@ -107,7 +117,7 @@ def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, ar
     format=format.lower()
     book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=format,
                 title=title,annotation=annotation,docdate=docdate,lang=lang,
-                cat_type=archive,doublicat=0,avail=2)
+                cat_type=archive,doublicat=0,avail=2, lang_code=getlangcode(title))
     return book
 
 def findauthor(first_name,last_name):
@@ -119,7 +129,7 @@ def findauthor(first_name,last_name):
     return author
 
 def addauthor(first_name, last_name):
-    author, created = Author.objects.get_or_create(last_name=last_name, first_name=first_name)
+    author, created = Author.objects.get_or_create(last_name=last_name, first_name=first_name, lang_code=getlangcode(last_name))
     return author
 
 def addbauthor(book, author):
@@ -137,7 +147,7 @@ def addbgenre(book, genre):
     #book.genres.add(genre)
 
 def addseries(ser):
-    series, created = Series.objects.get_or_create(ser=ser)
+    series, created = Series.objects.get_or_create(ser=ser, lang_code=getlangcode(ser))
     return series
 
 def addbseries(book, ser, ser_no):

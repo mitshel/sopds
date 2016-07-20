@@ -9,6 +9,10 @@ counter_allauthors = 'allauthors'
 counter_allgenres = 'allgenres'
 counter_allseries = 'allseries'
 
+LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ',
+             2:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+             3:'0123456789'}
+
 class Book(models.Model):
     filename = models.CharField(db_index=True, max_length=256)
     path = models.CharField(db_index=True, max_length=1024)
@@ -25,6 +29,7 @@ class Book(models.Model):
     cover = models.CharField(max_length=32)
     cover_type = models.CharField(max_length=32)
     doublicat = models.IntegerField(null=False, default=0)
+    lang_code = models.IntegerField(db_index=True, null=False, default=9)
     avail = models.IntegerField(null=False, default=0)
     authors = models.ManyToManyField('Author', through='bauthor')
     genres = models.ManyToManyField('Genre', through='bgenre')
@@ -50,6 +55,7 @@ class Catalog(models.Model):
 class Author(models.Model):
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
+    lang_code = models.IntegerField(db_index=True, null=False, default=9)
 
     class Meta:
         index_together = [
@@ -80,6 +86,7 @@ class bgenre(models.Model):
 
 class Series(models.Model):
     ser = models.CharField(db_index=True, max_length=64)
+    lang_code = models.IntegerField(db_index=True, null=False, default=9)
 
 class bseries(models.Model):
     book = models.ForeignKey('Book')

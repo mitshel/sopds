@@ -108,6 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
 LANGUAGE_CODE = 'ru-RU'
+#LANGUAGE_CODE = 'en-US'
 
 TIME_ZONE = 'Europe/Moscow'
 
@@ -120,12 +121,24 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
 STATIC_URL = '/static/'
 
-#SOPDS_ROOT_LIB = 'D:\\Projects\\Books\\'
-#SOPDS_ROOT_LIB = 'C:\\Users\\shelepnevdv\\git\\sopds\\opds_catalog\\tests\\data\\'
-#SOPDS_ROOT_LIB = 'D:\\Мои документы\\Dropbox\\Projects\\Eclipse\\workspace\\sopds\\opds_catalog\\tests\\data\\'
-SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\BOOKS\\Художественная литература\\LIB.RUS.EC\\'
+# Конфигурация для ведения разработки на разных хостах
+# убрать при окончании разработки
+import socket
+HOSTNAME=socket.gethostname()
+
+if HOSTNAME=='DS-HOME-PC':
+    SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
+    #SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\BOOKS\\Художественная литература\\LIB.RUS.EC\\'
+    #SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
+else:
+    SOPDS_ROOT_LIB = 'D:\\Projects\\Books\\'
+    #SOPDS_ROOT_LIB = 'C:\\Users\\shelepnevdv\\git\\sopds\\opds_catalog\\tests\\data\\'
+
+
 SOPDS_AUTH = False
+SOPDS_ALPHABET_MENU = True
+SOPDS_SPLITBOOKS = 6
+SOPDS_SPLITAUTHORS = 6
 

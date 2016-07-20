@@ -21,7 +21,7 @@ ZIPRESCAN = getattr(settings, "SOPDS_ZIPRESCAN", False)
 ZIPCODEPAGE = getattr(settings, "SOPDS_ZIPCODEPAGE", "cp866")
 DELETE_LOGICAL = getattr(settings, "SOPDS_DELETE_LOGICAL", False)
 SPLITAUTHORS = getattr(settings, "SOPDS_SPLITAUTHORS", 300)
-SPLITTITLES = getattr(settings, "SOPDS_SPLITTITLES", 300)
+SPLITBOOKS = getattr(settings, "SOPDS_SPLITBOOKS", 300)
 FB2TOEPUB = getattr(settings, "SOPDS_FB2TOEPUB", "")
 FB2TOMOBI = getattr(settings, "SOPDS_FB2TOMOBI", "")
 TEMP_DIR = getattr(settings, "SOPDS_TEMP_DIR", "/tmp")
@@ -42,3 +42,19 @@ if loglevel.lower() in loglevels:
    LOGLEVEL=loglevels[loglevel.lower()]
 else:
    LOGLEVEL=logging.NOTSET
+   
+# Переопределяем некоторые функции для SQLite, которые работают неправлено
+from django.db.backends.signals import connection_created
+from django.dispatch import receiver
+
+def sopds_upper(s):
+    return s.upper()
+
+#def sopds_substring(s,i,l):
+#    return s[i:i+l]
+
+@receiver(connection_created)
+def extend_sqlite(connection=None, **kwargs):
+    if connection.vendor == "sqlite":
+        connection.connection.create_function('upper',1,sopds_upper)
+#        connection.connection.create_function('substring',3,sopds_substring)

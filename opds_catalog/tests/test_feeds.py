@@ -47,25 +47,73 @@ class feedsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertIn('www.sopds.ru', response.content.decode())
         
-    def test_SearchTerms(self):
+    def test_SearchTypes(self):
         c = Client()
         response = c.get('/opds/search/Драк/')
         self.assertEquals(response.status_code, 200)
+        response = c.get(reverse('opds:searchtypes', kwargs={'searchterms':'Драк'}))
+        self.assertEquals(response.status_code, 200)
         self.assertIn(_("Search by titles"), response.content.decode())
         
-        response = c.get('/opds/search/titles/Драк/')
+    def test_SearchBooks(self):
+        c = Client()        
+        response = c.get('/opds/search/books/Драк/')
         self.assertEquals(response.status_code, 200)
+        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'books','searchterms':'рак'}))
+        self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
         self.assertIn("Куприянов Денис", response.content.decode())
-        
+        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'sbooks','searchterms':'Драк'}))
+        self.assertEquals(response.status_code, 200)        
+        self.assertIn("Драконьи Услуги", response.content.decode())
+        self.assertIn("Куприянов Денис", response.content.decode())   
+        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'abooks','searchterms':'1034'}))
+        self.assertEquals(response.status_code, 200)        
+        self.assertIn("Драконьи Услуги", response.content.decode())
+        self.assertIn("Куприянов Денис", response.content.decode())         
+    
+    def test_SearchAuthors(self):
+        c = Client()                
         response = c.get('/opds/search/authors/Логинов/')
         self.assertEquals(response.status_code, 200)
-        self.assertIn("Любовь в жизни Обломова", response.content.decode())
+        response = c.get(reverse('opds:searchauthors', kwargs={'searchtype':'authors','searchterms':'гинов'}))
+        self.assertEquals(response.status_code, 200)        
         self.assertIn("Логинов Святослав", response.content.decode())     
-        
-        response = c.get('/opds/search/genres/antiq/')
+        response = c.get(reverse('opds:searchauthors', kwargs={'searchtype':'sauthors','searchterms':'Лог'}))
+        self.assertEquals(response.status_code, 200)        
+        self.assertIn("Логинов Святослав", response.content.decode())         
+
+    def test_SearchGenres(self):        
+        #response = c.get('/opds/search/genres/antiq/')
+        #self.assertEquals(response.status_code, 200)
+        #self.assertIn("The Sanctuary Sparrow", response.content.decode())
+        #self.assertIn("Peters Ellis", response.content.decode())  
+        pass  
+
+    def test_LangFeed(self):
+        c = Client()
+        response = c.get('/opds/books/')
         self.assertEquals(response.status_code, 200)
-        self.assertIn("The Sanctuary Sparrow", response.content.decode())
-        self.assertIn("Peters Ellis", response.content.decode())    
-        
-          
+        response = c.get(reverse('opds:lang_books'));
+        self.assertEquals(response.status_code, 200)
+        self.assertIn(_("Cyrillic"), response.content.decode())
+        self.assertIn(_("Latin"), response.content.decode())
+        self.assertIn(_("Digits"), response.content.decode())
+        self.assertIn(_("Other symbols"), response.content.decode())  
+        self.assertIn(_("Show all"), response.content.decode())           
+     
+    def test_BooksFeed(self):
+        c = Client()
+        response = c.get('/opds/books/0/')
+        self.assertEquals(response.status_code, 200)
+        response = c.get(reverse('opds:char_books', kwargs={'lang_code':0}));
+        self.assertEquals(response.status_code, 200)
+#        self.assertIn(_("Cyrillic"), response.content.decode()) 
+
+    def test_AuthorsFeed(self):
+        c = Client()
+        response = c.get('/opds/authors/0/')
+        self.assertEquals(response.status_code, 200)
+        response = c.get(reverse('opds:char_authors', kwargs={'lang_code':0}));
+        self.assertEquals(response.status_code, 200)
+#        self.assertIn(_("Cyrillic"), response.content.decode())      
