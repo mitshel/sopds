@@ -13,5 +13,5 @@ script:
 
 branches:
     only:
-        - v0.3-devel
+        - v0.31-devel
 
