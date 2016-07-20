@@ -577,16 +577,16 @@ class AuthorsFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substr(last_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substr(last_name || ' ' || first_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
-                   where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%'
-                   group by upper(substr(last_name,1,%(length)s)) 
+                   where lang_code=%(lang_code)s and upper(last_name || ' ' || first_name) like '%(chars)s%%'
+                   group by upper(substr(last_name || ' ' || first_name,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substr(last_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substr(last_name || ' ' || first_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
-                   where upper(last_name) like '%(chars)s%%'
-                   group by upper(substr(last_name,1,%(length)s)) 
+                   where upper(last_name || ' ' || first_name) like '%(chars)s%%'
+                   group by upper(substr(last_name || ' ' || first_name,1,%(length)s)) 
                    order by id"""%{'length':length,'chars':chars}
           
         dataset = Author.objects.raw(sql)

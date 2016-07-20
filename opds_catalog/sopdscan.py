@@ -186,13 +186,13 @@ class opdsScanner:
 
                    idx=0
                    for l in self.fb2parser.author_last.getvalue():
-                       last_name=l.strip(' \'\"\&-.#\\\`')
-                       first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \'\"\&-.#\\\`')
+                       last_name=l.strip(' \n\'\"\&-.#\\\`')
+                       first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \n\'\"\&-.#\\\`')
                        author=opdsdb.addauthor(first_name,last_name)
                        opdsdb.addbauthor(book,author)
                        idx+=1
                    for l in self.fb2parser.genre.getvalue():
-                       opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(' \'\"')))
+                       opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(' \n\'\"')))
                    for l in self.fb2parser.series.attrss:
                        ser_name=l.get('name')
                        if ser_name:
