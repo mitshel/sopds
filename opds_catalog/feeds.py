@@ -290,8 +290,9 @@ class SearchTypesFeed(AuthFeed):
            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"books", "searchterms":item["term"]})
         elif item["id"] == 2:
            return reverse("opds_catalog:searchauthors", kwargs={"searchtype":"authors", "searchterms":item["term"]})
-        #elif item["id"] == 3:
-        #   return reverse("opds_catalog:searchgenres", kwargs={"searchtype":"genres", "searchterms":item["term"]})
+        elif item["id"] == 3:
+           return reverse("opds_catalog:searchgenres", kwargs={"searchtype":"genres", "searchterms":item["term"]})
+
         return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"books", "searchterms":item["term"]})
              
     def item_title(self, item):
@@ -426,7 +427,7 @@ class SearchAuthorsFeed(AuthFeed):
         return {
                 "searchTerm_url":"/opds/search/{searchTerms}/",
                 "start_url":reverse("opds_catalog:main"),
-                "description_mime_type":"text/html",
+                "description_mime_type":"text",
                 "prev_url":prev_url,
                 "next_url":next_url,
         }
@@ -444,6 +445,9 @@ class SearchAuthorsFeed(AuthFeed):
 
     def item_title(self, item):
         return "%s %s"%(item.last_name,item.first_name)
+    
+    def item_description(self, item):
+        return _("Books count: %s")%(Book.objects.filter(authors=item.id).count())     
 
     def item_guid(self, item):
         return "a:%s"%(item.id)
@@ -467,9 +471,9 @@ class SearchSeriesFeed(AuthFeed):
             page = int(page)
 
         if searchtype == 'series':
-            series = Author.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
+            series = Series.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
         elif searchtype == 'sseries':
-            series = Author.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()])            
+            series = Series.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()])            
 
         return {"series":series, "searchterms":searchterms, "searchtype":searchtype, "page":page}
 
@@ -489,7 +493,7 @@ class SearchSeriesFeed(AuthFeed):
         return {
                 "searchTerm_url":"/opds/search/{searchTerms}/",
                 "start_url":reverse("opds_catalog:main"),
-                "description_mime_type":"text/html",
+                "description_mime_type":"text",
                 "prev_url":prev_url,
                 "next_url":next_url,
         }
@@ -507,6 +511,9 @@ class SearchSeriesFeed(AuthFeed):
 
     def item_title(self, item):
         return "%s"%(item.ser)
+    
+    def item_description(self, item):
+        return _("Books count: %s")%(Book.objects.filter(series=item.id).count())    
 
     def item_guid(self, item):
         return "a:%s"%(item.id)
