@@ -126,15 +126,15 @@ STATIC_URL = '/static/'
 # Конфигурация для ведения разработки на разных хостах
 # убрать при окончании разработки
 import socket
-HOSTNAME=socket.gethostname()
+HOSTNAME=socket.gethostname().upper()
 
 if HOSTNAME=='DS-HOME-PC':
     SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
     #SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\BOOKS\\Художественная литература\\LIB.RUS.EC\\'
-    #SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
-else:
+elif HOSTNAME=='ARZ-NB-IT':
     SOPDS_ROOT_LIB = 'D:\\Projects\\Books\\'
-    #SOPDS_ROOT_LIB = 'C:\\Users\\shelepnevdv\\git\\sopds\\opds_catalog\\tests\\data\\'
+else:
+    SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
 
 
 SOPDS_AUTH = False
