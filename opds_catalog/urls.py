@@ -16,19 +16,26 @@ urlpatterns = [
     url(r'^authors/0/$',feeds.AuthorsFeed(), name='nolang_authors'),     
     url(r'^authors/(?P<lang_code>[0-9])/$',feeds.AuthorsFeed(), name='char_authors'), 
     url(r'^authors/(?P<lang_code>[0-9])/(?P<chars>.+)/$',feeds.AuthorsFeed(), name='chars_authors'), 
+    
+    url(r'^series/$',feeds.LangFeed(), name='lang_series'),    
+    url(r'^series/0/$',feeds.SeriesFeed(), name='nolang_series'),     
+    url(r'^series/(?P<lang_code>[0-9])/$',feeds.SeriesFeed(), name='char_series'), 
+    url(r'^series/(?P<lang_code>[0-9])/(?P<chars>.+)/$',feeds.SeriesFeed(), name='chars_series'), 
          
     url(r'^genres/',feeds.MainFeed(), name='genres'),
-    url(r'^series/',feeds.MainFeed(), name='series'),
     url(r'^bookshelf/',feeds.MainFeed(), name='bookshelf'),
     url(r'^search/$',feeds.OpenSearch, name='opensearch'),
-    #url(r'^search/(?P<searchtype>\w+)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchterms'),
-    #url(r'^search/(?P<searchtype>\w+)/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchterms'),
+
     url(r'^search/(?P<searchtype>.*books)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
     url(r'^search/(?P<searchtype>.*books)/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
     
     url(r'^search/(?P<searchtype>.*authors)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
     url(r'^search/(?P<searchtype>.*authors)/(?P<searchterms>.+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),       
+   
     
+    url(r'^search/(?P<searchtype>.*series)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchSeriesFeed(), name='searchseries'),
+    url(r'^search/(?P<searchtype>.*series)/(?P<searchterms>.+)/',feeds.SearchSeriesFeed(), name='searchseries'), 
+        
     url(r'^search/(?P<searchterms>.+)/',feeds.SearchTypesFeed(), name='searchtypes'),
     
     url(r'^download/(?P<book_id>[0-9]+)/(?P<zip>[0-1])/$',dl.Download, name='download'),
