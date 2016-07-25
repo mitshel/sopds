@@ -282,7 +282,7 @@ class SearchTypesFeed(AuthFeed):
         return [
                     {"id":1, "title":_("Search by titles"), "term":obj, "descr": _("Search books by title")},
                     {"id":2, "title":_("Search by authors"), "term":obj, "descr": _("Search authors by name")},
-                    {"id":3, "title":_("Search genres"), "term":obj, "descr": _("Search genres")},
+                    {"id":3, "title":_("Search series"), "term":obj, "descr": _("Search series")},
         ]
 
     def item_link(self, item):
@@ -291,7 +291,7 @@ class SearchTypesFeed(AuthFeed):
         elif item["id"] == 2:
            return reverse("opds_catalog:searchauthors", kwargs={"searchtype":"authors", "searchterms":item["term"]})
         elif item["id"] == 3:
-           return reverse("opds_catalog:searchgenres", kwargs={"searchtype":"genres", "searchterms":item["term"]})
+           return reverse("opds_catalog:searchseries", kwargs={"searchtype":"series", "searchterms":item["term"]})
 
         return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"books", "searchterms":item["term"]})
              
@@ -395,7 +395,6 @@ class SearchBooksFeed(AuthFeed):
 class SearchAuthorsFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
-    #description_template = "autor_description.html"
     
     def title(self, obj):
         return "%s | %s"%(settings.TITLE,_("Authors found"))    
@@ -461,7 +460,6 @@ class SearchAuthorsFeed(AuthFeed):
 class SearchSeriesFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
-    #description_template = "autor_description.html"
     
     def title(self, obj):
         return "%s | %s"%(settings.TITLE,_("Series found"))    

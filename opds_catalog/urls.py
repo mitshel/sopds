@@ -31,8 +31,7 @@ urlpatterns = [
     
     url(r'^search/(?P<searchtype>.*authors)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
     url(r'^search/(?P<searchtype>.*authors)/(?P<searchterms>.+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),       
-   
-    
+       
     url(r'^search/(?P<searchtype>.*series)/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchSeriesFeed(), name='searchseries'),
     url(r'^search/(?P<searchtype>.*series)/(?P<searchterms>.+)/',feeds.SearchSeriesFeed(), name='searchseries'), 
         
