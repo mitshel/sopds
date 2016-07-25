@@ -108,6 +108,23 @@ class opdsFeed(Atom1Feed):
         if item.get("description") is not None:
             handler.addQuickElement("content", item["description"], {"type": content_type})
             handler.characters("\n")
+            
+        if item.get("authors") is not None:
+            for a in item["authors"]:
+                handler.startElement("author", {})
+                handler.addQuickElement("name", "%s %s"%(a.last_name,a.first_name))
+                #handler.addQuickElement("uri", item['author_link'])
+                handler.endElement("author")
+                handler.addQuickElement("link", "", {"href": reverse("opds_catalog:searchbooks", kwargs={"searchtype":'abooks', "searchterms":a.id}), 
+                                                     "rel": "related", 
+                                                     "type":"application/atom+xml;profile=opds-catalog", 
+                                                     "title":_("All books by %s %s")%(a.last_name,a.first_name)})
+                handler.characters("\n")
+         
+        if item.get("genres") is not None:       
+            for g in item["genres"]:
+                handler.addQuickElement("category", "", {"term": g.subsection, "label": g.subsection})    
+            handler.characters("\n")        
 
 class MainFeed(AuthFeed):
     feed_type = opdsFeed
@@ -383,14 +400,18 @@ class SearchBooksFeed(AuthFeed):
         return reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0})
   
     def item_updateddate(self, item):
-        return item.registerdate    
-
+        return item.registerdate   
+         
     def item_enclosures(self, item):
         return (
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item.id}),"image/jpeg", "http://opds-spec.org/image"),
         )
+        
+    def item_extra_kwargs(self, item): 
+        return {'authors':item.authors.all(),
+                'genres':item.genres.all()}        
         
 class SearchAuthorsFeed(AuthFeed):
     feed_type = opdsFeed

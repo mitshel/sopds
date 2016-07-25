@@ -1,13 +1,15 @@
 {% load i18n %}
 
+{% autoescape off %}
 {% if obj.cat_name %}
     {{ obj.cat_name }}
 {% else %}
     <b>{% trans "Book name:" %} </b>{{ obj.title }}<br/>
-    <b>{% trans "Authors:" %} </b>{% for a in obj.authors.all %}{{ a.last_name }} {{ a.first_name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br/>
-    <b>{% trans "Genres:" %} </b>{% for g in obj.genres.all %}{{ g.subsection }}{% if not forloop.last %}, {% endif %}{% endfor %}<br/>
+    <b>{% trans "Authors:" %} </b>{% for a in obj.authors.all %}<author><name>{{ a.last_name }} {{ a.first_name }}</name></author>{% endfor %}<br/>
+    <b>{% trans "Genres:" %} </b>{% for g in obj.genres.all %}<category term="{{ g.subsection }}" label="{{ g.subsection }}" />{% endfor %}<br/>
     <b>{% trans "File:" %} </b>{{ obj.filename }}<br/>
     <b>{% trans "File size:" %} </b>{{ obj.filesize }}<br/>
     <b>{% trans "Changes date:" %} </b>{{ obj.docdate }}<br/>
-    <p class=book">{{ obj.annotation }}</p>
+    <p class="book">{{ obj.annotation }}</p>
 {% endif %}
+{% endautoescape %}

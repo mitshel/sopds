@@ -136,6 +136,7 @@ elif HOSTNAME=='ARZ-NB-IT':
 else:
     SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
 
+#SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
 
 SOPDS_AUTH = False
 SOPDS_ALPHABET_MENU = True

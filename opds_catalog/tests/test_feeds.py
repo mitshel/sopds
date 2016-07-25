@@ -70,7 +70,10 @@ class feedsTestCase(TestCase):
         response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'abooks','searchterms':'1034'}))
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
-        self.assertIn("Куприянов Денис", response.content.decode())         
+        self.assertIn("Куприянов Денис", response.content.decode())  
+        self.assertIn("All books by Куприянов Денис", response.content.decode())  
+        self.assertIn("prose_contemporary", response.content.decode())    
+        self.assertIn("<category term", response.content.decode()) 
     
     def test_SearchAuthors(self):
         c = Client()                
