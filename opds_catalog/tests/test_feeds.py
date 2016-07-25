@@ -73,7 +73,7 @@ class feedsTestCase(TestCase):
         self.assertIn("Куприянов Денис", response.content.decode())  
         self.assertIn("All books by Куприянов Денис", response.content.decode())  
         self.assertIn("prose_contemporary", response.content.decode())    
-        self.assertIn("<category term", response.content.decode()) 
+        self.assertIn("<category ", response.content.decode()) 
     
     def test_SearchAuthors(self):
         c = Client()                
