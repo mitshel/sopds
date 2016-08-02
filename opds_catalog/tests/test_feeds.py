@@ -57,17 +57,17 @@ class feedsTestCase(TestCase):
         
     def test_SearchBooks(self):
         c = Client()        
-        response = c.get('/opds/search/books/Драк/')
+        response = c.get('/opds/search/books/m/Драк/')
         self.assertEquals(response.status_code, 200)
-        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'books','searchterms':'рак'}))
+        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'m','searchterms':'рак'}))
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
         self.assertIn("Куприянов Денис", response.content.decode())
-        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'sbooks','searchterms':'Драк'}))
+        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'b','searchterms':'Драк'}))
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
         self.assertIn("Куприянов Денис", response.content.decode())   
-        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'abooks','searchterms':'1034'}))
+        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'a','searchterms':'1034'}))
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
         self.assertIn("Куприянов Денис", response.content.decode())  
@@ -77,12 +77,12 @@ class feedsTestCase(TestCase):
     
     def test_SearchAuthors(self):
         c = Client()                
-        response = c.get('/opds/search/authors/Логинов/')
+        response = c.get('/opds/search/authors/m/Логинов/')
         self.assertEquals(response.status_code, 200)
-        response = c.get(reverse('opds:searchauthors', kwargs={'searchtype':'authors','searchterms':'гинов'}))
+        response = c.get(reverse('opds:searchauthors', kwargs={'searchtype':'m','searchterms':'гинов'}))
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Логинов Святослав", response.content.decode())     
-        response = c.get(reverse('opds:searchauthors', kwargs={'searchtype':'sauthors','searchterms':'Лог'}))
+        response = c.get(reverse('opds:searchauthors', kwargs={'searchtype':'b','searchterms':'Лог'}))
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Логинов Святослав", response.content.decode())         
 
