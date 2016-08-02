@@ -71,7 +71,7 @@ class feedsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
         self.assertIn("Куприянов Денис", response.content.decode())  
-        self.assertIn("All books by Куприянов Денис", response.content.decode())  
+        self.assertIn(_("All books by %(last_name)s %(first_name)s")%{"last_name":"Куприянов", "first_name":"Денис"}, response.content.decode())  
         self.assertIn("prose_contemporary", response.content.decode())    
         self.assertIn("<category ", response.content.decode()) 
     
