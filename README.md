@@ -17,5 +17,6 @@ SOPDS_ROOT_LIB = < Путь к каталогу с книгами >
 SOPDS_AUTH = < False | True >
 
 manage.py sopds --clear
+manage.py loaddata genre.json
 manage.py sopds --scan
 
