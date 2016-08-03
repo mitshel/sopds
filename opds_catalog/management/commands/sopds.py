@@ -1,8 +1,9 @@
 import logging
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from opds_catalog.models import Counter
+from django.core.management import call_command
 
+from opds_catalog.models import Counter
 from opds_catalog.sopdscan import opdsScanner
 from opds_catalog import opdsdb, settings
 
@@ -53,4 +54,5 @@ class Command(BaseCommand):
 
     def clear(self,verbose=False):
         opdsdb.clear_all()
+        call_command('loaddata', 'genre.json', app_label='opds_catalog') 
 
