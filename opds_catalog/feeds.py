@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import Substr, Upper
-from django.db.models import Count
+from django.db.models import Count, Min
 from django.utils.encoding import escape_uri_path
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
@@ -367,8 +367,14 @@ class SearchBooksFeed(AuthFeed):
             except:
                 ser_id = 0
                 author_id = 0 
-
             books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None)
+        # Поиск книг по жанру
+        elif searchtype == 'g':
+            try:
+                genre_id = int(searchterms)
+            except:
+                genre_id = 0
+            books = Book.objects.filter(genres=genre_id)            
                  
         return {"books":books, "searchterms":searchterms, "searchterms0":searchterms0, "searchtype":searchtype, "page":page}
 
@@ -867,40 +873,38 @@ class GenresFeed(AuthFeed):
                 "description_mime_type":"text",
         }
 
-    def get_object(self, request, level = 0):    
-        if not isinstance(level, int):
-            level = int(level)
-        return level
+    def get_object(self, request, section = 0):  
+        if not isinstance(section, int):
+            self.section_id = int(section)
+        else:
+            self.section_id = section
+        return self.section_id
         
     def items(self, obj):
-        length, chars = obj
-        if self.lang_code:
-            sql="""select upper(substr(ser,1,%(length)s)) as id, count(*) as cnt 
-                   from opds_catalog_series 
-                   where lang_code=%(lang_code)s and upper(ser) like '%(chars)s%%'
-                   group by upper(substr(ser,1,%(length)s)) 
-                   order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
+        section_id = obj
+        if section_id==0:
+            dataset = Genre.objects.values('section').annotate(section_id=Min('id')).order_by('section')
         else:
-            sql="""select upper(substr(ser,1,%(length)s)) as id, count(*) as cnt 
-                   from opds_catalog_series 
-                   where upper(ser) like '%(chars)s%%'
-                   group by upper(substr(ser,1,%(length)s)) 
-                   order by id"""%{'length':length,'chars':chars}
-          
-        dataset = Series.objects.raw(sql)
+            section = Genre.objects.get(id=section_id).section
+            dataset = Genre.objects.filter(section=section).annotate(num_book=Count('book')).filter(num_book__gt=0).order_by('subsection')       
         return dataset
 
     def item_title(self, item):
-        return "%s"%item.id
+        title = item['section'] if self.section_id==0 else item.subsection
+        return "%s"%title
     
     def item_description(self, item):
-        return _("Found: %s series")%item.cnt    
+        if self.section_id==0:
+            count = Book.objects.filter(genres__section=item['section']).count()
+        else:
+            count = item.num_book
+        return _("Found: %s books")%count   
 
     def item_link(self, item):
-        if item.cnt>=settings.SPLITITEMS:
-            return reverse("opds_catalog:chars_series", kwargs={"lang_code":self.lang_code,"chars":item.id})
+        if self.section_id==0:
+            return reverse("opds_catalog:genres", kwargs={"section":item['section_id']})
         else:
-            return reverse("opds_catalog:searchseries", kwargs={"searchtype":'b', "searchterms":item.id})
+            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'g', "searchterms":item.id})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
