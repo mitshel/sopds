@@ -133,6 +133,8 @@ if HOSTNAME=='DS-HOME-PC':
     #SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\BOOKS\\Художественная литература\\LIB.RUS.EC\\'
 elif HOSTNAME=='ARZ-NB-IT':
     SOPDS_ROOT_LIB = 'D:\\Projects\\Books\\'
+elif HOSTNAME=='DSGATE':
+    SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'    
 else:
     SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
 
