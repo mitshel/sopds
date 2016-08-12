@@ -25,16 +25,15 @@ urlpatterns = [
     url(r'^genres/$',feeds.GenresFeed(), name='genres'),
     url(r'^genres/(?P<section>\d+)/$',feeds.GenresFeed(), name='genres'),
     
-    url(r'^bookshelf/',feeds.MainFeed(), name='bookshelf'),
-    
     url(r'^search/$',feeds.OpenSearch, name='opensearch'),
   
-    url(r'^search/books/(?P<searchtype>[bmasg])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
-    url(r'^search/books/(?P<searchtype>[bmasg])/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
+    url(r'^search/books/(?P<searchtype>[bmasgu])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
+    url(r'^search/books/(?P<searchtype>[bmasgu])/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/(?P<searchterms0>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/(?P<searchterms0>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/',feeds.SelectSeriesFeed(), name='searchbooks'), 
-             
+    url(r'^search/books/u/0/',feeds.SearchBooksFeed(), name='bookshelf'),
+                 
     url(r'^search/authors/(?P<searchtype>[bm])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
     url(r'^search/authors/(?P<searchtype>[bm])/(?P<searchterms>.+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),       
        

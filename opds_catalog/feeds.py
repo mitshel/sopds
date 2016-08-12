@@ -158,7 +158,7 @@ class MainFeed(AuthFeed):
         if settings.AUTH and self.request.user.is_authenticated():
             mainitems += [
                         {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
-                         "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.count(),"username":self.request.user.username}},
+                         "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.filter(user=self.request.user).count(),"username":self.request.user.username}},
             ]
 
         return mainitems
@@ -374,7 +374,15 @@ class SearchBooksFeed(AuthFeed):
                 genre_id = int(searchterms)
             except:
                 genre_id = 0
-            books = Book.objects.filter(genres=genre_id)            
+            books = Book.objects.filter(genres=genre_id)    
+        # Поиск книг на книжной полке            
+        elif searchtype == 'u':
+            if settings.AUTH:
+                books = Book.objects\
+                .filter(bookshelf__user=self.request.user)\
+                .order_by('-readtime')
+            else:
+                books={}      
                  
         return {"books":books, "searchterms":searchterms, "searchterms0":searchterms0, "searchtype":searchtype, "page":page}
 
@@ -903,4 +911,3 @@ class GenresFeed(AuthFeed):
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
-        

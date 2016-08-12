@@ -15,6 +15,8 @@ def Download(request, book_id, zip = 0):
     """ Загрузка файла книги """
     book = Book.objects.get(id=book_id)
     # TODO: Добавить книгу на книжную полку
+    if settings.AUTH:
+        bookshelf.objects.get_or_create(user=request.user, book=book)
 
     full_path=os.path.join(settings.ROOT_LIB,book.path)
     if settings.TITLE_AS_FILENAME:

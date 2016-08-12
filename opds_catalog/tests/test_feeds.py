@@ -11,7 +11,7 @@ class feedsTestCase(TestCase):
     fixtures = ['testdb.json']
     
     def setUp(self):
-        pass            
+        settings.AUTH=False           
   
     def test_MainFeed(self):
         c = Client()
