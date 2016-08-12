@@ -5,8 +5,9 @@
     {{ obj.cat_name }}
 {% else %}
     <b>{% trans "Book name:" %} </b>{{ obj.title }}<br/>
-    <b>{% trans "Authors:" %} </b>{% for a in obj.authors.all %}<author><name>{{ a.last_name }} {{ a.first_name }}</name></author>{% endfor %}<br/>
-    <b>{% trans "Genres:" %} </b>{% for g in obj.genres.all %}<category term="{{ g.subsection }}" label="{{ g.subsection }}" />{% endfor %}<br/>
+    <b>{% trans "Authors:" %} </b>{% for a in authors %}{{ a.last_name }} {{ a.first_name }}; {% endfor %}<br/>
+    <b>{% trans "Genres:" %} </b>{% for g in genres %}{{ g.subsection }}; {% endfor %}<br/>
+    <b>{% trans "Series:" %} </b>{% for s in series %}{{s.ser}}; {% endfor %}<br/>
     <b>{% trans "File:" %} </b>{{ obj.filename }}<br/>
     <b>{% trans "File size:" %} </b>{{ obj.filesize }}<br/>
     <b>{% trans "Changes date:" %} </b>{{ obj.docdate }}<br/>
