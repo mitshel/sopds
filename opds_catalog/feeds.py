@@ -528,9 +528,9 @@ class SearchAuthorsFeed(AuthFeed):
             page = int(page)
 
         if searchtype == 'm':
-            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper()])
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper().strip_whitespace()])
         elif searchtype == 'b':
-            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])            
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper().strip_whitespace()])            
         return {"authors":authors, "searchterms":searchterms, "searchtype":searchtype, "page":page}
 
     def link(self, obj):
