@@ -20,7 +20,7 @@ ZIPSCAN = getattr(settings, "SOPDS_ZIPSCAN", True)
 ZIPRESCAN = getattr(settings, "SOPDS_ZIPRESCAN", False)
 ZIPCODEPAGE = getattr(settings, "SOPDS_ZIPCODEPAGE", "cp866")
 DELETE_LOGICAL = getattr(settings, "SOPDS_DELETE_LOGICAL", False)
-SPLITITEMS = getattr(settings, "SOPDS_SPLITITEMKS", 300)
+SPLITITEMS = getattr(settings, "SOPDS_SPLITITEMS", 300)
 FB2TOEPUB = getattr(settings, "SOPDS_FB2TOEPUB", "")
 FB2TOMOBI = getattr(settings, "SOPDS_FB2TOMOBI", "")
 TEMP_DIR = getattr(settings, "SOPDS_TEMP_DIR", "/tmp")
@@ -49,11 +49,12 @@ from django.dispatch import receiver
 def sopds_upper(s):
     return s.upper()
 
-#def sopds_substring(s,i,l):
-#    return s[i:i+l]
+def sopds_substring(s,i,l):
+    i = i - 1
+    return s[i:i+l]
 
 @receiver(connection_created)
 def extend_sqlite(connection=None, **kwargs):
     if connection.vendor == "sqlite":
         connection.connection.create_function('upper',1,sopds_upper)
-#        connection.connection.create_function('substring',3,sopds_substring)
+        connection.connection.create_function('substring',3,sopds_substring)

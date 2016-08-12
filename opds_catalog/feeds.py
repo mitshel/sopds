@@ -379,8 +379,7 @@ class SearchBooksFeed(AuthFeed):
         elif searchtype == 'u':
             if settings.AUTH:
                 books = Book.objects\
-                .filter(bookshelf__user=self.request.user)\
-                .order_by('-readtime')
+                .filter(bookshelf__user=self.request.user)
             else:
                 books={}      
                  
@@ -720,16 +719,16 @@ class BooksFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substr(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%'
-                   group by upper(substr(title,1,%(length)s)) 
+                   group by upper(substring(title,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substr(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where upper(title) like '%(chars)s%%'
-                   group by upper(substr(title,1,%(length)s)) 
+                   group by upper(substring(title,1,%(length)s)) 
                    order by id"""%{'length':length,'chars':chars}
           
         dataset = Book.objects.raw(sql)
@@ -777,16 +776,16 @@ class AuthorsFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substr(last_name || ' ' || first_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(last_name || ' ' || first_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
                    where lang_code=%(lang_code)s and upper(last_name || ' ' || first_name) like '%(chars)s%%'
-                   group by upper(substr(last_name || ' ' || first_name,1,%(length)s)) 
+                   group by upper(substring(last_name || ' ' || first_name,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substr(last_name || ' ' || first_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(last_name || ' ' || first_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
                    where upper(last_name || ' ' || first_name) like '%(chars)s%%'
-                   group by upper(substr(last_name || ' ' || first_name,1,%(length)s)) 
+                   group by upper(substring(last_name || ' ' || first_name,1,%(length)s)) 
                    order by id"""%{'length':length,'chars':chars}
           
         dataset = Author.objects.raw(sql)
@@ -834,16 +833,16 @@ class SeriesFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substr(ser,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_series 
                    where lang_code=%(lang_code)s and upper(ser) like '%(chars)s%%'
-                   group by upper(substr(ser,1,%(length)s)) 
+                   group by upper(substring(ser,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substr(ser,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_series 
                    where upper(ser) like '%(chars)s%%'
-                   group by upper(substr(ser,1,%(length)s)) 
+                   group by upper(substring(ser,1,%(length)s)) 
                    order by id"""%{'length':length,'chars':chars}
           
         dataset = Series.objects.raw(sql)
