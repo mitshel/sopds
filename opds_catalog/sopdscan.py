@@ -66,14 +66,6 @@ class opdsScanner:
         hours=t.seconds//3600
         self.logger.info('Time estimated:'+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
 
-    def log_stats_dbl(self):
-        self.t3=datetime.timedelta(seconds=time.time())
-        t=self.t3-self.t2
-        seconds=t.seconds%60
-        minutes=((t.seconds-seconds)//60)%60
-        hours=t.seconds//3600
-        self.logger.info('Finishing mark_double proc in '+str(hours)+' hours, '+str(minutes)+' minutes, '+str(seconds)+' seconds.')
-
     def scan_all(self):
         self.init_stats()
         self.log_options()
@@ -90,20 +82,14 @@ class opdsScanner:
                 else:
                     file_size=os.path.getsize(file)
                     self.processfile(name,full_path,file,None,0,file_size)
-
+                    
+        opdsdb.commit()
+        
         if settings.DELETE_LOGICAL:
            self.books_deleted=opdsdb.books_del_logical()
         else:
            self.books_deleted=opdsdb.books_del_phisical()
         self.log_stats()
-
-#        if settings.DUBLICATES_FIND!=0:
-#           self.logger.info('Starting mark_double proc with DUBLICATES_FIND param = %s'%self.cfg.DUBLICATES_FIND)
-#           self.opdsdb.mark_double(self.cfg.DUBLICATES_FIND)
-#           self.log_stats_dbl()
-
-#        self.opdsdb.closeDB()
-#        self.opdsdb=None
 
     def processzip(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
@@ -139,7 +125,6 @@ class opdsScanner:
             #self.logger.debug("   full_path = "+full_path)
             #self.logger.debug("   settings.ROOT_LIB = "+settings.ROOT_LIB)
             #self.logger.debug("   rel_path = "+rel_path)
-
 
             self.fb2parser.reset()
             if opdsdb.findbook(name,rel_path,1)==None:
@@ -203,6 +188,9 @@ class opdsScanner:
                           else:
                              ser_no=0
                           opdsdb.addbseries(book,ser,ser_no)
+                          
+                if not settings.SINGLE_COMMIT: 
+                    opdsdb.commit()
 
             else:
                self.books_skipped+=1

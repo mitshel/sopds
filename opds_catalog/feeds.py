@@ -155,7 +155,7 @@ class MainFeed(AuthFeed):
                     {"id":5, "title":_("By series"), "link":("opds_catalog:lang_series" if settings.ALPHABET_MENU else "opds_catalog:nolang_series"),
                      "descr": _("Series: %(series)s."),"counters":{"series":Counter.objects.get_counter(models.counter_allseries)}},
         ]
-        if settings.AUTH and self.request.user.is_authenticated():
+        if settings.BOOK_SHELF and settings.AUTH and self.request.user.is_authenticated():
             mainitems += [
                         {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
                          "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.filter(user=self.request.user).count(),"username":self.request.user.username}},
@@ -382,7 +382,12 @@ class SearchBooksFeed(AuthFeed):
                 .filter(bookshelf__user=self.request.user)
             else:
                 books={}      
-                 
+        # Сортируем
+        books = books.order_by('title')
+        
+        # Фильтруем дубликаты
+        #books_without_double = books.annotate() 
+               
         return {"books":books, "searchterms":searchterms, "searchterms0":searchterms0, "searchtype":searchtype, "page":page}
 
     def get_link_kwargs(self, obj):

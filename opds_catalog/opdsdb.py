@@ -153,3 +153,7 @@ def addseries(ser):
 def addbseries(book, ser, ser_no):
     bs = bseries(book=book, ser=ser, ser_no=ser_no)
     bs.save()
+    
+def commit():
+    #self.cnx.commit()
+    pass
