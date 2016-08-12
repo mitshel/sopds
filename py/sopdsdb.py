@@ -5,6 +5,8 @@ import sys
 import mysql.connector
 from mysql.connector import errorcode
 
+from django.utils.translation import ugettext as _
+
 ##########################################################################
 # Наименования таблиц БД
 #
@@ -39,8 +41,7 @@ CMP_TITLE_AUTHORS=1
 ##########################################################################
 # разные константы
 #
-unknown_genre='Неизвестный жанр'
-
+unknown_genre=_("Unknown genre")
 
 ###########################################################################
 # Класс доступа к  MYSQL

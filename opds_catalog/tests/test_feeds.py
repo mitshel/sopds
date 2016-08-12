@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from django.utils.translation import ugettext as _
 
+from opds_catalog import settings
+
 
 class feedsTestCase(TestCase):
     fixtures = ['testdb.json']
@@ -109,14 +111,32 @@ class feedsTestCase(TestCase):
         c = Client()
         response = c.get('/opds/books/0/')
         self.assertEquals(response.status_code, 200)
+        if settings.ALPHABET_MENU:
+            response = c.get(reverse('opds:lang_books'));
+            self.assertEquals(response.status_code, 200)
+            self.assertIn(_("Cyrillic"), response.content.decode()) 
         response = c.get(reverse('opds:char_books', kwargs={'lang_code':0}));
-        self.assertEquals(response.status_code, 200)
-#        self.assertIn(_("Cyrillic"), response.content.decode()) 
+        self.assertIn("<title>T</title>", response.content.decode())
 
     def test_AuthorsFeed(self):
         c = Client()
         response = c.get('/opds/authors/0/')
         self.assertEquals(response.status_code, 200)
-        response = c.get(reverse('opds:char_authors', kwargs={'lang_code':0}));
+        if settings.ALPHABET_MENU:        
+            response = c.get(reverse('opds:lang_authors'));
+            self.assertEquals(response.status_code, 200)
+            self.assertIn(_("Cyrillic"), response.content.decode())  
+        response = c.get(reverse('opds:char_authors', kwargs={'lang_code':0}));    
+        self.assertIn("<title>P</title>", response.content.decode())    
+        
+        
+    def test_GenresFeed(self):
+        c = Client()
+        response = c.get('/opds/genres/')
         self.assertEquals(response.status_code, 200)
-#        self.assertIn(_("Cyrillic"), response.content.decode())      
+        response = c.get(reverse('opds:genres'));
+        self.assertEquals(response.status_code, 200)
+        self.assertIn("Неизвестный жанр", response.content.decode()) 
+        response = c.get(reverse('opds:genres', kwargs={'section':266}));
+        self.assertEquals(response.status_code, 200)
+        self.assertIn("prose_contemporary", response.content.decode())         

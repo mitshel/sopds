@@ -864,7 +864,7 @@ class GenresFeed(AuthFeed):
         return self.request.path
         
     def title(self, obj):
-        return "%s | %s"%(settings.TITLE,_("Select genres"))    
+            return "%s | %s"%(settings.TITLE,_("Select genres (%s)")%(_("section") if obj==0 else _("subsection")))    
     
     def feed_extra_kwargs(self, obj):
         return {
