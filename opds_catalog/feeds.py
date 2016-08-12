@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import Substr, Upper
-from django.db.models import Count, Min
+from django.db.models import Count, Min, Sum
 from django.utils.encoding import escape_uri_path
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
@@ -883,28 +883,23 @@ class GenresFeed(AuthFeed):
     def items(self, obj):
         section_id = obj
         if section_id==0:
-            dataset = Genre.objects.values('section').annotate(section_id=Min('id')).order_by('section')
+            dataset = Genre.objects.values('section').annotate(section_id=Min('id'), num_book=Count('book')).filter(num_book__gt=0).order_by('section')
         else:
             section = Genre.objects.get(id=section_id).section
-            dataset = Genre.objects.filter(section=section).annotate(num_book=Count('book')).filter(num_book__gt=0).order_by('subsection')       
+            dataset = Genre.objects.filter(section=section).annotate(num_book=Count('book')).filter(num_book__gt=0).values().order_by('subsection')       
         return dataset
 
     def item_title(self, item):
-        title = item['section'] if self.section_id==0 else item.subsection
-        return "%s"%title
+        return "%s"%(item['section'] if self.section_id==0 else item['subsection'])
     
     def item_description(self, item):
-        if self.section_id==0:
-            count = Book.objects.filter(genres__section=item['section']).count()
-        else:
-            count = item.num_book
-        return _("Found: %s books")%count   
+        return _("Found: %s books")%item['num_book']   
 
     def item_link(self, item):
         if self.section_id==0:
             return reverse("opds_catalog:genres", kwargs={"section":item['section_id']})
         else:
-            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'g', "searchterms":item.id})
+            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'g', "searchterms":item["id"]})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
