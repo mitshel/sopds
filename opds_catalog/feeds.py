@@ -345,7 +345,9 @@ class SearchBooksFeed(AuthFeed):
         # Поиск книг по начальной подстроке
         elif searchtype == 'b':
             books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()])
-        # Поиск книг по автору
+        # Поиск книг по точному совпадению наименования
+        elif searchtype == 'e':
+            books = Book.objects.extra(where=["upper(title)=%s"], params=["%s"%searchterms.upper()])        # Поиск книг по автору
         elif searchtype == 'a':
             try:
                 author_id = int(searchterms)
@@ -599,6 +601,8 @@ class SearchSeriesFeed(AuthFeed):
             series = Series.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
         elif searchtype == 'b':
             series = Series.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()]) 
+        elif searchtype == 'e':
+            series = Series.objects.extra(where=["upper(ser)=%s"], params=["%s"%searchterms.upper()])             
         elif searchtype == 'a':
             try:
                 self.author_id = int(searchterms)
@@ -734,13 +738,13 @@ class BooksFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%'
                    group by upper(substring(title,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where upper(title) like '%(chars)s%%'
                    group by upper(substring(title,1,%(length)s)) 
@@ -756,10 +760,12 @@ class BooksFeed(AuthFeed):
         return _("Found: %s books")%item.cnt    
 
     def item_link(self, item):
-        if item.cnt>=settings.SPLITITEMS:
+        title_full = len(item.id)<item.l
+        if item.cnt>=settings.SPLITITEMS and not title_full:
             return reverse("opds_catalog:chars_books", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
-            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'b', "searchterms":item.id})
+            return reverse("opds_catalog:searchbooks", \
+                           kwargs={"searchtype":'b' if not title_full else 'e', "searchterms":item.id})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
@@ -850,13 +856,13 @@ class SeriesFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_series 
                    where lang_code=%(lang_code)s and upper(ser) like '%(chars)s%%'
                    group by upper(substring(ser,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_series 
                    where upper(ser) like '%(chars)s%%'
                    group by upper(substring(ser,1,%(length)s)) 
@@ -872,10 +878,12 @@ class SeriesFeed(AuthFeed):
         return _("Found: %s series")%item.cnt    
 
     def item_link(self, item):
-        if item.cnt>=settings.SPLITITEMS:
+        series_full = len(item.id)<item.l
+        if item.cnt>=settings.SPLITITEMS and not series_full:
             return reverse("opds_catalog:chars_series", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
-            return reverse("opds_catalog:searchseries", kwargs={"searchtype":'b', "searchterms":item.id})
+            return reverse("opds_catalog:searchseries", \
+                           kwargs={"searchtype":'b' if not series_full else 'e', "searchterms":item.id})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)

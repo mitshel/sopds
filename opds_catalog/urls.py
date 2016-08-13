@@ -27,8 +27,8 @@ urlpatterns = [
     
     url(r'^search/$',feeds.OpenSearch, name='opensearch'),
   
-    url(r'^search/books/(?P<searchtype>[bmasgu])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
-    url(r'^search/books/(?P<searchtype>[bmasgu])/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
+    url(r'^search/books/(?P<searchtype>[bmasgue])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
+    url(r'^search/books/(?P<searchtype>[bmasgue])/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/(?P<searchterms0>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/(?P<searchterms0>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/',feeds.SelectSeriesFeed(), name='searchbooks'), 
@@ -37,8 +37,8 @@ urlpatterns = [
     url(r'^search/authors/(?P<searchtype>[bme])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
     url(r'^search/authors/(?P<searchtype>[bme])/(?P<searchterms>.+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),       
        
-    url(r'^search/series/(?P<searchtype>[bma])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchSeriesFeed(), name='searchseries'),
-    url(r'^search/series/(?P<searchtype>[bma])/(?P<searchterms>.+)/',feeds.SearchSeriesFeed(), name='searchseries'), 
+    url(r'^search/series/(?P<searchtype>[bmae])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchSeriesFeed(), name='searchseries'),
+    url(r'^search/series/(?P<searchtype>[bmae])/(?P<searchterms>.+)/',feeds.SearchSeriesFeed(), name='searchseries'), 
         
     url(r'^search/(?P<searchterms>.+)/',feeds.SearchTypesFeed(), name='searchtypes'),
     
