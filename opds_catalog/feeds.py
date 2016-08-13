@@ -734,13 +734,13 @@ class BooksFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%'
                    group by upper(substring(title,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where upper(title) like '%(chars)s%%'
                    group by upper(substring(title,1,%(length)s)) 
@@ -759,8 +759,7 @@ class BooksFeed(AuthFeed):
         if item.cnt>=settings.SPLITITEMS:
             return reverse("opds_catalog:chars_books", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
-            return reverse("opds_catalog:searchbooks", \
-                           kwargs={"searchtype":'b' if len(item.id)==item.l else 'e', "searchterms":item.id})
+            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'b', "searchterms":item.id})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
@@ -792,13 +791,13 @@ class AuthorsFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
                    where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%'
                    group by upper(substring(last_name,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
                    where upper(last_name) like '%(chars)s%%'
                    group by upper(substring(last_name,1,%(length)s)) 
@@ -817,7 +816,8 @@ class AuthorsFeed(AuthFeed):
         if item.cnt>=settings.SPLITITEMS:
             return reverse("opds_catalog:chars_authors", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
-            return reverse("opds_catalog:searchauthors", kwargs={"searchtype":'b', "searchterms":item.id})
+            return reverse("opds_catalog:searchauthors", \
+                           kwargs={"searchtype":'b' if len(item.id)==item.l else 'e', "searchterms":item.id})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
