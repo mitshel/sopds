@@ -117,7 +117,7 @@ def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, ar
     format=format.lower()
     book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=format,
                 title=title,annotation=annotation,docdate=docdate,lang=lang,
-                cat_type=archive,doublicat=0,avail=2, lang_code=getlangcode(title))
+                cat_type=archive,avail=2, lang_code=getlangcode(title))
     return book
 
 def findauthor(first_name,last_name):

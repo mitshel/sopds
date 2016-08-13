@@ -10,7 +10,7 @@ BOOK_EXTENSIONS = getattr(settings, "SOPDS_BOOK_EXTESIONS", ['.pdf', '.djvu', '.
 
 # Количество выдаваемых строк на одну страницу
 MAXITEMS = getattr(settings, "SOPDS_MAXITEMS", 60)
-DUBLICATES_FIND = getattr(settings, "SOPDS_DUBLICATES_FIND", True)
+DOUBLES_HIDE = getattr(settings, "SOPDS_DOUBLES_HIDE", True)
 FB2PARSE = getattr(settings, "SOPDS_FB2PARSE", True)
 FB2HSIZE = getattr(settings, "SOPDS_FB2HSIZE", 0)
 EPUB2PARSE = getattr(settings, "SOPDS_EPUB2PARSE", False)

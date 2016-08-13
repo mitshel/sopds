@@ -188,7 +188,7 @@ class MainFeed(AuthFeed):
 class CatalogsFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
-    description_template = "book_description.html"
+    description_template = "book_description_cat.html"
 
     def get_object(self, request, cat_id=None, page=1):
         if not isinstance(page, int):
@@ -233,7 +233,7 @@ class CatalogsFeed(AuthFeed):
     def items(self, obj):
         cat, current_page = obj
         catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_type","cat_name")
-        books_list = Book.objects.filter(catalog=cat).order_by("title")
+        books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
         union_list = list(chain(catalogs_list,books_list))
         paginator = Paginator(union_list,settings.MAXITEMS)
         try:
@@ -333,7 +333,7 @@ class SearchBooksFeed(AuthFeed):
     description_template = "book_description.html"
     
     def title(self, obj):
-        return "%s | %s"%(settings.TITLE,_("Books found"))    
+        return "%s | %s (%s)"%(settings.TITLE,_("Books found"),_("doubles hide") if settings.DOUBLES_HIDE else _("doubles show"))    
 
     def get_object(self, request, searchtype="m", searchterms=None, searchterms0=None, page=1):
         if not isinstance(page, int):
@@ -385,12 +385,39 @@ class SearchBooksFeed(AuthFeed):
             else:
                 books={}      
         # Сортируем
-        books = books.prefetch_related('authors','genres','series').order_by('title','authors')
+        books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
         
         # Фильтруем дубликаты
-        books = books.values() 
-      
-        return {"books":books, "searchterms":searchterms, "searchterms0":searchterms0, "searchtype":searchtype, "page":page}
+        #books = books.values() 
+        result = []
+        prev_title = ''
+        prev_authors_set = set()
+        for row in books:
+            #p = {'lang_code': row['lang_code'], 'filename': row['filename'], 'path': row['path'], \
+            #      'registerdate': row['registerdate'], 'id': row['id'], 'annotation': row['annotation'], \
+            #      'docdate': row['docdate'], 'format': row['format'], 'title': row['title'], 'filesize': row['filesize']}
+            #p['authors'] = Author.objects.filter(book=row['id']).values()
+            #p['genres'] = Genre.objects.filter(book=row['id']).values()
+            #p['series'] = Series.objects.filter(book=row['id']).values()
+            p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
+                  'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize}
+            p['authors'] = row.authors.values()
+            p['genres'] = row.genres.values()
+            p['series'] = row.series.values()          
+            if settings.DOUBLES_HIDE:
+                title = p['title'] 
+                authors_set = {a['id'] for a in p['authors']}         
+                if title==prev_title and authors_set==prev_authors_set:
+                    result[-1]['doubles']+=1
+                else:
+                    result.append(p)                   
+                prev_title = title
+                prev_authors_set = authors_set
+            else:
+                result.append(p)
+                  
+        return {"books":result, "searchterms":searchterms, "searchterms0":searchterms0, "searchtype":searchtype, "page":page}
 
     def get_link_kwargs(self, obj):
         kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]}
@@ -409,7 +436,7 @@ class SearchBooksFeed(AuthFeed):
         else:
             prev_url  = None
 
-        if obj["page"]*settings.MAXITEMS<obj["books"].count():
+        if obj["page"]*settings.MAXITEMS<len(obj["books"]):
             kwargs["page"]=obj["page"]+1
             next_url = reverse("opds_catalog:searchbooks", kwargs=kwargs)
         else:
@@ -433,7 +460,7 @@ class SearchBooksFeed(AuthFeed):
 
         return page
 
-    def item_title(self, item):
+    def item_title(self, item):     
         return item['title']
 
     def item_guid(self, item):
@@ -453,15 +480,16 @@ class SearchBooksFeed(AuthFeed):
         )
         
     def item_extra_kwargs(self, item): 
-        return {'authors':Author.objects.filter(book=item['id']).values(),
-                'genres':Genre.objects.filter(book=item['id']).values()}         
+        return {'authors':item['authors'],'genres':item['genres']}         
+#        return {'authors':Author.objects.filter(book=item['id']).values(),
+#                'genres':Genre.objects.filter(book=item['id']).values()}         
         
-    def get_context_data(self, **kwargs):
-        context = super(SearchBooksFeed, self).get_context_data(**kwargs)
-        context['authors'] = Author.objects.filter(book=context['obj']['id']).values()
-        context['genres'] = Genre.objects.filter(book=context['obj']['id']).values()
-        context['series'] = Series.objects.filter(book=context['obj']['id']).values()
-        return context                 
+#    def get_context_data(self, **kwargs):
+#        context = super(SearchBooksFeed, self).get_context_data(**kwargs)
+#        context['authors'] = Author.objects.filter(book=context['obj']['id']).values()
+#        context['genres'] = Genre.objects.filter(book=context['obj']['id']).values()
+#        context['series'] = Series.objects.filter(book=context['obj']['id']).values()
+#        return context                 
 
 class SelectSeriesFeed(AuthFeed):
     feed_type = opdsFeed

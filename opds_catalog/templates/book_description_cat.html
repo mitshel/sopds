@@ -1,0 +1,16 @@
+{% load i18n %}
+
+{% autoescape off %}
+{% if obj.cat_name %}
+    {{ obj.cat_name }}
+{% else %}
+    <b>{% trans "Book name:" %} </b>{{ obj.title }}<br/>
+    <b>{% trans "Authors:" %} </b>{% for a in obj.authors.all %}{{ a.last_name }} {{ a.first_name }}; {% endfor %}<br/>
+    <b>{% trans "Genres:" %} </b>{% for g in obj.genres.all %}{{ g.subsection }}; {% endfor %}<br/>
+    <b>{% trans "Series:" %} </b>{% for s in obj.series.all %}{{s.ser}}; {% endfor %}<br/>
+    <b>{% trans "File:" %} </b>{{ obj.filename }}<br/>
+    <b>{% trans "File size:" %} </b>{{ obj.filesize }}<br/>
+    <b>{% trans "Changes date:" %} </b>{{ obj.docdate }}<br/>   
+    <p class="book">{{ obj.annotation }}</p>
+{% endif %}
+{% endautoescape %}

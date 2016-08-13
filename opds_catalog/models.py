@@ -22,13 +22,13 @@ class Book(models.Model):
     cat_type = models.IntegerField(null=False, default=0)
     registerdate = models.DateTimeField(db_index=True, null=False, default=timezone.now)
     docdate = models.CharField(max_length=20)
-    favorite = models.IntegerField(null=False, default=0)
+    #favorite = models.IntegerField(null=False, default=0)
     lang = models.CharField(max_length=16)
     title = models.CharField(max_length=256)
     annotation = models.CharField(max_length=10000)
-    cover = models.CharField(max_length=32)
-    cover_type = models.CharField(max_length=32)
-    doublicat = models.IntegerField(null=False, default=0)
+    #cover = models.CharField(max_length=32)
+    #cover_type = models.CharField(max_length=32)
+    #doublicat = models.IntegerField(null=False, default=0)
     lang_code = models.IntegerField(db_index=True, null=False, default=9)
     avail = models.IntegerField(null=False, default=0)
     authors = models.ManyToManyField('Author', through='bauthor')
@@ -38,7 +38,7 @@ class Book(models.Model):
     class Meta:
         index_together = [
             ["title", "format", "filesize"],
-            ["avail", "doublicat"],
+            ["avail"],
         ]
 
 class Catalog(models.Model):

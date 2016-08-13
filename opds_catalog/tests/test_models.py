@@ -17,8 +17,7 @@ class modelsTestCase(TestCase):
     def setUp(self):
         opdsdb.clear_all()
         book = Book.objects.create(filename="testbook.fb2", path=".", filesize=500, format="fb2", cat_type=0, registerdate=self.testdatetime,
-                            docdate="01.01.2016", favorite=0, lang="ru", title="Книга", annotation="Аннотация", cover="", cover_type="",
-                            doublicat=0, avail=2,
+                            docdate="01.01.2016", lang="ru", title="Книга", annotation="Аннотация", avail=2,
                             catalog=Catalog.objects.create(parent=None, cat_name=".", path=".", cat_type=0)
         )
         author = Author.objects.create(first_name="Дмитрий", last_name="Шелепнев")
@@ -42,13 +41,9 @@ class modelsTestCase(TestCase):
         self.assertEqual(book.cat_type, 0)
         self.assertEqual(book.registerdate, self.testdatetime)
         self.assertEqual(book.docdate, "01.01.2016")
-        self.assertEqual(book.favorite, 0)
         self.assertEqual(book.lang, "ru")
         self.assertEqual(book.title, "Книга")
         self.assertEqual(book.annotation, "Аннотация")
-        self.assertEqual(book.cover, "")
-        self.assertEqual(book.cover_type, "")
-        self.assertEqual(book.doublicat, 0)
         self.assertEqual(book.avail, 2)
         self.assertEqual(book.catalog.path, ".")
         self.assertEqual(book.catalog.cat_name, ".")
