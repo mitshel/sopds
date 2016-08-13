@@ -528,9 +528,10 @@ class SearchAuthorsFeed(AuthFeed):
             page = int(page)
 
         if searchtype == 'm':
-            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%%%s%%"%searchterms.upper()])
+            #concat(last_name,' ',first_name)
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper()])
         elif searchtype == 'b':
-            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%s%%"%searchterms.upper()])            
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])            
         return {"authors":authors, "searchterms":searchterms, "searchtype":searchtype, "page":page}
 
     def link(self, obj):
@@ -788,16 +789,16 @@ class AuthorsFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
-                   where lang_code=%(lang_code)s and upper(concat(last_name,' ',first_name)) like '%(chars)s%%'
-                   group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
+                   where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%'
+                   group by upper(substring(last_name,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
+            sql="""select upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
-                   where upper(concat(last_name,' ',first_name)) like '%(chars)s%%'
-                   group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
+                   where upper(last_name) like '%(chars)s%%'
+                   group by upper(substring(last_name,1,%(length)s)) 
                    order by id"""%{'length':length,'chars':chars}
           
         dataset = Author.objects.raw(sql)
