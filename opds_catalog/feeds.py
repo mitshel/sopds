@@ -813,11 +813,12 @@ class AuthorsFeed(AuthFeed):
         return _("Found: %s authors")%item.cnt    
 
     def item_link(self, item):
-        if item.cnt>=settings.SPLITITEMS:
+        last_name_full = len(item.id)<item.l
+        if (item.cnt>=settings.SPLITITEMS) and not last_name_full:
             return reverse("opds_catalog:chars_authors", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
             return reverse("opds_catalog:searchauthors", \
-                           kwargs={"searchtype":'b' if len(item.id)==item.l else 'e', "searchterms":item.id})
+                           kwargs={"searchtype":'b' if not last_name_full else 'e', "searchterms":item.id})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
