@@ -531,7 +531,9 @@ class SearchAuthorsFeed(AuthFeed):
             #concat(last_name,' ',first_name)
             authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper()])
         elif searchtype == 'b':
-            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])            
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])  
+        elif searchtype == 'e':
+            authors = Author.objects.extra(where=["upper(last_name)=%s"], params=["%s"%searchterms.upper()])                       
         return {"authors":authors, "searchterms":searchterms, "searchtype":searchtype, "page":page}
 
     def link(self, obj):
@@ -732,13 +734,13 @@ class BooksFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%'
                    group by upper(substring(title,1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_book 
                    where upper(title) like '%(chars)s%%'
                    group by upper(substring(title,1,%(length)s)) 
@@ -757,7 +759,8 @@ class BooksFeed(AuthFeed):
         if item.cnt>=settings.SPLITITEMS:
             return reverse("opds_catalog:chars_books", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
-            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'b', "searchterms":item.id})
+            return reverse("opds_catalog:searchbooks", \
+                           kwargs={"searchtype":'b' if len(item.id)==item.l else 'e', "searchterms":item.id})
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)

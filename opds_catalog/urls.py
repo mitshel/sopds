@@ -34,8 +34,8 @@ urlpatterns = [
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/',feeds.SelectSeriesFeed(), name='searchbooks'), 
     url(r'^search/books/u/0/',feeds.SearchBooksFeed(), name='bookshelf'),
                  
-    url(r'^search/authors/(?P<searchtype>[bm])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
-    url(r'^search/authors/(?P<searchtype>[bm])/(?P<searchterms>.+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),       
+    url(r'^search/authors/(?P<searchtype>[bme])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
+    url(r'^search/authors/(?P<searchtype>[bme])/(?P<searchterms>.+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),       
        
     url(r'^search/series/(?P<searchtype>[bma])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchSeriesFeed(), name='searchseries'),
     url(r'^search/series/(?P<searchtype>[bma])/(?P<searchterms>.+)/',feeds.SearchSeriesFeed(), name='searchseries'), 
