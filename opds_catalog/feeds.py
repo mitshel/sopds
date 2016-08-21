@@ -380,10 +380,17 @@ class SearchBooksFeed(AuthFeed):
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
             if settings.AUTH:
-                books = Book.objects\
-                .filter(bookshelf__user=self.request.user)
+                books = Book.objects.filter(bookshelf__user=self.request.user)
             else:
-                books={}      
+                books={}  
+        # Поиск дубликатов для книги            
+        elif searchtype == 'd':
+            try:
+                book_id = int(searchterms)
+                mbook = Book.objects.get(book=book_id)
+                books = Book.objects.filter(Upper(title)=mbook.title.upper, authors__in=mbook.authors, book!=book_id)
+            except:
+                books={}                
         # Сортируем
         books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
         
@@ -393,12 +400,6 @@ class SearchBooksFeed(AuthFeed):
         prev_title = ''
         prev_authors_set = set()
         for row in books:
-            #p = {'lang_code': row['lang_code'], 'filename': row['filename'], 'path': row['path'], \
-            #      'registerdate': row['registerdate'], 'id': row['id'], 'annotation': row['annotation'], \
-            #      'docdate': row['docdate'], 'format': row['format'], 'title': row['title'], 'filesize': row['filesize']}
-            #p['authors'] = Author.objects.filter(book=row['id']).values()
-            #p['genres'] = Genre.objects.filter(book=row['id']).values()
-            #p['series'] = Series.objects.filter(book=row['id']).values()
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize}
@@ -477,19 +478,11 @@ class SearchBooksFeed(AuthFeed):
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
+            opdsEnclosure(reverse("opds_catalog:searchbooks", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
         )
         
     def item_extra_kwargs(self, item): 
-        return {'authors':item['authors'],'genres':item['genres']}         
-#        return {'authors':Author.objects.filter(book=item['id']).values(),
-#                'genres':Genre.objects.filter(book=item['id']).values()}         
-        
-#    def get_context_data(self, **kwargs):
-#        context = super(SearchBooksFeed, self).get_context_data(**kwargs)
-#        context['authors'] = Author.objects.filter(book=context['obj']['id']).values()
-#        context['genres'] = Genre.objects.filter(book=context['obj']['id']).values()
-#        context['series'] = Series.objects.filter(book=context['obj']['id']).values()
-#        return context                 
+        return {'authors':item['authors'],'genres':item['genres']}                            
 
 class SelectSeriesFeed(AuthFeed):
     feed_type = opdsFeed
