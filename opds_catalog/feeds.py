@@ -125,6 +125,13 @@ class opdsFeed(Atom1Feed):
             for g in item["genres"]:
                 handler.addQuickElement("category", "", {"term": g['subsection'], "label": g['subsection']})    
             handler.characters("\n")        
+        
+        if item.get("doubles") is not None:    
+                handler.addQuickElement("link", "", {"href": reverse("opds_catalog:searchbooks", kwargs={"searchtype":'d', "searchterms":item['doubles']}), 
+                                                     "rel": "related", 
+                                                     "type":"application/atom+xml;profile=opds-catalog", 
+                                                     "title":_("Book doublicates")})
+                handler.characters("\n")
             
 
 class MainFeed(AuthFeed):
@@ -386,14 +393,15 @@ class SearchBooksFeed(AuthFeed):
                 books={}  
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
-            try:
-                book_id = int(searchterms)
-                mbook = Book.objects.get(book=book_id)
-                books = Book.objects.filter(title=mbook.title, authors__in=mbook.authors).exclude(book=book_id)
-            except:
-                books={}                
+            #try:
+            book_id = int(searchterms)
+            mbook = Book.objects.get(id=book_id)
+            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id)
+            #except:
+            #    books={}                      
         # Сортируем
-        books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
+        if len(books)>0:
+            books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
         
         # Фильтруем дубликаты
         #books = books.values() 
@@ -480,12 +488,10 @@ class SearchBooksFeed(AuthFeed):
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
         ]
-        if item['doubles']>0:
-            enclosure+=[opdsEnclosure(reverse("opds_catalog:searchbooks", kwargs={"searchtype":"d", "searchterms":item['id']}),"application/atom+xml;profile=opds-catalog", "related")]
         return enclosure
         
     def item_extra_kwargs(self, item): 
-        return {'authors':item['authors'],'genres':item['genres']}                            
+        return {'authors':item['authors'],'genres':item['genres'], 'doubles': item['id'] if item['doubles']>0 else None}                            
 
 class SelectSeriesFeed(AuthFeed):
     feed_type = opdsFeed
