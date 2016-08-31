@@ -415,7 +415,7 @@ class SearchBooksFeed(AuthFeed):
             p['authors'] = row.authors.values()
             p['genres'] = row.genres.values()
             p['series'] = row.series.values()          
-            if settings.DOUBLES_HIDE or (searchtype != 'd'):
+            if settings.DOUBLES_HIDE and (searchtype != 'd'):
                 title = p['title'] 
                 authors_set = {a['id'] for a in p['authors']}         
                 if title==prev_title and authors_set==prev_authors_set:
