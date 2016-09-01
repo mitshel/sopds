@@ -36,3 +36,4 @@ mitshel:madlenka
 ## Basic Authorizaton Django
 - http://www.idiotinside.com/2015/09/21/basic-auth-in-django-flask/
 - https://djangosnippets.org/snippets/2468/
+

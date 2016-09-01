@@ -18,6 +18,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^opds/', include('opds_catalog.urls', namespace='opds', app_name='opds_catalog')),
+    url(r'^web/', include('sopds_web_backend.urls', namespace='web', app_name='opds_web_backend')),    
     url(r'^admin/', admin.site.urls),
     url(r'^', include('opds_catalog.urls', namespace='opds', app_name='opds_catalog')),
 ]

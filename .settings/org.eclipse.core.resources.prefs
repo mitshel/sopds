@@ -3,7 +3,4 @@ encoding//opds_catalog/dl.py=utf-8
 encoding//opds_catalog/sopdscan.py=utf-8
 encoding//opds_catalog/tests/test_dl.py=utf-8
 encoding//opds_catalog/tests/test_feeds.py=utf-8
-encoding//py/sopdscan.py=utf-8
-encoding//py/sopdscli.py=utf-8
-encoding//py/sopdsdb.py=utf-8
 encoding/<project>=UTF-8
