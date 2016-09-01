@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'opds_catalog',
+    'sopds_web_backend',
 ]
 
 MIDDLEWARE_CLASSES = [
