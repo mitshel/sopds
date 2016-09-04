@@ -42,6 +42,12 @@
 
 @import 'util/util';
 
+// 0. SOPDS Constants
+$sopds-bg-color: #f15a23;
+$sopds-title-color: #e0e0e0;
+$sopds-hover-color: #ffffff;
+$sopds-bg-hover: scale-color($sopds-bg-color, $lightness: -15%);
+
 // 1. Global
 // ---------
 
@@ -49,7 +55,8 @@ $global-font-size: 100%;
 $global-width: rem-calc(1200);
 $global-lineheight: 1.5;
 $foundation-palette: (
-  primary: #2199e8,
+//  primary: #2199e8,
+  primary: $sopds-bg-color,
   secondary: #777,
   success: #3adb76,
   warning: #ffae00,
@@ -378,7 +385,8 @@ $mediaobject-image-width-stacked: 100%;
 
 $menu-margin: 0;
 $menu-margin-nested: 1rem;
-$menu-item-padding: 0.7rem 1rem;
+//$menu-item-padding: 0.7rem 1rem;
+$menu-item-padding: 0.25rem 1rem;
 $menu-item-color-active: $white;
 $menu-item-background-active: map-get($foundation-palette, primary);
 $menu-icon-spacing: 0.25rem;
@@ -559,7 +567,7 @@ $tooltip-radius: $global-radius;
 // -----------
 
 $topbar-padding: 0.5rem;
-$topbar-background: $light-gray;
+$topbar-background: $sopds-bg-color;
 $topbar-submenu-background: $topbar-background;
 $topbar-title-spacing: 1rem;
 $topbar-input-width: 200px;

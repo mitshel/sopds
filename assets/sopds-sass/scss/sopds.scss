@@ -48,3 +48,20 @@
 
 @include motion-ui-transitions;
 @include motion-ui-animations;
+
+.top-bar {
+@extend .top-bar;
+  ul.menu {
+    a { color : $sopds-title-color; }
+    a:hover { color: $sopds-hover-color; }
+  }
+  .title-bar-title { color : $sopds-title-color; }
+}
+
+.sopdsbg {
+  background-color: $sopds-bg-color;
+  a { color : $sopds-title-color; }
+  a:hover { color: $sopds-hover-color; } 
+  color : $sopds-title-color;
+}
+

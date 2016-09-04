@@ -15,16 +15,12 @@
 </head>
 
 <body>
-<div class="row">
-<div class="column large-12" style="background-color: white; padding:0;">
-    <div data-sticky-container>
-        <div data-sticky data-options="marginTop:0" style="width:100%; background-color: white;">
-            {% include "sopds_top.html" %}
-            {% include "sopds_menu.html" %}
-        </div>
-    </div>
-</div>
-</div>
+<div class="row"><div class="column large-12" style="background-color: white; padding:0;">
+     {% include "sopds_top.html" %}
+</div></div>
+<div class="row"><div class="column large-12" style="background-color: white; padding:0.5rem;">
+     {% include "sopds_logo.html" %}
+</div></div>
 
 <div class="row">
 <div class="column large-12" style="background-color: white;">
@@ -56,8 +52,8 @@
 </div>
 </div>
 
-  <script src="{% static "js/vendor/jquery.min.js" %}"></script>
-  <script src="{% static "js/foundation.min.js" %}"></script>
+  <script src="{% static "js/vendor/jquery.js" %}"></script>
+  <script src="{% static "js/vendor/foundation.min.js" %}"></script>
 
   <script>
     $(document).foundation();
