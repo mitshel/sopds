@@ -25,10 +25,14 @@
 <div class="row">
 <div class="column large-12" style="background-color: white;">
 
+    <div class="row"><div class="large-12 column">
+        {% include "sopds_breadcrumbs.html" %}
+    </div></div>
+
     {% if system_message %}
     <div class="row"><div class="large-12 column">
         {% include "sopds_messages.html" %}
-    </div>
+    </div></div>
     {% endif %}
 
     {% if not user.is_authenticated %}
@@ -36,9 +40,17 @@
         {# {% include "registration/login.html" %} #}
     </div></div>
     {% endif %}
-
+    
+    
     {% block content %}
-
+    <div class="row">
+    <div class="small-12 large-4 column">
+        {% include "sopds_menu.html" %}
+    </div>    
+        <div class="small-12 large-8 column">
+        {% include "sopds_body.html" %}
+    </div>  
+    </div>
     {% endblock %}  {# content #}
 
 </div></div>
