@@ -1,6 +1,6 @@
 
 from django.conf.urls import url
-from opds_catalog import feeds, views, dl
+from opds_catalog import feeds, dl
 
 urlpatterns = [
     url(r'^catalogs/$',feeds.CatalogsFeed(), name='catalogs'),

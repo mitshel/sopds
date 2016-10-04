@@ -68,8 +68,12 @@
   <script src="{% static "js/vendor/foundation.min.js" %}"></script>
 
   <script>
-    $(document).foundation();
-    var elem = new Foundation.OffCanvas($(offCanvas));
+    $(document).foundation();	
+    $('#main_searchbox').attr( "placeholder","Search by "+$("input[name='searchtype']:radio:checked").attr("value") );
+    	
+	function SetSearch(r) {
+		$('#main_searchbox').attr( "placeholder","Search by "+$("input[name='searchtype']:radio:checked").attr("value") );
+	}	   
   </script>
 
  {% block block-js %}{% endblock %}
