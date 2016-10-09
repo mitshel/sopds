@@ -1,8 +1,35 @@
-<br/>
-<br/>
-<h4 id="texter"> Это тестовый текст </h4>
-<br/>
-<br/>
+{% extends "sopds_main.html" %}
+
+{% block body %}
+{%  for b in books %}
+	<div class="acq_entry">
+		<div class="acq_link">
+			<h2><b>{{ b.title }}</b></h2> <i>Скачать в формате: </i>
+			<i><a href="{% url 'opds_catalog:download' b.id 0 %}">fb2</a></i>&nbsp;
+			<i><a href="{% url 'opds_catalog:download' b.id 1 %}">fb2+zip</a></i>&nbsp;
+		</div>
+		
+		<div class="acq_info_container">		
+			<div class=acq_cover><img src="{% url 'opds_catalog:cover' b.id %}" type="image/jpeg" width="80"></div>
+				<div class=acq_infobook>
+					<b>Название книги:</b> Алая Луна Зимбабве<br>
+					<b>Авторы:</b> <a href="sopds.wsgi?id=228322">Картер Лин, </a><a href="sopds.wsgi?id=2239535">де Камп Лион, </a><br>
+					<b>Жанры:</b> <a href="sopds.wsgi?id=24197">Героическая фантастика</a>, <br>
+					<b>Серии:</b> <a href="sopds.wsgi?id=263990">Конан. Классическая сага</a> #51, <br>
+					<b>Файл:</b> 202670.fb2<br>
+					<b>Размер файла:</b> 181Кб.<br>
+					<b>Дата правки:</b> 21.05.2010<br>
+					<p class="acq_annotation">Тот-Амон категорически не согласен с Конаном и в последний момент ускользает на драконе. Конан упорно настаивает на своей версии событий.</p>	
+				</div>
+				<div class="acq_rel">
+					<a href="sopds.wsgi?id=23192960">Дубликаты книги "Алая Луна Зимбабве" (1шт.)</a>			
+				</div>
+			</div>
+		</div>	
+	</div>
+	<br/> 
+{% endfor %}
+
 <ul class="pagination" role="navigation" aria-label="Pagination">
   <li class="pagination-previous disabled">Previous <span class="show-for-sr">page</span></li>
   <li class="current"><span class="show-for-sr">You're on page</span> 1</li>
@@ -14,3 +41,4 @@
   <li><a href="#" aria-label="Page 13">13</a></li>
   <li class="pagination-next"><a href="#" aria-label="Next page">Next <span class="show-for-sr">page</span></a></li>
 </ul>
+{% endblock %}  {# body #}

@@ -4,19 +4,20 @@
   <div class="show-for-medium medium-4 large-3 column" style="padding:0.7rem 0rem 0rem 0rem;"><img src="{% static "images/sopds_logo.gif" %}"></div>
 
   <div class="small-12 medium-8 large-9 column" style="padding:0.9rem 0rem 0 0rem;">
-  <form>
+  <form method="post" action="/web/search/books/">
+  {% csrf_token %}
     <div class="input-group">
     
-		<input class="input-group-field" type="search" placeholder="Search" id="main_searchbox">
+		<input class="input-group-field" type="search" name="searchterms" placeholder="Search" id="main_searchbox">
 	
 		<div class="input-group-button">
-		      <a class="button" data-close="search-dropdown">Search</a>	   
+		      <button class="button" type="submit" data-close="search-dropdown" name="submit">Search</button>	   
 		</div>   
 		
 		<div class="input-group-button">
 		      <a class="dropdown button arrow-only float-right" data-toggle="search-dropdown"></a>    
 		</div> 	
-	
+		<input type="hidden" name="page" value="0">
 	</div>
 	
 
@@ -24,9 +25,9 @@
 	  <div class="row">
 	  <fieldset class="large-12 columns">
 	    <legend>Choose Search Type:</legend>
-	    <input type="radio" name="searchtype" value="title" id="title" onClick="SetSearch(this)" checked>  <label for="title">Title</label>
-	    <input type="radio" name="searchtype" value="author" id="author" onClick="SetSearch(this)"><label for="author">Author</label>
-	    <input type="radio" name="searchtype" value="series" id="series" onClick="SetSearch(this)"><label for="series">Series</label>
+	    <input type="radio" name="searchtype" value="m" id="title" onClick="SetSearch()" checked>  <label for="title">Title</label>
+	    <input type="radio" name="searchtype" value="a" id="author" onClick="SetSearch()"><label for="author">Author</label>
+	    <input type="radio" name="searchtype" value="s" id="series" onClick="SetSearch()"><label for="series">Series</label>
 	  </fieldset>
 	  </div>
 	</div>	
@@ -35,3 +36,7 @@
   
   </div>
 </div>
+
+  <script>    	
+	function SetSearch() {$('#main_searchbox').attr( "placeholder","Search by "+$("input[name='searchtype']:radio:checked").attr("id") );}	   
+  </script>
