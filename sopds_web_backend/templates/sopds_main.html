@@ -21,6 +21,7 @@
        .acq_cover { float: left; width: 100px; }
        .acq_infobook  { float: left; width: 600px; }
        .acq_annotation { font-size: 90%%; }
+       div.acq_annotation { clear: both; padding: 10px 0 10px 0;}
        .acq_info_container { clear: both; }
        .acq_rel { clear: both; }
        .page_control { text-align:center; }
@@ -39,7 +40,7 @@
 <div class="column large-12" style="background-color: white;">
 
     <div class="row"><div class="large-12 column">
-        {% include "sopds_breadcrumbs.html" %}
+        {% include "sopds_menu.html" %}
     </div></div>
 
     {% if system_message %}
@@ -56,11 +57,8 @@
     
     
     {% block content %}
-    <div class="row">
-	    <div class="small-12 large-3 column">
-	        {% include "sopds_menu.html" %}
-	    </div>    
-        <div class="small-12 large-9 column">
+    <div class="row">   
+        <div class="large-12 column">
         {% block body %}
 
         {% endblock %}  {# body #}

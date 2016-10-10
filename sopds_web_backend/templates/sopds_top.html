@@ -1,15 +1,19 @@
 <div class="top-bar">
     <div class="top-bar-title">
-        <span data-responsive-toggle="top-menu" data-hide-for="medium">
-          <button class="menu-icon" type="button" data-toggle></button>
+        <span data-responsive-toggle="main-menu" data-hide-for="medium">
+          <button class="menu-icon dark" type="button" data-toggle=""></button>
         </span>
        <div class="title-bar-title">
            <div class="show-for-small-only">SOPDS</div>
            <div class="show-for-medium">SIMPLE OPDS CATALOG</div>
       </div>    
     </div>
+    
+    <div style="display: block;">
+    <div class="top-bar-left">
+    </div>
+    <div>
 
-    <div id="top-menu">
     <div class="top-bar-right">
         <ul class="menu">
             {% if user.username %}
@@ -20,6 +24,6 @@
             	<li><a href="#">Settings</a></li>
         </ul>
     </div>
-    </div>
+
 </div>
 

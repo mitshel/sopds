@@ -44,9 +44,10 @@
 
 // 0. SOPDS Constants
 $sopds-bg-color: #f15a23;
-$sopds-title-color: #e0e0e0;
-$sopds-hover-color: #ffffff;
 $sopds-bg-hover: scale-color($sopds-bg-color, $lightness: -15%);
+$sopds-topbar-bg-color: #ffffff;
+$sopds-title-color: #f15a23;
+$sopds-hover-color: scale-color($sopds-title-color, $lightness: -15%);
 
 // 1. Global
 // ---------
@@ -567,8 +568,8 @@ $tooltip-radius: $global-radius;
 // -----------
 
 $topbar-padding: 0.5rem;
-$topbar-background: $sopds-bg-color;
+$topbar-background: $sopds-topbar-bg-color;
 $topbar-submenu-background: $topbar-background;
 $topbar-title-spacing: 1rem;
 $topbar-input-width: 200px;
-$topbar-unstack-breakpoint: medium;
+$topbar-unstack-breakpoint: small;
