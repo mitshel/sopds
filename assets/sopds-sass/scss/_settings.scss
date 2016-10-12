@@ -47,7 +47,12 @@ $sopds-bg-color: #f15a23;
 $sopds-bg-hover: scale-color($sopds-bg-color, $lightness: -15%);
 $sopds-topbar-bg-color: #ffffff;
 $sopds-title-color: #f15a23;
-$sopds-hover-color: scale-color($sopds-title-color, $lightness: -15%);
+$sopds-hover-color: scale-color($sopds-title-color, $lightness: -40%);
+
+$sopds-menu-bg-color: #f15a23;
+$sopds-menu-color: #FFFFFF;
+$sopds-menu-bg-hover-color: scale-color($sopds-menu-bg-color, $lightness: -20%);
+$sopds-menu-hover-color: scale-color($sopds-menu-color, $lightness: -15%);
 
 // 1. Global
 // ---------
@@ -386,10 +391,11 @@ $mediaobject-image-width-stacked: 100%;
 
 $menu-margin: 0;
 $menu-margin-nested: 1rem;
-//$menu-item-padding: 0.7rem 1rem;
-$menu-item-padding: 0.25rem 1rem;
+$menu-item-padding: 0.5rem 1rem;
+//$menu-item-padding: 0.25rem 1rem;
 $menu-item-color-active: $white;
-$menu-item-background-active: map-get($foundation-palette, primary);
+//$menu-item-background-active: map-get($foundation-palette, primary);
+$menu-item-background-active: $sopds-menu-bg-hover-color;
 $menu-icon-spacing: 0.25rem;
 
 // 23. Meter
@@ -547,8 +553,8 @@ $titlebar-background: $black;
 $titlebar-color: $white;
 $titlebar-padding: 0.5rem;
 $titlebar-text-font-weight: bold;
-$titlebar-icon-color: $white;
-$titlebar-icon-color-hover: $medium-gray;
+$titlebar-icon-color: $sopds-title-color;
+$titlebar-icon-color-hover: $sopds-hover-color;
 $titlebar-icon-spacing: 0.25rem;
 
 // 35. Tooltip
