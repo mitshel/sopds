@@ -51,7 +51,8 @@ $sopds-hover-color: scale-color($sopds-title-color, $lightness: -40%);
 
 $sopds-menu-bg-color: #f15a23;
 $sopds-menu-color: #FFFFFF;
-$sopds-menu-bg-hover-color: scale-color($sopds-menu-bg-color, $lightness: -20%);
+$sopds-menu-bg-hover-color: scale-color($sopds-menu-bg-color, $lightness: -15%);
+$sopds-menu-bg-active-color: scale-color($sopds-menu-bg-color, $lightness: -20%);
 $sopds-menu-hover-color: scale-color($sopds-menu-color, $lightness: -15%);
 
 // 1. Global
@@ -376,7 +377,7 @@ $input-radius: $global-radius;
 $label-background: $primary-color;
 $label-color: foreground($label-background);
 $label-font-size: 0.8rem;
-$label-padding: 0.33333rem 0.5rem;
+$label-padding: 0.2rem 0.2rem;
 $label-radius: $global-radius;
 
 // 21. Media Object
@@ -391,11 +392,11 @@ $mediaobject-image-width-stacked: 100%;
 
 $menu-margin: 0;
 $menu-margin-nested: 1rem;
-$menu-item-padding: 0.5rem 1rem;
+$menu-item-padding: 0.5rem 0.5rem;
 //$menu-item-padding: 0.25rem 1rem;
 $menu-item-color-active: $white;
 //$menu-item-background-active: map-get($foundation-palette, primary);
-$menu-item-background-active: $sopds-menu-bg-hover-color;
+$menu-item-background-active: $sopds-menu-bg-active-color;
 $menu-icon-spacing: 0.25rem;
 
 // 23. Meter
@@ -509,7 +510,7 @@ $switch-paddle-transition: all 0.25s ease-out;
 
 $table-background: $white;
 $table-color-scale: 5%;
-$table-border: 1px solid smart-scale($table-background, $table-color-scale);
+$table-border: 0px solid smart-scale($table-background, $table-color-scale);
 $table-padding: rem-calc(8 10 10);
 $table-hover-scale: 2%;
 $table-row-hover: darken($table-background, $table-hover-scale);

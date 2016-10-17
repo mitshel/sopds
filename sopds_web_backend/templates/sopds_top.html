@@ -1,6 +1,6 @@
 <div class="top-bar">
     <div class="top-bar-title">
-        <span data-responsive-toggle="main-menu" data-hide-for="medium">
+        <span data-responsive-toggle="main_menu" data-hide-for="medium">
           <button class="menu-icon" type="button" data-toggle></button>
         </span>
        <div class="title-bar-title">
@@ -15,13 +15,13 @@
     <div>
 
     <div class="top-bar-right">
-        <ul class="menu">
+        <ul class="menu" style="font-size:90%;">
             {% if user.username %}
-                <li><a href="#">{{ user.username }}</a></li>
+                <li><a href="#"><i class="fi-torsos"></i>{{ user.username }}</a></li>
             {% else %}
-                <li><a href="#">Login</a></li>
+                <li><a href="#"><i class="fi-torsos"></i>Login</a></li>
             {% endif %}
-            	<li><a href="#">Settings</a></li>
+            	<li><a href="#"><i class="fi-widget"></i>Settings</a></li>
         </ul>
     </div>
 

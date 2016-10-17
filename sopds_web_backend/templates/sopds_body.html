@@ -2,18 +2,19 @@
 
 {% block body %}
 {%  for b in books %}
-	<div class="acq_entry">
-		<div class="acq_link">
-			<h2><b>{{ b.title }}</b></h2> <i>Скачать в формате: </i>
-			<i><a href="{% url 'opds_catalog:download' b.id 0 %}"><span class="label">fb2</span></a></i>&nbsp;
-			<i><a href="{% url 'opds_catalog:download' b.id 1 %}"><span class="label">fb2+zip</span></a></i>&nbsp;
+		<div class="large-12 column">
+			<b>{{ b.title }}</b>
+			<i style="font-size:80%;">Скачать: </i>
+			<i><a href="{% url 'opds_catalog:download' b.id 0 %}"><span class="label small">fb2</span></a></i>&nbsp;
+			<i><a href="{% url 'opds_catalog:download' b.id 1 %}"><span class="label small">fb2+zip</span></a></i>&nbsp;
 		</div>
 		
-		<div class="acq_info_container">		
-			<div class=acq_cover>
-			     <img src="{% url 'opds_catalog:cover' b.id %}" type="image/jpeg" width="80">
-			</div>
-			<div class=acq_infobook>
+		<div class="large-12 column">	
+		    <table><tr>	
+		    <td width="100px" style="padding:0rem 0rem;">
+			     <img src="{% url 'opds_catalog:cover' b.id %}" type="image/jpeg" width="80px">
+			</td>
+			<td style="font-size:80%; padding:1rem 1rem;">
 				<b>Название книги:</b> {{ b.title }} <br>
 				<b>Авторы:</b> <a href="sopds.wsgi?id=228322">Картер Лин, </a><a href="sopds.wsgi?id=2239535">де Камп Лион, </a><br>
 				<b>Жанры:</b> <a href="sopds.wsgi?id=24197">Героическая фантастика</a>, <br>
@@ -22,13 +23,14 @@
 				<b>Размер файла:</b> {{ b.filesize }}Кб.<br>
 				<b>Дата правки:</b> {{ b.docdate }} <br>	
 				<b>Дубликаты книги: </b> <a href="sopds.wsgi?id=23192960"> {{ b.title }} (1шт.)</a>
-			</div>
-		</div>	
-		
-		<div class="acq_annotation">
-		    <p class="acq_annotation"> {{ b.annotation }} </p>			
-		</div>		
-	</div> 
+			</td>
+			</tr>
+			<tr>
+			<td colspan="2">
+			    <p style="font-size:80%;"> {{ b.annotation }} </p>
+			</td>
+			</tr></table>
+		</div>			
 {% endfor %}
 
 <ul class="pagination" role="navigation" aria-label="Pagination">

@@ -68,6 +68,6 @@
 .sopdsmenu {
   background-color: $sopds-menu-bg-color;
   a { color : $sopds-menu-color; }
-  a:hover { color: $sopds-menu-hover-color; } 
+  a:hover { background-color: $sopds-menu-bg-hover-color; } 
   color : $sopds-menu-color;
 }
