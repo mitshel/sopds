@@ -33,15 +33,29 @@
 		</div>			
 {% endfor %}
 
+{% if books.paginator.num_pages > 1 %}
 <ul class="pagination" role="navigation" aria-label="Pagination">
-  <li class="pagination-previous disabled">Previous <span class="show-for-sr">page</span></li>
-  <li class="current"><span class="show-for-sr">You're on page</span> 1</li>
-  <li><a href="#" aria-label="Page 2">2</a></li>
-  <li><a href="#" aria-label="Page 3">3</a></li>
-  <li><a href="#" aria-label="Page 4">4</a></li>
-  <li class="ellipsis" aria-hidden="true"></li>
-  <li><a href="#" aria-label="Page 12">12</a></li>
-  <li><a href="#" aria-label="Page 13">13</a></li>
-  <li class="pagination-next"><a href="#" aria-label="Next page">Next <span class="show-for-sr">page</span></a></li>
+  <li class="pagination-previous {% if not books.has_previous %}disabled{%endif%}">
+      {% if books.has_previous %}<a href="{% url "web:searchbooks" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{books.previous_page_number}}" aria-label="Previous page"> {%endif%}
+         Previous <span class="show-for-sr">page</span>
+      {% if books.has_previous %}</a>{%endif%}
+  </li>
+  
+  {% for pn in page_range %}
+     {% if books.number = pn %}
+        <li class="current"><span class="show-for-sr">You're on page</span> {{pn}}</li>
+     {% else %}
+        <li><a href="{% url "web:searchbooks" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{pn}}" aria-label="Page {{pn}}">{{pn}}</a></li>
+     {% endif %}   
+        {# <li class="ellipsis" aria-hidden="true"></li> #}
+  {% endfor %}
+  
+  <li class="pagination-next" {% if not books.has_next %}disabled{%endif%}>
+      {% if books.has_next %}<a href="{% url "web:searchbooks" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{books.next_page_number}}" aria-label="Next page">{%endif%}
+         Next <span class="show-for-sr">page</span>
+      {% if books.has_next %}</a>{%endif%}
+  </li>
 </ul>
+{% endif %}
+
 {% endblock %}  {# body #}
