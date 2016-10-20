@@ -1,4 +1,5 @@
 import logging
+import os
 from django.conf import settings
 
 sopds_version = '0.30a'
@@ -27,7 +28,7 @@ SINGLE_COMMIT = getattr(settings, "SOPDS_SINGLE_COMMIT", True)
 TITLE_AS_FILENAME = getattr(settings, "SOPDS_TITLE_AS_FILENAME", True)
 ALPHABET_MENU = getattr(settings, "SOPDS_ALPHABET_MENU", True)
 BOOK_SHELF = getattr(settings, "SOPDS_BOOK_SHELF", True)
-NOCOVER_PATH = getattr(settings, "SOPDS_NOCOVER_PATH", "")
+NOCOVER_PATH = getattr(settings, "SOPDS_NOCOVER_PATH", os.path.join(settings.BASE_DIR,'static/images/nocover.jpg'))
 AUTH = getattr(settings, "SOPDS_AUTH", False)
 
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
