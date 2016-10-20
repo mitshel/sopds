@@ -16,13 +16,21 @@
 			</td>
 			<td style="font-size:80%; padding:1rem 1rem;">
 				<b>Название книги:</b> {{ b.title }} <br>
-				<b>Авторы:</b> <a href="sopds.wsgi?id=228322">Картер Лин, </a><a href="sopds.wsgi?id=2239535">де Камп Лион, </a><br>
-				<b>Жанры:</b> <a href="sopds.wsgi?id=24197">Героическая фантастика</a>, <br>
-				<b>Серии:</b> <a href="sopds.wsgi?id=263990">Конан. Классическая сага</a> #51, <br>
+				{% if b.authors.count > 0 %}
+				   <b>Авторы:</b>{% for a in b.authors %} {{a.last_name}} {{a.first_name}}{% if not forloop.last %},{%endif%} {%endfor%}<br>
+				{% endif %}
+				{% if b.genres.count > 0 %}
+				   <b>Жанры:</b>{% for g in b.genres %} {{g.subsection}}{% if not forloop.last %},{%endif%} {%endfor%} <br>
+				{% endif %}
+				{% if b.series.count > 0 %}
+				   <b>Серии:</b> {% for s in b.series %} {{s.ser}}{% if not forloop.last %},{%endif%} {%endfor%} <br>
+				{% endif %}
 				<b>Файл:</b> {{ b.filename }} <br>
 				<b>Размер файла:</b> {{ b.filesize }}Кб.<br>
 				<b>Дата правки:</b> {{ b.docdate }} <br>	
-				<b>Дубликаты книги: </b> <a href="sopds.wsgi?id=23192960"> {{ b.title }} (1шт.)</a>
+				{% if b.doubles > 0 %}
+				<b>Дубликаты книги: </b> {{ b.title }} ({{b.doubles}}шт.)
+				{% endif %}
 			</td>
 			</tr>
 			<tr>
@@ -42,7 +50,7 @@
   </li>
   
   {% for pn in page_range %}
-     {% if books.number = pn %}
+     {% if books.number == pn %}
         <li class="current"><span class="show-for-sr">You're on page</span> {{pn}}</li>
      {% else %}
         <li><a href="{% url "web:searchbooks" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{pn}}" aria-label="Page {{pn}}">{{pn}}</a></li>

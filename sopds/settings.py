@@ -123,6 +123,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
 
 # Конфигурация для ведения разработки на разных хостах
 # убрать при окончании разработки
@@ -143,6 +144,6 @@ else:
 
 SOPDS_AUTH = False
 SOPDS_ALPHABET_MENU = True
-SOPDS_SPLITITEMS = 6
+SOPDS_SPLITITEMS = 50
 SOPDS_DOUBLES_HIDE = True
 

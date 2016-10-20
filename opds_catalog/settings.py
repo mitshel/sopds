@@ -40,7 +40,7 @@ if loglevel.lower() in loglevels:
    LOGLEVEL=loglevels[loglevel.lower()]
 else:
    LOGLEVEL=logging.NOTSET
-   
+
 # Переопределяем некоторые функции для SQLite, которые работают неправлено
 from django.db.backends.signals import connection_created
 from django.dispatch import receiver
