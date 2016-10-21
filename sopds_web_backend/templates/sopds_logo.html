@@ -4,7 +4,7 @@
   <div class="show-for-medium medium-4 large-3 column" style="padding:0rem 0rem 0rem 1rem;"><img src="{% static "images/sopds_logo.gif" %}"></div>
 
   <div class="small-12 medium-8 large-9 column" style="padding:0.2rem 1rem 0 1rem;">
-  <form method="get" action="/web/search/books/">
+  <form method="get" action="/web/search/books/" id="searchform">
   {% csrf_token %}
     <div class="input-group">
     
@@ -26,8 +26,8 @@
 	  <fieldset class="large-12 columns">
 	    <legend>Choose Search Type:</legend>
 	    <input type="radio" name="searchtype" value="m" id="title" onClick="SetSearch()" checked>  <label for="title">Title</label>
-	    <input type="radio" name="searchtype" value="a" id="author" onClick="SetSearch()"><label for="author">Author</label>
-	    <input type="radio" name="searchtype" value="s" id="series" onClick="SetSearch()"><label for="series">Series</label>
+	    <input type="radio" name="searchtype" value="m" id="author" onClick="SetSearch()"><label for="author">Author</label>
+	    <input type="radio" name="searchtype" value="m" id="series" onClick="SetSearch()"><label for="series">Series</label>
 	  </fieldset>
 	  </div>
 	</div>	
@@ -38,5 +38,12 @@
 </div>
 
   <script>    	
-	function SetSearch() {$('#main_searchbox').attr( "placeholder","Search by "+$("input[name='searchtype']:radio:checked").attr("id") );}	   
+	function SetSearch() {
+	         var searchtype = $("input[name='searchtype']:radio:checked").attr("id");
+	         $('#main_searchbox').attr( "placeholder","Search by "+ searchtype);
+	         if (searchtype == "title") $('#searchform').attr( "action","{% url "web:searchbooks" %}");
+	         if (searchtype == "author") $('#searchform').attr( "action","{% url "web:searchauthors" %}");
+	         if (searchtype == "series") $('#searchform').attr( "action","{% url "web:searchseries" %}");	
+	         $('#search-dropdown').foundation('close');         
+	}	   
   </script>

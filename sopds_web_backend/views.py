@@ -74,13 +74,33 @@ def SearchBooksView(request):
         args['books']=books
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         
-    return render_to_response('sopds_body.html', args)
+    return render_to_response('sopds_books.html', args)
 
-def SelectSeriesView(request, searchtype=None, searchterms=None, page=None):
-    return
+def SelectSeriesView(request):
+    #Read searchtype, searchterms, searchterms0, page from form
+    args = RequestContext(request)
+    args.update(csrf(request))
 
-def SearchAuthorsViews(request, searchtype=None, searchterms=None, page=None):
-    return
+    if request.GET:
+        searchtype = request.GET.get('searchtype', 'm')
+        searchterms = request.GET.get('searchterms', '')
+        #searchterms0 = int(request.POST.get('searchterms0', ''))
+        page_num = int(request.GET.get('page', '1'))
+            
+    return render_to_response('sopds_series.html', args)
+
+def SearchAuthorsViews(request):
+    #Read searchtype, searchterms, searchterms0, page from form    
+    args = RequestContext(request)
+    args.update(csrf(request))
+
+    if request.GET:
+        searchtype = request.GET.get('searchtype', 'm')
+        searchterms = request.GET.get('searchterms', '')
+        #searchterms0 = int(request.POST.get('searchterms0', ''))
+        page_num = int(request.GET.get('page', '1'))
+            
+    return render_to_response('sopds_authors.html', args)
 
 def hello(request):
     args = {}
