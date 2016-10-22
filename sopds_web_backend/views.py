@@ -22,6 +22,10 @@ def SearchBooksView(request):
         #searchterms0 = int(request.POST.get('searchterms0', ''))
         page_num = int(request.GET.get('page', '1'))
         
+        if len(searchterms)<3:
+            args['errormsg'] = 'Too few symbols in search string !';
+            return render_to_response('sopds_error.html', args)
+        
         books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()])
         
         if len(books)>0:

@@ -63,8 +63,14 @@
   <script src="{% static "js/vendor/foundation.min.js" %}"></script>
 
   <script>
-    $(document).foundation();	
+    $(document).foundation();   	
     SetSearch();   
+	Foundation.Abide.defaults.validators['check_len3'] = 
+		function($el,required,parent) {
+		     if ($el[0].value.length < 3)          
+		            return false;
+		     return true;
+	  	};    
   </script>
 
  {% block block-js %}{% endblock %}
