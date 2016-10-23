@@ -5,6 +5,8 @@ from django.conf import settings
 sopds_version = '0.30a'
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
 
+VERSION = "0.31"
+
 # Main SOPDS Book Collection Directory
 ROOT_LIB = getattr(settings, "SOPDS_ROOT_LIB", "books/")
 BOOK_EXTENSIONS = getattr(settings, "SOPDS_BOOK_EXTESIONS", ['.pdf', '.djvu', '.fb2', '.epub'])

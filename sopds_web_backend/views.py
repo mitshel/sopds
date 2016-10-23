@@ -4,13 +4,21 @@ from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 
 from opds_catalog.models import Book, Author, Series
-from opds_catalog.settings import SPLITITEMS, MAXITEMS, DOUBLES_HIDE
+from opds_catalog.settings import SPLITITEMS, MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 
 
-# Create your views here.
+def sopds_processor(request):
+    args={}
+    args['sopds_auth']=AUTH
+    args['sopds_version']=VERSION
+    user=request.user
+    if user.is_authenticated():
+        pass
+    return args
 
+# Create your views here.
 def SearchBooksView(request):
     #Read searchtype, searchterms, searchterms0, page from form
     args = RequestContext(request)

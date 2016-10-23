@@ -11,14 +11,18 @@
     </div>
     
     <div class="top-bar-right">
+        {% if sopds_auth %}
         <ul class="menu" style="font-size:90%;">
             {% if user.username %}
-                <li><a href="#"><i class="fi-torsos"></i>{{ user.username }}</a></li>
+                <li><a href="/logout/"><i class="fi-torsos"></i>Logout ({{ user.username }})</a></li>
             {% else %}
                 <li><a href="#"><i class="fi-torsos"></i>Login</a></li>
             {% endif %}
+            {% if user.is_superuser %}
             	<li><a href="#"><i class="fi-widget"></i>Settings</a></li>
+            {% endif %}	
         </ul>
+        {% endif %}
     </div>
 
 </div>

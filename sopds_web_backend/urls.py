@@ -19,6 +19,6 @@ urlpatterns = [
 #    url(r'^search/series/(?P<searchtype>[bmae])/(?P<searchterms>.+)/(?P<page>\d+)/',views.SelectSeriesView, name='searchseries'),
 #    url(r'^search/series/(?P<searchtype>[bmae])/(?P<searchterms>.+)/',views.SelectSeriesView, name='searchseries'), 
         
-#    url(r'^search/(?P<searchterms>.+)/',feeds.SearchTypesFeed(), name='searchtypes'),      
+#    url(r'^search/(?P<searchterms>.+)/',feeds.SearchTypesFeed(), name='searchtypes'),     
     url(r'^',views.hello, name='main'),         
 ]

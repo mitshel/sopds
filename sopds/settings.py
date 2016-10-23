@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'sopds_web_backend.views.sopds_processor',
             ],
         },
     },
@@ -142,7 +143,7 @@ else:
 
 #SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
 
-SOPDS_AUTH = False
+SOPDS_AUTH = True
 SOPDS_ALPHABET_MENU = True
 SOPDS_SPLITITEMS = 50
 SOPDS_DOUBLES_HIDE = True
