@@ -34,6 +34,13 @@ def SearchBooksView(request):
             except:
                 author_id = 0
             books = Book.objects.filter(authors=author_id)      
+        # Поиск книг по серии
+        elif searchtype == 's':
+            try:
+                ser_id = int(searchterms)
+            except:
+                ser_id = 0
+            books = Book.objects.filter(series=ser_id)             
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
             #try:
@@ -106,7 +113,48 @@ def SelectSeriesView(request):
         searchterms = request.GET.get('searchterms', '')
         #searchterms0 = int(request.POST.get('searchterms0', ''))
         page_num = int(request.GET.get('page', '1'))
+        
+        if searchtype == 'm':
+            series = Series.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
+        elif searchtype == 'b':
+            series = Series.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()]) 
+        elif searchtype == 'e':
+            series = Series.objects.extra(where=["upper(ser)=%s"], params=["%s"%searchterms.upper()])         
+
+        if len(series)>0:
+            series = series.order_by('ser')   
             
+        # Создаем результирующее множество
+        result = []
+        for row in series:
+            p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(series=row).count()}
+            result.append(p)                     
+            
+        p = Paginator(result, MAXITEMS)
+        try:
+            series = p.page(page_num)
+        except InvalidPage:
+            series = p.page(1)
+            page_num = 1
+            
+        firstpage = page_num - HALF_PAGES_LINKS
+        lastpage = page_num + HALF_PAGES_LINKS
+        if firstpage<1:
+            lastpage = lastpage - firstpage + 1
+            firstpage = 1
+            
+        if lastpage>p.num_pages:
+            firstpage = firstpage - (lastpage-p.num_pages)
+            lastpage = p.num_pages
+            if firstpage<1:
+                firstpage = 1
+              
+        args['searchterms']=searchterms;
+        args['searchtype']=searchtype;
+        args['series']=series
+        args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
+        args['searchobject'] = 'series'
+                                              
     return render_to_response('sopds_series.html', args)
 
 def SearchAuthorsViews(request):

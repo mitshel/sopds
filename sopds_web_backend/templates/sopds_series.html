@@ -1,0 +1,37 @@
+{% extends "sopds_main.html" %}
+
+{% block body %}
+{%  for s in series %}
+		<div class="large-12 column">
+			<b>{{ s.ser }}</b> <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}"><span style="font-size:80%;">Total: {{ s.book_count }} books.</span></a>
+		</div>		
+{% endfor %}
+
+{% if series.paginator.num_pages > 1 %}
+<ul class="pagination" role="navigation" aria-label="Pagination">
+  <li class="pagination-previous {% if not series.has_previous %}disabled{%endif%}">
+      {% if series.has_previous %}<a href="{% url "web:searchseries" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{series.previous_page_number}}" aria-label="Previous page"> {%endif%}
+         Previous <span class="show-for-sr">page</span>
+      {% if series.has_previous %}</a>{%endif%}
+  </li>
+  
+  {% for pn in page_range %}
+     {% if series.number == pn %}
+        <li class="current"><span class="show-for-sr">You're on page</span> {{pn}}</li>
+     {% else %}
+        <li><a href="{% url "web:searchseries" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{pn}}" aria-label="Page {{pn}}">{{pn}}</a></li>
+     {% endif %}   
+        {# <li class="ellipsis" aria-hidden="true"></li> #}
+  {% endfor %}
+  
+  <li class="pagination-next" {% if not series.has_next %}disabled{%endif%}>
+      {% if series.has_next %}<a href="{% url "web:searchseries" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{series.next_page_number}}" aria-label="Next page">{%endif%}
+         Next <span class="show-for-sr">page</span>
+      {% if series.has_next %}</a>{%endif%}
+  </li>
+</ul>
+{% else %}
+<div class="large-12 column"><p></p></div>
+{% endif %}
+
+{% endblock %}  {# body #}
