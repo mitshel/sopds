@@ -23,7 +23,7 @@
 				   <b>Жанры:</b>{% for g in b.genres %} {{g.subsection}}{% if not forloop.last %},{%endif%} {%endfor%} <br>
 				{% endif %}
 				{% if b.series.count > 0 %}
-				   <b>Серии:</b> {% for s in b.series %} {{s.ser}}{% if not forloop.last %},{%endif%} {%endfor%} <br>
+				   <b>Серии:</b> {% for s in b.series %} <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}">{{s.ser}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>
 				{% endif %}
 				<b>Файл:</b> {{ b.path }}/{{ b.filename }} <br>
 				<b>Размер файла:</b> {{ b.filesize }}Кб.<br>
