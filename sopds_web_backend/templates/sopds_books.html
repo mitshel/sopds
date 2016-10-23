@@ -17,7 +17,7 @@
 			<td style="font-size:80%; padding:1rem 1rem;">
 				<b>Название книги:</b> {{ b.title }} <br>
 				{% if b.authors.count > 0 %}
-				   <b>Авторы:</b>{% for a in b.authors %} {{a.last_name}} {{a.first_name}}{% if not forloop.last %},{%endif%} {%endfor%}<br>
+				   <b>Авторы:</b>{% for a in b.authors %} <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}">{{a.last_name}} {{a.first_name}}</a>{% if not forloop.last %},{%endif%} {%endfor%}<br>
 				{% endif %}
 				{% if b.genres.count > 0 %}
 				   <b>Жанры:</b>{% for g in b.genres %} {{g.subsection}}{% if not forloop.last %},{%endif%} {%endfor%} <br>
@@ -29,7 +29,7 @@
 				<b>Размер файла:</b> {{ b.filesize }}Кб.<br>
 				<b>Дата правки:</b> {{ b.docdate }} <br>	
 				{% if b.doubles > 0 %}
-				<b>Дубликаты книги: </b> {{ b.title }} ({{b.doubles}}шт.)
+				<b>Дубликаты книги: </b> <a href="{% url "web:searchbooks" %}?searchtype=d&searchterms={{b.id}}">{{ b.title }} ({{b.doubles}}шт.)</a>
 				{% endif %}
 			</td>
 			</tr>

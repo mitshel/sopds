@@ -33,7 +33,15 @@ def SearchBooksView(request):
                 author_id = int(searchterms)
             except:
                 author_id = 0
-            books = Book.objects.filter(authors=author_id)            
+            books = Book.objects.filter(authors=author_id)      
+        # Поиск дубликатов для книги            
+        elif searchtype == 'd':
+            #try:
+            book_id = int(searchterms)
+            mbook = Book.objects.get(id=book_id)
+            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id)
+            #except:
+            #    books={}                    
         
         if len(books)>0:
             books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
