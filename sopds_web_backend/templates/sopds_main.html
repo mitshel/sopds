@@ -65,9 +65,9 @@
   <script>
     $(document).foundation();   	
     SetSearch();   
-	Foundation.Abide.defaults.validators['check_len3'] = 
+	Foundation.Abide.defaults.validators['check_search'] = 
 		function($el,required,parent) {
-		     if ($el[0].value.length < 3)          
+		     if ($('#main_searchbox')[0].value.length < 3)          
 		            return false;
 		     return true;
 	  	};    

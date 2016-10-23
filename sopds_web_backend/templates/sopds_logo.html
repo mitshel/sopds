@@ -6,9 +6,9 @@
   <div class="small-12 medium-8 large-9 column" style="padding:0.2rem 1rem 0 1rem;">
   <form method="get" action="/web/search/books/" id="searchform" data-abide>
   {% csrf_token %}
-    <div class="input-group">
-    
-		<input class="input-group-field" type="search" name="searchterms" placeholder="Search" id="main_searchbox" data-validator="check_len3" required>
+ 
+    <div class="input-group">  
+		<input class="input-group-field" type="search" name="searchterms" placeholder="Search" id="main_searchbox" data-validator="check_search" required>
 
 		<div class="input-group-button">
 		      <button class="button" type="submit" data-close="search-dropdown" name="submit">Search</button>	   
@@ -19,7 +19,7 @@
 		</div> 	
 		<input type="hidden" name="page" value="0">		
 	</div>
-
+			
 	<div class="dropdown-pane bottom" id="search-dropdown" data-dropdown>
 	  <div class="row">
 	  <fieldset class="large-12 columns">
