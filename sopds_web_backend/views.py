@@ -3,7 +3,7 @@ from django.template import Context, RequestContext
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 
-from opds_catalog.models import Book, Author, Series
+from opds_catalog.models import Book, Author, Series, bookshelf
 from opds_catalog.settings import SPLITITEMS, MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
@@ -15,7 +15,14 @@ def sopds_processor(request):
     args['sopds_version']=VERSION
     user=request.user
     if user.is_authenticated():
-        pass
+        result=[]
+        for i,row in enumerate(bookshelf.objects.filter(user=user).order_by('-readtime')):
+            book = Book.objects.get(id=row.book_id)
+            p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
+            result.append(p)    
+            if (i>=7): break; 
+        args['bookshelf']=result
+
     return args
 
 # Create your views here.
@@ -48,7 +55,13 @@ def SearchBooksView(request):
                 ser_id = int(searchterms)
             except:
                 ser_id = 0
-            books = Book.objects.filter(series=ser_id)             
+            books = Book.objects.filter(series=ser_id)    
+        # Поиск книг на книжной полке            
+        elif searchtype == 'u':
+            if AUTH:
+                books = Book.objects.filter(bookshelf__user=request.user)
+            else:
+                books={}                       
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
             #try:

@@ -59,8 +59,16 @@
 		     if ($('#main_searchbox')[0].value.length < 3)          
 		            return false;
 		     return true;
-	  	};    
+	  	};
+	function logout(to_url) {
+	    var out = window.location.href.replace(/:\/\//, '://log:out@');
+	
+	    jQuery.get(out).error(function() {
+	        window.location = to_url;
+	    });
+	}	  	    
   </script>
+  
 
  {% block block-js %}{% endblock %}
 </body>
