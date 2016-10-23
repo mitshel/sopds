@@ -3,7 +3,7 @@ from django.template import Context, RequestContext
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 
-from opds_catalog.models import Book
+from opds_catalog.models import Book, Author, Series
 from opds_catalog.settings import SPLITITEMS, MAXITEMS, DOUBLES_HIDE
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
@@ -22,11 +22,18 @@ def SearchBooksView(request):
         #searchterms0 = int(request.POST.get('searchterms0', ''))
         page_num = int(request.GET.get('page', '1'))
         
-        if len(searchterms)<3:
+        if (len(searchterms)<3) and (searchtype in ('m', 'b', 'e')):
             args['errormsg'] = 'Too few symbols in search string !';
             return render_to_response('sopds_error.html', args)
         
-        books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()])
+        if searchtype == 'm':
+            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()])
+        elif searchtype == 'a':
+            try:
+                author_id = int(searchterms)
+            except:
+                author_id = 0
+            books = Book.objects.filter(authors=author_id)            
         
         if len(books)>0:
             books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
@@ -76,7 +83,8 @@ def SearchBooksView(request):
         args['searchterms']=searchterms;
         args['searchtype']=searchtype;
         args['books']=books
-        args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
+        args['page_range']= [ i for i in range(firstpage,lastpage+1)]  
+        args['searchobject'] = 'title'     
         
     return render_to_response('sopds_books.html', args)
 
@@ -103,7 +111,49 @@ def SearchAuthorsViews(request):
         searchterms = request.GET.get('searchterms', '')
         #searchterms0 = int(request.POST.get('searchterms0', ''))
         page_num = int(request.GET.get('page', '1'))
+        
+        if searchtype == 'm':
+            #concat(last_name,' ',first_name)
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper()])
+        elif searchtype == 'b':
+            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])  
+        elif searchtype == 'e':
+            authors = Author.objects.extra(where=["upper(last_name)=%s"], params=["%s"%searchterms.upper()])   
             
+        if len(authors)>0:
+            authors = authors.order_by('last_name','first_name')   
+            
+        # Создаем результирующее множество
+        result = []
+        for row in authors:
+            p = {'id':row.id, 'last_name':row.last_name, 'first_name': row.first_name, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(authors=row).count()}
+            result.append(p)                     
+            
+        p = Paginator(result, MAXITEMS)
+        try:
+            authors = p.page(page_num)
+        except InvalidPage:
+            authors = p.page(1)
+            page_num = 1
+            
+        firstpage = page_num - HALF_PAGES_LINKS
+        lastpage = page_num + HALF_PAGES_LINKS
+        if firstpage<1:
+            lastpage = lastpage - firstpage + 1
+            firstpage = 1
+            
+        if lastpage>p.num_pages:
+            firstpage = firstpage - (lastpage-p.num_pages)
+            lastpage = p.num_pages
+            if firstpage<1:
+                firstpage = 1
+              
+        args['searchterms']=searchterms;
+        args['searchtype']=searchtype;
+        args['authors']=authors
+        args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
+        args['searchobject'] = 'author'
+                                    
     return render_to_response('sopds_authors.html', args)
 
 def hello(request):

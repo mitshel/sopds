@@ -23,9 +23,9 @@
 	  <div class="row">
 	  <fieldset class="large-12 columns">
 	    <legend>Choose Search Type:</legend>
-	    <input type="radio" name="searchtype" value="m" id="title" onClick="SetSearch()" checked>  <label for="title">Title</label>
-	    <input type="radio" name="searchtype" value="m" id="author" onClick="SetSearch()"><label for="author">Author</label>
-	    <input type="radio" name="searchtype" value="m" id="series" onClick="SetSearch()"><label for="series">Series</label>
+	    <input type="radio" name="searchtype" value="m" id="title" onClick="SetSearch()" {% if searchobject == "title" %}checked{%endif%}>  <label for="title">Title</label>
+	    <input type="radio" name="searchtype" value="m" id="author" onClick="SetSearch()" {% if searchobject == "author" %}checked{%endif%}><label for="author">Author</label>
+	    <input type="radio" name="searchtype" value="m" id="series" onClick="SetSearch()" {% if searchobject == "series" %}checked{%endif%}><label for="series">Series</label>
 	  </fieldset>
 	  </div>
 	</div>	
