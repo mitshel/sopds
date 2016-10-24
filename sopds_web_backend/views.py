@@ -22,13 +22,13 @@ def sopds_processor(request):
             result.append(p)    
             if (i>=7): break; 
         args['bookshelf']=result
-
+        
     return args
 
 # Create your views here.
 def SearchBooksView(request):
     #Read searchtype, searchterms, searchterms0, page from form
-    args = RequestContext(request)
+    args = {}
     args.update(csrf(request))
 
     if request.GET:
@@ -122,11 +122,11 @@ def SearchBooksView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]  
         args['searchobject'] = 'title'     
         
-    return render_to_response('sopds_books.html', args)
+    return render(request,'sopds_books.html', args)
 
 def SelectSeriesView(request):
     #Read searchtype, searchterms, searchterms0, page from form
-    args = RequestContext(request)
+    args = {}
     args.update(csrf(request))
 
     if request.GET:
@@ -176,11 +176,11 @@ def SelectSeriesView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'series'
                                               
-    return render_to_response('sopds_series.html', args)
+    return render(request,'sopds_series.html', args)
 
 def SearchAuthorsViews(request):
     #Read searchtype, searchterms, searchterms0, page from form    
-    args = RequestContext(request)
+    args = {}
     args.update(csrf(request))
 
     if request.GET:
@@ -231,7 +231,7 @@ def SearchAuthorsViews(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'author'
                                     
-    return render_to_response('sopds_authors.html', args)
+    return render(request,'sopds_authors.html', args)
 
 def hello(request):
     args = {}

@@ -1,8 +1,15 @@
+import base64
+
 from django.http import HttpResponse
-from opds_catalog import settings
 from django.contrib import auth
+from django.contrib.auth.backends import RemoteUserBackend
+from django.core.exceptions import ImproperlyConfigured
+
+from opds_catalog import settings
+
 
 class BasicAuthMiddleware(object):
+    header = "HTTP_AUTHORIZATION"
 
     def unauthed(self):
         response = HttpResponse("""<html><title>Auth required</title><body>
@@ -12,26 +19,32 @@ class BasicAuthMiddleware(object):
         return response
 
     def process_request(self,request):
-        import base64
-
         if not settings.AUTH:
             return
-
-        if not 'HTTP_AUTHORIZATION' in request.META:
-            return self.unauthed()
-
-        authentication = request.META['HTTP_AUTHORIZATION']
+        
+        # AuthenticationMiddleware is required so that request.user exists.
+        if not hasattr(request, 'user'):
+            raise ImproperlyConfigured(
+                "The Django remote user auth middleware requires the"
+                " authentication middleware to be installed.  Edit your"
+                " MIDDLEWARE setting to insert"
+                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
+                " before the BasicAuthMiddleware class.")
+        try:
+            authentication = request.META[self.header]
+        except KeyError:
+            return self.unauthed()  
+                    
         (auth_meth, auth_data) = authentication.split(' ',1)
         if 'basic' != auth_meth.lower():
             return self.unauthed()
         auth_data = base64.b64decode(auth_data.strip()).decode('utf-8')
-        username, password = auth_data.split(':',1)
+        username, password = auth_data.split(':',1)            
 
         user = auth.authenticate(username=username, password=password)
-#        if (user is not None) and user.is_active:
-        if user:
+        if user and user.is_active:
             request.user = user
             auth.login(request, user)
-            return
+            return 
 
         return self.unauthed()

@@ -13,7 +13,7 @@
     <div class="top-bar-right">
         {% if sopds_auth %}
         <ul class="menu" style="font-size:90%;">
-            {% if user.username %}
+            {% if user.is_authenticated %}
                 <li><a href="#" onClick="logout('/logout/')"><i class="fi-torsos"></i>Logout ({{ user.username }})</a></li>
             {% else %}
                 <li><a href="#"><i class="fi-torsos"></i>Login</a></li>
