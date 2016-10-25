@@ -23,6 +23,9 @@ def sopds_processor(request):
             if (i>=7): break; 
         args['bookshelf']=result
         
+        random_book = Book.objects.all().order_by('?')[:1].get()
+        args['random_book'] = random_book
+        
     return args
 
 # Create your views here.
@@ -68,8 +71,12 @@ def SearchBooksView(request):
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
             books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id)
-            #except:
-            #    books={}                    
+        elif searchtype == 'i':
+            try:
+                book_id = int(searchterms)
+            except:
+                book_id = 0
+            books = Book.objects.filter(id=book_id)                 
         
         if len(books)>0:
             books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')

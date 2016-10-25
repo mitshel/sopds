@@ -5,7 +5,9 @@
 {% for b in bookshelf %}
    <div class="column">
    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{{b.title}}">
-    <img class="thumbnail" src="{% url 'opds_catalog:cover' b.book_id %}" type="image/jpeg" alt="{{b.title}}">
+    <a href="{% url "web:searchbooks" %}?searchtype=i&searchterms={{b.book_id}}">
+       <img class="thumbnail" src="{% url 'opds_catalog:cover' b.book_id %}" type="image/jpeg" alt="{{b.title}}">
+    </a>   
    </span></div>
 {% endfor %}
 </div>
@@ -22,8 +24,14 @@
 <span class="secondary label">R2D2</span>
 </div>
 <div class="large-4 columns">
-<h5>RANDOM TEXT</h5>
-<p><b>Алексей Миллер:</b> "Пусть 2016 год будет добрым для России, для Группы «Газпром», для каждого из нас. Желаю вам и вашим семьям счастья, благополучия, крепкого здоровья и всего наилучшего!"</p>
+	<div class="large-12 columns extended">
+		<h5>RANDOM BOOK</h5>	
+		<span style="font-size:80%;"><b> <a href="{% url "web:searchbooks" %}?searchtype=i&searchterms={{random_book.id}}">{{ random_book.title }}</a> </b></span>
+	</div>
+	<div class="large-12 columns extended clearfix">    
+		<img class="float-left" src="{% url 'opds_catalog:cover' random_book.id %}" type="image/jpeg" width="80px" style="padding:0.3rem;">
+		<div style="font-size:80%;text-align:justify;"> {{ random_book.annotation | truncatechars:300}} </div>	
+	</div>	
 </div>
 </div>
 

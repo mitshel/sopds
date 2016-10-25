@@ -2,8 +2,8 @@ import base64
 
 from django.http import HttpResponse
 from django.contrib import auth
-from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import resolve
 
 from opds_catalog import settings
 
@@ -21,7 +21,7 @@ class BasicAuthMiddleware(object):
     def process_request(self,request):
         if not settings.AUTH:
             return
-        
+            
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, 'user'):
             raise ImproperlyConfigured(
