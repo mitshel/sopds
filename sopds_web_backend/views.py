@@ -16,11 +16,10 @@ def sopds_processor(request):
     user=request.user
     if user.is_authenticated():
         result=[]
-        for i,row in enumerate(bookshelf.objects.filter(user=user).order_by('-readtime')):
+        for i,row in enumerate(bookshelf.objects.filter(user=user).order_by('-readtime')[:8]):
             book = Book.objects.get(id=row.book_id)
             p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
             result.append(p)    
-            if (i>=7): break; 
         args['bookshelf']=result
         
         random_book = Book.objects.all().order_by('?')[:1].get()
@@ -45,32 +44,35 @@ def SearchBooksView(request):
             return render_to_response('sopds_error.html', args)
         
         if searchtype == 'm':
-            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()])
+            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','authors','-docdate')
         elif searchtype == 'a':
             try:
                 author_id = int(searchterms)
             except:
                 author_id = 0
-            books = Book.objects.filter(authors=author_id)      
+            books = Book.objects.filter(authors=author_id).order_by('title','authors','-docdate')      
         # Поиск книг по серии
         elif searchtype == 's':
             try:
                 ser_id = int(searchterms)
             except:
                 ser_id = 0
-            books = Book.objects.filter(series=ser_id)    
+            books = Book.objects.filter(series=ser_id).order_by('title','authors','-docdate')    
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
             if AUTH:
-                books = Book.objects.filter(bookshelf__user=request.user)
+                books = Book.objects.filter(bookshelf__user=request.user).order_by('-bookshelf__readtime')
+                #books = bookshelf.objects.filter(user=request.user).select_related('book')              
             else:
-                books={}                       
+                books={}         
+            print(books.query)
+
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
             #try:
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
-            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id)
+            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('-docdate')
         elif searchtype == 'i':
             try:
                 book_id = int(searchterms)
@@ -79,7 +81,7 @@ def SearchBooksView(request):
             books = Book.objects.filter(id=book_id)                 
         
         if len(books)>0:
-            books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
+            books = books.prefetch_related('authors','genres','series')
         
         # Фильтруем дубликаты
         result = []
