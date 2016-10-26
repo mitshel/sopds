@@ -23,19 +23,26 @@ def Download(request, book_id, zip = 0):
         transname=utils.translit(book.title+'.'+book.format)
     else:
         transname=utils.translit(book.filename)
-
-    if book.format=="fb2":
-        content_type='text/xml'
-    elif book.format=="epub":
-        content_type='application/epub+zip'
-    elif book.format=="mobi":
-        content_type='application/x-mobipocket-ebook'
-    else:
-        content_type='application/octet-stream'
+        
+    if zip:
+        dlfilename=transname+'.zip'   
+        content_type='application/zip' 
+    else:    
+        dlfilename=transname
+        if book.format=="fb2":
+            content_type='text/xml'
+        elif book.format=="epub":
+            content_type='application/epub+zip'
+        elif book.format=="mobi":
+            content_type='application/x-mobipocket-ebook'
+        else:
+            content_type='application/octet-stream'
+        
+        
 
     response = HttpResponse()
-    response["Content-Type"]='%s; name="%s"'%(content_type,transname)
-    response["Content-Disposition"] = 'attachment; filename="%s"'%(transname)
+    response["Content-Type"]='%s; name="%s"'%(content_type,dlfilename)
+    response["Content-Disposition"] = 'attachment; filename="%s"'%(dlfilename)
     response["Content-Transfer-Encoding"]='binary'
 
     z = None
@@ -45,11 +52,8 @@ def Download(request, book_id, zip = 0):
     if book.cat_type==opdsdb.CAT_NORMAL:
        file_path=os.path.join(full_path,book.filename)
        book_size=os.path.getsize(file_path)
-       response["Content-Length"] = str(book_size)
        fo=codecs.open(file_path, "rb")
        s=fo.read()
-       response.write(s)
-       fo.close()
     elif book.cat_type==opdsdb.CAT_ZIP:
        fz=codecs.open(full_path, "rb")
        z = zipfile.ZipFile(fz, 'r', allowZip64=True)
