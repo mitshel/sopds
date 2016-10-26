@@ -11,7 +11,7 @@ from opds_catalog.models import Book, bookshelf
 from opds_catalog import settings, utils, opdsdb, fb2parse
 import opds_catalog.zipf as zipfile
 
-def Download(request, book_id, zip = 0):
+def Download(request, book_id, zip):
     """ Загрузка файла книги """
     book = Book.objects.get(id=book_id)
     # TODO: Добавить книгу на книжную полку
@@ -24,7 +24,7 @@ def Download(request, book_id, zip = 0):
     else:
         transname=utils.translit(book.filename)
         
-    if zip:
+    if zip=='1':
         dlfilename=transname+'.zip'   
         content_type='application/zip' 
     else:    
@@ -36,9 +36,7 @@ def Download(request, book_id, zip = 0):
         elif book.format=="mobi":
             content_type='application/x-mobipocket-ebook'
         else:
-            content_type='application/octet-stream'
-        
-        
+            content_type='application/octet-stream'       
 
     response = HttpResponse()
     response["Content-Type"]='%s; name="%s"'%(content_type,dlfilename)
