@@ -87,7 +87,7 @@ def SearchBooksView(request):
         for row in books:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize}
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000}
             p['authors'] = row.authors.values()
             p['genres'] = row.genres.values()
             p['series'] = row.series.values()          
