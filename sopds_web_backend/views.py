@@ -13,14 +13,14 @@ def sopds_processor(request):
     args['sopds_auth']=AUTH
     args['sopds_version']=VERSION
     user=request.user
-#    if user.is_authenticated():
-#        result=[]
-#        for i,row in enumerate(bookshelf.objects.filter(user=user).order_by('-readtime')[:8]):
-#            book = Book.objects.get(id=row.book_id)
-#            p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
-#            result.append(p)    
-#        args['bookshelf']=result
-#        
+    if user.is_authenticated():
+        result=[]
+        for i,row in enumerate(bookshelf.objects.filter(user=user).order_by('-readtime')[:8]):
+            book = Book.objects.get(id=row.book_id)
+            p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
+            result.append(p)    
+        args['bookshelf']=result
+        
 #        random_book = Book.objects.all().order_by('?')[:1].get()
 #        args['random_book'] = random_book
         
