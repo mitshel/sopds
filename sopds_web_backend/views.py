@@ -26,10 +26,11 @@ def sopds_processor(request):
         
         random_id = randint(1,Counter.objects.get_counter(models.counter_allbooks))
         try:
-            random_book = Book.objects.get(id=random_id)
+            #random_book = Book.objects.get(id=random_id)
+            random_book = Book.objects.all()[random_id-1:random_id][0]
         except Book.DoesNotExist:
             random_book= None
-            
+                   
         args['random_book'] = random_book
         
     return args
