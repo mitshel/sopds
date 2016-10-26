@@ -59,18 +59,17 @@ def Download(request, book_id, zip):
        fo= z.open(book.filename)
        s=fo.read()
 
-    if not zip:
-        response["Content-Length"] = str(book_size)
-        response.write(s)
-    else:
+    if zip=='1':
        dio = io.BytesIO()
        zo = zipfile.ZipFile(dio, 'w', zipfile.ZIP_DEFLATED)
        zo.writestr(transname,s)
        zo.close()
-
        buf = dio.getvalue()
        response["Content-Length"] = str(len(buf))
-       response.write(buf)
+       response.write(buf)        
+    else:
+        response["Content-Length"] = str(book_size)
+        response.write(s)
 
     fo.close()
     if z: z.close()
