@@ -484,8 +484,8 @@ class SearchBooksFeed(AuthFeed):
          
     def item_enclosures(self, item):
         enclosure = [
-            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
-            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
+            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":0}),"application/%s"%item['format'] ,"http://opds-spec.org/acquisition/open-access"),
+            opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":1}),"application/%s+zip"%item['format'], "http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
         ]
         return enclosure

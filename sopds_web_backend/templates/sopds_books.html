@@ -5,8 +5,8 @@
 		<div class="large-12 column">
 			<b>{{ b.title }}</b>
 			<i style="font-size:80%;">Скачать: </i>
-			<i><a href="{% url 'opds_catalog:download' b.id 0 %}"><span class="label small">fb2</span></a></i>&nbsp;
-			<i><a href="{% url 'opds_catalog:download' b.id 1 %}"><span class="label small">fb2+zip</span></a></i>&nbsp;
+			<i><a href="{% url 'opds_catalog:download' b.id 0 %}"><span class="label small">{{b.format}}</span></a></i>&nbsp;
+			<i><a href="{% url 'opds_catalog:download' b.id 1 %}"><span class="label small">{{b.format}}+zip</span></a></i>&nbsp;
 		</div>
 		
 		<div class="large-12 column">	

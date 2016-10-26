@@ -1,10 +1,9 @@
 from django.shortcuts import render, render_to_response, redirect, Http404
-from django.template import Context, RequestContext
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 
 from opds_catalog.models import Book, Author, Series, bookshelf
-from opds_catalog.settings import SPLITITEMS, MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
+from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 
@@ -65,8 +64,6 @@ def SearchBooksView(request):
                 #books = bookshelf.objects.filter(user=request.user).select_related('book')              
             else:
                 books={}         
-            print(books.query)
-
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
             #try:
