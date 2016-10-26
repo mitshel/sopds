@@ -1,8 +1,11 @@
+from random import randint
+
 from django.shortcuts import render, render_to_response, redirect, Http404
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 
-from opds_catalog.models import Book, Author, Series, bookshelf
+from opds_catalog import models
+from opds_catalog.models import Book, Author, Series, bookshelf, Counter
 from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
@@ -15,14 +18,19 @@ def sopds_processor(request):
     user=request.user
     if user.is_authenticated():
         result=[]
-        for i,row in enumerate(bookshelf.objects.filter(user=user).order_by('-readtime')[:8]):
+        for row in bookshelf.objects.filter(user=user).order_by('-readtime')[:8]:
             book = Book.objects.get(id=row.book_id)
             p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
             result.append(p)    
         args['bookshelf']=result
         
-#        random_book = Book.objects.all().order_by('?')[:1].get()
-#        args['random_book'] = random_book
+        random_id = randint(1,Counter.objects.get_counter(models.counter_allbooks))
+        try:
+            random_book = Book.objects.get(id=random_id)
+        except Book.DoesNotExist:
+            random_book= None
+            
+        args['random_book'] = random_book
         
     return args
 
