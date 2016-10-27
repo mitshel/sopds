@@ -127,6 +127,7 @@ class Counter(models.Model):
     name = models.CharField(primary_key=True, null=False, blank=False, max_length=16)
     value = models.IntegerField(null=False, default=0)
     update_time = models.DateTimeField(null=False, default=timezone.now)
+    obj = models.Manager()
     objects = CounterManager()
 
 

@@ -9,6 +9,7 @@ from opds_catalog.models import Book, Author, Series, bookshelf, Counter
 from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
+from django.contrib.gis.db.models.aggregates import Collect
 
 
 def sopds_processor(request):
@@ -32,6 +33,9 @@ def sopds_processor(request):
             random_book= None
                    
         args['random_book'] = random_book
+        stats = { d['name']:d['value'] for d in Counter.obj.all().values() }
+        stats['lastscan_date']=Counter.obj.get(name='allbooks').update_time
+        args['stats'] = stats
         
     return args
 
