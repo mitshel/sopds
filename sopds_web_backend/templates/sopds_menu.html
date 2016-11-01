@@ -1,11 +1,11 @@
   
 	<div class="menu sopdsmenu" id="main_menu">
 	  <ul class="menu" style="font-size:100%;"> {# vertical medium-horizontal menu #}
-	    <li class="active"><a href="#">Каталоги</a></li>
-	    <li><a href="#">Книги</a></li>
-	    <li><a href="#">Авторы</a></li>
-	    <li><a href="#">Жанры</a></li>
-	    <li><a href="#">Серии</a></li>
+	    <li {% if current == "catalog" %} class="active" {% endif %}><a href="{% url "web:catalog" %}">Catalogs</a></li>
+	    <li {% if current == "book" %} class="active" {% endif %}><a href="#">Books</a></li>
+	    <li {% if current == "author" %} class="active" {% endif %}><a href="#">Authors</a></li>
+	    <li {% if current == "genre" %} class="active" {% endif %}><a href="#">Genres</a></li>
+	    <li {% if current == "series" %} class="active" {% endif %}><a href="#">Series</a></li>
 	  </ul>
 	</div>
 

@@ -11,7 +11,7 @@ urlpatterns = [
 #    url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/',views.SelectSeriesView, name='searchbooks'), 
 #    url(r'^search/books/u/0/',views.SearchBooksView, name='bookshelf'),
     
-    url(r'^search/authors/',views.SearchAuthorsViews, name='searchauthors'),             
+    url(r'^search/authors/',views.SearchAuthorsView, name='searchauthors'),             
 #    url(r'^search/authors/(?P<searchtype>[bme])/(?P<searchterms>.+)/(?P<page>\d+)/',views.SearchAuthorsViews, name='searchauthors'),
 #    url(r'^search/authors/(?P<searchtype>[bme])/(?P<searchterms>.+)/',views.SearchAuthorsViews, name='searchauthors'),       
        
@@ -20,5 +20,6 @@ urlpatterns = [
 #    url(r'^search/series/(?P<searchtype>[bmae])/(?P<searchterms>.+)/',views.SelectSeriesView, name='searchseries'), 
         
 #    url(r'^search/(?P<searchterms>.+)/',feeds.SearchTypesFeed(), name='searchtypes'),     
+    url(r'^catalog/',views.CatalogsView, name='catalog'),  
     url(r'^',views.hello, name='main'),         
 ]

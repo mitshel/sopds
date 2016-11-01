@@ -241,7 +241,9 @@ class CatalogsFeed(AuthFeed):
     def items(self, obj):
         cat, current_page = obj
         catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_type","cat_name")
-        books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
+        # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
+        #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
+        books_list = Book.objects.filter(catalog=cat).order_by("title")
         union_list = list(chain(catalogs_list,books_list))
         paginator = Paginator(union_list,settings.MAXITEMS)
         try:
@@ -401,7 +403,9 @@ class SearchBooksFeed(AuthFeed):
             #    books={}                      
         # Сортируем
         if len(books)>0:
-            books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
+            # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
+            #books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
+            books = books.order_by('title','authors','-docdate')
         
         # Фильтруем дубликаты
         #books = books.values() 

@@ -1,11 +1,12 @@
 from random import randint
+from itertools import chain
 
 from django.shortcuts import render, render_to_response, redirect, Http404
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 
 from opds_catalog import models
-from opds_catalog.models import Book, Author, Series, bookshelf, Counter
+from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog
 from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
@@ -139,7 +140,8 @@ def SearchBooksView(request):
         args['searchtype']=searchtype;
         args['books']=books
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]  
-        args['searchobject'] = 'title'     
+        args['searchobject'] = 'title'   
+        args['current'] = 'search'  
         
     return render(request,'sopds_books.html', args)
 
@@ -194,10 +196,11 @@ def SelectSeriesView(request):
         args['series']=series
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'series'
+        args['current'] = 'search'
                                               
     return render(request,'sopds_series.html', args)
 
-def SearchAuthorsViews(request):
+def SearchAuthorsView(request):
     #Read searchtype, searchterms, searchterms0, page from form    
     args = {}
     args.update(csrf(request))
@@ -249,8 +252,69 @@ def SearchAuthorsViews(request):
         args['authors']=authors
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'author'
+        args['current'] = 'search'
                                     
     return render(request,'sopds_authors.html', args)
+
+def CatalogsView(request):   
+    args = {}
+    args.update(csrf(request))
+
+    if request.GET:
+        cat_id = request.GET.get('cat', None)
+        page_num = int(request.GET.get('page', '1'))   
+    else:
+        cat_id = None
+        page_num = 1
+
+    if cat_id is not None:
+        cat = Catalog.objects.get(id=cat_id)
+    else:
+        cat = Catalog.objects.get(parent__id=cat_id)
+    
+    catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_type","cat_name")
+    # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
+    #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
+    books_list = Book.objects.filter(catalog=cat).order_by("title")
+    union_list = list(chain(catalogs_list,books_list)) 
+    
+    # Получаем результирующий список
+    result = []
+    for row in union_list:
+        if isinstance(row, Catalog):
+            p = {'is_catalog':1, 'title': row.cat_name,'id': row.id, 'cat_type':row.cat_type, 'parent_id':row.parent_id}
+        else:
+            p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
+                  'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
+        result.append(p)
+                    
+    p = Paginator(result, MAXITEMS)
+    try:
+        items = p.page(page_num)
+    except InvalidPage:
+        items = p.page(1)
+        page_num = 1
+        
+    firstpage = page_num - HALF_PAGES_LINKS
+    lastpage = page_num + HALF_PAGES_LINKS
+    if firstpage<1:
+        lastpage = lastpage - firstpage + 1
+        firstpage = 1
+        
+    if lastpage>p.num_pages:
+        firstpage = firstpage - (lastpage-p.num_pages)
+        lastpage = p.num_pages
+        if firstpage<1:
+            firstpage = 1
+          
+    args['items']=items
+    args['page_range'] = [ i for i in range(firstpage,lastpage+1)]  
+    args['cat_id'] = cat_id
+    args['current'] = 'catalog'           
+      
+    return render(request,'sopds_catalogs.html', args)    
 
 def hello(request):
     args = {}
