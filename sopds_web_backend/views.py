@@ -12,11 +12,11 @@ from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from django.contrib.gis.db.models.aggregates import Collect
 
-
 def sopds_processor(request):
     args={}
     args['sopds_auth']=AUTH
     args['sopds_version']=VERSION
+    
     user=request.user
     if user.is_authenticated():
         result=[]
@@ -142,6 +142,7 @@ def SearchBooksView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]  
         args['searchobject'] = 'title'   
         args['current'] = 'search'  
+        args['breadcrumbs'] = ['Search','Books',searchterms]
         
     return render(request,'sopds_books.html', args)
 
@@ -196,7 +197,8 @@ def SelectSeriesView(request):
         args['series']=series
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'series'
-        args['current'] = 'search'
+        args['current'] = 'search'        
+        args['breadcrumbs'] = ['Search','Series',searchterms]
                                               
     return render(request,'sopds_series.html', args)
 
@@ -252,7 +254,8 @@ def SearchAuthorsView(request):
         args['authors']=authors
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'author'
-        args['current'] = 'search'
+        args['current'] = 'search'       
+        args['breadcrumbs'] = ['Search','Authors',searchterms]
                                     
     return render(request,'sopds_authors.html', args)
 
@@ -312,10 +315,19 @@ def CatalogsView(request):
     args['items']=items
     args['page_range'] = [ i for i in range(firstpage,lastpage+1)]  
     args['cat_id'] = cat_id
-    args['current'] = 'catalog'           
+    args['current'] = 'catalog'     
+    
+    breadcrumbs_list = []
+    while (cat.parent):
+        breadcrumbs_list.insert(0, cat.cat_name)
+        cat = cat.parent
+    breadcrumbs_list.insert(0, 'ROOT')    
+    breadcrumbs_list.insert(0, 'Catalogs')     
+    args['breadcrumbs'] =  breadcrumbs_list  
       
     return render(request,'sopds_catalogs.html', args)    
 
 def hello(request):
     args = {}
+    args['breadcrumbs'] = ['HOME']
     return render(request, 'sopds_main.html', args)
