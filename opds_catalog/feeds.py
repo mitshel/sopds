@@ -7,17 +7,15 @@ from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.functions import Substr, Upper
-from django.db.models import Count, Min, Sum
-from django.utils.encoding import escape_uri_path
+#from django.core.exceptions import ObjectDoesNotExist
+#from django.db.models.functions import Substr, Upper
+#from django.db.models import Count, Min, Sum
+#from django.utils.encoding import escape_uri_path
 
-from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter
+from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, lang_codes
 from opds_catalog import models
 from opds_catalog import settings
-from django.http.response import Http404
-
-lang_codes = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
+#from django.http.response import Http404
 
 class AuthFeed(Feed):
     request = None

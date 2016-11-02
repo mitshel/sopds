@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
 
 counter_allbooks = 'allbooks'
 counter_allcatalogs = 'allcatalogs'
@@ -9,9 +10,10 @@ counter_allauthors = 'allauthors'
 counter_allgenres = 'allgenres'
 counter_allseries = 'allseries'
 
-LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ',
-             2:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯабвгдеёжзийклмнопрстуфхцчшщьыъэюя',
+             2:'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
              3:'0123456789'}
+lang_codes = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
 
 class Book(models.Model):
     filename = models.CharField(db_index=True, max_length=256)

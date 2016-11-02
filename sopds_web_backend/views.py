@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, InvalidPage
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog
 from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABET_MENU, SPLITITEMS
-from opds_catalog.feeds import lang_codes
+from opds_catalog.models import lang_codes
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from django.contrib.gis.db.models.aggregates import Collect
