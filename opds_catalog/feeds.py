@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
 #from django.core.exceptions import ObjectDoesNotExist
 #from django.db.models.functions import Substr, Upper
-#from django.db.models import Count, Min, Sum
+from django.db.models import Count, Min, Sum
 #from django.utils.encoding import escape_uri_path
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, lang_menu
