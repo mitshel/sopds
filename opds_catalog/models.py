@@ -23,7 +23,7 @@ class Book(models.Model):
     catalog = models.ForeignKey('Catalog',db_index=True)
     cat_type = models.IntegerField(null=False, default=0)
     registerdate = models.DateTimeField(db_index=True, null=False, default=timezone.now)
-    docdate = models.CharField(max_length=20)
+    docdate = models.CharField(max_length=32)
     #favorite = models.IntegerField(null=False, default=0)
     lang = models.CharField(max_length=16)
     title = models.CharField(max_length=256)
@@ -45,7 +45,7 @@ class Book(models.Model):
 
 class Catalog(models.Model):
     parent = models.ForeignKey('self', null=True)
-    cat_name = models.CharField(max_length=64)
+    cat_name = models.CharField(max_length=128)
     path = models.CharField(max_length=1024)
     cat_type = models.IntegerField(null=False, default=0)
 
@@ -87,7 +87,7 @@ class bgenre(models.Model):
         ]
 
 class Series(models.Model):
-    ser = models.CharField(db_index=True, max_length=64)
+    ser = models.CharField(db_index=True, max_length=80)
     lang_code = models.IntegerField(db_index=True, null=False, default=9)
 
 class bseries(models.Model):
