@@ -351,26 +351,27 @@ class SearchBooksFeed(AuthFeed):
         
         # Поиск книг по подсроке
         if  searchtype == 'm':
-            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()])
+            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
         # Поиск книг по начальной подстроке
         elif searchtype == 'b':
-            books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()])
+            books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
         # Поиск книг по точному совпадению наименования
         elif searchtype == 'e':
-            books = Book.objects.extra(where=["upper(title)=%s"], params=["%s"%searchterms.upper()])        # Поиск книг по автору
+            books = Book.objects.extra(where=["upper(title)=%s"], params=["%s"%searchterms.upper()]).order_by('title','-docdate')
+        # Поиск книг по автору
         elif searchtype == 'a':
             try:
                 author_id = int(searchterms)
             except:
                 author_id = 0
-            books = Book.objects.filter(authors=author_id)
+            books = Book.objects.filter(authors=author_id).order_by('title','-docdate')
         # Поиск книг по серии
         elif searchtype == 's':
             try:
                 ser_id = int(searchterms)
             except:
                 ser_id = 0
-            books = Book.objects.filter(series=ser_id)    
+            books = Book.objects.filter(series=ser_id).order_by('title','-docdate')    
         # Поиск книг по автору и серии
         elif searchtype == 'as':
             try:
@@ -379,36 +380,31 @@ class SearchBooksFeed(AuthFeed):
             except:
                 ser_id = 0
                 author_id = 0 
-            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None)
+            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None).order_by('title','-docdate')
         # Поиск книг по жанру
         elif searchtype == 'g':
             try:
                 genre_id = int(searchterms)
             except:
                 genre_id = 0
-            books = Book.objects.filter(genres=genre_id)    
+            books = Book.objects.filter(genres=genre_id).order_by('title','-docdate')    
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
             if settings.AUTH:
-                books = Book.objects.filter(bookshelf__user=self.request.user)
+                books = Book.objects.filter(bookshelf__user=request.user).order_by('-bookshelf__readtime')
             else:
                 books={}  
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
-            #try:
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
-            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id)
-            #except:
-            #    books={}                      
-        # Сортируем
-        if len(books)>0:
-            # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
+            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('title','-docdate')
+                    
+        # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
+        #if len(books)>0:            
             #books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
-            books = books.order_by('title','authors','-docdate')
         
         # Фильтруем дубликаты
-        #books = books.values() 
         result = []
         prev_title = ''
         prev_authors_set = set()
