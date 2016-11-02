@@ -20,7 +20,7 @@
 				   <b>Авторы:</b>{% for a in b.authors %} <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}">{{a.last_name}} {{a.first_name}}</a>{% if not forloop.last %},{%endif%} {%endfor%}<br>
 				{% endif %}
 				{% if b.genres.count > 0 %}
-				   <b>Жанры:</b>{% for g in b.genres %} {{g.subsection}}{% if not forloop.last %},{%endif%} {%endfor%} <br>
+				   <b>Жанры:</b>{% for g in b.genres %} <a href="{% url "web:searchbooks" %}?searchtype=g&searchterms={{g.id}}">{{g.subsection}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>
 				{% endif %}
 				{% if b.series.count > 0 %}
 				   <b>Серии:</b> {% for s in b.series %} <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}">{{s.ser}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>

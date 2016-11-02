@@ -4,16 +4,19 @@ from itertools import chain
 from django.shortcuts import render, render_to_response, redirect, Http404
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
+from django.db.models import Count, Min
+#from django.contrib.gis.db.models.aggregates import Collect
+from django.utils.translation import ugettext as _
 
 from opds_catalog import models
-from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog
+from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre
 from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABET_MENU, SPLITITEMS
 from opds_catalog.models import lang_menu
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
-from django.contrib.gis.db.models.aggregates import Collect
 
-from django.utils.translation import ugettext as _
+
+
 
 def sopds_processor(request):
     args={}
@@ -92,6 +95,20 @@ def SearchBooksView(request):
                 ser = ""
             books = Book.objects.filter(series=ser_id).order_by('title','series','-docdate')    
             args['breadcrumbs'] = ['Books','Search by Series',ser]
+            
+        # Поиск книг по жанру
+        elif searchtype == 'g':
+            try:
+                genre_id = int(searchterms)
+                section = Genre.objects.get(id=genre_id).section
+                subsection = Genre.objects.get(id=genre_id).subsection
+                args['breadcrumbs'] = ['Books','Search by Genre',section,subsection]
+            except:
+                genre_id = 0
+                args['breadcrumbs'] = ['Books','Search by Genre']
+                
+            books = Book.objects.filter(genres=genre_id).order_by('title','genres','-docdate') 
+                        
             
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
@@ -291,7 +308,6 @@ def SearchAuthorsView(request):
 
 def CatalogsView(request):   
     args = {}
-    args.update(csrf(request))
 
     if request.GET:
         cat_id = request.GET.get('cat', None)
@@ -359,7 +375,6 @@ def CatalogsView(request):
 
 def BooksView(request):   
     args = {}
-    args.update(csrf(request))
 
     if request.GET:
         lang_code = int(request.GET.get('lang', '0'))  
@@ -393,7 +408,6 @@ def BooksView(request):
 
 def AuthorsView(request):   
     args = {}
-    args.update(csrf(request))
 
     if request.GET:
         lang_code = int(request.GET.get('lang', '0'))  
@@ -427,7 +441,6 @@ def AuthorsView(request):
 
 def SeriesView(request):   
     args = {}
-    args.update(csrf(request))
 
     if request.GET:
         lang_code = int(request.GET.get('lang', '0'))  
@@ -458,6 +471,28 @@ def SeriesView(request):
     args['breadcrumbs'] =  ['Series','Select',lang_menu[lang_code],chars]
       
     return render(request,'sopds_selectseries.html', args)
+
+def GenresView(request):   
+    args = {}
+
+    if request.GET:
+        section_id = int(request.GET.get('section', '0'))  
+    else:
+        section_id = 0
+        
+    if section_id==0:
+        items = Genre.objects.values('section').annotate(section_id=Min('id'), num_book=Count('book')).filter(num_book__gt=0).order_by('section')
+        args['breadcrumbs'] =  ['Genres','Select']
+    else:
+        section = Genre.objects.get(id=section_id).section
+        items = Genre.objects.filter(section=section).annotate(num_book=Count('book')).filter(num_book__gt=0).values().order_by('subsection')   
+        args['breadcrumbs'] =  ['Genres','Select',section]   
+          
+    args['items']=items
+    args['current'] = 'genre'  
+    args['parent_id'] = section_id     
+       
+    return render(request,'sopds_selectgenres.html', args)
 
 def hello(request):
     args = {}

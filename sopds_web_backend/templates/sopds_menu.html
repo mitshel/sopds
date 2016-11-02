@@ -4,7 +4,7 @@
 	    <li {% if current == "catalog" %} class="active" {% endif %}><a href="{% url "web:catalog" %}">Catalogs</a></li>
 	    <li {% if current == "book" %} class="active" {% endif %}><a href="{% url "web:book" %}?lang=0">Books</a></li>
 	    <li {% if current == "author" %} class="active" {% endif %}><a href="{% url "web:author" %}?lang=0">Authors</a></li>
-	    <li {% if current == "genre" %} class="active" {% endif %}><a href="#">Genres</a></li>
+	    <li {% if current == "genre" %} class="active" {% endif %}><a href="{% url "web:genre" %}">Genres</a></li>
 	    <li {% if current == "series" %} class="active" {% endif %}><a href="{% url "web:series" %}?lang=0">Series</a></li>
 	  </ul>
 	</div>
@@ -26,7 +26,7 @@
 	        {% endfor %}  
 	        </ul>	    
 	    </li>
-	    <li {% if current == "genre" %} class="active" {% endif %}><a href="#">Genres</a>    
+	    <li {% if current == "genre" %} class="active" {% endif %}><a href="{% url "web:genre" %}">Genres</a>    
 	    </li>
 	    <li {% if current == "series" %} class="active" {% endif %}><a href="#">Series</a>
 	        <ul class="vertical menu sopdsmenu">

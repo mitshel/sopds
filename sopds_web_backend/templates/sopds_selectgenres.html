@@ -1,0 +1,21 @@
+{% extends "sopds_main.html" %}
+{% load staticfiles %}
+
+{% block body %}
+<table>
+{%  for g in items %}
+<tr>
+	<td>
+	{% if not parent_id %}
+	   <a href="{% url "web:genre" %}?section={{g.section_id}}">{{ g.section }}</a>
+	{% else %}
+	   <a href="{% url "web:searchbooks" %}?searchtype=g&searchterms={{g.id}}">{{ g.subsection }}</a>
+	{% endif %}
+	<span style="font-size:80%">Total: {{ g.num_book }} books.</span>
+	</td>
+</tr>		
+{% endfor %}
+</table>
+
+
+{% endblock %}  {# body #}
