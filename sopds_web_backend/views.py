@@ -137,9 +137,10 @@ def SearchBooksView(request):
                 btitle = ""
             books = Book.objects.filter(id=book_id)                 
             args['breadcrumbs'] = ['Books',btitle]
-            
-        if len(books)>0:
-            books = books.prefetch_related('authors','genres','series')
+        
+        # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
+        #if len(books)>0:
+        #    books = books.prefetch_related('authors','genres','series')
         
         # Фильтруем дубликаты
         result = []
@@ -149,9 +150,9 @@ def SearchBooksView(request):
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000}
-            p['authors'] = row.authors
-            p['genres'] = row.genres
-            p['series'] = row.series        
+            p['authors'] = row.authors.values()
+            p['genres'] = row.genres.values()
+            p['series'] = row.series.values()          
             if DOUBLES_HIDE and (searchtype != 'd'):
                 title = p['title'] 
                 authors_set = {a['id'] for a in p['authors']}         
