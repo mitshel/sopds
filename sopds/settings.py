@@ -25,6 +25,11 @@ SECRET_KEY = 'm4l1c#nq6*zs!c3ri4dg4(54_7bvrl5uintni6p20tijlaxv!x'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Конфигурация для ведения разработки на разных хостах
+# убрать при окончании разработки
+import socket
+HOSTNAME=socket.gethostname().upper()
+
 ALLOWED_HOSTS = []
 
 
@@ -78,20 +83,24 @@ WSGI_APPLICATION = 'sopds.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if HOSTNAME=='DSGATE':
+    DATABASES = {
+    
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'sopds2',
+            'HOST': 'localhost',
+            'USER': 'sopds',
+            'PASSWORD' : 'sopds'
+        }             
     }
-    #'default': {
-    #    'ENGINE': 'django.db.backends.mysql',
-    #    'NAME': 'sopds2',
-    #    'HOST': 'localhost',
-    #    'USER': 'sopds',
-    #    'PASSWORD' : 'sopds'
-    #}             
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }         
+    }    
 
 
 # Password validation
@@ -132,11 +141,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
-
-# Конфигурация для ведения разработки на разных хостах
-# убрать при окончании разработки
-import socket
-HOSTNAME=socket.gethostname().upper()
 
 if HOSTNAME=='DS-HOME-PC':
     SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
