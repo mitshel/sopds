@@ -13,7 +13,7 @@ counter_allseries = 'allseries'
 LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯабвгдеёжзийклмнопрстуфхцчшщьыъэюя',
              2:'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
              3:'0123456789'}
-lang_codes = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
+lang_menu = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
 
 class Book(models.Model):
     filename = models.CharField(db_index=True, max_length=256)

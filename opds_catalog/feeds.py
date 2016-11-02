@@ -12,7 +12,7 @@ from django.shortcuts import render
 #from django.db.models import Count, Min, Sum
 #from django.utils.encoding import escape_uri_path
 
-from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, lang_codes
+from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, lang_menu
 from opds_catalog import models
 from opds_catalog import settings
 #from django.http.response import Http404

@@ -22,5 +22,6 @@ urlpatterns = [
 #    url(r'^search/(?P<searchterms>.+)/',feeds.SearchTypesFeed(), name='searchtypes'),     
     url(r'^catalog/',views.CatalogsView, name='catalog'),  
     url(r'^book/',views.BooksView, name='book'), 
+    url(r'^author/',views.AuthorsView, name='author'),     
     url(r'^',views.hello, name='main'),         
 ]

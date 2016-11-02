@@ -1,11 +1,13 @@
 {% extends "sopds_main.html" %}
 
 {% block body %}
+<table>
 {%  for a in authors %}
-		<div class="large-12 column">
-			<b>{{ a.last_name }} {{ a.first_name }}</b> <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}"><span style="font-size:80%;">Total: {{ a.book_count }} books.</span></a>
-		</div>		
+	<tr><td>
+		<b>{{ a.last_name }} {{ a.first_name }}</b> <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}"><span style="font-size:80%;">Total: {{ a.book_count }} books.</span></a>
+	</td></tr>		
 {% endfor %}
+</table>
 
 {% if authors.paginator.num_pages > 1 %}
 <ul class="pagination" role="navigation" aria-label="Pagination">

@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, InvalidPage
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog
 from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABET_MENU, SPLITITEMS
-from opds_catalog.models import lang_codes
+from opds_catalog.models import lang_menu
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from django.contrib.gis.db.models.aggregates import Collect
@@ -22,7 +22,7 @@ def sopds_processor(request):
     args['alphabet'] = ALPHABET_MENU
     args['splititems'] = SPLITITEMS
     if ALPHABET_MENU:
-        args['lang_codes'] = lang_codes
+        args['lang_menu'] = lang_menu
     
     user=request.user
     if user.is_authenticated():
@@ -387,9 +387,43 @@ def BooksView(request):
     args['items']=items
     args['current'] = 'book'      
     args['lang_code'] = lang_code   
-    args['breadcrumbs'] =  ['Books','Select',lang_codes[lang_code],chars]
+    args['breadcrumbs'] =  ['Books','Select',lang_menu[lang_code],chars]
       
     return render(request,'sopds_selectbook.html', args)      
+
+def AuthorsView(request):   
+    args = {}
+    args.update(csrf(request))
+
+    if request.GET:
+        lang_code = int(request.GET.get('lang', '0'))  
+        chars = request.GET.get('chars', '')
+    else:
+        lang_code = 0
+        chars = ''
+        
+    length = len(chars)+1
+    if lang_code:
+        sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+               from opds_catalog_author 
+               where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%'
+               group by upper(substring(last_name,1,%(length)s)) 
+               order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
+    else:
+        sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+               from opds_catalog_author 
+               where upper(last_name) like '%(chars)s%%'
+               group by upper(substring(last_name,1,%(length)s)) 
+               order by id"""%{'length':length,'chars':chars}
+      
+    items = Author.objects.raw(sql)
+          
+    args['items']=items
+    args['current'] = 'author'      
+    args['lang_code'] = lang_code   
+    args['breadcrumbs'] =  ['Authors','Select',lang_menu[lang_code],chars]
+      
+    return render(request,'sopds_selectauthor.html', args)    
 
 def hello(request):
     args = {}

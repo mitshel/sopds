@@ -3,7 +3,7 @@
 	  <ul class="menu sopdsmenu" style="font-size:100%;"> {# vertical medium-horizontal menu #}
 	    <li {% if current == "catalog" %} class="active" {% endif %}><a href="{% url "web:catalog" %}">Catalogs</a></li>
 	    <li {% if current == "book" %} class="active" {% endif %}><a href="{% url "web:book" %}?lang=0">Books</a></li>
-	    <li {% if current == "author" %} class="active" {% endif %}><a href="#">Authors</a></li>
+	    <li {% if current == "author" %} class="active" {% endif %}><a href="{% url "web:author" %}?lang=0">Authors</a></li>
 	    <li {% if current == "genre" %} class="active" {% endif %}><a href="#">Genres</a></li>
 	    <li {% if current == "series" %} class="active" {% endif %}><a href="#">Series</a></li>
 	  </ul>
@@ -14,28 +14,28 @@
 	    <li {% if current == "catalog" %} class="active" {% endif %}><a href="{% url "web:catalog" %}">Catalogs</a></li>
 	    <li {% if current == "book" %} class="active" {% endif %}><a href="#">Books</a>
 	        <ul class="vertical menu sopdsmenu">
-	        {% for key, value in lang_codes.items %}
+	        {% for key, value in lang_menu.items %}
 	            <li><a href="{% url "web:book" %}?lang={{ key }}">{{ value }}</a></li>
 	        {% endfor %}    
 	        </ul>
 	    </li>
 	    <li {% if current == "author" %} class="active" {% endif %}><a href="#">Authors</a>	    
 	        <ul class="vertical menu sopdsmenu">
-	        {% for key, value in lang_codes.items %}
-	            <li><a href="{% url "web:book" %}?lang={{ key }}">{{ value }}</a></li>
+	        {% for key, value in lang_menu.items %}
+	            <li><a href="{% url "web:author" %}?lang={{ key }}">{{ value }}</a></li>
 	        {% endfor %}  
 	        </ul>	    
 	    </li>
 	    <li {% if current == "genre" %} class="active" {% endif %}><a href="#">Genres</a>
 	        <ul class="vertical menu sopdsmenu">
-	        {% for key, value in lang_codes.items %}
+	        {% for key, value in lang_menu.items %}
 	            <li><a href="{% url "web:book" %}?lang={{ key }}">{{ value }}</a></li>
 	        {% endfor %}  
 	        </ul>	    
 	    </li>
 	    <li {% if current == "series" %} class="active" {% endif %}><a href="#">Series</a>
 	        <ul class="vertical menu sopdsmenu">
-	        {% for key, value in lang_codes.items %}
+	        {% for key, value in lang_menu.items %}
 	            <li><a href="{% url "web:book" %}?lang={{ key }}">{{ value }}</a></li>
 	        {% endfor %}  
 	        </ul>	    

@@ -1,0 +1,21 @@
+{% extends "sopds_main.html" %}
+{% load staticfiles %}
+
+{% block body %}
+<table>
+{%  for chars in items %}
+<tr>
+	<td>
+	{% if chars.cnt >= splititems %}
+	   <a href="{% url "web:author" %}?lang={{lang_code}}&chars={{chars.id}}">{{ chars.id }}</a>
+	{% else %}
+	   <a href="{% url "web:searchauthors" %}?searchtype=b&searchterms={{chars.id}}">{{ chars.id }}</a>
+	{% endif %}
+	<span style="font-size:80%">Total: {{ chars.cnt }} authors.</span>
+	</td>
+</tr>		
+{% endfor %}
+</table>
+
+
+{% endblock %}  {# body #}
