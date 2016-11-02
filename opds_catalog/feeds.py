@@ -17,6 +17,8 @@ from opds_catalog import models
 from opds_catalog import settings
 from django.http.response import Http404
 
+lang_codes = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
+
 class AuthFeed(Feed):
     request = None
     def __call__(self,request,*args,**kwargs):
@@ -718,6 +720,7 @@ class LangFeed(AuthFeed):
         }
         
     def items(self):
+    # TODO: переделать, используя словарь lang_codes
         langitems = [
                     {"id":1, "title":_("Cyrillic")},
                     {"id":2, "title":_("Latin")},
