@@ -58,39 +58,58 @@ def SearchBooksView(request):
         
         if searchtype == 'm':
             books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','authors','-docdate')
+            args['breadcrumbs'] = ['Books','Search by title',searchterms]
+            
         elif searchtype == 'a':
             try:
                 author_id = int(searchterms)
+                author = Author.objects.get(id=author_id)
+                aname = "%s %s"%(author.last_name,author.first_name)
             except:
                 author_id = 0
-            books = Book.objects.filter(authors=author_id).order_by('title','authors','-docdate')      
+                aname = ""                  
+            books = Book.objects.filter(authors=author_id).order_by('title','authors','-docdate')  
+            args['breadcrumbs'] = ['Books','Search by Author',aname]    
+            
         # Поиск книг по серии
         elif searchtype == 's':
             try:
                 ser_id = int(searchterms)
+                ser = Series.objects.get(id=ser_id).ser
             except:
                 ser_id = 0
-            books = Book.objects.filter(series=ser_id).order_by('title','authors','-docdate')    
+                ser = ""
+            books = Book.objects.filter(series=ser_id).order_by('title','series','-docdate')    
+            args['breadcrumbs'] = ['Books','Search by Series',ser]
+            
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
             if AUTH:
                 books = Book.objects.filter(bookshelf__user=request.user).order_by('-bookshelf__readtime')
+                args['breadcrumbs'] = ['Books','Bookshelf',request.user.username]
                 #books = bookshelf.objects.filter(user=request.user).select_related('book')              
             else:
-                books={}         
+                books={}        
+                args['breadcrumbs'] = ['Books', 'Bookshelf'] 
+                
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
             #try:
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
             books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('-docdate')
+            args['breadcrumbs'] = ['Books','Doubles for book',mbook.title]
+            
         elif searchtype == 'i':
             try:
                 book_id = int(searchterms)
+                btitle = Book.objects.get(id=book_id).title
             except:
                 book_id = 0
+                btitle = ""
             books = Book.objects.filter(id=book_id)                 
-        
+            args['breadcrumbs'] = ['Books',btitle]
+            
         if len(books)>0:
             books = books.prefetch_related('authors','genres','series')
         
@@ -142,7 +161,7 @@ def SearchBooksView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]  
         args['searchobject'] = 'title'   
         args['current'] = 'search'  
-        args['breadcrumbs'] = ['Search','Books',searchterms]
+
         
     return render(request,'sopds_books.html', args)
 
@@ -198,7 +217,7 @@ def SelectSeriesView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'series'
         args['current'] = 'search'        
-        args['breadcrumbs'] = ['Search','Series',searchterms]
+        args['breadcrumbs'] = ['Series','Search',searchterms]
                                               
     return render(request,'sopds_series.html', args)
 
@@ -255,7 +274,7 @@ def SearchAuthorsView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'author'
         args['current'] = 'search'       
-        args['breadcrumbs'] = ['Search','Authors',searchterms]
+        args['breadcrumbs'] = ['Authors','Search',searchterms]
                                     
     return render(request,'sopds_authors.html', args)
 
