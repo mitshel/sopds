@@ -82,7 +82,7 @@ def SearchBooksView(request):
             except:
                 author_id = 0
                 aname = ""                  
-            books = Book.objects.filter(authors=author_id).order_by('title','authors','-docdate')  
+            books = Book.objects.filter(authors=author_id).order_by('title','-docdate')  
             args['breadcrumbs'] = ['Books','Search by Author',aname]    
             
         # Поиск книг по серии
@@ -93,7 +93,7 @@ def SearchBooksView(request):
             except:
                 ser_id = 0
                 ser = ""
-            books = Book.objects.filter(series=ser_id).order_by('title','series','-docdate')    
+            books = Book.objects.filter(series=ser_id).order_by('title','-docdate')    
             args['breadcrumbs'] = ['Books','Search by Series',ser]
             
         # Поиск книг по жанру
@@ -107,7 +107,7 @@ def SearchBooksView(request):
                 genre_id = 0
                 args['breadcrumbs'] = ['Books','Search by Genre']
                 
-            books = Book.objects.filter(genres=genre_id).order_by('title','genres','-docdate') 
+            books = Book.objects.filter(genres=genre_id).order_by('title','-docdate') 
                         
             
         # Поиск книг на книжной полке            
