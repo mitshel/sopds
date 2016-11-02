@@ -425,6 +425,40 @@ def AuthorsView(request):
       
     return render(request,'sopds_selectauthor.html', args)    
 
+def SeriesView(request):   
+    args = {}
+    args.update(csrf(request))
+
+    if request.GET:
+        lang_code = int(request.GET.get('lang', '0'))  
+        chars = request.GET.get('chars', '')
+    else:
+        lang_code = 0
+        chars = ''
+        
+    length = len(chars)+1
+    if lang_code:
+        sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
+               from opds_catalog_series 
+               where lang_code=%(lang_code)s and upper(ser) like '%(chars)s%%'
+               group by upper(substring(ser,1,%(length)s)) 
+               order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
+    else:
+        sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
+               from opds_catalog_series 
+               where upper(ser) like '%(chars)s%%'
+               group by upper(substring(ser,1,%(length)s)) 
+               order by id"""%{'length':length,'chars':chars}
+      
+    items = Series.objects.raw(sql)
+          
+    args['items']=items
+    args['current'] = 'series'      
+    args['lang_code'] = lang_code   
+    args['breadcrumbs'] =  ['Series','Select',lang_menu[lang_code],chars]
+      
+    return render(request,'sopds_selectseries.html', args)
+
 def hello(request):
     args = {}
     args['breadcrumbs'] = ['HOME']

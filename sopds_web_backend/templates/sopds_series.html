@@ -1,11 +1,13 @@
 {% extends "sopds_main.html" %}
 
 {% block body %}
+<table>
 {%  for s in series %}
-		<div class="large-12 column">
+	<tr><td>
 			<b>{{ s.ser }}</b> <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}"><span style="font-size:80%;">Total: {{ s.book_count }} books.</span></a>
-		</div>		
+	</td></tr>		
 {% endfor %}
+</table>
 
 {% if series.paginator.num_pages > 1 %}
 <ul class="pagination" role="navigation" aria-label="Pagination">
