@@ -35,7 +35,7 @@ AUTH = getattr(settings, "SOPDS_AUTH", False)
 
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
 SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%sopds_version)
-ICON = getattr(settings, "SOPDS_ICON", "http://www.sopds.ru/favicon.ico")
+ICON = getattr(settings, "SOPDS_ICON", "/static/images/favicon.ico")
 
 LOGFILE = getattr(settings, "SOPDS_LOGFILE", "scan.log")
 loglevel = getattr(settings, "SOPDS_LOGLEVEL", "info")
