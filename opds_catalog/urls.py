@@ -27,11 +27,11 @@ urlpatterns = [
     
     url(r'^search/$',feeds.OpenSearch, name='opensearch'),
   
-    url(r'^search/books/(?P<searchtype>[bmasgued])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
-    url(r'^search/books/(?P<searchtype>[bmasgued])/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/(?P<searchterms0>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
     url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/(?P<searchterms0>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),
-    url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/',feeds.SelectSeriesFeed(), name='searchbooks'), 
+    url(r'^search/books/(?P<searchtype>as)/(?P<searchterms>.+)/',feeds.SelectSeriesFeed(), name='searchbooks'),   
+    url(r'^search/books/(?P<searchtype>[bmasgued])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
+    url(r'^search/books/(?P<searchtype>[bmasgued])/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
     url(r'^search/books/u/0/',feeds.SearchBooksFeed(), name='bookshelf'),
                  
     url(r'^search/authors/(?P<searchtype>[bme])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchAuthorsFeed(), name='searchauthors'),
