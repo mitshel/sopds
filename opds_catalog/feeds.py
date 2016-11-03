@@ -431,7 +431,7 @@ class SearchBooksFeed(AuthFeed):
 
     def get_link_kwargs(self, obj):
         kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]}
-        if obj.get("serarchterms0") is not None:
+        if obj.get("searchterms0") is not None:
             kwargs["searchterms0"]=obj["searchterms0"]
         return kwargs
         
