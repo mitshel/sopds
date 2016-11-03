@@ -30,7 +30,7 @@ DEBUG = True
 import socket
 HOSTNAME=socket.gethostname().upper()
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
