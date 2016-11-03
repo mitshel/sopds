@@ -388,13 +388,13 @@ def BooksView(request):
     if lang_code:
         sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_book 
-               where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%'
+               where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%%%'
                group by upper(substring(title,1,%(length)s)) 
                order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
     else:
         sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_book 
-               where upper(title) like '%(chars)s%%'
+               where upper(title) like '%(chars)s%%%%'
                group by upper(substring(title,1,%(length)s)) 
                order by id"""%{'length':length,'chars':chars}
      
@@ -422,13 +422,13 @@ def AuthorsView(request):
     if lang_code:
         sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_author 
-               where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%'
+               where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%%%'
                group by upper(substring(last_name,1,%(length)s)) 
                order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
     else:
         sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_author 
-               where upper(last_name) like '%(chars)s%%'
+               where upper(last_name) like '%(chars)s%%%%'
                group by upper(substring(last_name,1,%(length)s)) 
                order by id"""%{'length':length,'chars':chars}
       
@@ -455,13 +455,13 @@ def SeriesView(request):
     if lang_code:
         sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_series 
-               where lang_code=%(lang_code)s and upper(ser) like '%(chars)s%%'
+               where lang_code=%(lang_code)s and upper(ser) like '%(chars)s%%%%'
                group by upper(substring(ser,1,%(length)s)) 
                order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
     else:
         sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_series 
-               where upper(ser) like '%(chars)s%%'
+               where upper(ser) like '%(chars)s%%%%'
                group by upper(substring(ser,1,%(length)s)) 
                order by id"""%{'length':length,'chars':chars}
       
