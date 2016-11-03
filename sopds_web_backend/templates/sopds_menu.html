@@ -10,17 +10,17 @@
 	</div>
 {% else %}
 	<div id="main_menu">
-	  <ul class="dropdown menu sopdsmenu" style="font-size:100%;" data-dropdown-menu> {# vertical medium-horizontal menu #}
+	  <ul class="dropdown menu sopdsmenu" style="font-size:100%;" data-dropdown-menu data-close-on-click-inside="false">
 	    <li {% if current == "catalog" %} class="active" {% endif %}><a href="{% url "web:catalog" %}">Catalogs</a></li>
-	    <li {% if current == "book" %} class="active" {% endif %}><a href="#">Books</a>
-	        <ul class="vertical menu sopdsmenu">
+	    <li {% if current == "book" %}class="active"{% endif %} ><a href="#">Books</a>
+	        <ul class="menu sopdsmenu">
 	        {% for key, value in lang_menu.items %}
 	            <li><a href="{% url "web:book" %}?lang={{ key }}">{{ value }}</a></li>
 	        {% endfor %}    
 	        </ul>
 	    </li>
 	    <li {% if current == "author" %} class="active" {% endif %}><a href="#">Authors</a>	    
-	        <ul class="vertical menu sopdsmenu">
+	        <ul class="menu sopdsmenu">
 	        {% for key, value in lang_menu.items %}
 	            <li><a href="{% url "web:author" %}?lang={{ key }}">{{ value }}</a></li>
 	        {% endfor %}  
@@ -29,7 +29,7 @@
 	    <li {% if current == "genre" %} class="active" {% endif %}><a href="{% url "web:genre" %}">Genres</a>    
 	    </li>
 	    <li {% if current == "series" %} class="active" {% endif %}><a href="#">Series</a>
-	        <ul class="vertical menu sopdsmenu">
+	        <ul class="menu sopdsmenu">
 	        {% for key, value in lang_menu.items %}
 	            <li><a href="{% url "web:series" %}?lang={{ key }}">{{ value }}</a></li>
 	        {% endfor %}  
