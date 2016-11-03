@@ -45,15 +45,13 @@ class opdsFeed(Atom1Feed):
         #super(opdsFeed, self).add_root_elements(handler)
         handler.characters("\n")
         handler.addQuickElement("id", self.feed['id'])
+        handler.addQuickElement('icon', settings.ICON)
         handler.characters("\n")
         if self.feed.get('link') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["link"],"rel":"self","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
             handler.characters("\n")
         if self.feed.get('start_url') is not None:
             handler.addQuickElement('link', None, {"href":self.feed["start_url"],"rel":"start","type":"application/atom+xml;profile=opds-catalog;kind=navigation"})
-            handler.characters("\n")
-        if self.feed.get('icon') is not None:
-            handler.addQuickElement('icon', settings.ICON)
             handler.characters("\n")
         handler.addQuickElement("title", self.feed['title'])
         handler.characters("\n")
