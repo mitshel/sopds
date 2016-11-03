@@ -397,7 +397,8 @@ def BooksView(request):
                where upper(title) like '%(chars)s%%'
                group by upper(substring(title,1,%(length)s)) 
                order by id"""%{'length':length,'chars':chars}
-      
+     
+    print(sql)  
     items = Book.objects.raw(sql)
           
     args['items']=items
