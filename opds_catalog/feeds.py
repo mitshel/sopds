@@ -373,7 +373,7 @@ class SearchBooksFeed(AuthFeed):
                 ser_id = 0
             books = Book.objects.filter(series=ser_id).order_by('title','-docdate')    
         # Поиск книг по автору и серии
-        elif searchtype == 'as':
+        elif searchtype == "v":
             try:
                 ser_id = int(searchterms0)
                 author_id = int(searchterms)
@@ -508,7 +508,7 @@ class SelectSeriesFeed(AuthFeed):
         return author_id
     
     def link(self, obj):
-        return reverse("opds_catalog:searchbooks",kwargs={'searchtype':'as','searchterms':obj})
+        return reverse("opds_catalog:searchbooks",kwargs={'searchtype':"v",'searchterms':obj})
 
     def feed_extra_kwargs(self, obj):
         return {
@@ -528,7 +528,7 @@ class SelectSeriesFeed(AuthFeed):
         if item["id"] == 1:
            return reverse("opds_catalog:searchseries", kwargs={"searchtype":'a', "searchterms":item["author"]})
         elif item["id"] == 2:
-           return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'as', "searchterms":item["author"], "searchterms0":0})
+           return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'v', "searchterms":item["author"], "searchterms0":0})
         elif item["id"] == 3:
            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'a', "searchterms":item["author"]})
              
@@ -610,7 +610,7 @@ class SearchAuthorsFeed(AuthFeed):
         return "a:%s"%(item.id)
 
     def item_link(self, item):
-        return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"as", "searchterms":item.id}) 
+        return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"v", "searchterms":item.id}) 
 
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
@@ -687,7 +687,7 @@ class SearchSeriesFeed(AuthFeed):
 
     def item_link(self, item):        
         if self.author_id:
-            kwargs={"searchtype":"as", "searchterms":self.author_id,"searchterms0":item.id}
+            kwargs={"searchtype":"v", "searchterms":self.author_id,"searchterms0":item.id}
         else:
             kwargs={"searchtype":"s", "searchterms":item.id}
 
