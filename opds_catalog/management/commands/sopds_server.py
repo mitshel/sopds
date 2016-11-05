@@ -120,7 +120,7 @@ def daemonize():
 #        except OSError as e:
 #            if e.errno != errno.EBADF:
 #                raise
-    os.close(std_in)
-    os.close(std_out)
+    os.close(std_in.fileno())
+    os.close(std_out.fileno())
 
 
