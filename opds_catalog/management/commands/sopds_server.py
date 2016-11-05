@@ -76,7 +76,10 @@ class Command(BaseCommand):
             sys.exit(0) 
     
     def stop(self, pid):
-        os.kill(int(pid), signal.SIGTERM)
+        try:
+            os.kill(int(pid), signal.SIGTERM)
+        except OSError as e:
+            print(str(e))
     
     def restart(self, pid):
         self.stop(pid)
