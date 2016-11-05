@@ -7,9 +7,10 @@ import django
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.core.management import call_command
+from django.core.management import call_command, ManagementUtility
 from django.core.servers.basehttp import get_internal_wsgi_application, run
 from django.utils.encoding import force_text
+from django.core.handlers.wsgi import WSGIHandler
 
 from opds_catalog.settings import SERVER_LOG
 
@@ -43,43 +44,10 @@ class Command(BaseCommand):
         elif action == "restart":
             pid = open(self.pidfile, "r").read()
             self.restart(pid)
-
-    def start_simple(self):
-        writepid(self.pidfile)
-        call_command('runserver','%s:%s'%(self.addr,self.port), app_label='opds_catalog')
-           
+                      
     def start(self):
         writepid(self.pidfile)
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sopds.settings") 
-        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
-        self.stdout.write((
-            "Starting SOPDS server at http://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
-        ) % {
-            "addr": '[%s]' % self.addr,
-            "port": self.port,
-            "quit_command": quit_command,
-        })
-
-        try:
-            handler = get_internal_wsgi_application()
-            run(self.addr, int(self.port), handler,ipv6=False, threading=True)
-        except socket.error as e:
-            # Use helpful error messages instead of ugly tracebacks.
-            ERRORS = {
-                errno.EACCES: "You don't have permission to access that port.",
-                errno.EADDRINUSE: "That port is already in use.",
-                errno.EADDRNOTAVAIL: "That IP address can't be assigned to.",
-            }
-            try:
-                error_text = ERRORS[e.errno]
-            except KeyError:
-                error_text = force_text(e)
-            self.stderr.write("Error: %s" % error_text)
-            # Need to use an OS exit because sys.exit doesn't work in a thread
-            os._exit(1)
-        except KeyboardInterrupt:
-            sys.exit(0)
+        call_command('runserver',addrport='%s:%s'%(self.addr,self.port), use_reloader=False, app_label='opds_catalog')
 
     def stop(self, pid):
         try:
