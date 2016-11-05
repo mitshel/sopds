@@ -9,13 +9,20 @@
 
     
 ## Установка
+pip install -r requirements.txt
 manage.py migrate
 manage.py createsuperuser (admin:ma*ka)
 
-Внести изменения в settings.py
+## Настраиваем ./sopds/settings.py
 SOPDS_ROOT_LIB = < Путь к каталогу с книгами >
 SOPDS_AUTH = < False | True >
 
-manage.py sopds --clear
-manage.py sopds --scan
+## Готовим базу данных
+manage.py sopds_util --clear
+
+## Вручную запускаем сканирование коллекции книг
+manage.py sopds_scanner --scan
+
+## Запускаем http/opds сервер
+manage.py sopds_server start --daemon
 

@@ -7,9 +7,9 @@ import django
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.core.servers.basehttp import get_internal_wsgi_application, run 
-from django.utils.encoding import force_text
 from django.core.management import call_command
+from django.core.servers.basehttp import get_internal_wsgi_application, run
+from django.utils.encoding import force_text
 
 from opds_catalog.settings import SERVER_LOG
 
@@ -18,24 +18,23 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('command', help='Use [ start | stop | restart ]')
-        #parser.add_argument('stop',help='Start server')
         parser.add_argument('--host',action='store', dest='host', default="0.0.0.0", help='Set server binding address')
-        parser.add_argument('--port',action='store', dest='port', default=8001, help='Ser server port')
+        parser.add_argument('--port',action='store', dest='port', default=8001, help='Set server port')
         parser.add_argument('--daemon',action='store_true', dest='daemonize', default=False, help='Daemonize server')
 
 
     def handle(self, *args, **options):
         self.pidfile = os.path.join(settings.BASE_DIR, "sopds-server.pid")
-        try:
-            action = options['command']
-        except IndexError:
-            print("You must provide an action. Possible actions are start, stop and restart.")
-            raise SystemExit
+        action = options['command']
         self.addr = options['host']
         self.port = int(options['port'])
         
-        if options["daemonize"]:
-            daemonize()
+        if (options["daemonize"] and (action == "start")):
+            if sys.platform == "win32":
+                print("On Windows platform Daemonize not working.")
+            else:         
+                daemonize()
+                
         if action == "start":
             self.start()
         elif action == "stop":
@@ -45,10 +44,49 @@ class Command(BaseCommand):
             pid = open(self.pidfile, "r").read()
             self.restart(pid)
 
+    def start_simple(self):
+        writepid(self.pidfile)
+        call_command('runserver','%s:%s'%(self.addr,self.port), app_label='opds_catalog')
+           
     def start(self):
         writepid(self.pidfile)
-        call_command('runserver', '%s:%s'%(self.addr,int(self.port)), app_label='opds_catalog')
-           
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sopds.settings") 
+        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
+        self.stdout.write((
+            "Starting SOPDS server at http://%(addr)s:%(port)s/\n"
+            "Quit the server with %(quit_command)s.\n"
+        ) % {
+            "addr": '[%s]' % self.addr,
+            "port": self.port,
+            "quit_command": quit_command,
+        })
+
+        try:
+            handler = get_internal_wsgi_application()
+            run(self.addr, int(self.port), handler,ipv6=False, threading=True)
+        except socket.error as e:
+            # Use helpful error messages instead of ugly tracebacks.
+            ERRORS = {
+                errno.EACCES: "You don't have permission to access that port.",
+                errno.EADDRINUSE: "That port is already in use.",
+                errno.EADDRNOTAVAIL: "That IP address can't be assigned to.",
+            }
+            try:
+                error_text = ERRORS[e.errno]
+            except KeyError:
+                error_text = force_text(e)
+            self.stderr.write("Error: %s" % error_text)
+            # Need to use an OS exit because sys.exit doesn't work in a thread
+            os._exit(1)
+        except KeyboardInterrupt:
+            sys.exit(0)
+
+    def stop(self, pid):
+        try:
+            os.kill(int(pid), signal.SIGTERM)
+        except OSError as e:
+            print(str(e))
+
     def restart(self, pid):
         self.stop(pid)
         self.start()
@@ -67,10 +105,6 @@ def daemonize():
     """
     # swiped from twisted/scripts/twistd.py
     # See http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC16
-    if sys.platform == "win32":
-        print("On Windows platform Daemonize not working.")
-        return
-        
     if os.fork():   # launch child and...
         os._exit(0) # kill off parent
     os.setsid()
