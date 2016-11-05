@@ -10,15 +10,25 @@
     
 ## Установка
 pip install -r requirements.txt
-manage.py migrate
-manage.py createsuperuser (admin:ma*ka)
+
+## Инициализация базы данных MySQL.
+Во первых для работы каталога необходимо создать базу данных "sopds" и пользователя с необходимыми правами,
+например следующим образом:
+
+ mysql -uroot -proot_pass mysql  
+ mysql > create database if not exists sopds default charset=utf8;  
+ mysql > grant all on sopds.* to 'sopds'@'localhost' identified by 'sopds';  
+ mysql > commit;  
+ mysql > ^C  
 
 ## Настраиваем ./sopds/settings.py
 SOPDS_ROOT_LIB = < Путь к каталогу с книгами >
 SOPDS_AUTH = < False | True >
 
 ## Готовим базу данных
-manage.py sopds_util --clear
+python manage.py migrate
+python manage.py createsuperuser (admin:ma*ka)
+python manage.py sopds_util --clear
 
 ## Вручную запускаем сканирование коллекции книг
 manage.py sopds_scanner --scan
