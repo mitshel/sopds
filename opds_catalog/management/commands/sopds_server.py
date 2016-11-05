@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = 'HTTP/OPDS built-in server'
 
     def add_arguments(self, parser):
-        parser.add_argument('command', help='Start, stop or restart server')
+        parser.add_argument('command', help='Use [ start | stop | restart ]')
         #parser.add_argument('stop',help='Start server')
         parser.add_argument('--host',action='store', dest='host', default="0.0.0.0", help='Set server binding address')
         parser.add_argument('--port',action='store', dest='port', default=8001, help='Ser server port')
