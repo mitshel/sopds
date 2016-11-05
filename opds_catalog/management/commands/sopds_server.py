@@ -6,9 +6,10 @@ import errno
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import get_internal_wsgi_application, run 
 from django.utils.encoding import force_text
+
+from opds_catalog.settings import SERVER_LOG
 
 class Command(BaseCommand):
     help = 'HTTP/OPDS built-in server'
@@ -105,13 +106,20 @@ def daemonize():
     if os.fork():   # launch child and...
         os._exit(0) # kill off parent again.
     os.umask(0)
-    null = os.open("/dev/null", os.O_RDWR)
-    for i in range(3):
-        try:
-            os.dup2(null, i)
-        except OSError as e:
-            if e.errno != errno.EBADF:
-                raise
+
+    std_in = open("/dev/null", 'r')
+    std_out = open(SERVER_LOG, 'a+')
+    os.dup2(std_in.fileno(), sys.stdin.fileno())
+    os.dup2(std_out.fileno(), sys.stdout.fileno())
+    os.dup2(std_out.fileno(), sys.stderr.fileno())    
+    
+#    null = os.open("/dev/null", os.O_RDWR)
+#    for i in range(3):
+#        try:
+#            os.dup2(null, i)
+#        except OSError as e:
+#            if e.errno != errno.EBADF:
+#                raise
     os.close(null)
 
 
