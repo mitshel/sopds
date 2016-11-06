@@ -1,14 +1,4 @@
 *.log
 *.swp
-py
-db
-fb2toepub/*
-!fb2toepub/*.zip
-fb2conv/*
-!fb2conv/*.zip
-!fb2conv/*.gz
-!fb2conv/fb2epub
-!fb2conv/fb2mobi
-.htaccess
 db.sqlite3
 .idea/*
