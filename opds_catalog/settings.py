@@ -2,10 +2,9 @@ import logging
 import os
 from django.conf import settings
 
-sopds_version = '0.30a'
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
 
-VERSION = "0.31"
+VERSION = "0.33b"
 
 # Main SOPDS Book Collection Directory
 ROOT_LIB = getattr(settings, "SOPDS_ROOT_LIB", "books/")
@@ -40,7 +39,7 @@ SCAN_SHED_DAY = getattr(settings, "SOPDS_SCAN_SHED_DAY", '*')
 SCAN_SHED_DOW = getattr(settings, "SOPDS_SCAN_SHED_DOW", '*')
 
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
-SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%sopds_version)
+SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%VERSION)
 ICON = getattr(settings, "SOPDS_ICON", "/static/images/favicon.ico")
 
 loglevel = getattr(settings, "SOPDS_LOGLEVEL", "info")
