@@ -135,8 +135,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
-#SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
-SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
+SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
+#SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
 SOPDS_AUTH = True
 SOPDS_SCAN_SHED_MIN ='0'
 SOPDS_SCAN_SHED_HOUR ='0,12'
