@@ -1,4 +1,5 @@
 *.log
 *.swp
+*.pid
 db.sqlite3
 .idea/*
