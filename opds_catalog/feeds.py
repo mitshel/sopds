@@ -161,7 +161,7 @@ class MainFeed(AuthFeed):
                     {"id":5, "title":_("By series"), "link":("opds_catalog:lang_series" if settings.ALPHABET_MENU else "opds_catalog:nolang_series"),
                      "descr": _("Series: %(series)s."),"counters":{"series":Counter.objects.get_counter(models.counter_allseries)}},
         ]
-        if settings.BOOK_SHELF and settings.AUTH and self.request.user.is_authenticated():
+        if settings.AUTH and self.request.user.is_authenticated():
             mainitems += [
                         {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
                          "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.filter(user=self.request.user).count(),"username":self.request.user.username}},
@@ -486,6 +486,11 @@ class SearchBooksFeed(AuthFeed):
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip":1}),"application/%s+zip"%item['format'], "http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
         ]
+        if (settings.FB2TOEPUB!="") and (item['format']=='fb2'):
+            enclosure += [opdsEnclosure(reverse("opds_catalog:convert", kwargs={"book_id":item['id'],"convert_type":"epub"}),"application/epub+zip","http://opds-spec.org/acquisition/open-access")] 
+        if (settings.FB2TOMOBI!="") and (item['format']=='fb2'):
+            enclosure += [opdsEnclosure(reverse("opds_catalog:convert", kwargs={"book_id":item['id'],"convert_type":"mobi"}),"application/mobi","http://opds-spec.org/acquisition/open-access")] 
+
         return enclosure
         
     def item_extra_kwargs(self, item): 

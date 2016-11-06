@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre
-from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABET_MENU, SPLITITEMS
+from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABET_MENU, SPLITITEMS, FB2TOEPUB, FB2TOMOBI
 from opds_catalog.models import lang_menu
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
@@ -24,6 +24,8 @@ def sopds_processor(request):
     args['sopds_version']=VERSION
     args['alphabet'] = ALPHABET_MENU
     args['splititems'] = SPLITITEMS
+    args['fb2tomobi'] = (FB2TOMOBI!="")
+    args['fb2toepub'] = (FB2TOEPUB!="")
     if ALPHABET_MENU:
         args['lang_menu'] = lang_menu
     

@@ -1,14 +1,14 @@
 #### Simple OPDS Catalog - Простой OPDS Каталог  
 #### Author: Dmitry V.Shelepnev  
-#### Версия 0.3
+#### Версия 0.32
 
 
 ## Зависимости проекта
-- Django 1.9 
-    - в Django 1.8 в django.utils.feedgenerator.Atom1Feed не работает задание заголовка content_type
+- Django 1.8
+- Pillow 2.9.0
+- apscheduler
 
-    
-## Установка
+## Установка проекта
 	pip install -r requirements.txt
 
 ## Инициализация базы данных MySQL.
@@ -21,21 +21,26 @@
 	mysql > commit;  
 	mysql > ^C  
 
-## Настраиваем ./sopds/settings.py
+## Настраиваем ./sopds/settings.py (настройки в конце файла)
 
 	SOPDS_ROOT_LIB = < Путь к каталогу с книгами >
 	SOPDS_AUTH = < False | True >
-	SOPDS_SCAN_SHED_MIN  = '0'
+	SOPDS_SCAN_SHED_MIN  = '0,12'
 	SOPDS_SCAN_SHED_HOUR = '0'
-
-## Готовим базу данных
+    
+## Производим инициализацию базы данных и заполнение начальными данными (жанры)
 	python manage.py migrate
-	python manage.py createsuperuser (admin:ma*ka)
 	python manage.py sopds_util --clear
-
+	
+## Cоздаем суперпользователя
+	python manage.py createsuperuser
+	
 ## Вручную запускаем разовое сканирование коллекции книг
 	manage.py sopds_scanner scan
 
-## Запускаем http/opds сервер
+## Запускаем HTTP/OPDS сервер
 	manage.py sopds_server start --daemon
+	
+## Запускаем SCANNER сервер
+	manage.py sopds_scanner start --daemon
 

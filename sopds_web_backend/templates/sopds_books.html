@@ -7,6 +7,12 @@
 			<i style="font-size:80%;">Скачать: </i>
 			<i><a href="{% url 'opds_catalog:download' b.id 0 %}"><span class="label small">{{b.format}}</span></a></i>&nbsp;
 			<i><a href="{% url 'opds_catalog:download' b.id 1 %}"><span class="label small">{{b.format}}+zip</span></a></i>&nbsp;
+			{% if b.format == 'fb2' and fb2toepub %}
+			   <i><a href="{% url 'opds_catalog:convert' b.id 'epub' %}"><span class="label small">epub</span></a></i>&nbsp;
+			{% endif %}
+			{% if b.format == 'fb2' and fb2tomobi %}
+			   <i><a href="{% url 'opds_catalog:convert' b.id 'mobi' %}"><span class="label small">mobi</span></a></i>&nbsp;
+			{% endif %}			
 		</div>
 		
 		<div class="large-12 column">	
