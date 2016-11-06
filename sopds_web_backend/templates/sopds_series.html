@@ -1,10 +1,11 @@
 {% extends "sopds_main.html" %}
+{% load i18n %}
 
 {% block body %}
 <table>
 {%  for s in series %}
 	<tr><td>
-			<b>{{ s.ser }}</b> <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}"><span style="font-size:80%;">Total: {{ s.book_count }} books.</span></a>
+			<b>{{ s.ser }}</b> <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}"><span style="font-size:80%;">{% blocktrans with s_book_count=s.book_count %}Total: {{ s_book_count }} books.{% endblocktrans %}</span></a>
 	</td></tr>		
 {% endfor %}
 </table>
@@ -13,13 +14,13 @@
 <ul class="pagination" role="navigation" aria-label="Pagination">
   <li class="pagination-previous {% if not series.has_previous %}disabled{%endif%}">
       {% if series.has_previous %}<a href="{% url "web:searchseries" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{series.previous_page_number}}" aria-label="Previous page"> {%endif%}
-         Previous <span class="show-for-sr">page</span>
+         {% trans "Previous page" %}
       {% if series.has_previous %}</a>{%endif%}
   </li>
   
   {% for pn in page_range %}
      {% if series.number == pn %}
-        <li class="current"><span class="show-for-sr">You're on page</span> {{pn}}</li>
+        <li class="current">{{pn}}</li>
      {% else %}
         <li><a href="{% url "web:searchseries" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{pn}}" aria-label="Page {{pn}}">{{pn}}</a></li>
      {% endif %}   
@@ -28,7 +29,7 @@
   
   <li class="pagination-next" {% if not series.has_next %}disabled{%endif%}>
       {% if series.has_next %}<a href="{% url "web:searchseries" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{series.next_page_number}}" aria-label="Next page">{%endif%}
-         Next <span class="show-for-sr">page</span>
+         {% trans "Next page" %}
       {% if series.has_next %}</a>{%endif%}
   </li>
 </ul>

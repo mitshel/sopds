@@ -5,7 +5,7 @@
 {%  for b in books %}
 		<div class="large-12 column">
 			<b>{{ b.title }}</b>
-			<i style="font-size:80%;">Скачать: </i>
+			<i style="font-size:80%;">{% trans "Download:" %} </i>
 			<i><a href="{% url 'opds_catalog:download' b.id 0 %}"><span class="label small">{{b.format}}</span></a></i>&nbsp;
 			<i><a href="{% url 'opds_catalog:download' b.id 1 %}"><span class="label small">{{b.format}}+zip</span></a></i>&nbsp;
 			{% if b.format == 'fb2' and fb2toepub %}
@@ -22,21 +22,21 @@
 			     <img src="{% url 'opds_catalog:cover' b.id %}" type="image/jpeg" width="80px">
 			</td>
 			<td style="font-size:80%; padding:1rem 1rem;">
-				<b>Название книги:</b> {{ b.title }} <br>
+				<b>{% trans "Book title:" %}</b> {{ b.title }} <br>
 				{% if b.authors.count > 0 %}
-				   <b>Авторы:</b>{% for a in b.authors %} <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}">{{a.last_name}} {{a.first_name}}</a>{% if not forloop.last %},{%endif%} {%endfor%}<br>
+				   <b>{% trans "Authors:" %}</b>{% for a in b.authors %} <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}">{{a.last_name}} {{a.first_name}}</a>{% if not forloop.last %},{%endif%} {%endfor%}<br>
 				{% endif %}
 				{% if b.genres.count > 0 %}
-				   <b>Жанры:</b>{% for g in b.genres %} <a href="{% url "web:searchbooks" %}?searchtype=g&searchterms={{g.id}}">{{g.subsection}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>
+				   <b>{% trans "Genres" %}</b>{% for g in b.genres %} <a href="{% url "web:searchbooks" %}?searchtype=g&searchterms={{g.id}}">{{g.subsection}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>
 				{% endif %}
 				{% if b.series.count > 0 %}
-				   <b>Серии:</b> {% for s in b.series %} <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}">{{s.ser}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>
+				   <b>{% trans "Series" %}</b> {% for s in b.series %} <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}">{{s.ser}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>
 				{% endif %}
-				<b>Файл:</b> {{ b.path }}/{{ b.filename }} <br>
-				<b>Размер файла:</b> {{ b.filesize }}Кб.<br>
-				<b>Дата правки:</b> {{ b.docdate }} <br>	
+				<b>{% trans "File:" %}</b> {{ b.path }}/{{ b.filename }} <br>
+				<b>{% trans "File size:" %}</b> {{ b.filesize }}Кб.<br>
+				<b>{% trans "Changes date:" %}</b> {{ b.docdate }} <br>	
 				{% if b.doubles > 0 %}
-				<b>Дубликаты книги: </b> <a href="{% url "web:searchbooks" %}?searchtype=d&searchterms={{b.id}}">{{ b.title }} ({{b.doubles}}шт.)</a>
+				<b>{% trans "Doubles for book:" %}</b> <a href="{% url "web:searchbooks" %}?searchtype=d&searchterms={{b.id}}">{{ b.title }} ({{b.doubles}}шт.)</a>
 				{% endif %}
 			</td>
 			</tr>
@@ -52,13 +52,13 @@
 <ul class="pagination" role="navigation" aria-label="Pagination">
   <li class="pagination-previous {% if not books.has_previous %}disabled{%endif%}">
       {% if books.has_previous %}<a href="{% url "web:searchbooks" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{books.previous_page_number}}" aria-label="Previous page"> {%endif%}
-         Previous <span class="show-for-sr">page</span>
+         {% trans "Previous page" %}
       {% if books.has_previous %}</a>{%endif%}
   </li>
   
   {% for pn in page_range %}
      {% if books.number == pn %}
-        <li class="current"><span class="show-for-sr">You're on page</span> {{pn}}</li>
+        <li class="current">{{pn}}</li>
      {% else %}
         <li><a href="{% url "web:searchbooks" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{pn}}" aria-label="Page {{pn}}">{{pn}}</a></li>
      {% endif %}   
@@ -67,7 +67,7 @@
   
   <li class="pagination-next" {% if not books.has_next %}disabled{%endif%}>
       {% if books.has_next %}<a href="{% url "web:searchbooks" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{books.next_page_number}}" aria-label="Next page">{%endif%}
-         Next <span class="show-for-sr">page</span>
+         {% trans "Next page" %}
       {% if books.has_next %}</a>{%endif%}
   </li>
 </ul>

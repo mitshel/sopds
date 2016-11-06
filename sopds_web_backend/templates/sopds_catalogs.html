@@ -1,5 +1,6 @@
 {% extends "sopds_main.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block body %}
 <table>
@@ -33,13 +34,13 @@
 <ul class="pagination" role="navigation" aria-label="Pagination">
   <li class="pagination-previous {% if not items.has_previous %}disabled{%endif%}">
       {% if items.has_previous %}<a href="{% url "web:catalog" %}?cat={{cat_id}}&page={{items.previous_page_number}}" aria-label="Previous page"> {%endif%}
-         Previous <span class="show-for-sr">page</span>
+         {% trans "Previous page" %}
       {% if items.has_previous %}</a>{%endif%}
   </li>
   
   {% for pn in page_range %}
      {% if items.number == pn %}
-        <li class="current"><span class="show-for-sr">You're on page</span> {{pn}}</li>
+        <li class="current">{{pn}}</li>
      {% else %}
         <li><a href="{% url "web:catalog" %}?cat={{cat_id}}&page={{pn}}" aria-label="Page {{pn}}">{{pn}}</a></li>
      {% endif %}   
@@ -48,7 +49,7 @@
   
   <li class="pagination-next" {% if not items.has_next %}disabled{%endif%}>
       {% if items.has_next %}<a href="{% url "web:catalog" %}?cat={{cat_id}}&page={{items.next_page_number}}" aria-label="Next page">{%endif%}
-         Next <span class="show-for-sr">page</span>
+         {% trans "Next page" %}
       {% if items.has_next %}</a>{%endif%}
   </li>
 </ul>

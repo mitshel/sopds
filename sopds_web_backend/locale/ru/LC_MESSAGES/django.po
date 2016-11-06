@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-07 00:09+0300\n"
+"POT-Creation-Date: 2016-11-07 00:41+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,12 +25,61 @@ msgid "Total: %(a_book_count)s books."
 msgstr "Всего: %(a_book_count)s книг."
 
 #: .\sopds_web_backend\templates\sopds_authors.html:17
+#: .\sopds_web_backend\templates\sopds_books.html:55
+#: .\sopds_web_backend\templates\sopds_catalogs.html:37
+#: .\sopds_web_backend\templates\sopds_series.html:17
 msgid "Previous page"
 msgstr "Назад"
 
 #: .\sopds_web_backend\templates\sopds_authors.html:32
+#: .\sopds_web_backend\templates\sopds_books.html:70
+#: .\sopds_web_backend\templates\sopds_catalogs.html:52
+#: .\sopds_web_backend\templates\sopds_series.html:32
 msgid "Next page"
 msgstr "Вперед"
+
+#: .\sopds_web_backend\templates\sopds_books.html:8
+msgid "Download:"
+msgstr "Скачать:"
+
+#: .\sopds_web_backend\templates\sopds_books.html:25
+msgid "Book title:"
+msgstr "Название книги:"
+
+#: .\sopds_web_backend\templates\sopds_books.html:27
+msgid "Authors:"
+msgstr "Авторы:"
+
+#: .\sopds_web_backend\templates\sopds_books.html:30
+#: .\sopds_web_backend\templates\sopds_menu.html:9
+#: .\sopds_web_backend\templates\sopds_menu.html:31
+#: .\sopds_web_backend\views.py:492 .\sopds_web_backend\views.py:496
+msgid "Genres"
+msgstr "Жанры"
+
+#: .\sopds_web_backend\templates\sopds_books.html:33
+#: .\sopds_web_backend\templates\sopds_logo.html:29
+#: .\sopds_web_backend\templates\sopds_menu.html:10
+#: .\sopds_web_backend\templates\sopds_menu.html:33
+#: .\sopds_web_backend\views.py:251 .\sopds_web_backend\views.py:478
+msgid "Series"
+msgstr "Серии"
+
+#: .\sopds_web_backend\templates\sopds_books.html:35
+msgid "File:"
+msgstr "Файл:"
+
+#: .\sopds_web_backend\templates\sopds_books.html:36
+msgid "File size:"
+msgstr "Размер файла:"
+
+#: .\sopds_web_backend\templates\sopds_books.html:37
+msgid "Changes date:"
+msgstr "Дата правки:"
+
+#: .\sopds_web_backend\templates\sopds_books.html:39
+msgid "Doubles for book:"
+msgstr "Дубликаты книги:"
 
 #: .\sopds_web_backend\templates\sopds_breadcrumbs.html:3
 msgid "You are here:"
@@ -89,13 +138,6 @@ msgstr "Название"
 msgid "Author"
 msgstr "Автор"
 
-#: .\sopds_web_backend\templates\sopds_logo.html:29
-#: .\sopds_web_backend\templates\sopds_menu.html:10
-#: .\sopds_web_backend\templates\sopds_menu.html:33
-#: .\sopds_web_backend\views.py:251 .\sopds_web_backend\views.py:478
-msgid "Series"
-msgstr "Серии"
-
 #: .\sopds_web_backend\templates\sopds_menu.html:6
 #: .\sopds_web_backend\templates\sopds_menu.html:16
 #: .\sopds_web_backend\views.py:378
@@ -119,11 +161,30 @@ msgstr "Книги"
 msgid "Authors"
 msgstr "Авторы"
 
-#: .\sopds_web_backend\templates\sopds_menu.html:9
-#: .\sopds_web_backend\templates\sopds_menu.html:31
-#: .\sopds_web_backend\views.py:492 .\sopds_web_backend\views.py:496
-msgid "Genres"
-msgstr "Жанры"
+#: .\sopds_web_backend\templates\sopds_selectauthor.html:15
+#, python-format
+msgid "Total: %(chars_cnt)s authors."
+msgstr "Всего: %(chars_cnt)s авторов."
+
+#: .\sopds_web_backend\templates\sopds_selectbook.html:15
+#, python-format
+msgid "Total: %(chars_cnt)s books."
+msgstr "Всего: %(chars_cnt)s книг."
+
+#: .\sopds_web_backend\templates\sopds_selectgenres.html:15
+#, python-format
+msgid "Total: %(g_num_book)s books."
+msgstr "Всего: %(g_num_book)s книг."
+
+#: .\sopds_web_backend\templates\sopds_selectseries.html:15
+#, python-format
+msgid "Total: %(chars_cnt)s series."
+msgstr "Всего: %(chars_cnt)s серий."
+
+#: .\sopds_web_backend\templates\sopds_series.html:8
+#, python-format
+msgid "Total: %(s_book_count)s books."
+msgstr "Всего: %(s_book_count)s книг."
 
 #: .\sopds_web_backend\templates\sopds_top.html:19
 msgid "Logout"

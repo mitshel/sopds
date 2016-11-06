@@ -1,5 +1,6 @@
 {% extends "sopds_main.html" %}
 {% load staticfiles %}
+{% load i18n %}
 
 {% block body %}
 <table>
@@ -11,7 +12,7 @@
 	{% else %}
 	   <a href="{% url "web:searchbooks" %}?searchtype=g&searchterms={{g.id}}">{{ g.subsection }}</a>
 	{% endif %}
-	<span style="font-size:80%">Total: {{ g.num_book }} books.</span>
+	<span style="font-size:80%">{% blocktrans with g_num_book=g.num_book %}Total: {{ g_num_book }} books.{% endblocktrans %}</span>
 	</td>
 </tr>		
 {% endfor %}
