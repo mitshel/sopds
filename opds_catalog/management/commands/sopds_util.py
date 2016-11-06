@@ -12,8 +12,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['clear']:
             self.stdout.write('Clear book database.')
+            self.clear()
 
-    def clear(self,verbose=False):
+    def clear(self):
         opdsdb.clear_all()
         call_command('loaddata', 'genre.json', app_label='opds_catalog') 
         Counter.objects.update_known_counters()

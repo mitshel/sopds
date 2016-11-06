@@ -38,12 +38,15 @@ def sopds_processor(request):
             result.append(p)    
         args['bookshelf']=result
         
-        random_id = randint(1,Counter.objects.get_counter(models.counter_allbooks))
-        try:
-            #random_book = Book.objects.get(id=random_id)
-            random_book = Book.objects.all()[random_id-1:random_id][0]
-        except Book.DoesNotExist:
-            random_book= None
+        books_count = Counter.objects.get_counter(models.counter_allbooks)
+        if books_count:
+            random_id = randint(1,books_count)
+            try:
+                random_book = Book.objects.all()[random_id-1:random_id][0]
+            except Book.DoesNotExist:
+                random_book= None
+        else:
+            random_book= None        
                    
         args['random_book'] = random_book
         stats = { d['name']:d['value'] for d in Counter.obj.all().values() }
@@ -319,10 +322,13 @@ def CatalogsView(request):
         cat_id = None
         page_num = 1
 
-    if cat_id is not None:
-        cat = Catalog.objects.get(id=cat_id)
-    else:
-        cat = Catalog.objects.get(parent__id=cat_id)
+    try:
+        if cat_id is not None:
+            cat = Catalog.objects.get(id=cat_id)
+        else:
+            cat = Catalog.objects.get(parent__id=cat_id)
+    except Catalog.DoesNotExist:
+        cat = None
     
     catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_type","cat_name")
     # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
@@ -367,10 +373,11 @@ def CatalogsView(request):
     args['current'] = 'catalog'     
     
     breadcrumbs_list = []
-    while (cat.parent):
-        breadcrumbs_list.insert(0, cat.cat_name)
-        cat = cat.parent
-    breadcrumbs_list.insert(0, 'ROOT')    
+    if cat:
+        while (cat.parent):
+            breadcrumbs_list.insert(0, cat.cat_name)
+            cat = cat.parent
+        breadcrumbs_list.insert(0, 'ROOT')    
     breadcrumbs_list.insert(0, 'Catalogs')     
     args['breadcrumbs'] =  breadcrumbs_list  
       
