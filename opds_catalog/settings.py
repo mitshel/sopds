@@ -33,12 +33,16 @@ BOOK_SHELF = getattr(settings, "SOPDS_BOOK_SHELF", True)
 NOCOVER_PATH = getattr(settings, "SOPDS_NOCOVER_PATH", os.path.join(settings.BASE_DIR,'static/images/nocover.jpg'))
 AUTH = getattr(settings, "SOPDS_AUTH", False)
 SERVER_LOG = getattr(settings, "SOPDS_SERVER_LOG", os.path.join(settings.BASE_DIR,'log/sopds_server.log'))
+SCANNER_LOG = getattr(settings, "SOPDS_SCANNER_LOG", os.path.join(settings.BASE_DIR,'log/sopds_scanner.log'))
+SCAN_SHED_MIN = getattr(settings, "SOPDS_SCAN_SHED_MIN", '0')
+SCAN_SHED_HOUR = getattr(settings, "SOPDS_SCAN_SHED_HOUR", '0')
+SCAN_SHED_DAY = getattr(settings, "SOPDS_SCAN_SHED_DAY", '*')
+SCAN_SHED_DOW = getattr(settings, "SOPDS_SCAN_SHED_DOW", '*')
 
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
 SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%sopds_version)
 ICON = getattr(settings, "SOPDS_ICON", "/static/images/favicon.ico")
 
-LOGFILE = getattr(settings, "SOPDS_LOGFILE", "scan.log")
 loglevel = getattr(settings, "SOPDS_LOGLEVEL", "info")
 if loglevel.lower() in loglevels:
    LOGLEVEL=loglevels[loglevel.lower()]

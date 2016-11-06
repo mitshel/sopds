@@ -1,16 +1,10 @@
 import os
 import signal
 import sys
-import socket
-import errno
-import django
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.core.management import call_command, ManagementUtility
-from django.core.servers.basehttp import get_internal_wsgi_application, run
-from django.utils.encoding import force_text
-from django.core.handlers.wsgi import WSGIHandler
+from django.core.management import call_command
 
 from opds_catalog.settings import SERVER_LOG
 
@@ -32,7 +26,7 @@ class Command(BaseCommand):
         
         if (options["daemonize"] and (action == "start")):
             if sys.platform == "win32":
-                print("On Windows platform Daemonize not working.")
+                self.stdout.write("On Windows platform Daemonize not working.")
             else:         
                 daemonize()
                 
@@ -53,7 +47,7 @@ class Command(BaseCommand):
         try:
             os.kill(int(pid), signal.SIGTERM)
         except OSError as e:
-            print(str(e))
+            self.stdout.write("Error stopping sopds_server: %s"%str(e))
 
     def restart(self, pid):
         self.stop(pid)
