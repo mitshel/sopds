@@ -160,7 +160,6 @@ def ConvertFB2(request, book_id, convert_type):
         
     tmp_conv_path=os.path.join(settings.TEMP_DIR,dlfilename)
     popen_args = ("\"%s\" \"%s\" \"%s\""%(converter_path,file_path,tmp_conv_path))
-    print(popen_args)
     proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE)
     #proc = subprocess.Popen((converter_path.encode('utf8'),file_path.encode('utf8'),tmp_conv_path.encode('utf8')), shell=True, stdout=subprocess.PIPE)
     out = proc.stdout.readlines()
@@ -181,7 +180,7 @@ def ConvertFB2(request, book_id, convert_type):
 
     try: 
         if tmp_fb2_path:
-            os.remove(tmp_fb2_path.encode('utf-8'))
+            os.remove(tmp_fb2_path)
     except: 
         pass
     try: 
