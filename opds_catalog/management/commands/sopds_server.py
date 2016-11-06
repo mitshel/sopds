@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 
-from opds_catalog.settings import SERVER_LOG
+from opds_catalog.settings import SERVER_LOG, SERVER_PID
 
 class Command(BaseCommand):
     help = 'HTTP/OPDS built-in server'
@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        self.pidfile = os.path.join(settings.BASE_DIR, "sopds-server.pid")
+        self.pidfile = os.path.join(settings.BASE_DIR, SERVER_PID)
         action = options['command']
         self.addr = options['host']
         self.port = int(options['port'])

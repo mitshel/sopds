@@ -11,7 +11,7 @@ from django.conf import settings
 
 from opds_catalog.models import Counter
 from opds_catalog.sopdscan import opdsScanner
-from opds_catalog.settings import SCANNER_LOG, SCAN_SHED_DAY, SCAN_SHED_DOW, SCAN_SHED_HOUR, SCAN_SHED_MIN, LOGLEVEL
+from opds_catalog.settings import SCANNER_LOG, SCAN_SHED_DAY, SCAN_SHED_DOW, SCAN_SHED_HOUR, SCAN_SHED_MIN, LOGLEVEL, SCANNER_PID
 
 class Command(BaseCommand):
     help = 'Scan Books Collection.'
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         parser.add_argument('--daemon',action='store_true', dest='daemonize', default=False, help='Daemonize server')
         
     def handle(self, *args, **options): 
-        self.pidfile = os.path.join(settings.BASE_DIR, "sopds-scanner.pid")
+        self.pidfile = os.path.join(settings.BASE_DIR, SCANNER_PID)
         action = options['command']            
         self.logger = logging.getLogger('')
         self.logger.setLevel(logging.DEBUG)
