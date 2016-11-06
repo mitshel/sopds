@@ -155,6 +155,6 @@ else:
 #SOPDS_ROOT_LIB = os.path.join(BASE_DIR, 'opds_catalog\\tests\\data\\')
 
 SOPDS_AUTH = True
-SOPDS_SCAN_SHED_MIN ='*/2'
-SOPDS_SCAN_SHED_HOUR ='*'
+SOPDS_SCAN_SHED_MIN ='0'
+SOPDS_SCAN_SHED_HOUR ='0,12'
 
