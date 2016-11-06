@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <div class="top-bar">
 
     <div class="top-bar-title">
@@ -14,12 +16,12 @@
         {% if sopds_auth %}
         <ul class="menu" style="font-size:90%;">
             {% if user.is_authenticated %}
-                <li><a href="#" onClick="logout('/logout/')"><i class="fi-torsos"></i>Logout ({{ user.username }})</a></li>
+                <li><a href="#" onClick="logout('/logout/')"><i class="fi-torsos"></i>{% trans "Logout" %} ({{ user.username }})</a></li>
             {% else %}
-                <li><a href="#"><i class="fi-torsos"></i>Login</a></li>
+                <li><a href="#"><i class="fi-torsos"></i>{% trans "Login" %}</a></li>
             {% endif %}
             {% if user.is_superuser %}
-            	<li><a href="/admin/"><i class="fi-widget"></i>Settings</a></li>
+            	<li><a href="/admin/"><i class="fi-widget"></i>{% trans "Settings" %}</a></li>
             {% endif %}	
         </ul>
         {% endif %}

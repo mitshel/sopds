@@ -15,9 +15,6 @@ from opds_catalog.models import lang_menu
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 
-
-
-
 def sopds_processor(request):
     args={}
     args['sopds_auth']=AUTH
@@ -73,11 +70,11 @@ def SearchBooksView(request):
         
         if searchtype == 'm':
             books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            args['breadcrumbs'] = ['Books','Search by title',searchterms]
+            args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]
             
         if searchtype == 'b':
             books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            args['breadcrumbs'] = ['Books','Search by title',searchterms]            
+            args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]            
             
         elif searchtype == 'a':
             try:
@@ -88,7 +85,7 @@ def SearchBooksView(request):
                 author_id = 0
                 aname = ""                  
             books = Book.objects.filter(authors=author_id).order_by('title','-docdate')  
-            args['breadcrumbs'] = ['Books','Search by Author',aname]    
+            args['breadcrumbs'] = [_('Books'),_('Search by author'),aname]    
             
         # Поиск книг по серии
         elif searchtype == 's':
@@ -99,7 +96,7 @@ def SearchBooksView(request):
                 ser_id = 0
                 ser = ""
             books = Book.objects.filter(series=ser_id).order_by('title','-docdate')    
-            args['breadcrumbs'] = ['Books','Search by Series',ser]
+            args['breadcrumbs'] = [_('Books'),_('Search by series'),ser]
             
         # Поиск книг по жанру
         elif searchtype == 'g':
@@ -107,10 +104,10 @@ def SearchBooksView(request):
                 genre_id = int(searchterms)
                 section = Genre.objects.get(id=genre_id).section
                 subsection = Genre.objects.get(id=genre_id).subsection
-                args['breadcrumbs'] = ['Books','Search by Genre',section,subsection]
+                args['breadcrumbs'] = [_('Books'),_('Search by genre'),section,subsection]
             except:
                 genre_id = 0
-                args['breadcrumbs'] = ['Books','Search by Genre']
+                args['breadcrumbs'] = [_('Books'),_('Search by genre')]
                 
             books = Book.objects.filter(genres=genre_id).order_by('title','-docdate') 
                         
@@ -119,11 +116,11 @@ def SearchBooksView(request):
         elif searchtype == 'u':
             if AUTH:
                 books = Book.objects.filter(bookshelf__user=request.user).order_by('-bookshelf__readtime')
-                args['breadcrumbs'] = ['Books','Bookshelf',request.user.username]
+                args['breadcrumbs'] = [_('Books'),_('Bookshelf'),request.user.username]
                 #books = bookshelf.objects.filter(user=request.user).select_related('book')              
             else:
                 books={}        
-                args['breadcrumbs'] = ['Books', 'Bookshelf'] 
+                args['breadcrumbs'] = [_('Books'), _('Bookshelf')] 
                 
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
@@ -131,7 +128,7 @@ def SearchBooksView(request):
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
             books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('-docdate')
-            args['breadcrumbs'] = ['Books','Doubles for book',mbook.title]
+            args['breadcrumbs'] = [_('Books'),_('Doubles for book'),mbook.title]
             
         elif searchtype == 'i':
             try:
@@ -141,7 +138,7 @@ def SearchBooksView(request):
                 book_id = 0
                 btitle = ""
             books = Book.objects.filter(id=book_id)                 
-            args['breadcrumbs'] = ['Books',btitle]
+            args['breadcrumbs'] = [_('Books'),btitle]
         
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
         #if len(books)>0:
@@ -251,7 +248,7 @@ def SelectSeriesView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'series'
         args['current'] = 'search'        
-        args['breadcrumbs'] = ['Series','Search',searchterms]
+        args['breadcrumbs'] = [_('Series'),_('Search'),searchterms]
                                               
     return render(request,'sopds_series.html', args)
 
@@ -308,7 +305,7 @@ def SearchAuthorsView(request):
         args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
         args['searchobject'] = 'author'
         args['current'] = 'search'       
-        args['breadcrumbs'] = ['Authors','Search',searchterms]
+        args['breadcrumbs'] = [_('Authors'),_('Search'),searchterms]
                                     
     return render(request,'sopds_authors.html', args)
 
@@ -377,8 +374,8 @@ def CatalogsView(request):
         while (cat.parent):
             breadcrumbs_list.insert(0, cat.cat_name)
             cat = cat.parent
-        breadcrumbs_list.insert(0, 'ROOT')    
-    breadcrumbs_list.insert(0, 'Catalogs')     
+        breadcrumbs_list.insert(0, _('ROOT'))    
+    breadcrumbs_list.insert(0, _('Catalogs'))     
     args['breadcrumbs'] =  breadcrumbs_list  
       
     return render(request,'sopds_catalogs.html', args)  
@@ -412,7 +409,7 @@ def BooksView(request):
     args['items']=items
     args['current'] = 'book'      
     args['lang_code'] = lang_code   
-    args['breadcrumbs'] =  ['Books','Select',lang_menu[lang_code],chars]
+    args['breadcrumbs'] =  [_('Books'),_('Select'),lang_menu[lang_code],chars]
       
     return render(request,'sopds_selectbook.html', args)      
 
@@ -445,7 +442,7 @@ def AuthorsView(request):
     args['items']=items
     args['current'] = 'author'      
     args['lang_code'] = lang_code   
-    args['breadcrumbs'] =  ['Authors','Select',lang_menu[lang_code],chars]
+    args['breadcrumbs'] =  [_('Authors'),_('Select'),lang_menu[lang_code],chars]
       
     return render(request,'sopds_selectauthor.html', args)    
 
@@ -478,7 +475,7 @@ def SeriesView(request):
     args['items']=items
     args['current'] = 'series'      
     args['lang_code'] = lang_code   
-    args['breadcrumbs'] =  ['Series','Select',lang_menu[lang_code],chars]
+    args['breadcrumbs'] =  [_('Series'),_('Select'),lang_menu[lang_code],chars]
       
     return render(request,'sopds_selectseries.html', args)
 
@@ -492,11 +489,11 @@ def GenresView(request):
         
     if section_id==0:
         items = Genre.objects.values('section').annotate(section_id=Min('id'), num_book=Count('book')).filter(num_book__gt=0).order_by('section')
-        args['breadcrumbs'] =  ['Genres','Select']
+        args['breadcrumbs'] =  [_('Genres'),_('Select')]
     else:
         section = Genre.objects.get(id=section_id).section
         items = Genre.objects.filter(section=section).annotate(num_book=Count('book')).filter(num_book__gt=0).values().order_by('subsection')   
-        args['breadcrumbs'] =  ['Genres','Select',section]   
+        args['breadcrumbs'] =  [_('Genres'),_('Select'),section]   
           
     args['items']=items
     args['current'] = 'genre'  
@@ -506,5 +503,5 @@ def GenresView(request):
 
 def hello(request):
     args = {}
-    args['breadcrumbs'] = ['HOME']
+    args['breadcrumbs'] = [_('HOME')]
     return render(request, 'sopds_selectbook.html', args)

@@ -1,6 +1,8 @@
+{% load i18n %}
+
 <div class="row expanded callout secondary" style="margin:0; padding-top:0">
 <div class="large-4 columns" style="margin-top:1rem;">
-<h5><a href="{% url "web:searchbooks" %}?searchtype=u">BOOKSHELF</a></h5>
+<h5><a href="{% url "web:searchbooks" %}?searchtype=u">{% trans "BOOKSHELF" %}</a></h5>
 <div class="row small-up-4">
 {% for b in bookshelf %}
    <div class="column">
@@ -13,22 +15,22 @@
 </div>
 </div>
 <div class="large-4 columns" style="margin-top:1rem;">
-<h5>STATISTICS</h5>
+<h5>{% trans "STATISTICS" %}</h5>
 <p style="font-size:90%;">
-<b>This сatalog contains:</b> 
-<span class="label">{{ stats.allbooks }}</span> books, 
-<span class="label">{{ stats.allauthors }}</span> authors, 
-<span class="label">{{ stats.allgenres }}</span> genres  and 
-<span class="label">{{ stats.allseries }}</span> series.
+<b>{% trans "This сatalog contains:" %}</b> 
+<span class="label">{{ stats.allbooks }}</span> {% trans "books," %} 
+<span class="label">{{ stats.allauthors }}</span> {% trans "authors," %} 
+<span class="label">{{ stats.allgenres }}</span> {% trans "genres and" %} 
+<span class="label">{{ stats.allseries }}</span> {% trans "series." %}
 </p>
 <p style="font-size:90%;">
-<b>Last collection scan date:</b> 
+<b>{% trans "Last collection scan date:" %}</b> 
 <span class="label">{{ stats.lastscan_date }}</span> 
 </p>
 </div>
 <div class="large-4 columns" style="padding:0; margin-top:1rem;">
 	<div class="large-12 columns">
-		<h5>RANDOM BOOK</h5>	
+		<h5>{% trans "RANDOM BOOK" %}</h5>	
 	</div>
 	<div class="large-12 columns clearfix">    
 	{% if random_book %}
