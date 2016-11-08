@@ -5,7 +5,7 @@
 <table>
 {%  for s in series %}
 	<tr><td>
-			<b>{{ s.ser }}</b> <a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}"><span style="font-size:80%;">{% blocktrans with s_book_count=s.book_count %}Total: {{ s_book_count }} books.{% endblocktrans %}</span></a>
+			<a href="{% url "web:searchbooks" %}?searchtype=s&searchterms={{s.id}}"><b>{{ s.ser }}</b></a> <span style="font-size:80%;">{% blocktrans with s_book_count=s.book_count %}Total: {{ s_book_count }} books.{% endblocktrans %}</span>
 	</td></tr>		
 {% endfor %}
 </table>

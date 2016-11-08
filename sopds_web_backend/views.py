@@ -372,11 +372,11 @@ def CatalogsView(request):
     breadcrumbs_list = []
     if cat:
         while (cat.parent):
-            breadcrumbs_list.insert(0, cat.cat_name)
+            breadcrumbs_list.insert(0, (cat.cat_name, cat.id))
             cat = cat.parent
-        breadcrumbs_list.insert(0, _('ROOT'))    
-    breadcrumbs_list.insert(0, _('Catalogs'))     
-    args['breadcrumbs'] =  breadcrumbs_list  
+        breadcrumbs_list.insert(0, (_('ROOT'), 0))  
+    breadcrumbs_list.insert(0, (_('Catalogs'),-1))    
+    args['breadcrumbs_cat'] =  breadcrumbs_list  
       
     return render(request,'sopds_catalogs.html', args)  
 
