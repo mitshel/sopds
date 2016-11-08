@@ -265,11 +265,11 @@ def SearchAuthorsView(request):
         
         if searchtype == 'm':
             #concat(last_name,' ',first_name)
-            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper()])
+            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%%%s%%"%searchterms.upper()])
         elif searchtype == 'b':
-            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])  
+            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%s%%"%searchterms.upper()])  
         elif searchtype == 'e':
-            authors = Author.objects.extra(where=["upper(last_name)=%s"], params=["%s"%searchterms.upper()])   
+            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name))=%s"], params=["%s"%searchterms.upper()])   
             
         if len(authors)>0:
             authors = authors.order_by('last_name','first_name')   
@@ -425,16 +425,16 @@ def AuthorsView(request):
         
     length = len(chars)+1
     if lang_code:
-        sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_author 
-               where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%%%'
-               group by upper(substring(last_name,1,%(length)s)) 
+               where lang_code=%(lang_code)s and upper(concat(last_name,' ',first_name)) like '%(chars)s%%%%'
+               group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
                order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
     else:
-        sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
                from opds_catalog_author 
-               where upper(last_name) like '%(chars)s%%%%'
-               group by upper(substring(last_name,1,%(length)s)) 
+               where upper(concat(last_name,' ',first_name)) like '%(chars)s%%%%'
+               group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
                order by id"""%{'length':length,'chars':chars}
       
     items = Author.objects.raw(sql)

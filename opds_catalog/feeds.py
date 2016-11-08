@@ -118,7 +118,7 @@ class opdsFeed(Atom1Feed):
                                                      "type":"application/atom+xml;profile=opds-catalog", 
                                                      "title":_("All books by %(last_name)s %(first_name)s")%{"last_name":a['last_name'],"first_name":a['first_name']}})
                 handler.characters("\n")
-         
+                        
         if item.get("genres") is not None:       
             for g in item["genres"]:
                 handler.addQuickElement("category", "", {"term": g['subsection'], "label": g['subsection']})    
@@ -564,11 +564,11 @@ class SearchAuthorsFeed(AuthFeed):
 
         if searchtype == 'm':
             #concat(last_name,' ',first_name)
-            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%%%s%%"%searchterms.upper()])
+            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%%%s%%"%searchterms.upper()])
         elif searchtype == 'b':
-            authors = Author.objects.extra(where=["upper(last_name) like %s"], params=["%s%%"%searchterms.upper()])  
+            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%s%%"%searchterms.upper()])  
         elif searchtype == 'e':
-            authors = Author.objects.extra(where=["upper(last_name)=%s"], params=["%s"%searchterms.upper()])                       
+            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name))=%s"], params=["%s"%searchterms.upper()])                       
         return {"authors":authors, "searchterms":searchterms, "searchtype":searchtype, "page":page}
 
     def link(self, obj):
@@ -829,16 +829,16 @@ class AuthorsFeed(AuthFeed):
     def items(self, obj):
         length, chars = obj
         if self.lang_code:
-            sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
-                   where lang_code=%(lang_code)s and upper(last_name) like '%(chars)s%%%%'
-                   group by upper(substring(last_name,1,%(length)s)) 
+                   where lang_code=%(lang_code)s and upper(concat(last_name,' ',first_name)) like '%(chars)s%%%%'
+                   group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
                    order by id"""%{'length':length, 'lang_code':self.lang_code, 'chars':chars}
         else:
-            sql="""select %(length)s as l, upper(substring(last_name,1,%(length)s)) as id, count(*) as cnt 
+            sql="""select %(length)s as l, upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
                    from opds_catalog_author 
-                   where upper(last_name) like '%(chars)s%%%%'
-                   group by upper(substring(last_name,1,%(length)s)) 
+                   where upper(concat(last_name,' ',first_name)) like '%(chars)s%%%%'
+                   group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
                    order by id"""%{'length':length,'chars':chars}
           
         dataset = Author.objects.raw(sql)
