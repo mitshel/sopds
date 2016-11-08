@@ -71,10 +71,12 @@ def SearchBooksView(request):
         if searchtype == 'm':
             books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
             args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]
+            args['searchobject'] = 'title'
             
         if searchtype == 'b':
             books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]            
+            args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]   
+            args['searchobject'] = 'title'         
             
         elif searchtype == 'a':
             try:
@@ -85,7 +87,8 @@ def SearchBooksView(request):
                 author_id = 0
                 aname = ""                  
             books = Book.objects.filter(authors=author_id).order_by('title','-docdate')  
-            args['breadcrumbs'] = [_('Books'),_('Search by author'),aname]    
+            args['breadcrumbs'] = [_('Books'),_('Search by author'),aname]   
+            args['searchobject'] = 'author' 
             
         # Поиск книг по серии
         elif searchtype == 's':
@@ -97,6 +100,7 @@ def SearchBooksView(request):
                 ser = ""
             books = Book.objects.filter(series=ser_id).order_by('title','-docdate')    
             args['breadcrumbs'] = [_('Books'),_('Search by series'),ser]
+            args['searchobject'] = 'series'
             
         # Поиск книг по жанру
         elif searchtype == 'g':
@@ -110,8 +114,8 @@ def SearchBooksView(request):
                 args['breadcrumbs'] = [_('Books'),_('Search by genre')]
                 
             books = Book.objects.filter(genres=genre_id).order_by('title','-docdate') 
-                        
-            
+            args['searchobject'] = 'genre'
+                                   
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
             if AUTH:
@@ -121,6 +125,7 @@ def SearchBooksView(request):
             else:
                 books={}        
                 args['breadcrumbs'] = [_('Books'), _('Bookshelf')] 
+            args['searchobject'] = 'title'
                 
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
@@ -129,6 +134,7 @@ def SearchBooksView(request):
             mbook = Book.objects.get(id=book_id)
             books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('-docdate')
             args['breadcrumbs'] = [_('Books'),_('Doubles for book'),mbook.title]
+            args['searchobject'] = 'title'
             
         elif searchtype == 'i':
             try:
@@ -139,6 +145,7 @@ def SearchBooksView(request):
                 btitle = ""
             books = Book.objects.filter(id=book_id)                 
             args['breadcrumbs'] = [_('Books'),btitle]
+            args['searchobject'] = 'title'
         
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
         #if len(books)>0:
@@ -189,10 +196,8 @@ def SearchBooksView(request):
         args['searchterms']=searchterms;
         args['searchtype']=searchtype;
         args['books']=books
-        args['page_range']= [ i for i in range(firstpage,lastpage+1)]  
-        args['searchobject'] = 'title'   
+        args['page_range']= [ i for i in range(firstpage,lastpage+1)]     
         args['current'] = 'search'  
-
         
     return render(request,'sopds_books.html', args)
 
