@@ -639,11 +639,9 @@ class SearchSeriesFeed(AuthFeed):
         elif searchtype == 'a':
             try:
                 self.author_id = int(searchterms)
-                books = Book.objects.filter(authors=self.author_id)
             except:
-                books = None
-              
-            series = Series.objects.filter(book__in=books)                 
+                self.author_id = None
+            series = Series.objects.filter(book__authors=self.author_id).distinct()              
 
         return {"series":series, "searchterms":searchterms, "searchtype":searchtype, "page":page}
 
