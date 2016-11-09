@@ -1,0 +1,81 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<link rel="shortcut icon" type="image/icon" href="{% static "images/favicon.ico" %}"/>    
+    <title>{{ app_title }}</title>
+    <link rel="stylesheet" type="text/css" href="{% static "css/sopds.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "foundation-icons/foundation-icons.css" %}">   
+</head>
+
+<body>
+<div class="row"><div class="large-12 column">
+     {% include "sopds_top.html" %}
+</div></div>
+
+<div class="row"><div class="large-12 column">
+     {% include "sopds_logo.html" %}
+</div></div>
+
+<div class="row"><div class="large-12 column">
+     {% include "sopds_menu.html" %}
+</div></div>
+
+<div class="row"><div class="large-12 column">
+     {% include "sopds_breadcrumbs.html" %}
+</div></div>
+
+{% if system_message %}
+<div class="row"><div class="large-12 column">
+     {% include "sopds_messages.html" %}
+</div></div>
+{% endif %}
+
+{% if not user.is_authenticated %}
+<div class="row"><div class="large-12 column">
+    {# {% include "registration/login.html" %} #}
+</div></div>
+{% endif %}
+
+{% block content %}
+<div class="row"><div class="large-12 column">
+    {% block body %}
+
+    {% endblock %}  {# body #}
+</div></div>
+{% endblock %}  {# content #}
+
+
+<div class="row"><div class="large-12 column">
+      {% include "sopds_footer.html" %}
+</div></div>
+
+  <script src="{% static "js/vendor/jquery.js" %}"></script>
+  <script src="{% static "js/vendor/foundation.min.js" %}"></script>
+
+  <script>
+    $(document).foundation();   
+
+    SetSearch();  
+	Foundation.Abide.defaults.validators['check_search'] = 
+		function($el,required,parent) {
+		     if ($('#main_searchbox')[0].value.length < 3)          
+		            return false;
+		     return true;
+	  	};
+	function logout(to_url) {
+	    var out = window.location.href.replace(/:\/\//, '://log:out@');
+	
+	    jQuery.get(out).error(function() {
+	        window.location = to_url;
+	    });
+	}	  	    
+  </script>
+  
+
+ {% block block-js %}{% endblock %}
+</body>
+</html>

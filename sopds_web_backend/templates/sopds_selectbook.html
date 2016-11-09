@@ -1,0 +1,22 @@
+{% extends "sopds_main.html" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block body %}
+<table>
+{%  for chars in items %}
+<tr>
+	<td>
+	{% if chars.cnt >= splititems %}
+	   <a href="{% url "web:book" %}?lang={{lang_code}}&chars={{chars.id|urlencode|iriencode}}">{{ chars.id }}</a>
+	{% else %}
+	   <a href="{% url "web:searchbooks" %}?searchtype=b&searchterms={{chars.id|urlencode|iriencode}}">{{ chars.id }}</a>
+	{% endif %}
+	<span style="font-size:80%">{% blocktrans with chars_cnt=chars.cnt %}Total: {{ chars_cnt }} books.{% endblocktrans %}</span>
+	</td>
+</tr>		
+{% endfor %}
+</table>
+
+
+{% endblock %}  {# body #}

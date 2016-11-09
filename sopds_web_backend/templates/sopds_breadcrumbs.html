@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<nav aria-label="{% trans "You are here:" %}" role="navigation">
+  <ul class="breadcrumbs">
+    {% for b in breadcrumbs %}
+    <li>{{ b }}</li>
+    {% endfor %}
+    
+    {% for b in breadcrumbs_cat %}
+    <li>
+    {% if b.1 > 0 %}<a href="{% url "web:catalog" %}?cat={{b.1}}">{% endif %}
+    {% if b.1 == 0 %}<a href="{% url "web:catalog" %}">{% endif %}    
+    {{ b.0 }}
+    {% if b.1 >= 0 %}</a>{% endif %}    
+    </li>
+    {% endfor %}    
+  </ul>
+</nav>

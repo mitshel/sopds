@@ -1,0 +1,40 @@
+{% extends "sopds_main.html" %}
+{% load i18n %}
+
+{% block body %}
+<table>
+{%  for a in authors %}
+	<tr><td>
+		<a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}"><b>{{ a.last_name }} {{ a.first_name }}</b></a> <span style="font-size:80%;">{% blocktrans with a_book_count=a.book_count %}Total: {{ a_book_count }} books.{% endblocktrans %}</span>
+	</td></tr>		
+{% endfor %}
+</table>
+
+{% if authors.paginator.num_pages > 1 %}
+<ul class="pagination" role="navigation" aria-label="Pagination">
+  <li class="pagination-previous {% if not authors.has_previous %}disabled{%endif%}">
+      {% if authors.has_previous %}<a href="{% url "web:searchauthors" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{authors.previous_page_number}}" aria-label="Previous page"> {%endif%}
+         {% trans "Previous page" %}
+      {% if authors.has_previous %}</a>{%endif%}
+  </li>
+  
+  {% for pn in page_range %}
+     {% if authors.number == pn %}
+        <li class="current">{{pn}}</li>
+     {% else %}
+        <li><a href="{% url "web:searchauthors" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{pn}}" aria-label="Page {{pn}}">{{pn}}</a></li>
+     {% endif %}   
+        {# <li class="ellipsis" aria-hidden="true"></li> #}
+  {% endfor %}
+  
+  <li class="pagination-next" {% if not authors.has_next %}disabled{%endif%}>
+      {% if authors.has_next %}<a href="{% url "web:searchauthors" %}?searchtype={{searchtype}}&searchterms={{searchterms}}&page={{authors.next_page_number}}" aria-label="Next page">{%endif%}
+         {% trans "Next page" %}
+      {% if authors.has_next %}</a>{%endif%}
+  </li>
+</ul>
+{% else %}
+<div class="large-12 column"><p></p></div>
+{% endif %}
+
+{% endblock %}  {# body #}

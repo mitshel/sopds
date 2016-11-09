@@ -1,3 +1,0 @@
-#!/bin/bash
-
-echo "select count(*) as books, count(*)/((max(registerdate)-min(registerdate))/1000000/60) as books_min from books;" | mysql sopds

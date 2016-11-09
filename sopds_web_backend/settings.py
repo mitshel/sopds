@@ -1,0 +1,1 @@
+HALF_PAGES_LINKS = 3

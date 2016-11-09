@@ -1,0 +1,10 @@
+{% extends "sopds_main.html" %}
+
+{% block body %}
+{% if errormsg %}
+<div class="callout small alert">
+  <p>{{ errormsg }}</p>
+</div>
+{% endif %}		
+
+{% endblock %}  {# body #}

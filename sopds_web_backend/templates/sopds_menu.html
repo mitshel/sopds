@@ -1,0 +1,42 @@
+{% load i18n %}
+
+{% if not alphabet %}
+	<div id="main_menu">
+	  <ul class="menu sopdsmenu" style="font-size:100%;"> {# vertical medium-horizontal menu #}
+	    <li {% if current == "catalog" %} class="active" {% endif %}><a href="{% url "web:catalog" %}">{% trans "Catalogs" %}</a></li>
+	    <li {% if current == "book" %} class="active" {% endif %}><a href="{% url "web:book" %}?lang=0">{% trans "Books" %}</a></li>
+	    <li {% if current == "author" %} class="active" {% endif %}><a href="{% url "web:author" %}?lang=0">{% trans "Authors" %}</a></li>
+	    <li {% if current == "genre" %} class="active" {% endif %}><a href="{% url "web:genre" %}">{% trans "Genres" %}</a></li>
+	    <li {% if current == "series" %} class="active" {% endif %}><a href="{% url "web:series" %}?lang=0">{% trans "Series" %}</a></li>
+	  </ul>
+	</div>
+{% else %}
+	<div id="main_menu">
+	  <ul class="dropdown menu sopdsmenu" style="font-size:100%;" data-dropdown-menu data-close-on-click-inside="false">
+	    <li {% if current == "catalog" %} class="active" {% endif %}><a href="{% url "web:catalog" %}">{% trans "Catalogs" %}</a></li>
+	    <li {% if current == "book" %}class="active"{% endif %} ><a href="#">{% trans "Books" %}</a>
+	        <ul class="menu sopdsmenu">
+	        {% for key, value in lang_menu.items %}
+	            <li><a href="{% url "web:book" %}?lang={{ key }}">{{ value }}</a></li>
+	        {% endfor %}    
+	        </ul>
+	    </li>
+	    <li {% if current == "author" %} class="active" {% endif %}><a href="#">{% trans "Authors" %}</a>	    
+	        <ul class="menu sopdsmenu">
+	        {% for key, value in lang_menu.items %}
+	            <li><a href="{% url "web:author" %}?lang={{ key }}">{{ value }}</a></li>
+	        {% endfor %}  
+	        </ul>	    
+	    </li>
+	    <li {% if current == "genre" %} class="active" {% endif %}><a href="{% url "web:genre" %}">{% trans "Genres" %}</a>    
+	    </li>
+	    <li {% if current == "series" %} class="active" {% endif %}><a href="#">{% trans "Series" %}</a>
+	        <ul class="menu sopdsmenu">
+	        {% for key, value in lang_menu.items %}
+	            <li><a href="{% url "web:series" %}?lang={{ key }}">{{ value }}</a></li>
+	        {% endfor %}  
+	        </ul>	    
+	    </li>
+	  </ul>
+	</div>
+{% endif %}
