@@ -644,7 +644,6 @@ class SearchSeriesFeed(AuthFeed):
             series = Series.objects.filter(book__authors=self.author_id)
             
         series = series.annotate(count_book=Count('book')).distinct()  
-        print(series.query)  
         
         return {"series":series, "searchterms":searchterms, "searchtype":searchtype, "page":page}
     
