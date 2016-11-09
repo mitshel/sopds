@@ -4,7 +4,13 @@
 
 #### 1. Простая установка Simple OPDS (используем простую БД sqlite3)
 
-1.1 Зависимости.  
+1.1 Установка проекта  
+Загрузить архив с проектом можно с сайта www.sopds.ru, 
+либо из github.com следующей командой:
+
+	git clone git@github.com:mitshel/sopds.git
+
+1.2 Зависимости.  
 - Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3)  
 - Django 1.9 (для Python 3.3 необходимо устанавливать Django 1.8: https://code.djangoproject.com/ticket/25868)
 - Pillow 2.9.0
@@ -12,15 +18,9 @@
 
 Для работы проекта необходимо установить указанные  зависимости: 
 
-	yum install python3
+	yum install python3                   # команда установки для RedHad, Fedora, CentOS
 	pip install -r requirements.txt       # для Python 3.4 и выше
 	pip install -r requirements-p33.txt   # для Python 3.3
-
-1.2 Установка проекта  
-Загрузить архив с проектом можно с сайта www.sopds.ru, 
-либо из github.com следующей командой:
-
-	git clone git@github.com:mitshel/sopds.git
 
 1.3 Настраиваем ./sopds/settings.py (настройки в конце файла)
 
