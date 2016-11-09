@@ -24,6 +24,8 @@
 
 1.3 Настраиваем ./sopds/settings.py (настройки в конце файла)
 
+	LANGUAGE_CODE = 'ru-RU'
+	
 	SOPDS_ROOT_LIB = < Путь к каталогу с книгами >
 	SOPDS_AUTH = < False | True >
 	SOPDS_SCAN_SHED_MIN  = '0,12'
