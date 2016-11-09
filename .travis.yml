@@ -5,7 +5,7 @@ python:
     - 3.5
 
 install:
-    - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then travis_retry pip install -r requirements-p33.txt; fi
+    - if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then travis_retry pip install -r requirements.txt; fi
     - if [[ $TRAVIS_PYTHON_VERSION == '3.4' || $TRAVIS_PYTHON_VERSION == '3.5' ]]; then travis_retry pip install -r requirements.txt; fi
 
 script:
@@ -13,5 +13,5 @@ script:
 
 branches:
     only:
-        - v0.31-devel
+        - master
 
