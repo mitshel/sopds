@@ -6,14 +6,15 @@
 
 1.1 Зависимости.
 - Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3)  
-- Django 1.8
+- Django 1.9 (для Python 3.3 необхоимо устанавливать Django 1.8: https://code.djangoproject.com/ticket/25868)
 - Pillow 2.9.0
 - apscheduler 3.3.0
 
 Для работы проекта необходимо установить указанные  зависимости: 
 
 	yum install python3
-	pip install -r requirements.txt
+	pip install -r requirements.txt       # для Python 3.4 и выше
+	pip install -r requirements-p33.txt   # для Python 3.3
 
 1.2 Установка проекта
 Загрузить архив с проектом можно с сайта www.sopds.ru, 
