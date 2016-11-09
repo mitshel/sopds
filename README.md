@@ -8,7 +8,7 @@
 Загрузить архив с проектом можно с сайта www.sopds.ru, 
 либо из github.com следующей командой:
 
-	git clone git@github.com:mitshel/sopds.git
+	git clone https://github.com/mitshel/sopds.git
 
 1.2 Зависимости.  
 - Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3)  
