@@ -145,5 +145,5 @@ SOPDS_SCAN_SHED_HOUR ='0,12'
 #SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2toepub/unix_dist/fb2toepub')
 #SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2conv/fb2epub')
 #SOPDS_FB2TOMOBI = os.path.join(BASE_DIR,'convert/fb2conv/fb2mobi')
-SOPDS_FB2TOEPUB = os.path.join(BASE_DIR, 'convert\\fb2epub\\fb2epub.cmd' if sys.platform =='win32' else 'convert/fb2epub/fb2epub' )
+#SOPDS_FB2TOEPUB = os.path.join(BASE_DIR, 'convert\\fb2epub\\fb2epub.cmd' if sys.platform =='win32' else 'convert/fb2epub/fb2epub' )
 
