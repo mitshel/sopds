@@ -641,10 +641,13 @@ class SearchSeriesFeed(AuthFeed):
                 self.author_id = int(searchterms)
             except:
                 self.author_id = None
-            series = Series.objects.filter(book__authors=self.author_id).distinct()              
-
+            series = Series.objects.filter(book__authors=self.author_id)
+            
+        series = series.annotate(count_book=Count('book')).distinct()  
+        print(series.query)  
+        
         return {"series":series, "searchterms":searchterms, "searchtype":searchtype, "page":page}
-
+    
     def link(self, obj):
         return reverse("opds_catalog:searchseries", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]})
 
@@ -681,7 +684,9 @@ class SearchSeriesFeed(AuthFeed):
         return "%s"%(item.ser)
     
     def item_description(self, item):
-        return _("Books count: %s")%(Book.objects.filter(series=item.id).count())    
+        #count = Book.objects.filter(series=item.id).count()
+        count = item.count_book
+        return _("Books count: %s")%(count)    
 
     def item_guid(self, item):
         return "a:%s"%(item.id)
