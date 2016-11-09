@@ -1,7 +1,7 @@
 from random import randint
 from itertools import chain
 
-from django.shortcuts import render, render_to_response, redirect, Http404
+from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 from django.db.models import Count, Min

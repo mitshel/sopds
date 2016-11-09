@@ -312,11 +312,11 @@ class SearchTypesFeed(AuthFeed):
 
     def item_link(self, item):
         if item["id"] == 1:
-           return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"m", "searchterms":item["term"]})
+            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"m", "searchterms":item["term"]})
         elif item["id"] == 2:
-           return reverse("opds_catalog:searchauthors", kwargs={"searchtype":"m", "searchterms":item["term"]})
+            return reverse("opds_catalog:searchauthors", kwargs={"searchtype":"m", "searchterms":item["term"]})
         elif item["id"] == 3:
-           return reverse("opds_catalog:searchseries", kwargs={"searchtype":"m", "searchterms":item["term"]})
+            return reverse("opds_catalog:searchseries", kwargs={"searchtype":"m", "searchterms":item["term"]})
         return None
              
     def item_title(self, item):
@@ -529,11 +529,11 @@ class SelectSeriesFeed(AuthFeed):
 
     def item_link(self, item):
         if item["id"] == 1:
-           return reverse("opds_catalog:searchseries", kwargs={"searchtype":'a', "searchterms":item["author"]})
+            return reverse("opds_catalog:searchseries", kwargs={"searchtype":'a', "searchterms":item["author"]})
         elif item["id"] == 2:
-           return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"as", "searchterms":item["author"], "searchterms0":0})
+            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"as", "searchterms":item["author"], "searchterms0":0})
         elif item["id"] == 3:
-           return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'a', "searchterms":item["author"]})
+            return reverse("opds_catalog:searchbooks", kwargs={"searchtype":'a', "searchterms":item["author"]})
              
     def item_title(self, item):
         return item['title']
