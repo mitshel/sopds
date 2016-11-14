@@ -1,6 +1,7 @@
 import os
 
 from django.db.models import Q
+from django.utils.translation import ugettext as _
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
 
@@ -24,7 +25,7 @@ CMP_TITLE_AUTHORS=1
 ##########################################################################
 # разные константы
 #
-unknown_genre='Неизвестный жанр'
+unknown_genre=_('Unknown genre')
 
 
 def clear_all():
