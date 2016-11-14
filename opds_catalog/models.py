@@ -27,6 +27,7 @@ class Book(models.Model):
     #favorite = models.IntegerField(null=False, default=0)
     lang = models.CharField(max_length=16)
     title = models.CharField(max_length=256)
+    search_title = models.CharField(max_length=256, default=None)
     annotation = models.CharField(max_length=10000)
     #cover = models.CharField(max_length=32)
     #cover_type = models.CharField(max_length=32)
@@ -56,14 +57,16 @@ class Catalog(models.Model):
         ]
 
 class Author(models.Model):
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
+    #first_name = models.CharField(max_length=64)
+    #last_name = models.CharField(max_length=64)
+    full_name = models.CharField(db_index=True, max_length=128, default=None)
+    search_full_name = models.CharField(db_index=True, max_length=128, default=None)
     lang_code = models.IntegerField(db_index=True, null=False, default=9)
 
-    class Meta:
-        index_together = [
-            ["last_name", "first_name"],
-        ]
+    #class Meta:
+    #    index_together = [
+    #        ["last_name", "first_name"],
+    #    ]
 
 class bauthor(models.Model):
     book = models.ForeignKey('Book')
@@ -89,6 +92,7 @@ class bgenre(models.Model):
 
 class Series(models.Model):
     ser = models.CharField(db_index=True, max_length=80)
+    search_ser = models.CharField(db_index=True, max_length=80, default=None)
     lang_code = models.IntegerField(db_index=True, null=False, default=9)
 
 class bseries(models.Model):

@@ -141,7 +141,8 @@ class opdsScanner:
             l,f = a.split(',',1)
             last_name=l.strip(self.strip_symbols)
             first_name=f.strip(self.strip_symbols)
-            author=opdsdb.addauthor(first_name,last_name)
+            #author=opdsdb.addauthor(first_name,last_name)
+            author=opdsdb.addauthor("%s %s"%(last_name,first_name))
             opdsdb.addbauthor(book,author)
 
         for g in meta_data[inpx_parser.sGenre]:
@@ -157,7 +158,7 @@ class opdsScanner:
     def processinpx(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
         inpx_size = os.path.getsize(file)
-        if not settings.INPX_SKIP_UNCHANGED or opdsdb.inpx_changed(rel_file,inpx_size):
+        if settings.INPX_SKIP_UNCHANGED or opdsdb.inpx_changed(rel_file,inpx_size):
             self.logger.info('Start process INPX file = '+file)
             opdsdb.addcattree(rel_file, opdsdb.CAT_INPX, inpx_size)
             inpx = inpx_parser.Inpx(file, self.inpx_callback, self.inpskip_callback)       
@@ -246,7 +247,8 @@ class opdsScanner:
                     for l in self.fb2parser.author_last.getvalue():
                         last_name=l.strip(self.strip_symbols)
                         first_name=self.fb2parser.author_first.getvalue()[idx].strip(self.strip_symbols)
-                        author=opdsdb.addauthor(first_name,last_name)
+                        #author=opdsdb.addauthor(first_name,last_name)
+                        author=opdsdb.addauthor("%s %s"%(last_name,first_name))
                         opdsdb.addbauthor(book,author)
                         idx+=1
                     for l in self.fb2parser.genre.getvalue():

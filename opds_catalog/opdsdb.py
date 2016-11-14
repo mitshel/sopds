@@ -155,20 +155,32 @@ def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, ar
     format=exten[1:]
     format=format.lower()
     book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=format,
-                title=title,annotation=annotation,docdate=docdate,lang=lang,
+                title=title,search_title=title.upper(),annotation=annotation,docdate=docdate,lang=lang,
                 cat_type=archive,avail=2, lang_code=getlangcode(title))
     return book
 
-def findauthor(first_name,last_name):
+#def findauthor(first_name,last_name):
+#    try:
+#        author = Author.objects.filter(last_name=last_name, first_name=first_name)[:1]
+#    except Author.DoesNotExist:
+#        author = None
+#
+#    return author
+
+#def addauthor(first_name, last_name):
+#    author, created = Author.objects.get_or_create(last_name=last_name, first_name=first_name, lang_code=getlangcode(last_name))
+#    return author
+
+def findauthor(full_name):
     try:
-        author = Author.objects.filter(last_name=last_name, first_name=first_name)[:1]
+        author = Author.objects.filter(full_name=full_name)[:1]
     except Author.DoesNotExist:
         author = None
 
     return author
 
-def addauthor(first_name, last_name):
-    author, created = Author.objects.get_or_create(last_name=last_name, first_name=first_name, lang_code=getlangcode(last_name))
+def addauthor(full_name):
+    author, created = Author.objects.get_or_create(full_name=full_name, search_full_name=full_name.upper(), lang_code=getlangcode(full_name))
     return author
 
 def addbauthor(book, author):
@@ -186,7 +198,7 @@ def addbgenre(book, genre):
     #book.genres.add(genre)
 
 def addseries(ser):
-    series, created = Series.objects.get_or_create(ser=ser, lang_code=getlangcode(ser))
+    series, created = Series.objects.get_or_create(ser=ser, search_ser=ser.upper(), lang_code=getlangcode(ser))
     return series
 
 def addbseries(book, ser, ser_no):
