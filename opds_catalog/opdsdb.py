@@ -101,6 +101,20 @@ def arc_changed(arcpath,arcsize):
     # Здесь мы оказываемся если размеры архива в БД и в наличии разные, поэтому считаем что изменения в архиве есть     
     return 1
 
+def inpx_changed(arcpath,arcsize):
+    """
+       Выясняем изменялся ли INPX
+    """
+    catalog = findcat(arcpath)
+
+    if catalog == None:
+        return 1
+    
+    if arcsize != catalog.cat_size:
+        return 1
+      
+    return 0
+
 def findcat(cat_name):
     (head,tail)=os.path.split(cat_name)
     try:

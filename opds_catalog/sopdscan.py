@@ -10,6 +10,7 @@ import re
 
 from opds_catalog import fb2parse, settings, opdsdb
 from opds_catalog import inpx_parser
+from opds_catalog.settings import INPX_TEST_ZIP
 
 class opdsScanner:
     def __init__(self, logger=None):
@@ -100,7 +101,7 @@ class opdsScanner:
                     self.processfile(name,full_path,file,None,0,file_size)
                     
         opdsdb.commit()
-        
+
         if settings.DELETE_LOGICAL:
             self.books_deleted=opdsdb.books_del_logical()
         else:
@@ -113,11 +114,11 @@ class opdsScanner:
         self.rel_path=os.path.relpath(self.zip_file,settings.ROOT_LIB)            
         
         if opdsdb.arc_changed(self.zip_file,inp_size):
-            self.logger.debug('Start process ZIP for INP archive = '+self.zip_file) 
+            self.logger.info('Start process ZIP for INP archive = '+self.zip_file) 
             self.inp_cat = opdsdb.addcattree(self.rel_path, opdsdb.CAT_INP, inp_size)
             result = 0
         else:    
-            self.logger.debug('Skip ZIP for INP archive '+self.zip_file+'. Not changed.')
+            self.logger.info('Skip ZIP for INP archive '+self.zip_file+'. Not changed.')
             result = 1     
             
         return result
@@ -156,13 +157,15 @@ class opdsScanner:
     def processinpx(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
         inpx_size = os.path.getsize(file)
-        if opdsdb.arc_changed(rel_file,inpx_size):
-            self.logger.debug('Start process INPX file = '+file)
+        if not settings.INPX_SKIP_UNCHANGED or opdsdb.inpx_changed(rel_file,inpx_size):
+            self.logger.info('Start process INPX file = '+file)
             opdsdb.addcattree(rel_file, opdsdb.CAT_INPX, inpx_size)
-            inpx = inpx_parser.Inpx(file, self.inpx_callback, self.inpskip_callback)          
+            inpx = inpx_parser.Inpx(file, self.inpx_callback, self.inpskip_callback)       
+            inpx.INPX_TEST_ZIP = settings.INPX_TEST_ZIP  
+            inpx.INPX_TEST_FILES = settings.INPX_TEST_FILES 
             inpx.parse()
         else:
-            self.logger.debug('Skip INPX file = '+file+'. Not changed.')
+            self.logger.info('Skip INPX file = '+file+'. Not changed.')
 
     def processzip(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)

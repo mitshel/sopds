@@ -38,6 +38,7 @@ SCAN_SHED_HOUR = getattr(settings, "SOPDS_SCAN_SHED_HOUR", '0')
 SCAN_SHED_DAY = getattr(settings, "SOPDS_SCAN_SHED_DAY", '*')
 SCAN_SHED_DOW = getattr(settings, "SOPDS_SCAN_SHED_DOW", '*')
 INPX_ENABLE = getattr(settings, "SOPDS_INPX_ENABLE", True)
+INPX_SKIP_UNCHANGED = getattr(settings, "SOPDS_INPX_SKIP_UNCHANGED", True)
 INPX_TEST_ZIP = getattr(settings, "SOPDS_INPX_TEST_ZIP", False)
 INPX_TEST_FILES = getattr(settings, "SOPDS_TEST_FILES", False)
 
