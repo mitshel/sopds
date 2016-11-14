@@ -349,13 +349,16 @@ class SearchBooksFeed(AuthFeed):
         
         # Поиск книг по подсроке
         if  searchtype == 'm':
-            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            #books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__contains=searchterms.upper()).order_by('title','-docdate')
         # Поиск книг по начальной подстроке
         elif searchtype == 'b':
-            books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            #books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__startwith=searchterms.upper()).order_by('title','-docdate')
         # Поиск книг по точному совпадению наименования
         elif searchtype == 'e':
-            books = Book.objects.extra(where=["upper(title)=%s"], params=["%s"%searchterms.upper()]).order_by('title','-docdate')
+            #books = Book.objects.extra(where=["upper(title)=%s"], params=["%s"%searchterms.upper()]).order_by('title','-docdate')
+            books = Book.objects.filter(search_title=searchterms.upper()).order_by('title','-docdate')
         # Поиск книг по автору
         elif searchtype == 'a':
             try:

@@ -2,6 +2,7 @@ import os
 
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+from django.db import connection
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
 
@@ -180,7 +181,7 @@ def findauthor(full_name):
     return author
 
 def addauthor(full_name):
-    author, created = Author.objects.get_or_create(full_name=full_name, search_full_name=full_name.upper(), lang_code=getlangcode(full_name))
+    author, created = Author.objects.get_or_create(full_name=full_name, defaults={'search_full_name':full_name.upper(), 'lang_code':getlangcode(full_name)})
     return author
 
 def addbauthor(book, author):
@@ -198,7 +199,7 @@ def addbgenre(book, genre):
     #book.genres.add(genre)
 
 def addseries(ser):
-    series, created = Series.objects.get_or_create(ser=ser, search_ser=ser.upper(), lang_code=getlangcode(ser))
+    series, created = Series.objects.get_or_create(ser=ser, defaults={'search_ser':ser.upper(), 'lang_code':getlangcode(ser)})
     return series
 
 def addbseries(book, ser, ser_no):

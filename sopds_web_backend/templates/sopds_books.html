@@ -24,7 +24,7 @@
 			<td style="font-size:80%; padding:1rem 1rem;">
 				<b>{% trans "Book title:" %}</b> {{ b.title }} <br>
 				{% if b.authors.count > 0 %}
-				   <b>{% trans "Authors:" %}</b>{% for a in b.authors %} <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}">{{a.last_name}} {{a.first_name}}</a>{% if not forloop.last %},{%endif%} {%endfor%}<br>
+				   <b>{% trans "Authors:" %}</b>{% for a in b.authors %} <a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}">{{a.full_name}}</a>{% if not forloop.last %},{%endif%} {%endfor%}<br>
 				{% endif %}
 				{% if b.genres.count > 0 %}
 				   <b>{% trans "Genres" %}</b>{% for g in b.genres %} <a href="{% url "web:searchbooks" %}?searchtype=g&searchterms={{g.id}}">{{g.subsection}}</a>{% if not forloop.last %},{%endif%} {%endfor%} <br>

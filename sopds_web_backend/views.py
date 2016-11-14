@@ -69,12 +69,14 @@ def SearchBooksView(request):
         #    return render_to_response('sopds_error.html', args)
         
         if searchtype == 'm':
-            books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            #books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__contains=searchterms.upper()).order_by('title','-docdate')
             args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]
             args['searchobject'] = 'title'
             
         if searchtype == 'b':
-            books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            #books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__startswith=searchterms.upper()).order_by('title','-docdate')
             args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]   
             args['searchobject'] = 'title'         
             
@@ -82,7 +84,8 @@ def SearchBooksView(request):
             try:
                 author_id = int(searchterms)
                 author = Author.objects.get(id=author_id)
-                aname = "%s %s"%(author.last_name,author.first_name)
+                #aname = "%s %s"%(author.last_name,author.first_name)
+                aname = author.full_name
             except:
                 author_id = 0
                 aname = ""                  
@@ -213,11 +216,14 @@ def SelectSeriesView(request):
         page_num = int(request.GET.get('page', '1'))
         
         if searchtype == 'm':
-            series = Series.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
+            #series = Series.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
+            series = Series.objects.filter(search_ser__contains=searchterms.upper())
         elif searchtype == 'b':
-            series = Series.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()]) 
+            #series = Series.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()]) 
+            series = Series.objects.filter(search_ser__startswith=searchterms.upper())
         elif searchtype == 'e':
-            series = Series.objects.extra(where=["upper(ser)=%s"], params=["%s"%searchterms.upper()])         
+            #series = Series.objects.extra(where=["upper(ser)=%s"], params=["%s"%searchterms.upper()])   
+            series = Series.objects.filter(search_ser=searchterms.upper())      
 
         if len(series)>0:
             series = series.order_by('ser')   
@@ -270,19 +276,22 @@ def SearchAuthorsView(request):
         
         if searchtype == 'm':
             #concat(last_name,' ',first_name)
-            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%%%s%%"%searchterms.upper()])
+            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%%%s%%"%searchterms.upper()])
+            authors = Author.objects.filter(search_full_name__contains=searchterms.upper())
         elif searchtype == 'b':
-            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%s%%"%searchterms.upper()])  
+            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%s%%"%searchterms.upper()]) 
+            authors = Author.objects.filter(search_full_name__startswith=searchterms.upper()) 
         elif searchtype == 'e':
-            authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name))=%s"], params=["%s"%searchterms.upper()])   
+            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name))=%s"], params=["%s"%searchterms.upper()])   
+            authors = Author.objects.filter(search_full_name=searchterms.upper()) 
             
         if len(authors)>0:
-            authors = authors.order_by('last_name','first_name')   
+            authors = authors.order_by('full_name')   
             
         # Создаем результирующее множество
         result = []
         for row in authors:
-            p = {'id':row.id, 'last_name':row.last_name, 'first_name': row.first_name, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(authors=row).count()}
+            p = {'id':row.id, 'full_name':row.full_name, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(authors=row).count()}
             result.append(p)                     
             
         p = Paginator(result, MAXITEMS)
@@ -397,16 +406,16 @@ def BooksView(request):
         
     length = len(chars)+1
     if lang_code:
-        sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, substring(search_title,1,%(length)s) as id, count(*) as cnt 
                from opds_catalog_book 
-               where lang_code=%(lang_code)s and upper(title) like '%(chars)s%%%%'
-               group by upper(substring(title,1,%(length)s)) 
+               where lang_code=%(lang_code)s and search_title like '%(chars)s%%%%'
+               group by substring(search_title,1,%(length)s) 
                order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
     else:
-        sql="""select %(length)s as l, upper(substring(title,1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, substring(search_title,1,%(length)s) as id, count(*) as cnt 
                from opds_catalog_book 
-               where upper(title) like '%(chars)s%%%%'
-               group by upper(substring(title,1,%(length)s)) 
+               where search_title like '%(chars)s%%%%'
+               group by substring(search_title,1,%(length)s) 
                order by id"""%{'length':length,'chars':chars}
       
     items = Book.objects.raw(sql)
@@ -430,16 +439,16 @@ def AuthorsView(request):
         
     length = len(chars)+1
     if lang_code:
-        sql="""select %(length)s as l, upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, substring(search_full_name,1,%(length)s) as id, count(*) as cnt 
                from opds_catalog_author 
-               where lang_code=%(lang_code)s and upper(concat(last_name,' ',first_name)) like '%(chars)s%%%%'
-               group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
+               where lang_code=%(lang_code)s and search_full_name like '%(chars)s%%%%'
+               group by substring(search_full_name,1,%(length)s) 
                order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
     else:
-        sql="""select %(length)s as l, upper(substring(concat(last_name,' ',first_name),1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, substring(search_full_name,1,%(length)s) as id, count(*) as cnt 
                from opds_catalog_author 
-               where upper(concat(last_name,' ',first_name)) like '%(chars)s%%%%'
-               group by upper(substring(concat(last_name,' ',first_name),1,%(length)s)) 
+               where search_full_name like '%(chars)s%%%%'
+               group by substring(search_full_name,1,%(length)s) 
                order by id"""%{'length':length,'chars':chars}
       
     items = Author.objects.raw(sql)
@@ -463,16 +472,16 @@ def SeriesView(request):
         
     length = len(chars)+1
     if lang_code:
-        sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, substring(search_ser,1,%(length)s) as id, count(*) as cnt 
                from opds_catalog_series 
-               where lang_code=%(lang_code)s and upper(ser) like '%(chars)s%%%%'
-               group by upper(substring(ser,1,%(length)s)) 
+               where lang_code=%(lang_code)s and search_ser like '%(chars)s%%%%'
+               group by substring(search_ser,1,%(length)s)
                order by id"""%{'length':length, 'lang_code':lang_code, 'chars':chars}
     else:
-        sql="""select %(length)s as l, upper(substring(ser,1,%(length)s)) as id, count(*) as cnt 
+        sql="""select %(length)s as l, substring(search_ser,1,%(length)s) as id, count(*) as cnt 
                from opds_catalog_series 
-               where upper(ser) like '%(chars)s%%%%'
-               group by upper(substring(ser,1,%(length)s)) 
+               where search_ser like '%(chars)s%%%%'
+               group by substring(search_ser,1,%(length)s) 
                order by id"""%{'length':length,'chars':chars}
       
     items = Series.objects.raw(sql)

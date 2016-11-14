@@ -5,7 +5,7 @@
 <table>
 {%  for a in authors %}
 	<tr><td>
-		<a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}"><b>{{ a.last_name }} {{ a.first_name }}</b></a> <span style="font-size:80%;">{% blocktrans with a_book_count=a.book_count %}Total: {{ a_book_count }} books.{% endblocktrans %}</span>
+		<a href="{% url "web:searchbooks" %}?searchtype=a&searchterms={{a.id}}"><b>{{ a.full_name }}</b></a> <span style="font-size:80%;">{% blocktrans with a_book_count=a.book_count %}Total: {{ a_book_count }} books.{% endblocktrans %}</span>
 	</td></tr>		
 {% endfor %}
 </table>

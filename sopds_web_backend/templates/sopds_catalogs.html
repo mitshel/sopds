@@ -25,7 +25,7 @@
 	<a href="{% url "web:searchbooks" %}?searchtype=i&searchterms={{b.id}}"> 
 	{{ b.title }} 
 	{% if b.authors.count > 0 %}
-	   ({% for a in b.authors %}{{a.last_name}} {{a.first_name}}{% if not forloop.last %},{%endif%}{%endfor%})
+	   ({% for a in b.authors %}{{a.full_name}}{% if not forloop.last %}, {%endif%}{%endfor%})
 	{% endif %}
 	</a>
 	</td>
