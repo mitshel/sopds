@@ -3,17 +3,20 @@
 import os
 import time
 import datetime
-import base64
 import opds_catalog.zipf as zipfile
 import logging
+import re
+
 
 from opds_catalog import fb2parse, settings, opdsdb
-
+from opds_catalog import inpx_parser
 
 class opdsScanner:
     def __init__(self, logger=None):
         self.fb2parser=None
         self.init_parser()
+        self.strip_symbols = ' »«\'\"\&\n-.#\\\`'
+        self.max_annotation =  10000
 
         if logger:
             self.logger = logger
@@ -69,10 +72,23 @@ class opdsScanner:
     def scan_all(self):
         self.init_stats()
         self.log_options()
+        self.inp_cat = None
+        self.zip_file = None
+        self.rel_path = None         
 
         opdsdb.avail_check_prepare()
 
         for full_path, dirs, files in os.walk(settings.ROOT_LIB, followlinks=True):
+            # Если разрешена обработка inpx, то при нахождении inpx обрабатываем его и прекращаем обработку текущего каталога
+            if settings.INPX_ENABLE:
+                inpx_files = [inpx for inpx in files if re.match('.*(.inpx|.INPX)$', inpx)]
+                # Пропускаем обработку файлов в текущем каталоге, если найдены inpx
+                if inpx_files:
+                    for inpx_file in inpx_files:
+                        file = os.path.join(full_path, inpx_file)
+                        self.processinpx(inpx_file, full_path, file)
+                    continue
+                
             for name in files:
                 file=os.path.join(full_path,name)
                 (n,e)=os.path.splitext(name)
@@ -86,24 +102,82 @@ class opdsScanner:
         opdsdb.commit()
         
         if settings.DELETE_LOGICAL:
-           self.books_deleted=opdsdb.books_del_logical()
+            self.books_deleted=opdsdb.books_del_logical()
         else:
-           self.books_deleted=opdsdb.books_del_phisical()
+            self.books_deleted=opdsdb.books_del_phisical()
         self.log_stats()
+
+    def inpskip_callback(self, inpx, inp_name, inp_size):
+        
+        self.zip_file = os.path.join(inpx,"%s%s"%(inp_name,'.zip'))
+        self.rel_path=os.path.relpath(self.zip_file,settings.ROOT_LIB)            
+        
+        if opdsdb.arc_changed(self.zip_file,inp_size):
+            self.logger.debug('Start process ZIP for INP archive = '+self.zip_file) 
+            self.inp_cat = opdsdb.addcattree(self.rel_path, opdsdb.CAT_INP, inp_size)
+            result = 0
+        else:    
+            self.logger.debug('Skip ZIP for INP archive '+self.zip_file+'. Not changed.')
+            result = 1     
+            
+        return result
+                
+    def inpx_callback(self, inpx, inp, meta_data):          
+                    
+        name = "%s.%s"%(meta_data[inpx_parser.sFile],meta_data[inpx_parser.sExt])
+        
+        lang=meta_data[inpx_parser.sLang].strip(self.strip_symbols)
+        title=meta_data[inpx_parser.sTitle].strip(self.strip_symbols)
+        annotation=''
+        docdate=meta_data[inpx_parser.sDate].strip(self.strip_symbols)
+        
+        book=opdsdb.addbook(name,self.rel_path,self.inp_cat,meta_data[inpx_parser.sExt],title,annotation,docdate,lang,meta_data[inpx_parser.sSize],opdsdb.CAT_INP)
+        self.books_added+=1
+        self.books_in_archives+=1
+        self.logger.debug("Book "+self.rel_path+"/"+name+" Added ok.")    
+        
+        for a in meta_data[inpx_parser.sAuthor]:
+            l,f = a.split(',',1)
+            last_name=l.strip(self.strip_symbols)
+            first_name=f.strip(self.strip_symbols)
+            author=opdsdb.addauthor(first_name,last_name)
+            opdsdb.addbauthor(book,author)
+
+        for g in meta_data[inpx_parser.sGenre]:
+            opdsdb.addbgenre(book,opdsdb.addgenre(g.lower().strip(self.strip_symbols)))
+            
+        for s in meta_data[inpx_parser.sSeries]:
+            ser=opdsdb.addseries(s.strip())
+            opdsdb.addbseries(book,ser,0)        
+
+        if not settings.SINGLE_COMMIT: 
+            opdsdb.commit()                  
+                   
+    def processinpx(self,name,full_path,file):
+        rel_file=os.path.relpath(file,settings.ROOT_LIB)
+        inpx_size = os.path.getsize(file)
+        if opdsdb.arc_changed(rel_file,inpx_size):
+            self.logger.debug('Start process INPX file = '+file)
+            opdsdb.addcattree(rel_file, opdsdb.CAT_INPX, inpx_size)
+            inpx = inpx_parser.Inpx(file, self.inpx_callback, self.inpskip_callback)          
+            inpx.parse()
+        else:
+            self.logger.debug('Skip INPX file = '+file+'. Not changed.')
 
     def processzip(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
-        if settings.ZIPRESCAN or (not opdsdb.zipisscanned(rel_file,1)):
+        zsize = os.path.getsize(file)
+        if opdsdb.arc_changed(rel_file,zsize):
             zip_process_error = 0
             try:
                 z = zipfile.ZipFile(file, 'r', allowZip64=True)
                 filelist = z.namelist()
-                cat = opdsdb.addcattree(rel_file, 1)
+                cat = opdsdb.addcattree(rel_file, opdsdb.CAT_ZIP, zsize)
                 for n in filelist:
                     try:
                         self.logger.debug('Start process ZIP file = '+file+' book file = '+n)
                         file_size=z.getinfo(n).file_size
-                        self.processfile(n,file,z.open(n),cat,1,file_size)
+                        self.processfile(n,file,z.open(n),cat,opdsdb.CAT_ZIP,file_size)
                     except zipfile.BadZipFile:
                         self.logger.warning('Error processing ZIP file = '+file+' book file = '+n)
                         zip_process_error = 1
@@ -122,10 +196,6 @@ class opdsScanner:
         if e.lower() in settings.BOOK_EXTENSIONS:
             rel_path=os.path.relpath(full_path,settings.ROOT_LIB)
             self.logger.debug("Attempt to add book "+rel_path+"/"+name)
-            #self.logger.debug("   full_path = "+full_path)
-            #self.logger.debug("   settings.ROOT_LIB = "+settings.ROOT_LIB)
-            #self.logger.debug("   rel_path = "+rel_path)
-
             self.fb2parser.reset()
             if opdsdb.findbook(name,rel_path,1)==None:
                 if archive==0:
@@ -145,11 +215,11 @@ class opdsScanner:
                     f.close()
 
                     if len(self.fb2parser.lang.getvalue())>0:
-                        lang=self.fb2parser.lang.getvalue()[0].strip(' \'\"')
+                        lang=self.fb2parser.lang.getvalue()[0].strip(self.strip_symbols)
                     if len(self.fb2parser.book_title.getvalue())>0:
-                        title=self.fb2parser.book_title.getvalue()[0].strip(' »«\'\"\&\n-.#\\\`')
+                        title=self.fb2parser.book_title.getvalue()[0].strip(self.strip_symbols)
                     if len(self.fb2parser.annotation.getvalue())>0:
-                        annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:10000]
+                        annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:self.max_annotation]
                     if len(self.fb2parser.docdate.getvalue())>0:
                         docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
@@ -160,38 +230,38 @@ class opdsScanner:
                         self.bad_books+=1
 
                 if book_is_valid:
-                   if title=='': title=n
+                    if title=='': title=n
 
-                   book=opdsdb.addbook(name,rel_path,cat,e,title,annotation,docdate,lang,file_size,archive)
-                   self.books_added+=1
+                    book=opdsdb.addbook(name,rel_path,cat,e,title,annotation,docdate,lang,file_size,archive)
+                    self.books_added+=1
 
-                   if archive==1:
-                      self.books_in_archives+=1
-                   self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
+                    if archive!=0:
+                        self.books_in_archives+=1
+                    self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
 
-                   idx=0
-                   for l in self.fb2parser.author_last.getvalue():
-                       last_name=l.strip(' \n\'\"\&-.#\\\`')
-                       first_name=self.fb2parser.author_first.getvalue()[idx].strip(' \n\'\"\&-.#\\\`')
-                       author=opdsdb.addauthor(first_name,last_name)
-                       opdsdb.addbauthor(book,author)
-                       idx+=1
-                   for l in self.fb2parser.genre.getvalue():
-                       opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(' \n\'\"')))
-                   for l in self.fb2parser.series.attrss:
-                       ser_name=l.get('name')
-                       if ser_name:
-                          ser=opdsdb.addseries(ser_name.strip())
-                          sser_no=l.get('number','0').strip()
-                          if sser_no.isdigit():
-                             ser_no=int(sser_no)
-                          else:
-                             ser_no=0
-                          opdsdb.addbseries(book,ser,ser_no)
+                    idx=0
+                    for l in self.fb2parser.author_last.getvalue():
+                        last_name=l.strip(self.strip_symbols)
+                        first_name=self.fb2parser.author_first.getvalue()[idx].strip(self.strip_symbols)
+                        author=opdsdb.addauthor(first_name,last_name)
+                        opdsdb.addbauthor(book,author)
+                        idx+=1
+                    for l in self.fb2parser.genre.getvalue():
+                        opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(self.strip_symbols)))
+                    for l in self.fb2parser.series.attrss:
+                        ser_name=l.get('name')
+                        if ser_name:
+                            ser=opdsdb.addseries(ser_name.strip())
+                            sser_no=l.get('number','0').strip()
+                            if sser_no.isdigit():
+                                ser_no=int(sser_no)
+                            else:
+                                ser_no=0
+                            opdsdb.addbseries(book,ser,ser_no)
                           
                 if not settings.SINGLE_COMMIT: 
                     opdsdb.commit()
 
             else:
-               self.books_skipped+=1
-               self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
+                self.books_skipped+=1
+                self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")

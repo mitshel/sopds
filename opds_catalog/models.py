@@ -48,6 +48,7 @@ class Catalog(models.Model):
     cat_name = models.CharField(max_length=128)
     path = models.CharField(max_length=1024)
     cat_type = models.IntegerField(null=False, default=0)
+    cat_size = models.IntegerField(null=True, default=0)
 
     class Meta:
         index_together = [

@@ -10,9 +10,14 @@
 {% if b.is_catalog == 1 %}
     {% if b.cat_type == 0 %}
 		<td width="80px" style="padding:0rem 0rem;"><img src="{% static "images/folder.png" %}" width="32px"></td>
-	{% else %}
-	    <td width="80px" style="padding:0rem 0rem;"><img src="{% static "images/zip.png" %}" width="32px"></td>
 	{% endif %}	
+    {% if b.cat_type == 1 or b.cat_type == 3 %}
+	    <td width="80px" style="padding:0rem 0rem;"><img src="{% static "images/zip.png" %}" width="32px"></td>
+	{% endif %}
+    {% if b.cat_type == 2 %}
+	    <td width="80px" style="padding:0rem 0rem;"><img src="{% static "images/inpx.png" %}" width="32px"></td>
+	{% endif %}			
+		    	
 	<td> <a href="{% url "web:catalog" %}?cat={{b.id}}">{{ b.title }}</a> </td>
 {% else %}
 	<td width="80px" style="padding:0rem 0rem;"><img src="{% static "images/text.png" %}" width="32px"><span class="success label">{{ b.format }}</span></td>

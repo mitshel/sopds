@@ -10,7 +10,8 @@ from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, b
 #
 CAT_NORMAL=0
 CAT_ZIP=1
-CAT_GZ=2
+CAT_INPX=2
+CAT_INP=3
 
 ##########################################################################
 # Как будем искать дубликаты
@@ -73,9 +74,32 @@ def books_del_phisical():
     # sql='delete from '+TBL_BGENRES+' where book_id in (select book_id from '+TBL_BOOKS+' where avail<=1)'
     return row_count
 
-def zipisscanned(zipname,setavail=0):
+def zipisscanned(zipname):
     row_count = Book.objects.filter(path=zipname).update(avail=2)
     return row_count
+
+
+def arc_changed(arcpath,arcsize):
+    """
+       Выясняем изменялся ли архив (ZIP или INP-файл)
+    """
+    catalog = findcat(arcpath)
+    
+    # Если такого каталога еще нет в БД, то значит считаем что ZIP изменен
+    if catalog == None:
+        return 1
+    
+    # Если каталог в БД найден и его размер совпадает с текущим, то считаем что файл архива не менялся
+    # Поэтому делаем update всех книг из этого архива, однако если ни одного изменения не произошло, то
+    # таких книг нет, поэтому видимо нужно пересканировать архив
+    if arcsize == catalog.cat_size:
+        row_count = Book.objects.filter(path=arcpath).update(avail=2)
+        if row_count == 0:
+            return 1 
+        return 0
+    
+    # Здесь мы оказываемся если размеры архива в БД и в наличии разные, поэтому считаем что изменения в архиве есть     
+    return 1
 
 def findcat(cat_name):
     (head,tail)=os.path.split(cat_name)
@@ -86,7 +110,7 @@ def findcat(cat_name):
 
     return catalog
 
-def addcattree(cat_name, archive=0):
+def addcattree(cat_name, archive=0, size = 0):
     catalog = findcat(cat_name)
     if catalog:
         return catalog
@@ -94,7 +118,7 @@ def addcattree(cat_name, archive=0):
         return Catalog.objects.get_or_create(parent=None, cat_name=".", path=".", cat_type=0)[0]
     (head,tail)=os.path.split(cat_name)
     parent=addcattree(head)
-    new_cat = Catalog.objects.create(parent=parent, cat_name=tail, path=cat_name, cat_type=archive)
+    new_cat = Catalog.objects.create(parent=parent, cat_name=tail, path=cat_name, cat_type=archive, cat_size=size)
 
     return new_cat
 
