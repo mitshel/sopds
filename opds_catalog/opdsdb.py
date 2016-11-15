@@ -2,7 +2,6 @@ import os
 
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from django.db import connection
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
 
@@ -142,21 +141,19 @@ def findbook(name, path, setavail=0):
     # а книга была восстановлена в своем старом месте
     # то произойдет восстановление записи об этой книги а не добавится новая
     try:
-       book = Book.objects.get(filename=name, path=path)
+        book = Book.objects.get(filename=name, path=path)
     except Book.DoesNotExist:
-       book = None
+        book = None
 
     if book and setavail:
-       book.avail=2
-       book.save()
+        book.avail=2
+        book.save()
 
     return book
 
 def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, archive=0):
-    format=exten[1:]
-    format=format.lower()
-    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=format,
-                title=title,search_title=title.upper(),annotation=annotation,docdate=docdate,lang=lang,
+    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=exten[:8],
+                title=title[:256],search_title=title.upper()[:256],annotation=annotation[:10000],docdate=docdate[:32],lang=lang[:16],
                 cat_type=archive,avail=2, lang_code=getlangcode(title))
     return book
 
@@ -174,32 +171,30 @@ def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, ar
 
 def findauthor(full_name):
     try:
-        author = Author.objects.filter(full_name=full_name)[:1]
+        author = Author.objects.filter(full_name=full_name[:128])[:1]
     except Author.DoesNotExist:
         author = None
 
     return author
 
 def addauthor(full_name):
-    author, created = Author.objects.get_or_create(full_name=full_name, defaults={'search_full_name':full_name.upper(), 'lang_code':getlangcode(full_name)})
+    author, created = Author.objects.get_or_create(full_name=full_name[:128], defaults={'search_full_name':full_name.upper()[:128], 'lang_code':getlangcode(full_name)})
     return author
 
 def addbauthor(book, author):
     ba = bauthor(book=book, author=author)
     ba.save()
-    #book.authors.add(author)
 
 def addgenre(genre):
-    genre, created = Genre.objects.get_or_create(genre=genre, defaults={'section':unknown_genre, 'subsection':genre})
+    genre, created = Genre.objects.get_or_create(genre=genre[:32], defaults={'section':unknown_genre, 'subsection':genre[:100]})
     return genre
 
 def addbgenre(book, genre):
     bg = bgenre(book=book, genre=genre)
     bg.save()
-    #book.genres.add(genre)
 
 def addseries(ser):
-    series, created = Series.objects.get_or_create(ser=ser, defaults={'search_ser':ser.upper(), 'lang_code':getlangcode(ser)})
+    series, created = Series.objects.get_or_create(ser=ser[:80], defaults={'search_ser':ser.upper()[:80], 'lang_code':getlangcode(ser)})
     return series
 
 def addbseries(book, ser, ser_no):
