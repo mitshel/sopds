@@ -20,12 +20,19 @@ def Download(request, book_id, zip_flag):
         bookshelf.objects.get_or_create(user=request.user, book=book)
 
     full_path=os.path.join(settings.ROOT_LIB,book.path)
+    
+    if book.cat_type==opdsdb.CAT_INP:
+        # Убираем из пути INPX файл
+        inpx_path, zip_name = os.path.split(full_path)
+        path, inpx_file = os.path.split(inpx_path)
+        full_path = os.path.join(path,zip_name)
+        
     if settings.TITLE_AS_FILENAME:
         transname=utils.translit(book.title+'.'+book.format)
     else:
         transname=utils.translit(book.filename)
         
-    if zip_flag=='1':
+    if zip_flag == 1:
         dlfilename=transname+'.zip'   
         content_type='application/zip' 
     else:    
@@ -53,7 +60,7 @@ def Download(request, book_id, zip_flag):
         book_size=os.path.getsize(file_path)
         fo=codecs.open(file_path, "rb")
         s=fo.read()
-    elif book.cat_type==opdsdb.CAT_ZIP:
+    elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
         fz=codecs.open(full_path, "rb")
         z = zipfile.ZipFile(fz, 'r', allowZip64=True)
         book_size=z.getinfo(book.filename).file_size
@@ -83,15 +90,21 @@ def Cover(request, book_id):
     book = Book.objects.get(id=book_id)
     response = HttpResponse()
     c0=0
-    if book.format=='fb2':
-        full_path=os.path.join(settings.ROOT_LIB,book.path)
+    full_path=os.path.join(settings.ROOT_LIB,book.path)
+    if book.cat_type==opdsdb.CAT_INP:
+        # Убираем из пути INPX файл
+        inpx_path, zip_name = os.path.split(full_path)
+        path, inpx_file = os.path.split(inpx_path)
+        full_path = os.path.join(path,zip_name)   
+         
+    if book.format=='fb2':        
         fb2=fb2parse.fb2parser(1)
         if book.cat_type==opdsdb.CAT_NORMAL:
             file_path=os.path.join(full_path,book.filename)
             fo=codecs.open(file_path, "rb")
             fb2.parse(fo,0)
             fo.close()
-        elif book.cat_type==opdsdb.CAT_ZIP:
+        elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
             fz=codecs.open(full_path, "rb")
             z = zipfile.ZipFile(fz, 'r', allowZip64=True)
             fo = z.open(book.filename)
@@ -132,6 +145,12 @@ def ConvertFB2(request, book_id, convert_type):
         bookshelf.objects.get_or_create(user=request.user, book=book)
 
     full_path=os.path.join(settings.ROOT_LIB,book.path)
+    if book.cat_type==opdsdb.CAT_INP:
+        # Убираем из пути INPX файл
+        inpx_path, zip_name = os.path.split(full_path)
+        path, inpx_file = os.path.split(inpx_path)
+        full_path = os.path.join(path,zip_name)  
+            
     if settings.TITLE_AS_FILENAME:
         transname=utils.translit(book.title+'.'+book.format)
     else:
@@ -151,7 +170,7 @@ def ConvertFB2(request, book_id, convert_type):
     if book.cat_type==opdsdb.CAT_NORMAL:
         tmp_fb2_path=None
         file_path=os.path.join(full_path, book.filename)
-    elif book.cat_type==opdsdb.CAT_ZIP:
+    elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
         fz=codecs.open(full_path, "rb")
         z = zipfile.ZipFile(fz, 'r', allowZip64=True)
         z.extract(book.filename,settings.TEMP_DIR)

@@ -151,8 +151,9 @@ def findbook(name, path, setavail=0):
 
     return book
 
+
 def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, archive=0):
-    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=exten[:8],
+    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=exten.lower()[:8],
                 title=title[:256],search_title=title.upper()[:256],annotation=annotation[:10000],docdate=docdate[:32],lang=lang[:16],
                 cat_type=archive,avail=2, lang_code=getlangcode(title))
     return book
