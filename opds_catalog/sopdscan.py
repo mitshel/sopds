@@ -10,7 +10,6 @@ import re
 
 from opds_catalog import fb2parse, settings, opdsdb
 from opds_catalog import inpx_parser
-from opds_catalog.settings import INPX_TEST_ZIP
 
 class opdsScanner:
     def __init__(self, logger=None):

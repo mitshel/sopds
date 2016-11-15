@@ -238,10 +238,10 @@ class CatalogsFeed(AuthFeed):
 
     def items(self, obj):
         cat, current_page = obj
-        catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_type","cat_name")
+        catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_name", "cat_type")
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
         #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
-        books_list = Book.objects.filter(catalog=cat).order_by("title")
+        books_list = Book.objects.filter(catalog=cat).order_by("search_title")
         union_list = list(chain(catalogs_list,books_list))
         paginator = Paginator(union_list,settings.MAXITEMS)
         try:
@@ -350,29 +350,29 @@ class SearchBooksFeed(AuthFeed):
         # Поиск книг по подсроке
         if  searchtype == 'm':
             #books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            books = Book.objects.filter(search_title__contains=searchterms.upper()).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__contains=searchterms.upper()).order_by('search_title','-docdate')
         # Поиск книг по начальной подстроке
         elif searchtype == 'b':
             #books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            books = Book.objects.filter(search_title__startwith=searchterms.upper()).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__startwith=searchterms.upper()).order_by('search_title','-docdate')
         # Поиск книг по точному совпадению наименования
         elif searchtype == 'e':
             #books = Book.objects.extra(where=["upper(title)=%s"], params=["%s"%searchterms.upper()]).order_by('title','-docdate')
-            books = Book.objects.filter(search_title=searchterms.upper()).order_by('title','-docdate')
+            books = Book.objects.filter(search_title=searchterms.upper()).order_by('search_title','-docdate')
         # Поиск книг по автору
         elif searchtype == 'a':
             try:
                 author_id = int(searchterms)
             except:
                 author_id = 0
-            books = Book.objects.filter(authors=author_id).order_by('title','-docdate')
+            books = Book.objects.filter(authors=author_id).order_by('search_title','-docdate')
         # Поиск книг по серии
         elif searchtype == 's':
             try:
                 ser_id = int(searchterms)
             except:
                 ser_id = 0
-            books = Book.objects.filter(series=ser_id).order_by('title','-docdate')    
+            books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')    
         # Поиск книг по автору и серии
         elif searchtype == "as":
             try:
@@ -381,14 +381,14 @@ class SearchBooksFeed(AuthFeed):
             except:
                 ser_id = 0
                 author_id = 0 
-            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None).order_by('title','-docdate')
+            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None).order_by('search_title','-docdate')
         # Поиск книг по жанру
         elif searchtype == 'g':
             try:
                 genre_id = int(searchterms)
             except:
                 genre_id = 0
-            books = Book.objects.filter(genres=genre_id).order_by('title','-docdate')    
+            books = Book.objects.filter(genres=genre_id).order_by('search_title','-docdate')    
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
             if settings.AUTH:
@@ -399,7 +399,7 @@ class SearchBooksFeed(AuthFeed):
         elif searchtype == 'd':
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
-            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('title','-docdate')
+            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('search_title','-docdate')
                     
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
         #if len(books)>0:            
