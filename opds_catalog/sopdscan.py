@@ -236,7 +236,7 @@ class opdsScanner:
                 if book_is_valid:
                     if title=='': title=n
 
-                    book=opdsdb.addbook(name,rel_path,cat,e,title,annotation,docdate,lang,file_size,archive)
+                    book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
                     self.books_added+=1
 
                     if archive!=0:

@@ -18,7 +18,8 @@
 
 Для работы проекта необходимо установить указанные  зависимости: 
 
-	yum install python3                   # команда установки для RedHad, Fedora, CentOS
+	yum install python3                    # команда установки для RedHad, Fedora, CentOS
+	yum install python3-mysqldb            # необходима для работы с MySQL
 	pip3 install -r requirements.txt       # для Python 3.4 и выше
 	pip3 install -r requirements-p33.txt   # для Python 3.3
 
