@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-14 19:59+0300\n"
+"POT-Creation-Date: 2016-11-15 23:15+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,7 +53,7 @@ msgstr "Авторы:"
 #: .\sopds_web_backend\templates\sopds_books.html:30
 #: .\sopds_web_backend\templates\sopds_menu.html:9
 #: .\sopds_web_backend\templates\sopds_menu.html:31
-#: .\sopds_web_backend\views.py:497 .\sopds_web_backend\views.py:501
+#: .\sopds_web_backend\views.py:506 .\sopds_web_backend\views.py:510
 msgid "Genres"
 msgstr "Жанры"
 
@@ -61,7 +61,7 @@ msgstr "Жанры"
 #: .\sopds_web_backend\templates\sopds_logo.html:29
 #: .\sopds_web_backend\templates\sopds_menu.html:10
 #: .\sopds_web_backend\templates\sopds_menu.html:33
-#: .\sopds_web_backend\views.py:256 .\sopds_web_backend\views.py:483
+#: .\sopds_web_backend\views.py:262 .\sopds_web_backend\views.py:492
 msgid "Series"
 msgstr "Серии"
 
@@ -122,7 +122,7 @@ msgid "RANDOM BOOK"
 msgstr "СЛУЧАЙНАЯ КНИГА"
 
 #: .\sopds_web_backend\templates\sopds_logo.html:14
-#: .\sopds_web_backend\views.py:256 .\sopds_web_backend\views.py:313
+#: .\sopds_web_backend\views.py:262 .\sopds_web_backend\views.py:322
 msgid "Search"
 msgstr "Найти"
 
@@ -140,24 +140,24 @@ msgstr "Автор"
 
 #: .\sopds_web_backend\templates\sopds_menu.html:6
 #: .\sopds_web_backend\templates\sopds_menu.html:16
-#: .\sopds_web_backend\views.py:383
+#: .\sopds_web_backend\views.py:392
 msgid "Catalogs"
 msgstr "Каталоги"
 
 #: .\sopds_web_backend\templates\sopds_menu.html:7
 #: .\sopds_web_backend\templates\sopds_menu.html:17
-#: .\sopds_web_backend\views.py:73 .\sopds_web_backend\views.py:78
-#: .\sopds_web_backend\views.py:90 .\sopds_web_backend\views.py:102
-#: .\sopds_web_backend\views.py:111 .\sopds_web_backend\views.py:114
-#: .\sopds_web_backend\views.py:123 .\sopds_web_backend\views.py:127
-#: .\sopds_web_backend\views.py:136 .\sopds_web_backend\views.py:147
-#: .\sopds_web_backend\views.py:417
+#: .\sopds_web_backend\views.py:74 .\sopds_web_backend\views.py:80
+#: .\sopds_web_backend\views.py:93 .\sopds_web_backend\views.py:105
+#: .\sopds_web_backend\views.py:114 .\sopds_web_backend\views.py:117
+#: .\sopds_web_backend\views.py:126 .\sopds_web_backend\views.py:130
+#: .\sopds_web_backend\views.py:139 .\sopds_web_backend\views.py:150
+#: .\sopds_web_backend\views.py:426
 msgid "Books"
 msgstr "Книги"
 
 #: .\sopds_web_backend\templates\sopds_menu.html:8
 #: .\sopds_web_backend\templates\sopds_menu.html:24
-#: .\sopds_web_backend\views.py:313 .\sopds_web_backend\views.py:450
+#: .\sopds_web_backend\views.py:322 .\sopds_web_backend\views.py:459
 msgid "Authors"
 msgstr "Авторы"
 
@@ -198,40 +198,40 @@ msgstr "Вход"
 msgid "Settings"
 msgstr "Настройки"
 
-#: .\sopds_web_backend\views.py:73 .\sopds_web_backend\views.py:78
+#: .\sopds_web_backend\views.py:74 .\sopds_web_backend\views.py:80
 msgid "Search by title"
 msgstr "Поиск по наименованию"
 
-#: .\sopds_web_backend\views.py:90
+#: .\sopds_web_backend\views.py:93
 msgid "Search by author"
 msgstr "Поиск по автору"
 
-#: .\sopds_web_backend\views.py:102
+#: .\sopds_web_backend\views.py:105
 msgid "Search by series"
 msgstr "Поиск по серии"
 
-#: .\sopds_web_backend\views.py:111 .\sopds_web_backend\views.py:114
+#: .\sopds_web_backend\views.py:114 .\sopds_web_backend\views.py:117
 msgid "Search by genre"
 msgstr "Поиск по жанру"
 
-#: .\sopds_web_backend\views.py:123 .\sopds_web_backend\views.py:127
+#: .\sopds_web_backend\views.py:126 .\sopds_web_backend\views.py:130
 msgid "Bookshelf"
 msgstr "Книжная полка"
 
-#: .\sopds_web_backend\views.py:136
+#: .\sopds_web_backend\views.py:139
 msgid "Doubles for book"
 msgstr "Дубликаты книги"
 
-#: .\sopds_web_backend\views.py:382
+#: .\sopds_web_backend\views.py:391
 msgid "ROOT"
 msgstr "НАЧАЛО"
 
-#: .\sopds_web_backend\views.py:417 .\sopds_web_backend\views.py:450
-#: .\sopds_web_backend\views.py:483 .\sopds_web_backend\views.py:497
-#: .\sopds_web_backend\views.py:501
+#: .\sopds_web_backend\views.py:426 .\sopds_web_backend\views.py:459
+#: .\sopds_web_backend\views.py:492 .\sopds_web_backend\views.py:506
+#: .\sopds_web_backend\views.py:510
 msgid "Select"
 msgstr "Выбор"
 
-#: .\sopds_web_backend\views.py:511
+#: .\sopds_web_backend\views.py:520
 msgid "HOME"
 msgstr "ГЛАВНАЯ"

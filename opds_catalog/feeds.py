@@ -116,7 +116,7 @@ class opdsFeed(Atom1Feed):
                 handler.addQuickElement("link", "", {"href": reverse("opds_catalog:searchbooks", kwargs={"searchtype":'a', "searchterms":a['id']}), 
                                                      "rel": "related", 
                                                      "type":"application/atom+xml;profile=opds-catalog", 
-                                                     "title":_("All books by %s")%a['full_name']})
+                                                     "title":_("All books by %(author)s")%{'author':a['full_name']})
                 handler.characters("\n")
                         
         if item.get("genres") is not None:       

@@ -90,7 +90,11 @@ WSGI_APPLICATION = 'sopds.wsgi.application'
 #        'NAME': 'sopds',
 #        'HOST': 'localhost',
 #        'USER': 'sopds',
-#        'PASSWORD' : 'sopds'
+#        'PASSWORD' : 'sopds',
+#        'OPTIONS' : {
+#            'init_command': 'SET default_storage_engine=INNODB',
+#            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+#        }
 #    }             
 #}
 
