@@ -29,9 +29,6 @@ class Book(models.Model):
     title = models.CharField(max_length=256, db_index=True)
     search_title = models.CharField(max_length=256, default=None, db_index=True)
     annotation = models.CharField(max_length=10000)
-    #cover = models.CharField(max_length=32)
-    #cover_type = models.CharField(max_length=32)
-    #doublicat = models.IntegerField(null=False, default=0)
     lang_code = models.IntegerField(db_index=True, null=False, default=9)
     avail = models.IntegerField(null=False, default=0, db_index=True)
     authors = models.ManyToManyField('Author', through='bauthor')
@@ -51,16 +48,10 @@ class Catalog(models.Model):
     cat_size = models.IntegerField(null=True, default=0)
 
 class Author(models.Model):
-    #first_name = models.CharField(max_length=64)
-    #last_name = models.CharField(max_length=64)
     full_name = models.CharField(db_index=True, max_length=128, default=None)
     search_full_name = models.CharField(db_index=True, max_length=128, default=None)
     lang_code = models.IntegerField(db_index=True, null=False, default=9)
 
-    #class Meta:
-    #    index_together = [
-    #        ["last_name", "first_name"],
-    #    ]
 
 class bauthor(models.Model):
     book = models.ForeignKey('Book', db_index=True)
@@ -78,7 +69,6 @@ class Genre(models.Model):
 class bgenre(models.Model):
     book = models.ForeignKey('Book', db_index=True)
     genre = models.ForeignKey('Genre', db_index=True)
-
 #    class Meta:
 #        index_together = [
 #            ["book", "genre"],
@@ -93,7 +83,6 @@ class bseries(models.Model):
     book = models.ForeignKey('Book', db_index=True)
     ser = models.ForeignKey('Series', db_index=True)
     ser_no = models.IntegerField(null=False, default=0)
-
 #    class Meta:
 #        index_together = [
 #            ["book", "ser"],

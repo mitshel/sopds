@@ -100,10 +100,12 @@ class opdsScanner:
                     
         opdsdb.commit()
 
-        if settings.DELETE_LOGICAL:
-            self.books_deleted=opdsdb.books_del_logical()
-        else:
-            self.books_deleted=opdsdb.books_del_phisical()
+        #if settings.DELETE_LOGICAL:
+        #    self.books_deleted=opdsdb.books_del_logical()
+        #else:
+        #    self.books_deleted=opdsdb.books_del_phisical()
+            
+        self.books_deleted=opdsdb.books_del_phisical()
         self.log_stats()
 
     def inpskip_callback(self, inpx, inp_name, inp_size):
@@ -111,14 +113,14 @@ class opdsScanner:
         self.zip_file = os.path.join(inpx,"%s%s"%(inp_name,'.zip'))
         self.rel_path=os.path.relpath(self.zip_file,settings.ROOT_LIB)            
         
-        if opdsdb.arc_changed(self.zip_file,inp_size):
+        if opdsdb.arc_skip(self.rel_path,inp_size):
+            self.logger.info('Skip ZIP for INP archive '+self.zip_file+'. Not changed.')
+            result = 1               
+        else:    
             self.logger.info('Start process ZIP for INP archive = '+self.zip_file) 
             self.inp_cat = opdsdb.addcattree(self.rel_path, opdsdb.CAT_INP, inp_size)
             result = 0
-        else:    
-            self.logger.info('Skip ZIP for INP archive '+self.zip_file+'. Not changed.')
-            result = 1     
-            
+         
         return result
                 
     def inpx_callback(self, inpx, inp, meta_data):          
@@ -136,11 +138,7 @@ class opdsScanner:
         self.logger.debug("Book "+self.rel_path+"/"+name+" Added ok.")    
         
         for a in meta_data[inpx_parser.sAuthor]:
-            l,f = a.split(',',1)
-            last_name=l.strip(self.strip_symbols)
-            first_name=f.strip(self.strip_symbols)
-            #author=opdsdb.addauthor(first_name,last_name)
-            author=opdsdb.addauthor("%s %s"%(last_name,first_name))
+            author=opdsdb.addauthor(a.replace(',',' '))
             opdsdb.addbauthor(book,author)
 
         for g in meta_data[inpx_parser.sGenre]:
@@ -156,20 +154,23 @@ class opdsScanner:
     def processinpx(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
         inpx_size = os.path.getsize(file)
-        if settings.INPX_SKIP_UNCHANGED or opdsdb.inpx_changed(rel_file,inpx_size):
+        if settings.INPX_SKIP_UNCHANGED and opdsdb.inpx_skip(rel_file,inpx_size):
+            self.logger.info('Skip INPX file = '+file+'. Not changed.')
+        else:    
             self.logger.info('Start process INPX file = '+file)
             opdsdb.addcattree(rel_file, opdsdb.CAT_INPX, inpx_size)
             inpx = inpx_parser.Inpx(file, self.inpx_callback, self.inpskip_callback)       
             inpx.INPX_TEST_ZIP = settings.INPX_TEST_ZIP  
             inpx.INPX_TEST_FILES = settings.INPX_TEST_FILES 
             inpx.parse()
-        else:
-            self.logger.info('Skip INPX file = '+file+'. Not changed.')
 
     def processzip(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)
         zsize = os.path.getsize(file)
-        if opdsdb.arc_changed(rel_file,zsize):
+        if opdsdb.arc_skip(rel_file,zsize):
+            self.arch_skipped+=1
+            self.logger.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
+        else:                   
             zip_process_error = 0
             try:
                 z = zipfile.ZipFile(file, 'r', allowZip64=True)
@@ -189,9 +190,8 @@ class opdsScanner:
                 self.logger.warning('Error while read ZIP archive. File '+file+' corrupt.')
                 zip_process_error = 1
             self.bad_archives+=zip_process_error
-        else:
-            self.arch_skipped+=1
-            self.logger.debug('Skip ZIP archive '+rel_file+'. Already scanned.')
+
+
 
     def processfile(self,name,full_path,file,cat,archive=0,file_size=0):
         (n,e)=os.path.splitext(name)
@@ -213,7 +213,7 @@ class opdsScanner:
                         f=open(file,'rb')
                     else:
                         f=file
-                    self.fb2parser.parse(f,settings.FB2HSIZE)
+                    self.fb2parser.parse(f)
                     f.close()
 
                     if len(self.fb2parser.lang.getvalue())>0:
