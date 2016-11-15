@@ -17,7 +17,6 @@ class opdsScanner:
         self.fb2parser=None
         self.init_parser()
         self.strip_symbols = ' »«\'\"\&\n-.#\\\`'
-        self.max_annotation =  10000
 
         if logger:
             self.logger = logger
@@ -223,7 +222,7 @@ class opdsScanner:
                     if len(self.fb2parser.book_title.getvalue())>0:
                         title=self.fb2parser.book_title.getvalue()[0].strip(self.strip_symbols)
                     if len(self.fb2parser.annotation.getvalue())>0:
-                        annotation=('\n'.join(self.fb2parser.annotation.getvalue()))[:self.max_annotation]
+                        annotation=('\n'.join(self.fb2parser.annotation.getvalue()))
                     if len(self.fb2parser.docdate.getvalue())>0:
                         docdate=self.fb2parser.docdate.getvalue()[0].strip();
 
