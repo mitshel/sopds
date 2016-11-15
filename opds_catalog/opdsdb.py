@@ -116,21 +116,21 @@ def findbook(name, path, setavail=0):
 def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, archive=0):
     format=exten[1:]
     format=format.lower()
-    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=format,
-                title=title,annotation=annotation,docdate=docdate,lang=lang,
+    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=format[:8],
+                title=title[:256],annotation=annotation[:10000],docdate=docdate[:32],lang=lang[:16],
                 cat_type=archive,avail=2, lang_code=getlangcode(title))
     return book
 
 def findauthor(first_name,last_name):
     try:
-        author = Author.objects.filter(last_name=last_name, first_name=first_name)[:1]
+        author = Author.objects.filter(last_name=last_name[:64], first_name=first_name[:64])[:1]
     except Author.DoesNotExist:
         author = None
 
     return author
 
 def addauthor(first_name, last_name):
-    author, created = Author.objects.get_or_create(last_name=last_name, first_name=first_name, lang_code=getlangcode(last_name))
+    author, created = Author.objects.get_or_create(last_name=last_name[:64], first_name=first_name[:64], lang_code=getlangcode(last_name))
     return author
 
 def addbauthor(book, author):
@@ -139,7 +139,7 @@ def addbauthor(book, author):
     #book.authors.add(author)
 
 def addgenre(genre):
-    genre, created = Genre.objects.get_or_create(genre=genre, defaults={'section':unknown_genre, 'subsection':genre})
+    genre, created = Genre.objects.get_or_create(genre=genre[:32], defaults={'section':unknown_genre, 'subsection':genre[:100]})
     return genre
 
 def addbgenre(book, genre):
@@ -148,7 +148,7 @@ def addbgenre(book, genre):
     #book.genres.add(genre)
 
 def addseries(ser):
-    series, created = Series.objects.get_or_create(ser=ser, lang_code=getlangcode(ser))
+    series, created = Series.objects.get_or_create(ser=ser[:80], lang_code=getlangcode(ser))
     return series
 
 def addbseries(book, ser, ser_no):
