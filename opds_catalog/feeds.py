@@ -110,13 +110,13 @@ class opdsFeed(Atom1Feed):
         if item.get("authors") is not None:
             for a in item["authors"]:
                 handler.startElement("author", {})
-                handler.addQuickElement("name", "%s %s"%(a['last_name'],a['first_name']))
+                handler.addQuickElement("name", a['full_name'])
                 #handler.addQuickElement("uri", item['author_link'])
                 handler.endElement("author")
                 handler.addQuickElement("link", "", {"href": reverse("opds_catalog:searchbooks", kwargs={"searchtype":'a', "searchterms":a['id']}), 
                                                      "rel": "related", 
                                                      "type":"application/atom+xml;profile=opds-catalog", 
-                                                     "title":_("All books by %(last_name)s %(first_name)s")%{"last_name":a['last_name'],"first_name":a['first_name']}})
+                                                     "title":_("All books by %s")%a['full_name']})
                 handler.characters("\n")
                         
         if item.get("genres") is not None:       
@@ -354,7 +354,7 @@ class SearchBooksFeed(AuthFeed):
         # Поиск книг по начальной подстроке
         elif searchtype == 'b':
             #books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            books = Book.objects.filter(search_title__startwith=searchterms.upper()).order_by('search_title','-docdate')
+            books = Book.objects.filter(search_title__startswith=searchterms.upper()).order_by('search_title','-docdate')
         # Поиск книг по точному совпадению наименования
         elif searchtype == 'e':
             #books = Book.objects.extra(where=["upper(title)=%s"], params=["%s"%searchterms.upper()]).order_by('title','-docdate')
@@ -599,7 +599,7 @@ class SearchAuthorsFeed(AuthFeed):
         }
 
     def items(self, obj):
-        authors_list = obj["authors"].order_by("last_name","first_name")
+        authors_list = obj["authors"].order_by("search_full_name")
 
         paginator = Paginator(authors_list,settings.MAXITEMS)
         try:
@@ -610,7 +610,7 @@ class SearchAuthorsFeed(AuthFeed):
         return page
 
     def item_title(self, item):
-        return "%s %s"%(item.last_name,item.first_name)
+        return item.full_name
     
     def item_description(self, item):
         return _("Books count: %s")%(Book.objects.filter(authors=item.id).count())     
