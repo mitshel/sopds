@@ -17,7 +17,7 @@ lang_menu = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'),
 
 class Book(models.Model):
     filename = models.CharField(db_index=True, max_length=256)
-    path = models.CharField(db_index=True, max_length=1024)
+    path = models.CharField(db_index=True, max_length=1000)
     filesize = models.IntegerField(null=False, default=0)
     format = models.CharField(max_length=8)
     catalog = models.ForeignKey('Catalog',db_index=True)
@@ -45,14 +45,9 @@ class Book(models.Model):
 
 class Catalog(models.Model):
     parent = models.ForeignKey('self', null=True)
-    cat_name = models.CharField(max_length=128)
-    path = models.CharField(max_length=1024)
+    cat_name = models.CharField(db_index=True, max_length=128)
+    path = models.CharField(db_index=True, max_length=1000)
     cat_type = models.IntegerField(null=False, default=0)
-
-    class Meta:
-        index_together = [
-            ["cat_name", "path"],
-        ]
 
 class Author(models.Model):
     first_name = models.CharField(max_length=64)
