@@ -35,17 +35,27 @@ CMP_TITLE_AUTHORS=1
 unknown_genre=_('Unknown genre')
 
 
-def clear_all():
-    bseries.objects.all().delete()
-    bauthor.objects.all().delete()
-    bseries.objects.all().delete()    
-    Book.objects.all().delete()
-    Catalog.objects.all().delete()
-    Author.objects.all().delete()
-    Genre.objects.all().delete()
-    Series.objects.all().delete()
-    bookshelf.objects.all().delete()
-    Counter.objects.all().delete()
+def clear_all(verbose):
+    count = bseries.objects.all().delete()
+    if verbose: print("From bseries table %s row deleted"%count[0])
+    count = bauthor.objects.all().delete()
+    if verbose: print("From bauthor table %s row deleted"%count[0])
+    count = bgenre.objects.all().delete()    
+    if verbose: print("From bgenre table %s row deleted"%count[0])
+    count = Book.objects.all().delete()
+    if verbose: print("From Book  table %s row deleted"%count[0])
+    count = Catalog.objects.all().delete()
+    if verbose: print("From Catalog table %s row deleted"%count[0])
+    count = Author.objects.all().delete()
+    if verbose: print("From Author table %s row deleted"%count[0])
+    count = Genre.objects.all().delete()
+    if verbose: print("From Genre table %s row deleted"%count[0])
+    count = Series.objects.all().delete()
+    if verbose: print("From Series table %s row deleted"%count[0])
+    count = bookshelf.objects.all().delete()
+    if verbose: print("From bookshelf table %s row deleted"%count[0])
+    count = Counter.objects.all().delete()
+    if verbose: print("From Counter table %s row deleted"%count[0])
 
 # Книги где avail=0 уже известно что удалены
 # Книги где avail=2 это только что прверенные существующие книги

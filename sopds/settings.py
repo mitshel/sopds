@@ -147,7 +147,7 @@ SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.
 #SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
 #SOPDS_ROOT_LIB = '/mnt/nfs/КНИГИ/BOOKS/'
 
-SOPDS_SINGLE_COMMIT = True
+SOPDS_SINGLE_COMMIT = False
 SOPDS_AUTH = True
 SOPDS_SCAN_SHED_MIN ='0'
 SOPDS_SCAN_SHED_HOUR ='0,12'

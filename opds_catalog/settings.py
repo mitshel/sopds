@@ -72,10 +72,6 @@ FB2TOMOBI = getattr(settings, "SOPDS_FB2TOMOBI", "")
 # TEMP_DIR задает путь к временному каталогу, который используется для копирования оригинала и результата конвертации
 TEMP_DIR = getattr(settings, "SOPDS_TEMP_DIR", os.path.join(settings.BASE_DIR,'tmp'))
 
-# SINGLE_COMMIT = True приводит к тому, что сохранение данных сканирования произойден после окончания всего сканирования
-# в результате во время сканирования нельзя увидеть уже добавленные книги, но эта опция значительно увеличивает скорость сканирования коллекции
-SINGLE_COMMIT = getattr(settings, "SOPDS_SINGLE_COMMIT", True)
-
 # При скачивании вместо оригинального имени файла книги выдает транслитерацию названия книги
 TITLE_AS_FILENAME = getattr(settings, "SOPDS_TITLE_AS_FILENAME", True)
 
@@ -114,7 +110,7 @@ if loglevel.lower() in loglevels:
     LOGLEVEL=loglevels[loglevel.lower()]
 else:
     LOGLEVEL=logging.NOTSET
-
+    
 # Переопределяем некоторые функции для SQLite, которые работают неправлено
 from django.db.backends.signals import connection_created
 from django.dispatch import receiver

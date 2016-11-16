@@ -48,7 +48,6 @@ class opdsScanner:
         if settings.FB2TOEPUB!=None: self.logger.debug('fb2toepub = '+settings.FB2TOEPUB)
         if settings.FB2TOMOBI!=None: self.logger.debug('fb2tomobi = '+settings.FB2TOMOBI)
         if settings.TEMP_DIR!=None:       self.logger.debug('temp_dir = '+settings.TEMP_DIR)
-        if settings.SINGLE_COMMIT!=None:       self.logger.debug('SINGLE_COMMIT = '+settings.SINGLE_COMMIT)
 
     def log_stats(self):
         self.t2=datetime.timedelta(seconds=time.time())
@@ -76,13 +75,8 @@ class opdsScanner:
         self.inp_cat = None
         self.zip_file = None
         self.rel_path = None     
-        
-        opdsdb.set_autocommit(False)    
-              
+                    
         opdsdb.avail_check_prepare()
-        
-        if not settings.SINGLE_COMMIT: 
-            opdsdb.commit() 
             
         for full_path, dirs, files in os.walk(settings.ROOT_LIB, followlinks=True):
             # Если разрешена обработка inpx, то при нахождении inpx обрабатываем его и прекращаем обработку текущего каталога
@@ -92,9 +86,7 @@ class opdsScanner:
                 if inpx_files:
                     for inpx_file in inpx_files:
                         file = os.path.join(full_path, inpx_file)
-                        self.processinpx(inpx_file, full_path, file)
-                        if not settings.SINGLE_COMMIT: 
-                            opdsdb.commit()                        
+                        self.processinpx(inpx_file, full_path, file)                       
                     continue
                 
             for name in files:
@@ -105,9 +97,7 @@ class opdsScanner:
                         self.processzip(name,full_path,file)
                 else:
                     file_size=os.path.getsize(file)
-                    self.processfile(name,full_path,file,None,0,file_size)
-                if not settings.SINGLE_COMMIT: 
-                    opdsdb.commit()                    
+                    self.processfile(name,full_path,file,None,0,file_size)                   
 
         #if settings.DELETE_LOGICAL:
         #    self.books_deleted=opdsdb.books_del_logical()
@@ -116,8 +106,6 @@ class opdsScanner:
             
         self.books_deleted=opdsdb.books_del_phisical()
         
-        opdsdb.commit() 
-                    
         self.log_stats()
 
     def inpskip_callback(self, inpx, inp_name, inp_size):
@@ -158,10 +146,7 @@ class opdsScanner:
             
         for s in meta_data[inpx_parser.sSeries]:
             ser=opdsdb.addseries(s.strip())
-            opdsdb.addbseries(book,ser,0)        
-
-        if not settings.SINGLE_COMMIT: 
-            opdsdb.commit()                  
+            opdsdb.addbseries(book,ser,0)                         
                    
     def processinpx(self,name,full_path,file):
         rel_file=os.path.relpath(file,settings.ROOT_LIB)

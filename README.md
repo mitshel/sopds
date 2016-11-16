@@ -34,7 +34,7 @@
 1.4 Производим инициализацию базы данных и заполнение начальными данными (жанры)
 
 	python3 manage.py migrate
-	python3 manage.py sopds_util --clear
+	python3 manage.py sopds_util clear
 	
 1.5 Cоздаем суперпользователя
 
