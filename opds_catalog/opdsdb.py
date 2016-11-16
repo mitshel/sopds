@@ -36,14 +36,14 @@ unknown_genre=_('Unknown genre')
 
 
 def clear_all():
+    bseries.objects.all().delete()
+    bauthor.objects.all().delete()
+    bseries.objects.all().delete()    
     Book.objects.all().delete()
     Catalog.objects.all().delete()
     Author.objects.all().delete()
     Genre.objects.all().delete()
     Series.objects.all().delete()
-    bseries.objects.all().delete()
-    bauthor.objects.all().delete()
-    bseries.objects.all().delete()
     bookshelf.objects.all().delete()
     Counter.objects.all().delete()
 
