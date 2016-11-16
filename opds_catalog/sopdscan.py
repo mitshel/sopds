@@ -74,7 +74,9 @@ class opdsScanner:
         self.log_options()
         self.inp_cat = None
         self.zip_file = None
-        self.rel_path = None         
+        self.rel_path = None     
+        
+        opdsdb.set_autocommit(not settings.SINGLE_COMMIT)    
               
         opdsdb.avail_check_prepare()
         

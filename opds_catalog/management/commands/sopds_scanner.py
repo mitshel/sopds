@@ -63,8 +63,7 @@ class Command(BaseCommand):
 
     def scan(self):
         scanner=opdsScanner(self.logger)
-        with transaction.atomic():
-            scanner.scan_all()
+        scanner.scan_all()
         Counter.objects.update_known_counters()  
             
     def start(self):

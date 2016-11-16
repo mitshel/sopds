@@ -92,11 +92,11 @@ WSGI_APPLICATION = 'sopds.wsgi.application'
 #        'USER': 'sopds',
 #        'PASSWORD' : 'sopds',
 #        'OPTIONS' : {
-#            'init_command': """SET default_storage_engine=INNODB, 
-#                               SET sql_mode='STRICT_TRANS_TABLES',
-#                               SET NAMES UTF8,
-#                               SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
-#                            """,
+#            'init_command': """SET default_storage_engine=INNODB; \
+#                               SET sql_mode='STRICT_TRANS_TABLES'; \
+#                               SET NAMES UTF8; \
+#                               SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
+#                            """
 #        }
 #    }             
 #}
