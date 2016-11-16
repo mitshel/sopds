@@ -84,10 +84,6 @@ class Genre(models.Model):
 class bgenre(models.Model):
     book = models.ForeignKey('Book', db_index=True)
     genre = models.ForeignKey('Genre', db_index=True)
-#    class Meta:
-#        index_together = [
-#            ["book", "genre"],
-#        ]
 
 class Series(models.Model):
     ser = models.CharField(max_length=SIZE_SERIES, db_index=True)

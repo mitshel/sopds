@@ -2,6 +2,8 @@
 #
 # Вспомогательные функции
 #
+import unicodedata
+
 def translit(s):
     """Russian translit: converts 'привет'->'privet'"""
     assert s is not str, "Error: argument MUST be string"
@@ -12,4 +14,7 @@ def translit(s):
     s = s.translate(table1)
     for k in table2.keys():
         s = s.replace(k,table2[k])
-    return s
+    return s
+
+def to_ascii(s):
+    return s.encode('ascii', 'replace').decode('utf-8')

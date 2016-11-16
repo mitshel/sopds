@@ -32,6 +32,8 @@ def Download(request, book_id, zip_flag):
     else:
         transname=utils.translit(book.filename)
         
+    transname = utils.to_ascii(transname)
+        
     if zip_flag == 1:
         dlfilename=transname+'.zip'   
         content_type='application/zip' 
@@ -154,7 +156,10 @@ def ConvertFB2(request, book_id, convert_type):
     if settings.TITLE_AS_FILENAME:
         transname=utils.translit(book.title+'.'+book.format)
     else:
-        transname=utils.translit(book.filename)        
+        transname=utils.translit(book.filename)      
+        
+    transname = utils.to_ascii(transname)
+      
     (n,e)=os.path.splitext(transname)
     dlfilename="%s.%s"%(n,convert_type)
     
