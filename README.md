@@ -96,8 +96,9 @@ MySQL по сравнению с sqlite работает гораздо быст
             'USER': 'sopds',
             'PASSWORD' : 'sopds',
 	        'OPTIONS' : {
-    	        'init_command': "SET default_storage_engine=MyISAM",
-       		 }            
+	            'init_command': "SET default_storage_engine=MyISAM;\
+	                             SET sql_mode='';"
+	        }           
         }             
     }
 

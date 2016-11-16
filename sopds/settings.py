@@ -92,7 +92,8 @@ WSGI_APPLICATION = 'sopds.wsgi.application'
 #        'USER': 'sopds',
 #        'PASSWORD' : 'sopds',
 #        'OPTIONS' : {
-#            'init_command': "SET default_storage_engine=MyISAM",
+#            'init_command': "SET default_storage_engine=MyISAM;\
+#                             SET sql_mode='';"
 #        }
 #    }             
 #}
