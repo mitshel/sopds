@@ -74,9 +74,9 @@ class opdsScanner:
         self.inp_cat = None
         self.zip_file = None
         self.rel_path = None         
-
+       
+        opdsdb.set_autocommit(not settings.SINGLE_COMMIT)       
         opdsdb.avail_check_prepare()
-
         for full_path, dirs, files in os.walk(settings.ROOT_LIB, followlinks=True):
             # Если разрешена обработка inpx, то при нахождении inpx обрабатываем его и прекращаем обработку текущего каталога
             if settings.INPX_ENABLE:
@@ -97,8 +97,6 @@ class opdsScanner:
                 else:
                     file_size=os.path.getsize(file)
                     self.processfile(name,full_path,file,None,0,file_size)
-                    
-        opdsdb.commit()
 
         #if settings.DELETE_LOGICAL:
         #    self.books_deleted=opdsdb.books_del_logical()
@@ -106,6 +104,10 @@ class opdsScanner:
         #    self.books_deleted=opdsdb.books_del_phisical()
             
         self.books_deleted=opdsdb.books_del_phisical()
+        
+        if settings.SINGLE_COMMIT: 
+            opdsdb.commit() 
+                    
         self.log_stats()
 
     def inpskip_callback(self, inpx, inp_name, inp_size):
@@ -261,10 +263,6 @@ class opdsScanner:
                             else:
                                 ser_no=0
                             opdsdb.addbseries(book,ser,ser_no)
-                          
-                if not settings.SINGLE_COMMIT: 
-                    opdsdb.commit()
-
             else:
                 self.books_skipped+=1
                 self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")

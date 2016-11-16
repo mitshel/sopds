@@ -4,10 +4,12 @@ import os
 
 from django.db.models import Q
 from django.utils.translation import ugettext as _
+from django.db import transaction
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
 from opds_catalog.models import SIZE_BOOK_FILENAME, SIZE_BOOK_PATH, SIZE_BOOK_FORMAT, SIZE_BOOK_DOCDATE, SIZE_BOOK_LANG, SIZE_BOOK_TITLE, SIZE_BOOK_ANNOTATION
 from opds_catalog.models import SIZE_CAT_CATNAME, SIZE_CAT_PATH, SIZE_AUTHOR_NAME, SIZE_GENRE, SIZE_GENRE_SECTION, SIZE_GENRE_SUBSECTION, SIZE_SERIES
+
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -213,6 +215,8 @@ def addbseries(book, ser, ser_no):
     bs = bseries(book=book, ser=ser, ser_no=ser_no)
     bs.save()
     
+def set_autocommit(autocommit):
+    transaction.set_autocommit(autocommit)
+    
 def commit():
-    #self.cnx.commit()
-    pass
+    transaction.commit()
