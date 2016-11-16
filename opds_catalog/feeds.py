@@ -238,7 +238,7 @@ class CatalogsFeed(AuthFeed):
 
     def items(self, obj):
         cat, current_page = obj
-        catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_name", "cat_type")
+        catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_name")
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
         #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
         books_list = Book.objects.filter(catalog=cat).order_by("search_title")

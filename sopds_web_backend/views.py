@@ -70,13 +70,13 @@ def SearchBooksView(request):
         
         if searchtype == 'm':
             #books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            books = Book.objects.filter(search_title__contains=searchterms.upper()).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__contains=searchterms.upper()).order_by('search_title','-docdate')
             args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]
             args['searchobject'] = 'title'
             
         if searchtype == 'b':
             #books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
-            books = Book.objects.filter(search_title__startswith=searchterms.upper()).order_by('title','-docdate')
+            books = Book.objects.filter(search_title__startswith=searchterms.upper()).order_by('search_title','-docdate')
             args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]   
             args['searchobject'] = 'title'         
             
@@ -89,7 +89,7 @@ def SearchBooksView(request):
             except:
                 author_id = 0
                 aname = ""                  
-            books = Book.objects.filter(authors=author_id).order_by('title','-docdate')  
+            books = Book.objects.filter(authors=author_id).order_by('search_title','-docdate')  
             args['breadcrumbs'] = [_('Books'),_('Search by author'),aname]   
             args['searchobject'] = 'author' 
             
@@ -101,7 +101,7 @@ def SearchBooksView(request):
             except:
                 ser_id = 0
                 ser = ""
-            books = Book.objects.filter(series=ser_id).order_by('title','-docdate')    
+            books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')    
             args['breadcrumbs'] = [_('Books'),_('Search by series'),ser]
             args['searchobject'] = 'series'
             
@@ -116,7 +116,7 @@ def SearchBooksView(request):
                 genre_id = 0
                 args['breadcrumbs'] = [_('Books'),_('Search by genre')]
                 
-            books = Book.objects.filter(genres=genre_id).order_by('title','-docdate') 
+            books = Book.objects.filter(genres=genre_id).order_by('search_title','-docdate') 
             args['searchobject'] = 'genre'
                                    
         # Поиск книг на книжной полке            
@@ -341,7 +341,7 @@ def CatalogsView(request):
     except Catalog.DoesNotExist:
         cat = None
     
-    catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_type","cat_name")
+    catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_name")
     # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
     #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
     books_list = Book.objects.filter(catalog=cat).order_by("search_title")

@@ -4,6 +4,8 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
+from opds_catalog.models import SIZE_BOOK_FILENAME, SIZE_BOOK_PATH, SIZE_BOOK_FORMAT, SIZE_BOOK_DOCDATE, SIZE_BOOK_LANG, SIZE_BOOK_TITLE, SIZE_BOOK_ANNOTATION
+from opds_catalog.models import SIZE_CAT_CATNAME, SIZE_CAT_PATH, SIZE_AUTHOR_NAME, SIZE_GENRE, SIZE_GENRE_SECTION, SIZE_GENRE_SUBSECTION, SIZE_SERIES
 
 ##########################################################################
 # типы каталогов (cat_type)
@@ -74,11 +76,6 @@ def books_del_phisical():
     # sql='delete from '+TBL_BGENRES+' where book_id in (select book_id from '+TBL_BOOKS+' where avail<=1)'
     return row_count
 
-def zipisscanned(zipname):
-    row_count = Book.objects.filter(path=zipname).update(avail=2)
-    return row_count
-
-
 def arc_skip(arcpath,arcsize):
     """
        Выясняем изменялся ли архив (ZIP или INP-файл)
@@ -137,7 +134,7 @@ def inpx_skip(arcpath,arcsize):
 def findcat(cat_name):
     (head,tail)=os.path.split(cat_name)
     try:
-        catalog = Catalog.objects.get(cat_name=tail, path=cat_name)
+        catalog = Catalog.objects.get(cat_name=tail[:SIZE_CAT_CATNAME], path=cat_name[:SIZE_CAT_PATH])
     except Catalog.DoesNotExist:
         catalog = None
 
@@ -151,7 +148,7 @@ def addcattree(cat_name, archive=0, size = 0):
         return Catalog.objects.get_or_create(parent=None, cat_name=".", path=".", cat_type=0)[0]
     (head,tail)=os.path.split(cat_name)
     parent=addcattree(head)
-    new_cat = Catalog.objects.create(parent=parent, cat_name=tail, path=cat_name, cat_type=archive, cat_size=size)
+    new_cat = Catalog.objects.create(parent=parent, cat_name=tail[:SIZE_CAT_CATNAME], path=cat_name[:SIZE_CAT_PATH], cat_type=archive, cat_size=size)
 
     return new_cat
 
@@ -160,7 +157,7 @@ def findbook(name, path, setavail=0):
     # а книга была восстановлена в своем старом месте
     # то произойдет восстановление записи об этой книги а не добавится новая
     try:
-        book = Book.objects.get(filename=name, path=path)
+        book = Book.objects.get(filename=name[:SIZE_BOOK_FILENAME], path=path[:SIZE_BOOK_PATH])
     except Book.DoesNotExist:
         book = None
 
@@ -170,35 +167,23 @@ def findbook(name, path, setavail=0):
 
     return book
 
-
 def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, archive=0):
-    book = Book.objects.create(filename=name,path=path,catalog=cat,filesize=size,format=exten.lower()[:8],
-                title=title[:256],search_title=title.upper()[:256],annotation=annotation[:10000],docdate=docdate[:32],lang=lang[:16],
-                cat_type=archive,avail=2, lang_code=getlangcode(title))
+    book = Book.objects.create(filename=name[:SIZE_BOOK_FILENAME],path=path[:SIZE_BOOK_PATH],catalog=cat,filesize=size,format=exten.lower()[:SIZE_BOOK_FORMAT],
+                title=title[:SIZE_BOOK_TITLE],search_title=title.upper()[:SIZE_BOOK_TITLE],annotation=annotation[:SIZE_BOOK_ANNOTATION],
+                docdate=docdate[:SIZE_BOOK_DOCDATE],lang=lang[:SIZE_BOOK_LANG],cat_type=archive,avail=2, lang_code=getlangcode(title))
     return book
-
-#def findauthor(first_name,last_name):
-#    try:
-#        author = Author.objects.filter(last_name=last_name, first_name=first_name)[:1]
-#    except Author.DoesNotExist:
-#        author = None
-#
-#    return author
-
-#def addauthor(first_name, last_name):
-#    author, created = Author.objects.get_or_create(last_name=last_name, first_name=first_name, lang_code=getlangcode(last_name))
-#    return author
 
 def findauthor(full_name):
     try:
-        author = Author.objects.filter(full_name=full_name[:128])[:1]
+        author = Author.objects.filter(full_name=full_name[:SIZE_AUTHOR_NAME])[:1]
     except Author.DoesNotExist:
         author = None
 
     return author
 
 def addauthor(full_name):
-    author, created = Author.objects.get_or_create(full_name=full_name[:128], defaults={'search_full_name':full_name.upper()[:128], 'lang_code':getlangcode(full_name)})
+    author, created = Author.objects.get_or_create(full_name=full_name[:SIZE_AUTHOR_NAME], defaults={'search_full_name':full_name.upper()[:SIZE_AUTHOR_NAME], 
+                                                                                                     'lang_code':getlangcode(full_name)})
     return author
 
 def addbauthor(book, author):
@@ -206,7 +191,7 @@ def addbauthor(book, author):
     ba.save()
 
 def addgenre(genre):
-    genre, created = Genre.objects.get_or_create(genre=genre[:32], defaults={'section':unknown_genre, 'subsection':genre[:100]})
+    genre, created = Genre.objects.get_or_create(genre=genre[:SIZE_GENRE], defaults={'section':unknown_genre, 'subsection':genre[:SIZE_GENRE_SUBSECTION]})
     return genre
 
 def addbgenre(book, genre):
@@ -214,7 +199,7 @@ def addbgenre(book, genre):
     bg.save()
 
 def addseries(ser):
-    series, created = Series.objects.get_or_create(ser=ser[:80], defaults={'search_ser':ser.upper()[:80], 'lang_code':getlangcode(ser)})
+    series, created = Series.objects.get_or_create(ser=ser[:SIZE_SERIES], defaults={'search_ser':ser.upper()[:80], 'lang_code':getlangcode(ser)})
     return series
 
 def addbseries(book, ser, ser_no):

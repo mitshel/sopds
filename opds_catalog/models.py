@@ -10,47 +10,62 @@ counter_allauthors = 'allauthors'
 counter_allgenres = 'allgenres'
 counter_allseries = 'allseries'
 
+SIZE_BOOK_FILENAME   = 512
+SIZE_BOOK_PATH       = 512
+SIZE_BOOK_FORMAT     = 8
+SIZE_BOOK_DOCDATE    = 32
+SIZE_BOOK_LANG       = 16
+SIZE_BOOK_TITLE      = 512
+SIZE_BOOK_ANNOTATION = 10000
+
+SIZE_CAT_CATNAME     = 190
+SIZE_CAT_PATH        = SIZE_BOOK_PATH
+
+SIZE_AUTHOR_NAME     = 128
+
+SIZE_GENRE           = 32
+SIZE_GENRE_SECTION   = 64
+SIZE_GENRE_SUBSECTION = 100
+
+SIZE_SERIES          = 150
+
+
 LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯабвгдеёжзийклмнопрстуфхцчшщьыъэюя',
              2:'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
              3:'0123456789'}
 lang_menu = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
 
 class Book(models.Model):
-    filename = models.CharField(db_index=True, max_length=256)
-    path = models.CharField(db_index=True, max_length=1000)
-    filesize = models.IntegerField(null=False, default=0, db_index=True)
-    format = models.CharField(max_length=8, db_index=True)
+    filename = models.CharField(max_length=SIZE_BOOK_FILENAME)
+    path = models.CharField(max_length=SIZE_BOOK_PATH)
+    filesize = models.IntegerField(null=False, default=0)
+    format = models.CharField(max_length=SIZE_BOOK_FORMAT)
     catalog = models.ForeignKey('Catalog',db_index=True)
     cat_type = models.IntegerField(null=False, default=0)
-    registerdate = models.DateTimeField(db_index=True, null=False, default=timezone.now)
-    docdate = models.CharField(max_length=32)
+    registerdate = models.DateTimeField(null=False, default=timezone.now)
+    docdate = models.CharField(max_length=SIZE_BOOK_DOCDATE,db_index=True)
     #favorite = models.IntegerField(null=False, default=0)
-    lang = models.CharField(max_length=16)
-    title = models.CharField(max_length=256, db_index=True)
-    search_title = models.CharField(max_length=256, default=None, db_index=True)
-    annotation = models.CharField(max_length=10000)
-    lang_code = models.IntegerField(db_index=True, null=False, default=9)
+    lang = models.CharField(max_length=SIZE_BOOK_LANG)
+    title = models.CharField(max_length=SIZE_BOOK_TITLE, db_index=True)
+    search_title = models.CharField(max_length=SIZE_BOOK_TITLE, default=None, db_index=True)
+    annotation = models.CharField(max_length=SIZE_BOOK_ANNOTATION)
+    lang_code = models.IntegerField(null=False, default=9, db_index=True)
     avail = models.IntegerField(null=False, default=0, db_index=True)
     authors = models.ManyToManyField('Author', through='bauthor')
     genres = models.ManyToManyField('Genre', through='bgenre')
     series = models.ManyToManyField('Series', through='bseries')
 
-#    class Meta:
-#        index_together = [
-#            ["title", "format", "filesize"]
-#        ]
-
 class Catalog(models.Model):
     parent = models.ForeignKey('self', null=True, db_index=True)
-    cat_name = models.CharField(db_index=True, max_length=128)
-    path = models.CharField(db_index=True, max_length=1000)
+    cat_name = models.CharField(max_length=SIZE_CAT_CATNAME, db_index=True)
+    path = models.CharField(max_length=SIZE_CAT_PATH, db_index=True)
     cat_type = models.IntegerField(null=False, default=0)
     cat_size = models.BigIntegerField(null=True, default=0)
 
 class Author(models.Model):
-    full_name = models.CharField(db_index=True, max_length=128, default=None)
-    search_full_name = models.CharField(db_index=True, max_length=128, default=None)
-    lang_code = models.IntegerField(db_index=True, null=False, default=9)
+    full_name = models.CharField(max_length=SIZE_AUTHOR_NAME, default=None, db_index=True)
+    search_full_name = models.CharField(max_length=SIZE_AUTHOR_NAME, default=None, db_index=True)
+    lang_code = models.IntegerField(null=False, default=9, db_index=True)
 
 
 class bauthor(models.Model):
@@ -62,9 +77,9 @@ class bauthor(models.Model):
 #        ]
 
 class Genre(models.Model):
-    genre = models.CharField(db_index=True, max_length=32)
-    section = models.CharField(db_index=True, max_length=64)
-    subsection = models.CharField(db_index=True, max_length=100)
+    genre = models.CharField(max_length=SIZE_GENRE, db_index=True)
+    section = models.CharField(max_length=SIZE_GENRE_SECTION, db_index=True)
+    subsection = models.CharField(max_length=SIZE_GENRE_SUBSECTION, db_index=True)
 
 class bgenre(models.Model):
     book = models.ForeignKey('Book', db_index=True)
@@ -75,9 +90,9 @@ class bgenre(models.Model):
 #        ]
 
 class Series(models.Model):
-    ser = models.CharField(db_index=True, max_length=80)
-    search_ser = models.CharField(db_index=True, max_length=80, default=None)
-    lang_code = models.IntegerField(db_index=True, null=False, default=9)
+    ser = models.CharField(max_length=80, db_index=True)
+    search_ser = models.CharField(max_length=SIZE_SERIES, default=None, db_index=True)
+    lang_code = models.IntegerField(null=False, default=9,db_index=True)
 
 class bseries(models.Model):
     book = models.ForeignKey('Book', db_index=True)
@@ -91,7 +106,7 @@ class bseries(models.Model):
 class bookshelf(models.Model):
     user = models.ForeignKey(User, db_index=True)
     book = models.ForeignKey(Book, db_index=True)
-    readtime = models.DateTimeField(null=False, default=timezone.now)
+    readtime = models.DateTimeField(null=False, default=timezone.now, db_index=True)
 
 
 class CounterManager(models.Manager):
