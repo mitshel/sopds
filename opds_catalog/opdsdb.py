@@ -52,6 +52,11 @@ def clear_all():
 # три позиции (0,1,2) сделаны для того чтобы сделать возможным корректную работу
 # cgi-скрипта во время сканирования библиотеки
 #
+
+def p(s,size):
+    new = s.decode('utf8').encode('utf8', 'replace')[:size]
+    return new
+    
 def getlangcode(s):
     langcode = 9
     if len(s)==0:
@@ -169,7 +174,7 @@ def findbook(name, path, setavail=0):
 
 def addbook(name, path, cat, exten, title, annotation, docdate, lang, size=0, archive=0):
     book = Book.objects.create(filename=name[:SIZE_BOOK_FILENAME],path=path[:SIZE_BOOK_PATH],catalog=cat,filesize=size,format=exten.lower()[:SIZE_BOOK_FORMAT],
-                title=title[:SIZE_BOOK_TITLE],search_title=title.upper()[:SIZE_BOOK_TITLE],annotation=annotation[:SIZE_BOOK_ANNOTATION],
+                title=title[:SIZE_BOOK_TITLE],search_title=title.upper()[:SIZE_BOOK_TITLE],annotation=p(annotation,SIZE_BOOK_ANNOTATION),
                 docdate=docdate[:SIZE_BOOK_DOCDATE],lang=lang[:SIZE_BOOK_LANG],cat_type=archive,avail=2, lang_code=getlangcode(title))
     return book
 
