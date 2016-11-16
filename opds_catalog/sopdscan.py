@@ -76,7 +76,7 @@ class opdsScanner:
         self.zip_file = None
         self.rel_path = None     
         
-        opdsdb.set_autocommit(not settings.SINGLE_COMMIT)    
+        opdsdb.set_autocommit(False)    
               
         opdsdb.avail_check_prepare()
         
