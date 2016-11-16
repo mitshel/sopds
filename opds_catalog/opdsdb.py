@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 
 from django.db.models import Q
@@ -54,7 +56,7 @@ def clear_all():
 #
 
 def p(s,size):
-    new = s.decode('utf8').encode('utf8', 'replace')[:size]
+    new = s.encode('utf8', 'replace').decode('utf8')[:size]
     return new
     
 def getlangcode(s):
