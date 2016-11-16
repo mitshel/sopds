@@ -206,7 +206,12 @@ def addbgenre(book, genre):
     bg.save()
 
 def addseries(ser):
-    series, created = Series.objects.get_or_create(ser=ser[:SIZE_SERIES], defaults={'search_ser':ser.upper()[:80], 'lang_code':getlangcode(ser)})
+    try:
+        series, created = Series.objects.get_or_create(ser=ser[:SIZE_SERIES], defaults={'search_ser':ser.upper()[:SIZE_SERIES], 'lang_code':getlangcode(ser)})
+    except:
+        print(ser)
+        print(len(ser), len(ser[:SIZE_SERIES]))
+        raise
     return series
 
 def addbseries(book, ser, ser_no):

@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'sopds.wsgi.application'
 #        'PASSWORD' : 'sopds',
 #        'OPTIONS' : {
 #            'init_command': "SET default_storage_engine=INNODB",
-#            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+#            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
 #            'init_command': "SET NAMES UTF8"
 #        }
 #    }             
@@ -143,6 +143,8 @@ STATIC_ROOT = 'static'
 SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
 #SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
 #SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
+#SOPDS_ROOT_LIB = '/mnt/nfs/КНИГИ/BOOKS/'
+
 SOPDS_AUTH = True
 SOPDS_SCAN_SHED_MIN ='0'
 SOPDS_SCAN_SHED_HOUR ='0,12'
