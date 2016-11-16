@@ -3,13 +3,14 @@
 import os
 import time
 import datetime
-import opds_catalog.zipf as zipfile
 import logging
 import re
 
+from django.db import transaction
 
 from opds_catalog import fb2parse, settings, opdsdb
 from opds_catalog import inpx_parser
+import opds_catalog.zipf as zipfile
 
 class opdsScanner:
     def __init__(self, logger=None):
@@ -74,9 +75,12 @@ class opdsScanner:
         self.inp_cat = None
         self.zip_file = None
         self.rel_path = None         
-       
-        opdsdb.set_autocommit(not settings.SINGLE_COMMIT)       
+              
         opdsdb.avail_check_prepare()
+        
+        if not settings.SINGLE_COMMIT: 
+            opdsdb.commit() 
+            
         for full_path, dirs, files in os.walk(settings.ROOT_LIB, followlinks=True):
             # Если разрешена обработка inpx, то при нахождении inpx обрабатываем его и прекращаем обработку текущего каталога
             if settings.INPX_ENABLE:
@@ -86,6 +90,8 @@ class opdsScanner:
                     for inpx_file in inpx_files:
                         file = os.path.join(full_path, inpx_file)
                         self.processinpx(inpx_file, full_path, file)
+                        if not settings.SINGLE_COMMIT: 
+                            opdsdb.commit()                        
                     continue
                 
             for name in files:
@@ -97,6 +103,8 @@ class opdsScanner:
                 else:
                     file_size=os.path.getsize(file)
                     self.processfile(name,full_path,file,None,0,file_size)
+                if not settings.SINGLE_COMMIT: 
+                    opdsdb.commit()                    
 
         #if settings.DELETE_LOGICAL:
         #    self.books_deleted=opdsdb.books_del_logical()
@@ -105,8 +113,7 @@ class opdsScanner:
             
         self.books_deleted=opdsdb.books_del_phisical()
         
-        if settings.SINGLE_COMMIT: 
-            opdsdb.commit() 
+        opdsdb.commit() 
                     
         self.log_stats()
 
