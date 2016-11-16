@@ -48,6 +48,7 @@ class opdsScanner:
         if settings.FB2TOEPUB!=None: self.logger.debug('fb2toepub = '+settings.FB2TOEPUB)
         if settings.FB2TOMOBI!=None: self.logger.debug('fb2tomobi = '+settings.FB2TOMOBI)
         if settings.TEMP_DIR!=None:       self.logger.debug('temp_dir = '+settings.TEMP_DIR)
+        if settings.SINGLE_COMMIT!=None:       self.logger.debug('SINGLE_COMMIT = '+settings.SINGLE_COMMIT)
 
     def log_stats(self):
         self.t2=datetime.timedelta(seconds=time.time())
