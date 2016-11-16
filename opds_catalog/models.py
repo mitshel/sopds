@@ -90,7 +90,7 @@ class bgenre(models.Model):
 #        ]
 
 class Series(models.Model):
-    ser = models.CharField(max_length=80, db_index=True)
+    ser = models.CharField(max_length=SIZE_SERIES, db_index=True)
     search_ser = models.CharField(max_length=SIZE_SERIES, default=None, db_index=True)
     lang_code = models.IntegerField(null=False, default=9,db_index=True)
 
