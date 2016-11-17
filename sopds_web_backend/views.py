@@ -142,6 +142,7 @@ def SearchBooksView(request):
                 books={}        
                 args['breadcrumbs'] = [_('Books'), _('Bookshelf')] 
             args['searchobject'] = 'title'
+            args['isbookshelf'] = 1
                 
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
@@ -535,6 +536,19 @@ def GenresView(request):
        
     return render(request,'sopds_selectgenres.html', args)
 
+@sopds_login(url='web:login')
+def BSDelView(request):
+    if request.GET:
+       book = request.GET.get('book', None)
+    else:
+       book = None
+       
+    book = int(book)
+       
+    bookshelf.objects.filter(user=request.user, book=book).delete()
+    
+    return redirect("%s?searchtype=u"%reverse("web:searchbooks"))
+    
 def hello(request):
     args = {}
     args['breadcrumbs'] = [_('HOME')]

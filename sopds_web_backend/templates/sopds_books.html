@@ -2,6 +2,33 @@
 {% load i18n %}
 
 {% block body %}
+<script>
+       function del_bsbook(b_id, b_t) {
+           $('#DeleteBook_btnYes').attr("href",'/web/bs/delete/?book='+b_id);
+           $('#DeleteBook_image').attr("src","/opds/cover/"+b_id+"/");
+           $('#DeleteBook_title').text(b_t);
+           $('#DeleteBookModal').foundation('open');
+       }
+</script>
+           
+<div id="DeleteBookModal" class="reveal tiny text-center" data-reveal>
+  <h5 id="DeleteBookModalTitle">Подтвердите удаление книги с Вашей книжной полки.</h5>
+  <table><tr>	
+  <td width="100px" style="padding:0rem 0rem;">
+      <img src="#" id="DeleteBook_image" style="max-height: 100px; max-width: 100px">
+  </td> 
+  <td style="font-size:100%; padding:3px">
+      <p id="DeleteBook_title"></p>
+  </td>
+  </tr>
+  </table>
+  <p class="text-center"><a href="#" class="secondary button" id="DeleteBook_btnYes">Удалить</a>
+                         &nbsp;&nbsp;&nbsp;<a class="close button" data-close>Отмена</a></p>
+  <button class="close-button" data-close aria-label="Close modal" type="button">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
 {%  for b in books %}
 		<div class="large-12 column">
 			<b>{{ b.title }}</b>
@@ -14,6 +41,9 @@
 			{% if b.format == 'fb2' and fb2tomobi %}
 			   <i><a href="{% url 'opds_catalog:convert' b.id 'mobi' %}"><span class="label small">mobi</span></a></i>&nbsp;
 			{% endif %}			
+			{% if isbookshelf %}
+			&nbsp;&nbsp;<i><a href="#" onclick="del_bsbook({{ b.id }},'{{b.title}}');"><span class="secondary label small">&nbsp;{% trans "Delete from bookshelf" %}&nbsp;</span></a></i>
+		    {% endif %}
 		</div>
 		
 		<div class="large-12 column">	

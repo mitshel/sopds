@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^genre/',views.GenresView, name='genre'),        
     url(r'^series/',views.SeriesView, name='series'),   
     url(r'^login/',views.LoginView, name='login'),    
-    url(r'^logout/',views.LogoutView, name='logout'),   
+    url(r'^logout/',views.LogoutView, name='logout'),  
+    url(r'^bs/delete/',views.BSDelView, name='bsdel'),  
     url(r'^',views.hello, name='main'),         
 ]
