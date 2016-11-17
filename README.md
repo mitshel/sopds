@@ -156,7 +156,7 @@ UBUNTU: для работы с БД Mysql в UBUNTU потребовалось �
 #### 4. Опции каталогизатора Simple OPDS (www.sopds.ru)
 Каталогизатор Simple OPDS имеет дополнительные настройки которые можно указывать в конце файла sopds/settings.py  
 
-**SOPDS_ROOT_LIB** - содержит путь к каталогу в котором расположена ваша коллекция книг.  
+**SOPDS_ROOT_LIB** - содержит путь к каталогу, в котором расположена ваша коллекция книг.  
 
 **SOPDS_BOOK_EXTENSIONS** - Список форматов книг, которые будут включаться в каталог.  
 (по умолчанию SOPDS_BOOK_EXTENSIONS = ['.pdf', '.djvu', '.fb2', '.epub'])  
@@ -218,8 +218,8 @@ UBUNTU: для работы с БД Mysql в UBUNTU потребовалось �
 (по умолчанию SOPDS_AUTH = False)  
 
 **SOPDS_SERVER_LOG** и **SOPDS_SCANNER_LOG** задают размещение LOG файлов этих процессов.  
-(по умолчанию SOPDS_SERVER_LOG = os.path.join(settings.BASE_DIR,'opds_catalog/log/sopds_server.log'))
-(по умолчанию SOPDS_SCANNER_LOG = os.path.join(settings.BASE_DIR,'opds_catalog/log/sopds_scanner.log'))
+(по умолчанию SOPDS_SERVER_LOG = os.path.join(settings.BASE_DIR,'opds_catalog/log/sopds_server.log'))  
+(по умолчанию SOPDS_SCANNER_LOG = os.path.join(settings.BASE_DIR,'opds_catalog/log/sopds_scanner.log'))  
 
 **SOPDS_SERVER_PID** и **SOPDS_SCANNER_PID** задают размещение PID файлов этих процессов при демонизации.  
 (по умолчанию SOPDS_SERVER_PID = os.path.join(settings.BASE_DIR,'opds_catalog/tmp/sopds_server.pid'))  
