@@ -77,7 +77,7 @@ class Inpx:
                         meta_data[key] = '' 
                                   
                 # Если книга помечена как удаленная в INP, то пропускаем вызов callback   
-                if meta_data[sDel].strip()!='':
+                if not (meta_data[sDel].strip() in ['','0']):
                     continue          
                 
                 # Если нужно выполнить проверку книги в ZIP, а ее там не оказалось, то пропускаем вызов callback            

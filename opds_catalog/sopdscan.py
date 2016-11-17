@@ -124,13 +124,14 @@ class opdsScanner:
         return result
                 
     def inpx_callback(self, inpx, inp, meta_data):          
-                    
+                 
         name = "%s.%s"%(meta_data[inpx_parser.sFile],meta_data[inpx_parser.sExt])
         
         lang=meta_data[inpx_parser.sLang].strip(self.strip_symbols)
         title=meta_data[inpx_parser.sTitle].strip(self.strip_symbols)
         annotation=''
         docdate=meta_data[inpx_parser.sDate].strip(self.strip_symbols)
+        
         
         book=opdsdb.addbook(name,self.rel_path,self.inp_cat,meta_data[inpx_parser.sExt],title,annotation,docdate,lang,meta_data[inpx_parser.sSize],opdsdb.CAT_INP)
         self.books_added+=1

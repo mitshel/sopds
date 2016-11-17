@@ -142,7 +142,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
-SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
+SOPDS_ROOT_LIB = 'D:\\tmp\\flibusta\\'
+#SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
 #SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
 #SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
 #SOPDS_ROOT_LIB = '/mnt/nfs/КНИГИ/BOOKS/'
