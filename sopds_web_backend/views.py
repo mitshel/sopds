@@ -562,7 +562,7 @@ def LoginView(request):
         username = request.POST['username']
         password = request.POST['password']
     except KeyError:
-        return render(request, 'sopds_Login.html', args) 
+        return render(request, 'sopds_login.html', args) 
     
     next = request.GET.get('next',reverse("web:main"))
 
