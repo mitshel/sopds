@@ -25,16 +25,9 @@ SECRET_KEY = 'm4l1c#nq6*zs!c3ri4dg4(54_7bvrl5uintni6p20tijlaxv!x'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Конфигурация для ведения разработки на разных хостах
-# убрать при окончании разработки
-import socket
-HOSTNAME=socket.gethostname().upper()
-
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -92,11 +85,8 @@ WSGI_APPLICATION = 'sopds.wsgi.application'
 #        'USER': 'sopds',
 #        'PASSWORD' : 'sopds',
 #        'OPTIONS' : {
-#            'init_command': """SET default_storage_engine=INNODB; \
-#                               SET sql_mode='STRICT_TRANS_TABLES'; \
-#                               SET NAMES UTF8; \
-#                               SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
-#                            """
+#            'init_command': "SET default_storage_engine=MyISAM;\
+#                             SET sql_mode='';"
 #        }
 #    }             
 #}
@@ -129,8 +119,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
-#LANGUAGE_CODE = 'en-US'
-LANGUAGE_CODE = 'ru-RU'
+LANGUAGE_CODE = 'en-US'
+#LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
@@ -142,9 +132,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
-#SOPDS_ROOT_LIB = 'D:\\tmp\\flibusta\\'
+
+#
+# SIMPLE OPDS SETTINGS
+#
 SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
-#SOPDS_ROOT_LIB = 'Z:\\КНИГИ\\TEST\\'
 #SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
 #SOPDS_ROOT_LIB = '/mnt/nfs/КНИГИ/BOOKS/'
 
@@ -157,5 +149,5 @@ SOPDS_SCAN_SHED_HOUR ='0,12'
 #SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2toepub/unix_dist/fb2toepub')
 #SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2conv/fb2epub')
 #SOPDS_FB2TOMOBI = os.path.join(BASE_DIR,'convert/fb2conv/fb2mobi')
-SOPDS_FB2TOEPUB = os.path.join(BASE_DIR, 'convert\\fb2epub\\fb2epub.cmd' if sys.platform =='win32' else 'convert/fb2epub/fb2epub' )
+#SOPDS_FB2TOEPUB = os.path.join(BASE_DIR, 'convert\\fb2epub\\fb2epub.cmd' if sys.platform =='win32' else 'convert/fb2epub/fb2epub' )
 
