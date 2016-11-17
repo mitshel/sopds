@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-15 23:15+0300\n"
+"POT-Creation-Date: 2016-11-17 20:13+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,7 +53,7 @@ msgstr "Авторы:"
 #: .\sopds_web_backend\templates\sopds_books.html:30
 #: .\sopds_web_backend\templates\sopds_menu.html:9
 #: .\sopds_web_backend\templates\sopds_menu.html:31
-#: .\sopds_web_backend\views.py:506 .\sopds_web_backend\views.py:510
+#: .\sopds_web_backend\views.py:527 .\sopds_web_backend\views.py:531
 msgid "Genres"
 msgstr "Жанры"
 
@@ -61,7 +61,7 @@ msgstr "Жанры"
 #: .\sopds_web_backend\templates\sopds_logo.html:29
 #: .\sopds_web_backend\templates\sopds_menu.html:10
 #: .\sopds_web_backend\templates\sopds_menu.html:33
-#: .\sopds_web_backend\views.py:262 .\sopds_web_backend\views.py:492
+#: .\sopds_web_backend\views.py:277 .\sopds_web_backend\views.py:512
 msgid "Series"
 msgstr "Серии"
 
@@ -121,8 +121,44 @@ msgstr "Дата последнего сканирования:"
 msgid "RANDOM BOOK"
 msgstr "СЛУЧАЙНАЯ КНИГА"
 
+#: .\sopds_web_backend\templates\sopds_hello.html:8
+msgid ""
+"Simple OPDS Catalog - is a free program for Linux and Windows, which allows "
+"for the rapid creation of electronic OPDS-catalog books. OPDS (Open "
+"Publication Distribution System) directory allows you to access your library "
+"through the Internet with many devices for reading electronic books, "
+"tablets, smartphones, etc. More about the program can be found on the "
+"project website:"
+msgstr ""
+"Simple OPDS Catalog - Бесплатная программа для операционных систем Linux и "
+"Windows, предназначенная для быстрого создания электронного OPDS-каталога "
+"книг. OPDS (Open Publication Distribution System) каталог позволяет получать "
+"доступ к Вашей библиотеке через Интернет с большинства устройств для чтения "
+"электронных книг, планшетов, смартфонов и т.д. Дополнительную информацию о "
+"программе Вы сможете найти на Web-сайте проекта:"
+
+#: .\sopds_web_backend\templates\sopds_login.html:9
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: .\sopds_web_backend\templates\sopds_login.html:10
+msgid "Enter Username"
+msgstr "Введите имя"
+
+#: .\sopds_web_backend\templates\sopds_login.html:12
+msgid "Password"
+msgstr "Пароль"
+
+#: .\sopds_web_backend\templates\sopds_login.html:13
+msgid "Enter Password"
+msgstr "Введите пароль"
+
+#: .\sopds_web_backend\templates\sopds_login.html:15
+msgid "Log in"
+msgstr "Вход"
+
 #: .\sopds_web_backend\templates\sopds_logo.html:14
-#: .\sopds_web_backend\views.py:262 .\sopds_web_backend\views.py:322
+#: .\sopds_web_backend\views.py:277 .\sopds_web_backend\views.py:338
 msgid "Search"
 msgstr "Найти"
 
@@ -140,24 +176,24 @@ msgstr "Автор"
 
 #: .\sopds_web_backend\templates\sopds_menu.html:6
 #: .\sopds_web_backend\templates\sopds_menu.html:16
-#: .\sopds_web_backend\views.py:392
+#: .\sopds_web_backend\views.py:409
 msgid "Catalogs"
 msgstr "Каталоги"
 
 #: .\sopds_web_backend\templates\sopds_menu.html:7
 #: .\sopds_web_backend\templates\sopds_menu.html:17
-#: .\sopds_web_backend\views.py:74 .\sopds_web_backend\views.py:80
-#: .\sopds_web_backend\views.py:93 .\sopds_web_backend\views.py:105
-#: .\sopds_web_backend\views.py:114 .\sopds_web_backend\views.py:117
-#: .\sopds_web_backend\views.py:126 .\sopds_web_backend\views.py:130
-#: .\sopds_web_backend\views.py:139 .\sopds_web_backend\views.py:150
-#: .\sopds_web_backend\views.py:426
+#: .\sopds_web_backend\views.py:88 .\sopds_web_backend\views.py:94
+#: .\sopds_web_backend\views.py:107 .\sopds_web_backend\views.py:119
+#: .\sopds_web_backend\views.py:128 .\sopds_web_backend\views.py:131
+#: .\sopds_web_backend\views.py:140 .\sopds_web_backend\views.py:144
+#: .\sopds_web_backend\views.py:153 .\sopds_web_backend\views.py:164
+#: .\sopds_web_backend\views.py:444
 msgid "Books"
 msgstr "Книги"
 
 #: .\sopds_web_backend\templates\sopds_menu.html:8
 #: .\sopds_web_backend\templates\sopds_menu.html:24
-#: .\sopds_web_backend\views.py:322 .\sopds_web_backend\views.py:459
+#: .\sopds_web_backend\views.py:338 .\sopds_web_backend\views.py:478
 msgid "Authors"
 msgstr "Авторы"
 
@@ -187,51 +223,64 @@ msgid "Total: %(s_book_count)s books."
 msgstr "Всего: %(s_book_count)s книг."
 
 #: .\sopds_web_backend\templates\sopds_top.html:19
+#: .\sopds_web_backend\views.py:572
 msgid "Logout"
 msgstr "Выход"
 
 #: .\sopds_web_backend\templates\sopds_top.html:21
-msgid "Login"
-msgstr "Вход"
-
-#: .\sopds_web_backend\templates\sopds_top.html:24
 msgid "Settings"
 msgstr "Настройки"
 
-#: .\sopds_web_backend\views.py:74 .\sopds_web_backend\views.py:80
+#: .\sopds_web_backend\templates\sopds_top.html:24
+#: .\sopds_web_backend\views.py:546
+msgid "Login"
+msgstr "Вход"
+
+#: .\sopds_web_backend\views.py:88 .\sopds_web_backend\views.py:94
 msgid "Search by title"
 msgstr "Поиск по наименованию"
 
-#: .\sopds_web_backend\views.py:93
+#: .\sopds_web_backend\views.py:107
 msgid "Search by author"
 msgstr "Поиск по автору"
 
-#: .\sopds_web_backend\views.py:105
+#: .\sopds_web_backend\views.py:119
 msgid "Search by series"
 msgstr "Поиск по серии"
 
-#: .\sopds_web_backend\views.py:114 .\sopds_web_backend\views.py:117
+#: .\sopds_web_backend\views.py:128 .\sopds_web_backend\views.py:131
 msgid "Search by genre"
 msgstr "Поиск по жанру"
 
-#: .\sopds_web_backend\views.py:126 .\sopds_web_backend\views.py:130
+#: .\sopds_web_backend\views.py:140 .\sopds_web_backend\views.py:144
 msgid "Bookshelf"
 msgstr "Книжная полка"
 
-#: .\sopds_web_backend\views.py:139
+#: .\sopds_web_backend\views.py:153
 msgid "Doubles for book"
 msgstr "Дубликаты книги"
 
-#: .\sopds_web_backend\views.py:391
+#: .\sopds_web_backend\views.py:408
 msgid "ROOT"
 msgstr "НАЧАЛО"
 
-#: .\sopds_web_backend\views.py:426 .\sopds_web_backend\views.py:459
-#: .\sopds_web_backend\views.py:492 .\sopds_web_backend\views.py:506
-#: .\sopds_web_backend\views.py:510
+#: .\sopds_web_backend\views.py:444 .\sopds_web_backend\views.py:478
+#: .\sopds_web_backend\views.py:512 .\sopds_web_backend\views.py:527
+#: .\sopds_web_backend\views.py:531
 msgid "Select"
 msgstr "Выбор"
 
-#: .\sopds_web_backend\views.py:520
+#: .\sopds_web_backend\views.py:541
 msgid "HOME"
 msgstr "ГЛАВНАЯ"
+
+#: .\sopds_web_backend\views.py:562
+msgid "This account is not active!"
+msgstr "Учетная запись не активна!"
+
+#: .\sopds_web_backend\views.py:565
+msgid "User does not exist or the password is incorrect!"
+msgstr "Пользователь не существует или введен неправильный пароль!"
+
+#~ msgid "Authentication error!"
+#~ msgstr "Ошибка аутентификации!"

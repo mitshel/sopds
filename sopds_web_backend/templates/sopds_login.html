@@ -1,0 +1,19 @@
+{% extends "sopds_main.html" %}
+{% load i18n %}
+
+{% block body %}
+<form method="post" sction='{% url "web:login" %}'>
+{% csrf_token %}
+<div class="row">
+<div class="small-6 medium-4 large-3 small-centered columns">
+      <label>{% trans "Username" %}
+        <input type="text" name="username" placeholder="{% trans "Enter Username" %}">
+      </label>
+      <label>{% trans "Password" %}
+        <input type="password" name="password" placeholder="{% trans "Enter Password" %}">
+      </label>      
+	  <input type="submit" class="button" value="{% trans "Log in" %}">      
+</div>
+</div>
+</form>
+{% endblock %}  {# body #}

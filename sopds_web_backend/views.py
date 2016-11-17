@@ -1,12 +1,14 @@
 from random import randint
 from itertools import chain
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 from django.db.models import Count, Min
-#from django.contrib.gis.db.models.aggregates import Collect
 from django.utils.translation import ugettext as _
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login, logout
+from django.core.urlresolvers import reverse
 
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre
@@ -14,6 +16,17 @@ from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABE
 from opds_catalog.models import lang_menu
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
+
+def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+    actual_decorator = user_passes_test(
+        lambda u: u.is_authenticated(),
+#        login_url=login_url,
+        login_url="/web/login/",
+        redirect_field_name=redirect_field_name
+    )
+    if function:
+        return actual_decorator(function) if AUTH else function
+    return actual_decorator
 
 def sopds_processor(request):
     args={}
@@ -49,10 +62,11 @@ def sopds_processor(request):
         stats = { d['name']:d['value'] for d in Counter.obj.all().values() }
         stats['lastscan_date']=Counter.obj.get(name='allbooks').update_time
         args['stats'] = stats
-        
+  
     return args
 
 # Create your views here.
+@sopds_login
 def SearchBooksView(request):
     #Read searchtype, searchterms, searchterms0, page from form
     args = {}
@@ -204,6 +218,7 @@ def SearchBooksView(request):
         
     return render(request,'sopds_books.html', args)
 
+@sopds_login
 def SelectSeriesView(request):
     #Read searchtype, searchterms, searchterms0, page from form
     args = {}
@@ -263,6 +278,7 @@ def SelectSeriesView(request):
                                               
     return render(request,'sopds_series.html', args)
 
+@sopds_login
 def SearchAuthorsView(request):
     #Read searchtype, searchterms, searchterms0, page from form    
     args = {}
@@ -323,6 +339,7 @@ def SearchAuthorsView(request):
                                     
     return render(request,'sopds_authors.html', args)
 
+@sopds_login
 def CatalogsView(request):   
     args = {}
 
@@ -394,6 +411,7 @@ def CatalogsView(request):
       
     return render(request,'sopds_catalogs.html', args)  
 
+@sopds_login
 def BooksView(request):   
     args = {}
 
@@ -427,6 +445,7 @@ def BooksView(request):
       
     return render(request,'sopds_selectbook.html', args)      
 
+@sopds_login
 def AuthorsView(request):   
     args = {}
 
@@ -460,6 +479,7 @@ def AuthorsView(request):
       
     return render(request,'sopds_selectauthor.html', args)    
 
+@sopds_login
 def SeriesView(request):   
     args = {}
 
@@ -493,6 +513,7 @@ def SeriesView(request):
       
     return render(request,'sopds_selectseries.html', args)
 
+@sopds_login
 def GenresView(request):   
     args = {}
 
@@ -518,4 +539,35 @@ def GenresView(request):
 def hello(request):
     args = {}
     args['breadcrumbs'] = [_('HOME')]
-    return render(request, 'sopds_selectbook.html', args)
+    return render(request, 'sopds_hello.html', args)
+
+def LoginView(request):
+    args = {}
+    args['breadcrumbs'] = [_('Login')]
+    args.update(csrf(request))
+    try:
+        username = request.POST['username']
+        password = request.POST['password']
+    except KeyError:
+        return render(request, 'sopds_Login.html', args) 
+    
+    next = request.GET.get('next',reverse("web:main"))
+
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            return redirect(next)
+        else:
+            args['system_message']={'text':_('This account is not active!'),'type':'alert'}
+            return render(request, 'sopds_login.html', args)
+    else:
+        args['system_message']={'text':_('User does not exist or the password is incorrect!'),'type':'alert'}
+        return render(request, 'sopds_login.html', args)
+    
+    return render(request, 'sopds_Login.html', args)
+
+def LogoutView(request):
+    args = {}
+    args['breadcrumbs'] = [_('Logout')]
+    return redirect(reverse('web:main'))

@@ -53,7 +53,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',    
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  
-    'opds_catalog.opds_middleware.BasicAuthMiddleware',  
+    #'opds_catalog.opds_middleware.BasicAuthMiddleware',  
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -129,8 +129,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
-LANGUAGE_CODE = 'en-US'
-#LANGUAGE_CODE = 'ru-RU'
+#LANGUAGE_CODE = 'en-US'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True

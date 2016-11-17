@@ -45,6 +45,6 @@ class BasicAuthMiddleware(object):
         if user and user.is_active:
             request.user = user
             auth.login(request, user)
-            return 
+            return None
 
         return self.unauthed()
