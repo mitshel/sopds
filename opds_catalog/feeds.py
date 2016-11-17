@@ -14,7 +14,6 @@ from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf,
 from opds_catalog import models
 from opds_catalog import settings
 from opds_catalog.opds_middleware import BasicAuthMiddleware
-#from django.http.response import Http404
 
 class AuthFeed(Feed):
     request = None
@@ -136,7 +135,6 @@ class opdsFeed(Atom1Feed):
                                                      "title":_("Book doublicates")})
                 handler.characters("\n")
             
-
 class MainFeed(AuthFeed):
     feed_type = opdsFeed
     title = settings.TITLE
@@ -338,7 +336,6 @@ class SearchTypesFeed(AuthFeed):
 
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
-
 
 class SearchBooksFeed(AuthFeed):
     feed_type = opdsFeed
@@ -557,7 +554,6 @@ class SelectSeriesFeed(AuthFeed):
 
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
-
             
 class SearchAuthorsFeed(AuthFeed):
     feed_type = opdsFeed
@@ -761,7 +757,6 @@ class LangFeed(AuthFeed):
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
 
-
 class BooksFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
@@ -820,7 +815,6 @@ class BooksFeed(AuthFeed):
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
     
-
 class AuthorsFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
@@ -879,7 +873,6 @@ class AuthorsFeed(AuthFeed):
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
     
-
 class SeriesFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
@@ -937,7 +930,7 @@ class SeriesFeed(AuthFeed):
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
-
+    
 class GenresFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
@@ -985,3 +978,5 @@ class GenresFeed(AuthFeed):
         
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+
+        

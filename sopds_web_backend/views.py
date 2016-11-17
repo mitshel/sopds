@@ -6,9 +6,9 @@ from django.template.context_processors import csrf
 from django.core.paginator import Paginator, InvalidPage
 from django.db.models import Count, Min
 from django.utils.translation import ugettext as _
+from django.contrib.auth import authenticate, login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login, logout
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre
@@ -17,11 +17,10 @@ from opds_catalog.models import lang_menu
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 
-def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
+def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None):
     actual_decorator = user_passes_test(
         lambda u: u.is_authenticated(),
-#        login_url=login_url,
-        login_url="/web/login/",
+        login_url=reverse_lazy(url),
         redirect_field_name=redirect_field_name
     )
     if function:
@@ -48,25 +47,25 @@ def sopds_processor(request):
             result.append(p)    
         args['bookshelf']=result
         
-        books_count = Counter.objects.get_counter(models.counter_allbooks)
-        if books_count:
-            random_id = randint(1,books_count)
-            try:
-                random_book = Book.objects.all()[random_id-1:random_id][0]
-            except Book.DoesNotExist:
-                random_book= None
-        else:
-            random_book= None        
+    books_count = Counter.objects.get_counter(models.counter_allbooks)
+    if books_count:
+        random_id = randint(1,books_count)
+        try:
+            random_book = Book.objects.all()[random_id-1:random_id][0]
+        except Book.DoesNotExist:
+            random_book= None
+    else:
+        random_book= None        
                    
-        args['random_book'] = random_book
-        stats = { d['name']:d['value'] for d in Counter.obj.all().values() }
-        stats['lastscan_date']=Counter.obj.get(name='allbooks').update_time
-        args['stats'] = stats
+    args['random_book'] = random_book
+    stats = { d['name']:d['value'] for d in Counter.obj.all().values() }
+    stats['lastscan_date']=Counter.obj.get(name='allbooks').update_time
+    args['stats'] = stats
   
     return args
 
 # Create your views here.
-@sopds_login
+@sopds_login(url='web:login')
 def SearchBooksView(request):
     #Read searchtype, searchterms, searchterms0, page from form
     args = {}
@@ -218,7 +217,7 @@ def SearchBooksView(request):
         
     return render(request,'sopds_books.html', args)
 
-@sopds_login
+@sopds_login(url='web:login')
 def SelectSeriesView(request):
     #Read searchtype, searchterms, searchterms0, page from form
     args = {}
@@ -278,7 +277,7 @@ def SelectSeriesView(request):
                                               
     return render(request,'sopds_series.html', args)
 
-@sopds_login
+@sopds_login(url='web:login')
 def SearchAuthorsView(request):
     #Read searchtype, searchterms, searchterms0, page from form    
     args = {}
@@ -339,7 +338,7 @@ def SearchAuthorsView(request):
                                     
     return render(request,'sopds_authors.html', args)
 
-@sopds_login
+@sopds_login(url='web:login')
 def CatalogsView(request):   
     args = {}
 
@@ -411,7 +410,7 @@ def CatalogsView(request):
       
     return render(request,'sopds_catalogs.html', args)  
 
-@sopds_login
+@sopds_login(url='web:login')
 def BooksView(request):   
     args = {}
 
@@ -445,7 +444,7 @@ def BooksView(request):
       
     return render(request,'sopds_selectbook.html', args)      
 
-@sopds_login
+@sopds_login(url='web:login')
 def AuthorsView(request):   
     args = {}
 
@@ -479,7 +478,7 @@ def AuthorsView(request):
       
     return render(request,'sopds_selectauthor.html', args)    
 
-@sopds_login
+@sopds_login(url='web:login')
 def SeriesView(request):   
     args = {}
 
@@ -513,7 +512,7 @@ def SeriesView(request):
       
     return render(request,'sopds_selectseries.html', args)
 
-@sopds_login
+@sopds_login(url='web:login')
 def GenresView(request):   
     args = {}
 
