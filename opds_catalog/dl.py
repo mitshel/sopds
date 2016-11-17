@@ -60,10 +60,16 @@ def Download(request, book_id, zip_flag):
     if book.cat_type==opdsdb.CAT_NORMAL:
         file_path=os.path.join(full_path, book.filename)
         book_size=os.path.getsize(file_path)
-        fo=codecs.open(file_path, "rb")
+        try:
+            fo=codecs.open(file_path, "rb")
+        except FileNotFoundError:
+            raise Http404
         s=fo.read()
     elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
-        fz=codecs.open(full_path, "rb")
+        try:
+            fz=codecs.open(full_path, "rb")
+        except FileNotFoundError:
+            raise Http404
         z = zipfile.ZipFile(fz, 'r', allowZip64=True)
         book_size=z.getinfo(book.filename).file_size
         fo= z.open(book.filename)
@@ -176,7 +182,10 @@ def ConvertFB2(request, book_id, convert_type):
         tmp_fb2_path=None
         file_path=os.path.join(full_path, book.filename)
     elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
-        fz=codecs.open(full_path, "rb")
+        try:
+            fz=codecs.open(full_path, "rb")
+        except FileNotFoundError:
+            raise Http404        
         z = zipfile.ZipFile(fz, 'r', allowZip64=True)
         z.extract(book.filename,settings.TEMP_DIR)
         tmp_fb2_path=os.path.join(settings.TEMP_DIR,book.filename)
