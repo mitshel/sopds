@@ -578,7 +578,7 @@ def LoginView(request):
         args['system_message']={'text':_('User does not exist or the password is incorrect!'),'type':'alert'}
         return render(request, 'sopds_login.html', args)
     
-    return render(request, 'sopds_Login.html', args)
+    return render(request, 'sopds_login.html', args)
 
 def LogoutView(request):
     args = {}
