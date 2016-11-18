@@ -4,7 +4,7 @@ from django.conf import settings
 
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
 
-VERSION = "0.34b"
+VERSION = "0.35"
 
 # ROOT_LIB содержит путь к каталогу в котором расположена ваша коллекция книг
 ROOT_LIB = getattr(settings, "SOPDS_ROOT_LIB", "books/")

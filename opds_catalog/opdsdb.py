@@ -34,8 +34,7 @@ CMP_TITLE_AUTHORS=1
 #
 unknown_genre=_('Unknown genre')
 
-
-def clear_all(verbose):
+def clear_all(verbose=False):
     count = bseries.objects.all().delete()
     if verbose: print("From bseries table %s row deleted"%count[0])
     count = bauthor.objects.all().delete()
