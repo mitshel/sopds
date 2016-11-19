@@ -23,13 +23,13 @@ class BasicAuthMiddleware(object):
             return
             
         # AuthenticationMiddleware is required so that request.user exists.
-        if not hasattr(request, 'user'):
-            raise ImproperlyConfigured(
-                "The Django remote user auth middleware requires the"
-                " authentication middleware to be installed.  Edit your"
-                " MIDDLEWARE setting to insert"
-                " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
-                " before the BasicAuthMiddleware class.")
+        #if not hasattr(request, 'user'):
+        #    raise ImproperlyConfigured(
+        #        "The Django remote user auth middleware requires the"
+        #        " authentication middleware to be installed.  Edit your"
+        #        " MIDDLEWARE setting to insert"
+        #        " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
+        #        " before the BasicAuthMiddleware class.")
         try:
             authentication = request.META[self.header]
         except KeyError:
