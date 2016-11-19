@@ -9,7 +9,7 @@ class opdsdbTestCase(TestCase):
         opdsdb.clear_all()
         opdsdb.addcattree("root/child/subchild",opdsdb.CAT_NORMAL)
         book = opdsdb.addbook("testbook.fb2", "root/child",opdsdb.findcat("root/child"),".fb2","Test Book", "Annotation", "01.01.2016", "ru", 500, 0)
-        opdsdb.addbauthor(book, opdsdb.addauthor("Test","Author"))
+        opdsdb.addbauthor(book, opdsdb.addauthor("Test Author"))
         opdsdb.addbgenre(book, opdsdb.addgenre("fantastic"))
         opdsdb.addbseries(book, opdsdb.addseries("mywork"), 1)
 
@@ -43,7 +43,7 @@ class opdsdbTestCase(TestCase):
         self.assertEqual(book.path, "root/child")
         self.assertEqual(book.catalog.cat_name, "child")
         self.assertEqual(book.catalog.cat_type, 0)
-        self.assertEqual(book.format, "fb2")
+        self.assertEqual(book.format, ".fb2")
         self.assertEqual(book.title, "Test Book")
         self.assertEqual(book.annotation, "Annotation")
         self.assertEqual(book.docdate, "01.01.2016")
@@ -55,7 +55,7 @@ class opdsdbTestCase(TestCase):
         """ Тестирование функций addauthor, addbauthor """
         book = opdsdb.findbook("testbook.fb2", "root/child")
         self.assertEqual(book.authors.count(), 1)
-        self.assertEqual(book.authors.get(last_name="Author").first_name, "Test")
+        self.assertEqual(book.authors.get(full_name="Test Author").search_full_name, "TEST AUTHOR")
 
     def test_genre_fn(self):
         """ Тестирование функций addgenre, addbgenre """

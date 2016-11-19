@@ -32,6 +32,7 @@ class scanTestCase(TestCase):
         self.assertEqual(book.docdate, "30.1.2011")
         self.assertEqual(book.lang, "en")
         self.assertEqual(book.title, "The Sanctuary Sparrow")
+        self.assertEqual(book.search_title, "The Sanctuary Sparrow".upper())
         self.assertEqual(book.annotation, "")
         self.assertEqual(book.avail, 2)
         self.assertEqual(book.catalog.path, ".")
@@ -40,7 +41,7 @@ class scanTestCase(TestCase):
         self.assertEqual(book.filesize, 495373)
 
         self.assertEqual(book.authors.count(), 1)
-        self.assertEqual(book.authors.get(last_name="Peters").first_name, "Ellis")
+        self.assertEqual(book.authors.get(full_name="Peters Ellis").search_full_name, "PETERS ELLIS")
 
         self.assertEqual(book.genres.count(), 1)
         self.assertEqual(book.genres.get(genre="antique").section, opdsdb.unknown_genre)
@@ -66,7 +67,7 @@ class scanTestCase(TestCase):
         self.assertEqual(book.title, "Любовь в жизни Обломова")
         self.assertEqual(book.avail, 2)
         self.assertEqual(book.authors.count(), 1)
-        self.assertEqual(book.authors.get(last_name="Логинов").first_name, "Святослав")
+        self.assertEqual(book.authors.get(full_name="Логинов Святослав").search_full_name, "ЛОГИНОВ СВЯТОСЛАВ")
         self.assertEqual(book.genres.count(), 1)
         self.assertEqual(book.genres.get(genre="nonf_criticism").section, opdsdb.unknown_genre)
         self.assertEqual(book.genres.get(genre="nonf_criticism").subsection, "nonf_criticism")
@@ -76,14 +77,14 @@ class scanTestCase(TestCase):
         self.assertEqual(book.path, self.test_zip)
         self.assertEqual(book.cat_type, 1)
         self.assertEqual(book.title, "Китайски сладкиш с късметче")
-        self.assertEqual(book.authors.get(last_name="Фрич").first_name, "Чарлз")
+        self.assertEqual(book.authors.get(full_name="Фрич Чарлз").search_full_name, "ФРИЧ ЧАРЛЗ")
 
         book = Book.objects.get(filename="539273.fb2")
         self.assertEqual(book.filesize, 21722)
         self.assertEqual(book.path, self.test_zip)
         self.assertEqual(book.cat_type, 1)
         self.assertEqual(book.title, "Драконьи Услуги")
-        self.assertEqual(book.authors.get(last_name="Куприянов").first_name, "Денис")
+        self.assertEqual(book.authors.get(full_name="Куприянов Денис").search_full_name, "КУПРИЯНОВ ДЕНИС")
 
     def test_scanall(self):
         """ Тестирование процедуры scanall (извлекает метаданные из книг и помещает в БД) """

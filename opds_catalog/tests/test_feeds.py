@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from django.utils.translation import ugettext as _
 
-from opds_catalog import settings
+from opds_catalog import settings, opdsdb
 
 
 class feedsTestCase(TestCase):
@@ -35,9 +35,9 @@ class feedsTestCase(TestCase):
        
     def test_CatalogsFeedTree(self):
         c = Client()
-        response = c.get('/opds/catalogs/12/')
+        response = c.get('/opds/catalogs/4/')
         self.assertEquals(response.status_code, 200)
-        response = c.get( reverse('opds:cat_tree',args=['12']) )
+        response = c.get( reverse('opds:cat_tree',args=['4']) )
         self.assertEquals(response.status_code, 200) 
         self.assertIn('Драконьи Услуги', response.content.decode())     
         self.assertIn('Китайски сладкиш с късметче', response.content.decode())  
@@ -69,11 +69,11 @@ class feedsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
         self.assertIn("Куприянов Денис", response.content.decode())   
-        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'a','searchterms':'1034'}))
+        response = c.get(reverse('opds:searchbooks', kwargs={'searchtype':'a','searchterms':'8'}))
         self.assertEquals(response.status_code, 200)        
         self.assertIn("Драконьи Услуги", response.content.decode())
         self.assertIn("Куприянов Денис", response.content.decode())  
-        self.assertIn(_("All books by %(last_name)s %(first_name)s")%{"last_name":"Куприянов", "first_name":"Денис"}, response.content.decode())  
+        self.assertIn(_("All books by %(full_name)s")%{"full_name":"Куприянов Денис"}, response.content.decode())  
         self.assertIn("prose_contemporary", response.content.decode())    
         self.assertIn("<category ", response.content.decode()) 
     
@@ -136,7 +136,7 @@ class feedsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         response = c.get(reverse('opds:genres'));
         self.assertEquals(response.status_code, 200)
-        self.assertIn("Неизвестный жанр", response.content.decode()) 
-        response = c.get(reverse('opds:genres', kwargs={'section':266}));
+        self.assertIn(opdsdb.unknown_genre, response.content.decode()) 
+        response = c.get(reverse('opds:genres', kwargs={'section':232}));
         self.assertEquals(response.status_code, 200)
         self.assertIn("prose_contemporary", response.content.decode())         

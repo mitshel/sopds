@@ -12,12 +12,14 @@ class Command(BaseCommand):
         
     def add_arguments(self, parser):
         parser.add_argument('command', help='Use [ clear | info ]')
-        parser.add_argument('--verbose',action='store_true', dest='verbose', default=False, help='Set verbosity level for books collection scan.')        
+        parser.add_argument('--verbose',action='store_true', dest='verbose', default=False, help='Set verbosity level for books collection scan.')  
+        parser.add_argument('--nogenres',action='store_true', dest='nogenres', default=False, help='Not install genres fom fixtures.')              
 
     def handle(self, *args, **options):
         action = options['command'] 
         
         self.verbose = options['verbose']
+        self.nogenres = options['nogenres']
                
         if action=='clear':
             self.stdout.write('Clear book database.')
@@ -28,7 +30,8 @@ class Command(BaseCommand):
     def clear(self):
         with transaction.atomic():
             opdsdb.clear_all(self.verbose)
-        call_command('loaddata', 'genre.json', app_label='opds_catalog') 
+        if not self.nogenres:
+            call_command('loaddata', 'genre.json', app_label='opds_catalog') 
         Counter.objects.update_known_counters()
         
     def info(self):

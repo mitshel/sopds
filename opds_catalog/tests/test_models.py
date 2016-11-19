@@ -16,13 +16,13 @@ class modelsTestCase(TestCase):
 
     def setUp(self):
         opdsdb.clear_all()
-        book = Book.objects.create(filename="testbook.fb2", path=".", filesize=500, format="fb2", cat_type=0, registerdate=self.testdatetime,
-                            docdate="01.01.2016", lang="ru", title="Книга", annotation="Аннотация", avail=2,
-                            catalog=Catalog.objects.create(parent=None, cat_name=".", path=".", cat_type=0)
+        book = Book.objects.create(filename="testbook.fb2", path=".", filesize=500, format="fb2", cat_type=0, 
+                            registerdate=self.testdatetime,docdate="01.01.2016", lang="ru", title="Книга", search_title="КНИГА", 
+                            annotation="Аннотация", avail=2,catalog=Catalog.objects.create(parent=None, cat_name=".", path=".", cat_type=0)
         )
-        author = Author.objects.create(first_name="Дмитрий", last_name="Шелепнев")
+        author = Author.objects.create(full_name="Шелепнев Дмитрий", search_full_name="ШЕЛЕПНЕВ ДМИТРИЙ")
         genre = Genre.objects.create(genre="fantastic0", section="fantastic1", subsection="fantastic2")
-        series = Series.objects.create(ser="mywork")
+        series = Series.objects.create(ser="mywork", search_ser="MYWORK")
         bauthor.objects.create(book=book, author=author)
         bgenre.objects.create(book=book, genre=genre)
         bseries.objects.create(book=book, ser=series, ser_no=1)
@@ -43,6 +43,7 @@ class modelsTestCase(TestCase):
         self.assertEqual(book.docdate, "01.01.2016")
         self.assertEqual(book.lang, "ru")
         self.assertEqual(book.title, "Книга")
+        self.assertEqual(book.search_title, "КНИГА")
         self.assertEqual(book.annotation, "Аннотация")
         self.assertEqual(book.avail, 2)
         self.assertEqual(book.catalog.path, ".")
@@ -53,8 +54,7 @@ class modelsTestCase(TestCase):
         """ Тестирование соответствия структуры моделей Author и bauthor и работоспособности БД """
         book = Book.objects.get(title="Книга")
         self.assertEqual(book.authors.count(), 1)
-        self.assertEqual(book.authors.get(last_name="Шелепнев").first_name, "Дмитрий")
-
+        self.assertEqual(book.authors.get(full_name="Шелепнев Дмитрий").search_full_name, "ШЕЛЕПНЕВ ДМИТРИЙ")
 
     def test_Genre(self):
         """ Тестирование соответствия структуры моделей Genre и bgenre и работоспособности БД """
@@ -69,6 +69,7 @@ class modelsTestCase(TestCase):
         self.assertEqual(book.series.count(), 1)
         ser = book.series.all()[0]
         self.assertEqual(ser.ser,"mywork")
+        self.assertEqual(ser.search_ser,"MYWORK")
         self.assertEqual(bseries.objects.get(ser=ser).ser_no, 1)
 
     def test_bookshelf(self):
