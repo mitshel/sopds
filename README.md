@@ -28,8 +28,8 @@
 	
 	SOPDS_ROOT_LIB = < Путь к каталогу с книгами >
 	SOPDS_AUTH = < False | True >
-	SOPDS_SCAN_SHED_MIN  = '0,12'
-	SOPDS_SCAN_SHED_HOUR = '0'
+	SOPDS_SCAN_SHED_MIN  = '0'
+	SOPDS_SCAN_SHED_HOUR = '0,12'
     
 1.4 Производим инициализацию базы данных и заполнение начальными данными (жанры)
 
