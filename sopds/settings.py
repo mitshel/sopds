@@ -139,12 +139,16 @@ STATIC_ROOT = 'static'
 #SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
 #SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
 #SOPDS_ROOT_LIB = '/mnt/nfs/КНИГИ/BOOKS/'
-SOPDS_ROOT_LIB = os.path.join(BASE_DIR,'opds_catalog//tests//data//')
+#SOPDS_ROOT_LIB = os.path.join(BASE_DIR,'opds_catalog\\tests\\data\\')
+SOPDS_ROOT_LIB = "d:\\BOOKS\\"
 
-SOPDS_SINGLE_COMMIT = False
+
 SOPDS_AUTH = True
 SOPDS_SCAN_SHED_MIN ='0'
 SOPDS_SCAN_SHED_HOUR ='0,12'
+
+SOPDS_SINGLE_COMMIT = True
+SOPDS_INPX_TEST_ZIP = True
 
 #Конвертеры EPUB и MOBI
 #SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2toepub/unix_dist/fb2toepub')

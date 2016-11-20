@@ -7,6 +7,7 @@ Created on 14 нояб. 2016 г.
 # -*- coding: utf-8 -*-
 import os
 import zipfile
+from opds_catalog import settings
 
 sAuthor = 'AUTHOR'
 sGenre  = 'GENRE'
@@ -31,8 +32,8 @@ class Inpx:
         self.inpx_itemseparator = ':'
         self.append_callback = append_callback
         self.inpskip_callback = inpskip_callback
-        self.TEST_ZIP = False
-        self.TEST_FILES = False
+        self.TEST_ZIP = settings.INPX_TEST_ZIP
+        self.TEST_FILES = settings.INPX_TEST_FILES
         self.error = 0       
         
     def parse(self):
@@ -45,10 +46,14 @@ class Inpx:
             if inp_ext.upper() != '.INP':
                 continue
             
-            if self.inpskip_callback(self.inpx_file, inp_name,finpx.getinfo(inp_file).file_size):
-                continue
-
             zip_file_name = os.path.join(self.inpx_catalog,"%s%s"%(inp_name,'.zip'))
+            
+            # Если решили проверять на наличие ZIP файла или книги в ZIP, а самого ZIP файла нет - то пропускаем обработку всего ZIP файла
+            if (self.TEST_ZIP or self.TEST_FILES) and not os.path.isfile(zip_file_name):
+                continue
+                        
+            if self.inpskip_callback(self.inpx_file, inp_name,finpx.getinfo(inp_file).file_size):
+                continue             
             
             # Если будем проверять наличие файлов в ZIP то однократно получаем список файлов в обрабатываемом ZIP 
             if self.TEST_FILES: 
@@ -56,10 +61,6 @@ class Inpx:
                 testzip_namelist = testzip.namelist()
             else:
                 testzip_namelist = []
-            
-            # Если решили проверять на наличие ZIP файла или книги в ZIP, а самого ZIP файла нет - то пропускаем обработку всего ZIP файла
-            if (self.TEST_ZIP or self.TEST_FILES) and not os.path.isfile(zip_file_name):
-                continue 
             
             finp = finpx.open(inp_file)
             for line in finp:

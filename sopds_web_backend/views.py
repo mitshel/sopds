@@ -166,7 +166,7 @@ def SearchBooksView(request):
         
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
         #if len(books)>0:
-        #    books = books.prefetch_related('authors','genres','series')
+        #    books = books.select_related('authors','genres','series')
         
         # Фильтруем дубликаты
         result = []
@@ -190,6 +190,8 @@ def SearchBooksView(request):
                 prev_authors_set = authors_set
             else:
                 result.append(p)
+
+        result = books
                         
         p = Paginator(result, MAXITEMS)
         try:
