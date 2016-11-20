@@ -168,11 +168,14 @@ def SearchBooksView(request):
         #if len(books)>0:
         #    books = books.select_related('authors','genres','series')
         
-        # Фильтруем дубликаты
+        # Фильтруем дубликаты и формируем выдачу затребованной страницы
         result = []
         prev_title = ''
         prev_authors_set = set()
-        for row in books:
+        first_pos = MAXITEMS*(page_num-1);
+        last_pos =  MAXITEMS*page_num - 1;
+        
+        for row in books[first_pos,last_pos]:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000}
@@ -191,14 +194,14 @@ def SearchBooksView(request):
             else:
                 result.append(p)
 
-        result = books
+        books = result
                         
-        p = Paginator(result, MAXITEMS)
-        try:
-            books = p.page(page_num)
-        except InvalidPage:
-            books = p.page(1)
-            page_num = 1
+#        p = Paginator(result, MAXITEMS)
+#        try:
+#            books = p.page(page_num)
+#        except InvalidPage:
+#            books = p.page(1)
+#            page_num = 1
             
         firstpage = page_num - HALF_PAGES_LINKS
         lastpage = page_num + HALF_PAGES_LINKS
@@ -361,42 +364,71 @@ def CatalogsView(request):
         cat = None
     
     catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_name")
+    catalogs_count = catalogs_list.count()
     # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
     #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
     books_list = Book.objects.filter(catalog=cat).order_by("search_title")
-    union_list = list(chain(catalogs_list,books_list)) 
+    books_count = books_list.count()
+    #union_list = list(chain(catalogs_list,books_list)) 
     
     # Получаем результирующий список
     result = []
-    for row in union_list:
-        if isinstance(row, Catalog):
-            p = {'is_catalog':1, 'title': row.cat_name,'id': row.id, 'cat_type':row.cat_type, 'parent_id':row.parent_id}
-        else:
-            p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
-                  'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
+    c_first_pos = MAXITEMS*(page_num-1);
+    c_first_pos = c_first_pos if c_first_pos<catalogs_count else catalogs_count
+    c_last_pos =  MAXITEMS*page_num - 1;
+    c_last_pos = c_last_pos if c_last_pos<catalogs_count else catalogs_count
+    
+    for row in catalogs_list[c_first_pos:c_last_pos]:
+        p = {'is_catalog':1, 'title': row.cat_name,'id': row.id, 'cat_type':row.cat_type, 'parent_id':row.parent_id}       
+        result.append(p)
+
+    book_MAXITEMS = MAXITEMS - c_last_pos + c_first_pos
+    b_first_pos = book_MAXITEMS*(page_num-1);
+    b_first_pos = b_first_pos if b_first_pos<books_count else books_count
+    b_last_pos =  book_MAXITEMS*page_num - 1;
+    b_last_pos = b_last_pos if b_last_pos<books_count else books_count
+            
+    for row in books_list[b_first_pos:b_last_pos]:
+        p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
+              'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
+              'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
+              'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
         result.append(p)
                     
-    p = Paginator(result, MAXITEMS)
-    try:
-        items = p.page(page_num)
-    except InvalidPage:
-        items = p.page(1)
-        page_num = 1
-        
+    items = result
+    
+#    p = Paginator(result, MAXITEMS)
+#    try:
+#        items = p.page(page_num)
+#    except InvalidPage:
+#        items = p.page(1)
+#        page_num = 1
+    
+   
+    num_pages = int((catalogs_count+books_count)/MAXITEMS)+1
+    print(catalogs_count, books_count, num_pages)
     firstpage = page_num - HALF_PAGES_LINKS
     lastpage = page_num + HALF_PAGES_LINKS
     if firstpage<1:
         lastpage = lastpage - firstpage + 1
         firstpage = 1
         
-    if lastpage>p.num_pages:
-        firstpage = firstpage - (lastpage-p.num_pages)
-        lastpage = p.num_pages
+    if lastpage>num_pages:
+        firstpage = firstpage - (lastpage-num_pages)
+        lastpage = num_pages
         if firstpage<1:
             firstpage = 1
-          
+      
+    p ={}
+    
+    p['num_pages'] = num_pages
+    p['has_previos'] = (page_num > 1)
+    p['has_next'] = (page_num < num_pages)
+    p['previous_page_number'] = (page_num-1) if page_num>1 else 1
+    p['next_page_number'] = (page_num+1) if page_num<num_pages else num_pages
+    p['number'] = page_num
+      
+    args['paginator'] = p
     args['items']=items
     args['page_range'] = [ i for i in range(firstpage,lastpage+1)]  
     args['cat_id'] = cat_id
