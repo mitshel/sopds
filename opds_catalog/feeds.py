@@ -1,11 +1,7 @@
-from opds_catalog.sviews import Feed
-
-#from itertools import chain
-
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
-#from django.contrib.syndication.views import Feed
+from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
@@ -204,7 +200,6 @@ class CatalogsFeed(AuthFeed):
     ##description_template = "book_description.html"
 
     def get_object(self, request, cat_id=None, page=1):
-        print('get_object', time.time())
         if not isinstance(page, int):
             page = int(page)
 
@@ -273,7 +268,6 @@ class CatalogsFeed(AuthFeed):
 
     def items(self, obj):
         items, cat, paginator = obj
-        print('items', time.time())
         return items
 
     def item_title(self, item):
@@ -310,7 +304,6 @@ class CatalogsFeed(AuthFeed):
             s += "<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>"
             #if item['doubles']: s += "<b>Doubles count: </b>%(doubles)s<br/>"
             s +="<p class='book'>%(annotation)s</p>"
-            print(item['authors'])
             return s%{'title':item['title'],'filename':item['filename'], 'filesize':item['filesize'],'docdate':item['docdate'],'annotation':item['annotation'],
                       'authors':", ".join(a['full_name'] for a in item['authors']),
                       'genres':", ".join(g['subsection'] for g in item['genres']),
