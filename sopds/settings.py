@@ -153,10 +153,10 @@ SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.
 #SOPDS_ROOT_LIB = os.path.join(BASE_DIR,'opds_catalog\\tests\\data\\')
 #SOPDS_ROOT_LIB = "d:\\BOOKS\\"
 
-
 SOPDS_AUTH = True
 SOPDS_SCAN_SHED_MIN ='0'
 SOPDS_SCAN_SHED_HOUR ='0,12'
+SOPDS_INPX_ENABLE = False
 
 #Конвертеры EPUB и MOBI
 #SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2toepub/unix_dist/fb2toepub')
