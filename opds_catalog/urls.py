@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^series/(?P<lang_code>[0-9])/(?P<chars>.+)/$',feeds.SeriesFeed(), name='chars_series'), 
          
     url(r'^genres/$',feeds.GenresFeed(), name='genres'),
-    url(r'^genres/(?P<section>\d+)/$',feeds.GenresFeed(), name='genres'),
+    url(r'^genres/(?P<section>\d+)/$',feeds.GenresFeed(), name='genres'), 
     
     url(r'^search/$',feeds.OpenSearch, name='opensearch'),
    
