@@ -1,3 +1,5 @@
+import urllib
+
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
@@ -12,8 +14,6 @@ from opds_catalog import models
 from opds_catalog import settings
 from opds_catalog.opds_middleware import BasicAuthMiddleware
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
-
-import time
 
 class AuthFeed(Feed):
     request = None

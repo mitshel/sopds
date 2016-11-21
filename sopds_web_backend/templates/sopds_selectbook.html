@@ -3,20 +3,22 @@
 {% load i18n %}
 
 {% block body %}
+{% autoescape on %}
 <table>
 {%  for chars in items %}
 <tr>
 	<td>
 	{% if chars.cnt >= splititems %}
-	   <a href="{% url "web:book" %}?lang={{lang_code}}&chars={{chars.id|urlencode|iriencode}}">{{ chars.id }}</a>
+	   <a href="{% url "web:book" %}?lang={{lang_code}}&chars={{chars.id}}">{{ chars.id }}</a>
 	{% else %}
-	   <a href="{% url "web:searchbooks" %}?searchtype=b&searchterms={{chars.id|urlencode|iriencode}}">{{ chars.id }}</a>
+	   <a href="{% url "web:searchbooks" %}?searchtype=b&searchterms={{chars.id}}">{{ chars.id }}</a>
 	{% endif %}
 	<span style="font-size:80%">{% blocktrans with chars_cnt=chars.cnt %}Total: {{ chars_cnt }} books.{% endblocktrans %}</span>
 	</td>
 </tr>		
 {% endfor %}
 </table>
+{% endautoescape %}
 
 
 {% endblock %}  {# body #}

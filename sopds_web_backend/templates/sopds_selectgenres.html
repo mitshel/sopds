@@ -3,6 +3,7 @@
 {% load i18n %}
 
 {% block body %}
+{% autoescape on %}
 <table>
 {%  for g in items %}
 <tr>
@@ -17,6 +18,6 @@
 </tr>		
 {% endfor %}
 </table>
-
+{% endautoescape %}
 
 {% endblock %}  {# body #}
