@@ -249,7 +249,7 @@ class CatalogsFeed(AuthFeed):
     def feed_extra_kwargs(self, obj):
         items, cat, paginator = obj
         start_url = reverse("opds_catalog:main")
-        if paginator['has_previos']:
+        if paginator['has_previous']:
             prev_url = reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id,"page":paginator['previous_page_number']})
         else:
             prev_url  = None
@@ -746,7 +746,7 @@ class SearchSeriesFeed(AuthFeed):
         return "%s"%(item['ser'])
     
     def item_description(self, item):
-        return _("Books count: %s")%item['count_book']    
+        return _("Books count: %s")%item['book_count']    
 
     def item_guid(self, item):
         return "a:%s"%item['id']
