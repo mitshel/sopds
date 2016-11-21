@@ -176,7 +176,6 @@ def SearchBooksView(request):
         
         prev_title = ''
         prev_authors_set = set()
-        print(books_count, page_num, op.d1_first_pos,op.d1_last_pos)
         
         # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
         # свои дубликаты если они есть

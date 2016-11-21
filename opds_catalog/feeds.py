@@ -197,11 +197,11 @@ class MainFeed(AuthFeed):
 class CatalogsFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
-    ##description_template = "book_description.html"
 
     def get_object(self, request, cat_id=None, page=1):
         if not isinstance(page, int):
             page = int(page)
+        page_num = page if page>0 else 1
 
         try:
             if cat_id is not None:
@@ -219,7 +219,7 @@ class CatalogsFeed(AuthFeed):
         books_count = books_list.count()
         
         # Получаем результирующий список
-        op = OPDS_Paginator(catalogs_count, books_count, page, settings.MAXITEMS)
+        op = OPDS_Paginator(catalogs_count, books_count, page_num, settings.MAXITEMS)
         items = []
         
         for row in catalogs_list[op.d1_first_pos:op.d1_last_pos]:
@@ -367,7 +367,6 @@ class SearchTypesFeed(AuthFeed):
 class SearchBooksFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
-    description_template = "book_description.html"
     
     def title(self, obj):
         return "%s | %s (%s)"%(settings.TITLE,_("Books found"),_("doubles hide") if settings.DOUBLES_HIDE else _("doubles show"))    
@@ -375,6 +374,7 @@ class SearchBooksFeed(AuthFeed):
     def get_object(self, request, searchtype="m", searchterms=None, searchterms0=None, page=1):
         if not isinstance(page, int):
             page = int(page)
+        page_num = page if page>0 else 1
         
         # Поиск книг по подсроке
         if  searchtype == 'm':
@@ -433,31 +433,52 @@ class SearchBooksFeed(AuthFeed):
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
         #if len(books)>0:            
             #books = books.prefetch_related('authors','genres','series').order_by('title','authors','-docdate')
-        
+                 
         # Фильтруем дубликаты
-        result = []
+        books_count = books.count()
+        op = OPDS_Paginator(books_count, 0, page_num,settings.MAXITEMS)
+        items = []
+        
         prev_title = ''
         prev_authors_set = set()
-        for row in books:
+        
+        # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
+        # свои дубликаты если они есть
+        summary_DOUBLES_HIDE =  settings.DOUBLES_HIDE and (searchtype != 'd')
+        start = op.d1_first_pos if ((op.d1_first_pos==0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos-1
+        finish = op.d1_last_pos
+        
+        for row in books[start:finish]:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize}
-            p['authors'] = row.authors.values()
-            p['genres'] = row.genres.values()
-            p['series'] = row.series.values()          
-            if settings.DOUBLES_HIDE and (searchtype != 'd'):
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}       
+            if summary_DOUBLES_HIDE:
                 title = p['title'] 
                 authors_set = {a['id'] for a in p['authors']}         
                 if title==prev_title and authors_set==prev_authors_set:
-                    result[-1]['doubles']+=1
+                    items[-1]['doubles']+=1
                 else:
-                    result.append(p)                   
+                    items.append(p)                   
                 prev_title = title
                 prev_authors_set = authors_set
             else:
-                result.append(p)
+                items.append(p)
+                
+        # "вытягиваем" дубликаты книг со следующей страницы и удаляем первый элемент который с предыдущей страницы и "вытягивал" дубликаты с текущей
+        if summary_DOUBLES_HIDE:
+            double_flag = True
+            while (finish<books_count) and double_flag:
+                finish += 1  
+                if books[finish].title==prev_title and {a['id'] for a in books[finish].authors.values()}==prev_authors_set:
+                    items[-1]['doubles']+=1
+                else:
+                    double_flag = False   
+            
+            if op.d1_first_pos!=0:     
+                items.pop(0)          
                   
-        return {"books":result, "searchterms":searchterms, "searchterms0":searchterms0, "searchtype":searchtype, "page":page}
+        return {"books":items, "searchterms":searchterms, "searchterms0":searchterms0, "searchtype":searchtype, "paginator":op.get_data_dict()}
 
     def get_link_kwargs(self, obj):
         kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]}
@@ -470,14 +491,15 @@ class SearchBooksFeed(AuthFeed):
 
     def feed_extra_kwargs(self, obj):
         kwargs = self.get_link_kwargs(obj)
-        if obj["page"] != 1:
-            kwargs["page"]=obj["page"]-1
+        print(obj['paginator'])
+        if obj["paginator"]["has_previous"]:
+            kwargs["page"]=obj["paginator"]['previous_page_number']
             prev_url = reverse("opds_catalog:searchbooks", kwargs=kwargs)
         else:
             prev_url  = None
 
-        if obj["page"]*settings.MAXITEMS<len(obj["books"]):
-            kwargs["page"]=obj["page"]+1
+        if obj["paginator"]["has_next"]:
+            kwargs["page"]=obj["page"]['next_page_number']
             next_url = reverse("opds_catalog:searchbooks", kwargs=kwargs)
         else:
             next_url  = None
@@ -490,15 +512,7 @@ class SearchBooksFeed(AuthFeed):
         }
 
     def items(self, obj):
-        books_list = obj["books"]
-
-        paginator = Paginator(books_list,settings.MAXITEMS)
-        try:
-            page = paginator.page(obj["page"])
-        except EmptyPage:
-            page = paginator.page(paginator.num_pages)
-
-        return page
+        return obj["books"]
 
     def item_title(self, item):     
         return item['title']
@@ -526,7 +540,22 @@ class SearchBooksFeed(AuthFeed):
         return enclosure
         
     def item_extra_kwargs(self, item): 
-        return {'authors':item['authors'],'genres':item['genres'], 'doubles': item['id'] if item['doubles']>0 else None}                            
+        return {'authors':item['authors'],'genres':item['genres'], 'doubles': item['id'] if item['doubles']>0 else None}    
+    
+    def item_description(self, item):
+        s="<b> Book name: </b>%(title)s<br/>"
+        if item['authors']: s += "<b>Authors: </b>%(authors)s<br/>"
+        if item['genres']: s += "<b>Genres: </b>%(genres)s<br/>"
+        if item['series']: s += "<b>Series: </b>%(series)s<br/>"
+        s += "<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>"
+        if item['doubles']: s += "<b>Doubles count: </b>%(doubles)s<br/>"
+        s +="<p class='book'>%(annotation)s</p>"
+        return s%{'title':item['title'],'filename':item['filename'], 'filesize':item['filesize'],'docdate':item['docdate'],
+                  'doubles':item['doubles'],'annotation':item['annotation'],
+                  'authors':", ".join(a['full_name'] for a in item['authors']),
+                  'genres':", ".join(g['subsection'] for g in item['genres']),
+                  'series':", ".join(s['ser'] for s in item['series']),                     
+                  }                        
 
 class SelectSeriesFeed(AuthFeed):
     feed_type = opdsFeed

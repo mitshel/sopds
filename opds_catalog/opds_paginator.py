@@ -51,7 +51,7 @@ class Paginator:
     def get_data_dict(self):
         p = {}
         p['num_pages'] = self.num_pages
-        p['has_previos'] = self.has_previous
+        p['has_previous'] = self.has_previous
         p['has_next'] = self.has_next
         p['previous_page_number'] = self.previous_page_number
         p['next_page_number'] = self.next_page_number
