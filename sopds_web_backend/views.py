@@ -1,12 +1,10 @@
 from random import randint
-from itertools import chain
 
 from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
-from django.core.paginator import Paginator, InvalidPage
 from django.db.models import Count, Min
 from django.utils.translation import ugettext as _
-from django.contrib.auth import authenticate, login, logout, REDIRECT_FIELD_NAME
+from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse, reverse_lazy
 
@@ -158,12 +156,13 @@ def SearchBooksView(request):
         elif searchtype == 'i':
             try:
                 book_id = int(searchterms)
-                btitle = Book.objects.get(id=book_id).title
+                mbook = Book.objects.get(id=book_id)
             except:
                 book_id = 0
-                btitle = ""
-            books = Book.objects.filter(id=book_id)                 
-            args['breadcrumbs'] = [_('Books'),btitle]
+                mbook = None
+            #books = Book.objects.filter(id=book_id) 
+            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).distinct().order_by('-docdate')                
+            args['breadcrumbs'] = [_('Books'),mbook.title]
             args['searchobject'] = 'title'
         
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
@@ -211,8 +210,9 @@ def SearchBooksView(request):
                     items[-1]['doubles']+=1
                 else:
                     double_flag = False   
-                    
-            items.pop(0)                                   
+            
+            if op.d1_first_pos!=0:     
+                items.pop(0)                                   
               
         args['paginator'] = op.get_data_dict()
         args['searchterms']=searchterms;
@@ -495,9 +495,9 @@ def GenresView(request):
 @sopds_login(url='web:login')
 def BSDelView(request):
     if request.GET:
-       book = request.GET.get('book', None)
+        book = request.GET.get('book', None)
     else:
-       book = None
+        book = None
        
     book = int(book)
        
@@ -520,13 +520,13 @@ def LoginView(request):
     except KeyError:
         return render(request, 'sopds_login.html', args) 
     
-    next = request.GET.get('next',reverse("web:main"))
+    next_url = request.GET.get('next',reverse("web:main"))
 
     user = authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
             login(request, user)
-            return redirect(next)
+            return redirect(next_url)
         else:
             args['system_message']={'text':_('This account is not active!'),'type':'alert'}
             return render(request, 'sopds_login.html', args)

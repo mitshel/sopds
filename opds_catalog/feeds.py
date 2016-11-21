@@ -1,19 +1,23 @@
-from itertools import chain
+from opds_catalog.sviews import Feed
+
+#from itertools import chain
 
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
-from django.contrib.syndication.views import Feed
+#from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import render
-from django.db.models import Count, Min, Sum
-
+from django.db.models import Count, Min
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, lang_menu
 from opds_catalog import models
 from opds_catalog import settings
 from opds_catalog.opds_middleware import BasicAuthMiddleware
+from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
+
+import time
 
 class AuthFeed(Feed):
     request = None
@@ -34,7 +38,7 @@ class opdsEnclosure(Enclosure):
 
 class opdsFeed(Atom1Feed):
     content_type = 'text/xml; charset=utf-8'
-
+        
     def root_attributes(self):
         attrs = {}
         #attrs = super(opdsFeed, self).root_attributes()
@@ -197,38 +201,66 @@ class MainFeed(AuthFeed):
 class CatalogsFeed(AuthFeed):
     feed_type = opdsFeed
     subtitle = settings.SUBTITLE
-    description_template = "book_description_cat.html"
+    ##description_template = "book_description.html"
 
     def get_object(self, request, cat_id=None, page=1):
+        print('get_object', time.time())
         if not isinstance(page, int):
             page = int(page)
 
-        if cat_id is not None:
-            return (Catalog.objects.get(id=cat_id), page)
-        else:
-            return (Catalog.objects.get(parent__id=cat_id), page)
+        try:
+            if cat_id is not None:
+                cat = Catalog.objects.get(id=cat_id)
+            else:
+                cat = Catalog.objects.get(parent__id=cat_id)
+        except Catalog.DoesNotExist:
+            cat = None
+        
+        catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_name")
+        catalogs_count = catalogs_list.count()
+        # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
+        #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
+        books_list = Book.objects.filter(catalog=cat).order_by("search_title")
+        books_count = books_list.count()
+        
+        # Получаем результирующий список
+        op = OPDS_Paginator(catalogs_count, books_count, page, settings.MAXITEMS)
+        items = []
+        
+        for row in catalogs_list[op.d1_first_pos:op.d1_last_pos]:
+            p = {'is_catalog':1, 'title': row.cat_name,'id': row.id, 'cat_type':row.cat_type, 'parent_id':row.parent_id}       
+            items.append(p)
+              
+        for row in books_list[op.d2_first_pos:op.d2_last_pos]:
+            p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
+                  'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
+            items.append(p)
+            
+        return items, cat, op.get_data_dict()            
 
     def title(self, obj):
-        cat, current_page = obj
+        items, cat, paginator = obj
         if cat.parent:
             return "%s | %s | %s"%(settings.TITLE,_("By catalogs"), cat.path)
         else:
             return "%s | %s"%(settings.TITLE,_("By catalogs"))
 
     def link(self, obj):
-        cat, current_page = obj
-        return reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id, "page":current_page})
+        items, cat, paginator = obj
+        return reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id, "page":paginator['number']})
 
     def feed_extra_kwargs(self, obj):
-        cat, current_page = obj
+        items, cat, paginator = obj
         start_url = reverse("opds_catalog:main")
-        if current_page != 1:
-            prev_url = reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id,"page":(current_page-1)})
+        if paginator['has_previos']:
+            prev_url = reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id,"page":paginator['previous_page_number']})
         else:
             prev_url  = None
 
-        if current_page*settings.MAXITEMS<Catalog.objects.filter(parent=cat).count() + Book.objects.filter(catalog=cat).count():
-            next_url = reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id,"page":(current_page+1)})
+        if paginator['has_next']:
+            next_url = reverse("opds_catalog:cat_page", kwargs={"cat_id":cat.id,"page":paginator['next_page_number']})
         else:
             next_url  = None
 
@@ -240,48 +272,50 @@ class CatalogsFeed(AuthFeed):
         }
 
     def items(self, obj):
-        cat, current_page = obj
-        catalogs_list = Catalog.objects.filter(parent=cat).order_by("cat_name")
-        # prefetch_related on sqlite on items >999 therow error "too many SQL variables"
-        #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
-        books_list = Book.objects.filter(catalog=cat).order_by("search_title")
-        union_list = list(chain(catalogs_list,books_list))
-        paginator = Paginator(union_list,settings.MAXITEMS)
-        try:
-            page = paginator.page(current_page)
-        except EmptyPage:
-            page = paginator.page(paginator.num_pages)
-
-        return page
+        items, cat, paginator = obj
+        print('items', time.time())
+        return items
 
     def item_title(self, item):
-        if isinstance(item, Catalog):
-            return item.cat_name
-        else:
-            return item.title
+        return item['title']
 
     def item_guid(self, item):
-        if isinstance(item, Catalog):
-            gp = 'c:'
-        else:
-            gp = 'b:'
-        return "%s%s"%(gp,item.id)
+        gp = 'c:' if item['is_catalog'] else 'b:'
+        return "%s%s"%(gp,item['id'])
 
     def item_link(self, item):
-        if isinstance(item, Catalog):
-            return reverse("opds_catalog:cat_tree", kwargs={"cat_id":item.id})
+        if item['is_catalog']:
+            return reverse("opds_catalog:cat_tree", kwargs={"cat_id":item['id']})
         else:
-            return reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip_flag":0})
+            return reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":0})
 
     def item_enclosures(self, item):
-        if isinstance(item, Catalog):
-            return (opdsEnclosure(reverse("opds_catalog:cat_tree", kwargs={"cat_id":item.id}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
+        if item['is_catalog']:
+            return (opdsEnclosure(reverse("opds_catalog:cat_tree", kwargs={"cat_id":item['id']}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
         else:
             return (
-                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip_flag":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
-                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item.id,"zip_flag":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
-                opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item.id}),"image/jpeg", "http://opds-spec.org/image"),
+                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
+                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
+                opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
             )
+    
+    def item_description(self, item):
+        if item['is_catalog']:
+            return item['title']
+        else: 
+            s="<b> Book name: </b>%(title)s<br/>"
+            if item['authors']: s += "<b>Authors: </b>%(authors)s<br/>"
+            if item['genres']: s += "<b>Genres: </b>%(genres)s<br/>"
+            if item['series']: s += "<b>Series: </b>%(series)s<br/>"
+            s += "<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>"
+            #if item['doubles']: s += "<b>Doubles count: </b>%(doubles)s<br/>"
+            s +="<p class='book'>%(annotation)s</p>"
+            print(item['authors'])
+            return s%{'title':item['title'],'filename':item['filename'], 'filesize':item['filesize'],'docdate':item['docdate'],'annotation':item['annotation'],
+                      'authors':", ".join(a['full_name'] for a in item['authors']),
+                      'genres':", ".join(g['subsection'] for g in item['genres']),
+                      'series':", ".join(s['ser'] for s in item['series']),                     
+                      }
                             
 def OpenSearch(request):
     """

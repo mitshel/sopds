@@ -1,8 +1,8 @@
 {% load i18n %}
 
 {% autoescape off %}
-{% if obj.cat_name %}
-    {{ obj.cat_name }}
+{% if obj.is_catalog %}
+    {{ obj.title }}
 {% else %}
     <b>{% trans "Book name:" %} </b>{{ obj.title }}<br/>
     {% if obj.authors %}<b>{% trans "Authors:" %} </b>{% for a in obj.authors %}{{ a.full_name }}; {% endfor %}<br/>{% endif %}
