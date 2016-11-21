@@ -222,7 +222,7 @@ def SearchBooksView(request):
     return render(request,'sopds_books.html', args)
 
 @sopds_login(url='web:login')
-def SelectSeriesView(request):
+def SearchSeriesView(request):
     #Read searchtype, searchterms, searchterms0, page from form
     args = {}
     args.update(csrf(request))
@@ -234,24 +234,23 @@ def SelectSeriesView(request):
         page_num = int(request.GET.get('page', '1'))
         
         if searchtype == 'm':
-            #series = Series.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
             series = Series.objects.filter(search_ser__contains=searchterms.upper())
-        elif searchtype == 'b':
-            #series = Series.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()]) 
+        elif searchtype == 'b': 
             series = Series.objects.filter(search_ser__startswith=searchterms.upper())
         elif searchtype == 'e':
-            #series = Series.objects.extra(where=["upper(ser)=%s"], params=["%s"%searchterms.upper()])   
             series = Series.objects.filter(search_ser=searchterms.upper())      
 
-        if len(series)>0:
-            series = series.order_by('ser')   
+        #if len(series)>0:
+        #    series = series.order_by('ser')   
+        series = series.annotate(count_book=Count('book')).distinct().order_by('search_ser') 
             
         # Создаем результирующее множество
         series_count = series.count()
         op = OPDS_Paginator(series_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)        
         items = []
         for row in series:
-            p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(series=row).count()}
+            #p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(series=row).count()}
+            p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': row.count_book}
             items.append(p)                     
               
         args['paginator'] = op.get_data_dict()
@@ -277,22 +276,15 @@ def SearchAuthorsView(request):
         page_num = int(request.GET.get('page', '1'))
         
         if searchtype == 'm':
-            #concat(last_name,' ',first_name)
-            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%%%s%%"%searchterms.upper()])
-            authors = Author.objects.filter(search_full_name__contains=searchterms.upper())
+            authors = Author.objects.filter(search_full_name__contains=searchterms.upper()).order_by('search_full_name')   
         elif searchtype == 'b':
-            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%s%%"%searchterms.upper()]) 
-            authors = Author.objects.filter(search_full_name__startswith=searchterms.upper()) 
-        elif searchtype == 'e':
-            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name))=%s"], params=["%s"%searchterms.upper()])   
-            authors = Author.objects.filter(search_full_name=searchterms.upper()) 
-            
-        if len(authors)>0:
-            authors = authors.order_by('full_name')   
-            
+            authors = Author.objects.filter(search_full_name__startswith=searchterms.upper()).order_by('search_full_name')    
+        elif searchtype == 'e': 
+            authors = Author.objects.filter(search_full_name=searchterms.upper()).order_by('search_full_name')    
+                        
         # Создаем результирующее множество
-        series_count = authors.count()
-        op = OPDS_Paginator(series_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)        
+        authors_count = authors.count()
+        op = OPDS_Paginator(authors_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)        
         items = []
         
         for row in authors:

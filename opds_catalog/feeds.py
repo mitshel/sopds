@@ -491,7 +491,6 @@ class SearchBooksFeed(AuthFeed):
 
     def feed_extra_kwargs(self, obj):
         kwargs = self.get_link_kwargs(obj)
-        print(obj['paginator'])
         if obj["paginator"]["has_previous"]:
             kwargs["page"]=obj["paginator"]['previous_page_number']
             prev_url = reverse("opds_catalog:searchbooks", kwargs=kwargs)
@@ -499,7 +498,7 @@ class SearchBooksFeed(AuthFeed):
             prev_url  = None
 
         if obj["paginator"]["has_next"]:
-            kwargs["page"]=obj["page"]['next_page_number']
+            kwargs["page"]=obj["paginator"]['next_page_number']
             next_url = reverse("opds_catalog:searchbooks", kwargs=kwargs)
         else:
             next_url  = None
@@ -621,30 +620,37 @@ class SearchAuthorsFeed(AuthFeed):
     def get_object(self, request, searchterms, searchtype, page=1):
         if not isinstance(page, int):
             page = int(page)
+        page_num = page if page>0 else 1   
 
         if searchtype == 'm':
-            #concat(last_name,' ',first_name)
-            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%%%s%%"%searchterms.upper()])
-            authors = Author.objects.filter(search_full_name__contains=searchterms.upper())
+            authors = Author.objects.filter(search_full_name__contains=searchterms.upper()).order_by("search_full_name")
         elif searchtype == 'b':
-            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name)) like %s"], params=["%s%%"%searchterms.upper()]) 
-            authors = Author.objects.filter(search_full_name__startswith=searchterms.upper()) 
+            authors = Author.objects.filter(search_full_name__startswith=searchterms.upper()).order_by("search_full_name") 
         elif searchtype == 'e':
-            #authors = Author.objects.extra(where=["upper(concat(last_name,' ',first_name))=%s"], params=["%s"%searchterms.upper()])   
-            authors = Author.objects.filter(search_full_name=searchterms.upper())                    
-        return {"authors":authors, "searchterms":searchterms, "searchtype":searchtype, "page":page}
+            authors = Author.objects.filter(search_full_name=searchterms.upper()).order_by("search_full_name")
+            
+        # Создаем результирующее множество
+        authors_count = authors.count()
+        op = OPDS_Paginator(authors_count, 0, page_num, settings.MAXITEMS)        
+        items = []
+        
+        for row in authors:
+            p = {'id':row.id, 'full_name':row.full_name, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(authors=row).count()}
+            items.append(p)    
+                                
+        return {"authors":items, "searchterms":searchterms, "searchtype":searchtype, "paginator":op.get_data_dict()}
 
     def link(self, obj):
         return reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]})
 
     def feed_extra_kwargs(self, obj):
-        if obj["page"] != 1:
-            prev_url = reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]-1)})
+        if obj["paginator"]['has_previous']:
+            prev_url = reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["paginator"]['previous_page_number'])})
         else:
             prev_url  = None
 
-        if obj["page"]*settings.MAXITEMS<obj["authors"].count():
-            next_url = reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]+1)})
+        if obj["paginator"]['has_next']:
+            next_url = reverse("opds_catalog:searchauthors", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["paginator"]['next_page_number'])})
         else:
             next_url  = None
         return {
@@ -656,27 +662,19 @@ class SearchAuthorsFeed(AuthFeed):
         }
 
     def items(self, obj):
-        authors_list = obj["authors"].order_by("search_full_name")
-
-        paginator = Paginator(authors_list,settings.MAXITEMS)
-        try:
-            page = paginator.page(obj["page"])
-        except EmptyPage:
-            page = paginator.page(paginator.num_pages)
-
-        return page
+        return obj["authors"]
 
     def item_title(self, item):
-        return item.full_name
+        return item['full_name']
     
     def item_description(self, item):
-        return _("Books count: %s")%(Book.objects.filter(authors=item.id).count())     
+        return _("Books count: %s")%(Book.objects.filter(authors=item['id']).count())     
 
     def item_guid(self, item):
-        return "a:%s"%(item.id)
+        return "a:%s"%(item['id'])
 
     def item_link(self, item):
-        return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"as", "searchterms":item.id}) 
+        return reverse("opds_catalog:searchbooks", kwargs={"searchtype":"as", "searchterms":item['id']}) 
 
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
@@ -692,15 +690,13 @@ class SearchSeriesFeed(AuthFeed):
         self.author_id = None
         if not isinstance(page, int):
             page = int(page)
+        page_num = page if page>0 else 1  
 
         if searchtype == 'm':
-            #series = Series.objects.extra(where=["upper(ser) like %s"], params=["%%%s%%"%searchterms.upper()])
             series = Series.objects.filter(search_ser__contains=searchterms.upper())
         elif searchtype == 'b':
-            #series = Series.objects.extra(where=["upper(ser) like %s"], params=["%s%%"%searchterms.upper()]) 
             series = Series.objects.filter(search_ser__startswith=searchterms.upper())
-        elif searchtype == 'e':
-            #series = Series.objects.extra(where=["upper(ser)=%s"], params=["%s"%searchterms.upper()])      
+        elif searchtype == 'e':     
             series = Series.objects.filter(search_ser=searchterms.upper())       
         elif searchtype == 'a':
             try:
@@ -709,21 +705,30 @@ class SearchSeriesFeed(AuthFeed):
                 self.author_id = None
             series = Series.objects.filter(book__authors=self.author_id)
             
-        series = series.annotate(count_book=Count('book')).distinct()  
+        series = series.annotate(count_book=Count('book')).distinct().order_by('search_ser')  
         
-        return {"series":series, "searchterms":searchterms, "searchtype":searchtype, "page":page}
+        # Создаем результирующее множество
+        series_count = series.count()
+        op = OPDS_Paginator(series_count, 0, page_num, settings.MAXITEMS)        
+        items = []
+        
+        for row in series:
+            p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': row.count_book}
+            items.append(p)   
+        
+        return {"series":items, "searchterms":searchterms, "searchtype":searchtype, "paginator":op.get_data_dict()}
     
     def link(self, obj):
         return reverse("opds_catalog:searchseries", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"]})
 
     def feed_extra_kwargs(self, obj):
-        if obj["page"] != 1:
-            prev_url = reverse("opds_catalog:searchseries", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]-1)})
+        if obj["paginator"]['has_previous']:
+            prev_url = reverse("opds_catalog:searchseries", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["paginator"]['previous_page_number'])})
         else:
             prev_url  = None
 
-        if obj["page"]*settings.MAXITEMS<obj["series"].count():
-            next_url = reverse("opds_catalog:searchseries", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["page"]+1)})
+        if obj["paginator"]['has_next']:
+            next_url = reverse("opds_catalog:searchseries", kwargs={"searchtype":obj["searchtype"], "searchterms":obj["searchterms"], "page":(obj["paginator"]['next_page_number'])})
         else:
             next_url  = None
         return {
@@ -735,32 +740,22 @@ class SearchSeriesFeed(AuthFeed):
         }
 
     def items(self, obj):
-        series_list = obj["series"].order_by("search_ser")
-
-        paginator = Paginator(series_list,settings.MAXITEMS)
-        try:
-            page = paginator.page(obj["page"])
-        except EmptyPage:
-            page = paginator.page(paginator.num_pages)
-
-        return page
+        return obj["series"]
 
     def item_title(self, item):
-        return "%s"%(item.ser)
+        return "%s"%(item['ser'])
     
     def item_description(self, item):
-        #count = Book.objects.filter(series=item.id).count()
-        count = item.count_book
-        return _("Books count: %s")%(count)    
+        return _("Books count: %s")%item['count_book']    
 
     def item_guid(self, item):
-        return "a:%s"%(item.id)
+        return "a:%s"%item['id']
 
     def item_link(self, item):        
         if self.author_id:
-            kwargs={"searchtype":"as", "searchterms":self.author_id,"searchterms0":item.id}
+            kwargs={"searchtype":"as", "searchterms":self.author_id,"searchterms0":item['id']}
         else:
-            kwargs={"searchtype":"s", "searchterms":item.id}
+            kwargs={"searchtype":"s", "searchterms":item['id']}
 
         return reverse("opds_catalog:searchbooks", kwargs=kwargs) 
 
