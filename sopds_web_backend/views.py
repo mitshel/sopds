@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
 from django.db.models import Count, Min
 from django.utils.translation import ugettext as _
-from django.contrib.auth import authenticate, login, REDIRECT_FIELD_NAME
+from django.contrib.auth import authenticate, login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse, reverse_lazy
 
@@ -527,7 +527,9 @@ def LoginView(request):
     
     return render(request, 'sopds_login.html', args)
 
+@sopds_login(url='web:login')
 def LogoutView(request):
+    logout(request)
     args = {}
     args['breadcrumbs'] = [_('Logout')]
     return redirect(reverse('web:main'))
