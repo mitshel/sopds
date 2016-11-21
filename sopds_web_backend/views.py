@@ -1,4 +1,5 @@
 from random import randint
+import urllib
 
 from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
