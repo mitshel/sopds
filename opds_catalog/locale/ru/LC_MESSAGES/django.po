@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-17 22:11+0300\n"
+"POT-Creation-Date: 2016-11-21 11:36+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -273,6 +273,10 @@ msgid "Doubles count:"
 msgstr "Число дубликатов:"
 
 #: .\opds_catalog\tests\test_feeds.py:76
-#, python-format
-msgid "All books by %(last_name)s %(first_name)s"
-msgstr "Все книги автора %(last_name)s %(first_name)s"
+#, fuzzy, python-format
+#| msgid "All books by %(author)s"
+msgid "All books by %(full_name)s"
+msgstr "Все книги автора %(author)s"
+
+#~ msgid "All books by %(last_name)s %(first_name)s"
+#~ msgstr "Все книги автора %(last_name)s %(first_name)s"

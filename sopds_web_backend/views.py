@@ -14,6 +14,7 @@ from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre
 from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABET_MENU, SPLITITEMS, FB2TOEPUB, FB2TOMOBI
 from opds_catalog.models import lang_menu
+from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 
@@ -76,6 +77,7 @@ def SearchBooksView(request):
         searchterms = request.GET.get('searchterms', '')
         #searchterms0 = int(request.POST.get('searchterms0', ''))
         page_num = int(request.GET.get('page', '1'))
+        page_num = page_num if page_num>0 else 1
         
         #if (len(searchterms)<3) and (searchtype in ('m', 'b', 'e')):
         #    args['errormsg'] = 'Too few symbols in search string !';
@@ -149,7 +151,7 @@ def SearchBooksView(request):
             #try:
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
-            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).order_by('-docdate')
+            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).distinct().order_by('-docdate')
             args['breadcrumbs'] = [_('Books'),_('Doubles for book'),mbook.title]
             args['searchobject'] = 'title'
             
@@ -169,56 +171,53 @@ def SearchBooksView(request):
         #    books = books.select_related('authors','genres','series')
         
         # Фильтруем дубликаты и формируем выдачу затребованной страницы
-        result = []
+        books_count = books.count()
+        op = OPDS_Paginator(books_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)
+        items = []
+        
         prev_title = ''
         prev_authors_set = set()
-        first_pos = MAXITEMS*(page_num-1);
-        last_pos =  MAXITEMS*page_num - 1;
+        print(books_count, page_num, op.d1_first_pos,op.d1_last_pos)
         
-        for row in books[first_pos,last_pos]:
+        # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
+        # свои дубликаты если они есть
+        summary_DOUBLES_HIDE =  DOUBLES_HIDE and (searchtype != 'd')
+        start = op.d1_first_pos if ((op.d1_first_pos==0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos-1
+        finish = op.d1_last_pos
+        
+        for row in books[start:finish]:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000}
-            p['authors'] = row.authors.values()
-            p['genres'] = row.genres.values()
-            p['series'] = row.series.values()          
-            if DOUBLES_HIDE and (searchtype != 'd'):
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}       
+            if summary_DOUBLES_HIDE:
                 title = p['title'] 
                 authors_set = {a['id'] for a in p['authors']}         
                 if title==prev_title and authors_set==prev_authors_set:
-                    result[-1]['doubles']+=1
+                    items[-1]['doubles']+=1
                 else:
-                    result.append(p)                   
+                    items.append(p)                   
                 prev_title = title
                 prev_authors_set = authors_set
             else:
-                result.append(p)
-
-        books = result
-                        
-#        p = Paginator(result, MAXITEMS)
-#        try:
-#            books = p.page(page_num)
-#        except InvalidPage:
-#            books = p.page(1)
-#            page_num = 1
-            
-        firstpage = page_num - HALF_PAGES_LINKS
-        lastpage = page_num + HALF_PAGES_LINKS
-        if firstpage<1:
-            lastpage = lastpage - firstpage + 1
-            firstpage = 1
-            
-        if lastpage>p.num_pages:
-            firstpage = firstpage - (lastpage-p.num_pages)
-            lastpage = p.num_pages
-            if firstpage<1:
-                firstpage = 1
+                items.append(p)
+                
+        # "вытягиваем" дубликаты книг со следующей страницы и удаляем первый элемент который с предыдущей страницы и "вытягивал" дубликаты с текущей
+        if summary_DOUBLES_HIDE:
+            double_flag = True
+            while (finish<books_count) and double_flag:
+                finish += 1  
+                if books[finish].title==prev_title and {a['id'] for a in books[finish].authors.values()}==prev_authors_set:
+                    items[-1]['doubles']+=1
+                else:
+                    double_flag = False   
+                    
+            items.pop(0)                                   
               
+        args['paginator'] = op.get_data_dict()
         args['searchterms']=searchterms;
         args['searchtype']=searchtype;
-        args['books']=books
-        args['page_range']= [ i for i in range(firstpage,lastpage+1)]     
+        args['books']=items   
         args['current'] = 'search'  
         
     return render(request,'sopds_books.html', args)
@@ -249,34 +248,17 @@ def SelectSeriesView(request):
             series = series.order_by('ser')   
             
         # Создаем результирующее множество
-        result = []
+        series_count = series.count()
+        op = OPDS_Paginator(series_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)        
+        items = []
         for row in series:
             p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(series=row).count()}
-            result.append(p)                     
-            
-        p = Paginator(result, MAXITEMS)
-        try:
-            series = p.page(page_num)
-        except InvalidPage:
-            series = p.page(1)
-            page_num = 1
-            
-        firstpage = page_num - HALF_PAGES_LINKS
-        lastpage = page_num + HALF_PAGES_LINKS
-        if firstpage<1:
-            lastpage = lastpage - firstpage + 1
-            firstpage = 1
-            
-        if lastpage>p.num_pages:
-            firstpage = firstpage - (lastpage-p.num_pages)
-            lastpage = p.num_pages
-            if firstpage<1:
-                firstpage = 1
+            items.append(p)                     
               
+        args['paginator'] = op.get_data_dict()
         args['searchterms']=searchterms;
         args['searchtype']=searchtype;
-        args['series']=series
-        args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
+        args['series']=items     
         args['searchobject'] = 'series'
         args['current'] = 'search'        
         args['breadcrumbs'] = [_('Series'),_('Search'),searchterms]
@@ -310,34 +292,18 @@ def SearchAuthorsView(request):
             authors = authors.order_by('full_name')   
             
         # Создаем результирующее множество
-        result = []
+        series_count = authors.count()
+        op = OPDS_Paginator(series_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)        
+        items = []
+        
         for row in authors:
             p = {'id':row.id, 'full_name':row.full_name, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(authors=row).count()}
-            result.append(p)                     
+            items.append(p)                     
             
-        p = Paginator(result, MAXITEMS)
-        try:
-            authors = p.page(page_num)
-        except InvalidPage:
-            authors = p.page(1)
-            page_num = 1
-            
-        firstpage = page_num - HALF_PAGES_LINKS
-        lastpage = page_num + HALF_PAGES_LINKS
-        if firstpage<1:
-            lastpage = lastpage - firstpage + 1
-            firstpage = 1
-            
-        if lastpage>p.num_pages:
-            firstpage = firstpage - (lastpage-p.num_pages)
-            lastpage = p.num_pages
-            if firstpage<1:
-                firstpage = 1
-              
+        args['paginator'] = op.get_data_dict()              
         args['searchterms']=searchterms;
         args['searchtype']=searchtype;
-        args['authors']=authors
-        args['page_range']= [ i for i in range(firstpage,lastpage+1)]       
+        args['authors']=items     
         args['searchobject'] = 'author'
         args['current'] = 'search'       
         args['breadcrumbs'] = [_('Authors'),_('Search'),searchterms]
@@ -369,68 +335,24 @@ def CatalogsView(request):
     #books_list = Book.objects.filter(catalog=cat).prefetch_related('authors','genres','series').order_by("title")
     books_list = Book.objects.filter(catalog=cat).order_by("search_title")
     books_count = books_list.count()
-    #union_list = list(chain(catalogs_list,books_list)) 
     
     # Получаем результирующий список
-    result = []
-    c_first_pos = MAXITEMS*(page_num-1);
-    c_first_pos = c_first_pos if c_first_pos<catalogs_count else catalogs_count
-    c_last_pos =  MAXITEMS*page_num - 1;
-    c_last_pos = c_last_pos if c_last_pos<catalogs_count else catalogs_count
+    op = OPDS_Paginator(catalogs_count, books_count, page_num, MAXITEMS, HALF_PAGES_LINKS)
+    items = []
     
-    for row in catalogs_list[c_first_pos:c_last_pos]:
+    for row in catalogs_list[op.d1_first_pos:op.d1_last_pos]:
         p = {'is_catalog':1, 'title': row.cat_name,'id': row.id, 'cat_type':row.cat_type, 'parent_id':row.parent_id}       
-        result.append(p)
-
-    book_MAXITEMS = MAXITEMS - c_last_pos + c_first_pos
-    b_first_pos = book_MAXITEMS*(page_num-1);
-    b_first_pos = b_first_pos if b_first_pos<books_count else books_count
-    b_last_pos =  book_MAXITEMS*page_num - 1;
-    b_last_pos = b_last_pos if b_last_pos<books_count else books_count
-            
-    for row in books_list[b_first_pos:b_last_pos]:
+        items.append(p)
+          
+    for row in books_list[op.d2_first_pos:op.d2_last_pos]:
         p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
               'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
               'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
               'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
-        result.append(p)
+        items.append(p)
                     
-    items = result
-    
-#    p = Paginator(result, MAXITEMS)
-#    try:
-#        items = p.page(page_num)
-#    except InvalidPage:
-#        items = p.page(1)
-#        page_num = 1
-    
-   
-    num_pages = int((catalogs_count+books_count)/MAXITEMS)+1
-    print(catalogs_count, books_count, num_pages)
-    firstpage = page_num - HALF_PAGES_LINKS
-    lastpage = page_num + HALF_PAGES_LINKS
-    if firstpage<1:
-        lastpage = lastpage - firstpage + 1
-        firstpage = 1
-        
-    if lastpage>num_pages:
-        firstpage = firstpage - (lastpage-num_pages)
-        lastpage = num_pages
-        if firstpage<1:
-            firstpage = 1
-      
-    p ={}
-    
-    p['num_pages'] = num_pages
-    p['has_previos'] = (page_num > 1)
-    p['has_next'] = (page_num < num_pages)
-    p['previous_page_number'] = (page_num-1) if page_num>1 else 1
-    p['next_page_number'] = (page_num+1) if page_num<num_pages else num_pages
-    p['number'] = page_num
-      
-    args['paginator'] = p
+    args['paginator'] = op.get_data_dict()
     args['items']=items
-    args['page_range'] = [ i for i in range(firstpage,lastpage+1)]  
     args['cat_id'] = cat_id
     args['current'] = 'catalog'     
     

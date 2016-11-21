@@ -43,7 +43,7 @@
       {% if paginator.has_previous %}</a>{%endif%}
   </li>
   
-  {% for pn in page_range %}
+  {% for pn in paginator.page_range %}
      {% if paginator.number == pn %}
         <li class="current">{{pn}}</li>
      {% else %}

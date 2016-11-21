@@ -136,11 +136,11 @@ STATIC_ROOT = 'static'
 #
 # SIMPLE OPDS SETTINGS
 #
-#SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
+SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
 #SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
 #SOPDS_ROOT_LIB = '/mnt/nfs/КНИГИ/BOOKS/'
 #SOPDS_ROOT_LIB = os.path.join(BASE_DIR,'opds_catalog\\tests\\data\\')
-SOPDS_ROOT_LIB = "d:\\BOOKS\\"
+#SOPDS_ROOT_LIB = "d:\\BOOKS\\"
 
 
 SOPDS_AUTH = True
