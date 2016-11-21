@@ -298,11 +298,10 @@ class CatalogsFeed(AuthFeed):
             return item['title']
         else: 
             s="<b> Book name: </b>%(title)s<br/>"
-            if item['authors']: s += "<b>Authors: </b>%(authors)s<br/>"
-            if item['genres']: s += "<b>Genres: </b>%(genres)s<br/>"
-            if item['series']: s += "<b>Series: </b>%(series)s<br/>"
-            s += "<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>"
-            #if item['doubles']: s += "<b>Doubles count: </b>%(doubles)s<br/>"
+            if item['authors']: s += _("<b>Authors: </b>%(authors)s<br/>")
+            if item['genres']: s += _("<b>Genres: </b>%(genres)s<br/>")
+            if item['series']: s += _("<b>Series: </b>%(series)s<br/>")
+            s += _("<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>")
             s +="<p class='book'>%(annotation)s</p>"
             return s%{'title':item['title'],'filename':item['filename'], 'filesize':item['filesize'],'docdate':item['docdate'],'annotation':item['annotation'],
                       'authors':", ".join(a['full_name'] for a in item['authors']),
@@ -543,11 +542,11 @@ class SearchBooksFeed(AuthFeed):
     
     def item_description(self, item):
         s="<b> Book name: </b>%(title)s<br/>"
-        if item['authors']: s += "<b>Authors: </b>%(authors)s<br/>"
-        if item['genres']: s += "<b>Genres: </b>%(genres)s<br/>"
-        if item['series']: s += "<b>Series: </b>%(series)s<br/>"
-        s += "<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>"
-        if item['doubles']: s += "<b>Doubles count: </b>%(doubles)s<br/>"
+        if item['authors']: s += _("<b>Authors: </b>%(authors)s<br/>")
+        if item['genres']: s += _("<b>Genres: </b>%(genres)s<br/>")
+        if item['series']: s += _("<b>Series: </b>%(series)s<br/>")
+        s += _("<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>")
+        if item['doubles']: s += _("<b>Doubles count: </b>%(doubles)s<br/>")
         s +="<p class='book'>%(annotation)s</p>"
         return s%{'title':item['title'],'filename':item['filename'], 'filesize':item['filesize'],'docdate':item['docdate'],
                   'doubles':item['doubles'],'annotation':item['annotation'],
