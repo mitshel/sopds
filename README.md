@@ -141,25 +141,44 @@ UBUNTU: для работы с БД Mysql в UBUNTU потребовалось �
 #### 3. Настройка базы данных PostgreSQL (опционально, хороший вариант использования программы Simple OPDS).
 3.1 PostgreSQL - nявляется хорошим вариантом использования ПО Simple OPDS. Однако вставка данных будет происходить 
 значительно медленнее чем в случае с MySQL и SQLite. Поэтому время сканирования коллекции книг может увеличится (причем достаточно сильно).
-Для использования PostgreSQL этого неоюбходимо установить эту БД и настроить ее (подробное описание можно найти в Интернет, напримр здесь: http://alexxkn.ru/node/42)  
+Для использования PostgreSQL этого неоюбходимо установить эту БД и настроить ее (подробное описание можно найти в Интернет, напримр здесь: http://alexxkn.ru/node/42 или здесь: http://www.fight.org.ua/database/install_posqgresql_ubuntu.html):
 
-CentOS7: для работы с БД PostgreSQL в CentOS7 потребовалось установить доп пакет psycopg2:   
+    UBUNTU: 
+    	sudo apt-get install postgresql postgresql-client postgresql-contrib libpq-dev
+    	sudo vi /etc/postgresql/9.5/main/pg_hba.conf
+    	sudo /etc/init.d/postgresql restart
+    	
+    CENTOS: 
+      yum install postgresql postgresql-server
+      vi /var/lib/pgsql/data/pg_hba.conf
+      systemctl enable postgresql
+      systemctl start postgresql
+      
+редактируя файл hba.conf нужно исправить следующие строки:  
+
+    - local   all             all                                     peer
+    - host    all             all             127.0.0.1/32            ident
+    + local   all             all                                     md5
+    + host    all             all             127.0.0.1/32            md5
+
+    
+Для работы с БД PostgreSQL скорее всего потребуется установить дополнительный пакет psycopg2:   
    
     pip3 install psycopg2
 
 Далее необходимо сначала в БД PostgreSQL создать базу данных "sopds" и пользователя с необходимыми правами,
 например следующим образом:
 
-	psql -U postgres
-	Password for user postgres: *****
-	postgres=# create role sopds with password 'sopds' login;
-	postgres=# create database sopds with owner sopds;
-	postgres=# \q
+    psql -U postgres
+	 Password for user postgres: *****
+	 postgres=# create role sopds with password 'sopds' login;
+	 postgres=# create database sopds with owner sopds;
+	 postgres=# \q
 	
 3.2 Далее в конфигурационном файде нужно закомментировать строки подключения к БД sqlite и соответсвенно раскомментировать
 строки подключения к БД PostgreSQL:
 
-	DATABASES = {
+	 DATABASES = {
 	    'default': {
 	    'ENGINE': 'django.db.backends.postgresql_psycopg2',
 	    'NAME': 'sopds',
@@ -168,21 +187,21 @@ CentOS7: для работы с БД PostgreSQL в CentOS7 потребовал�
 	    'HOST': '', # Set to empty string for localhost.
 	    'PORT': '', # Set to empty string for default.
 	    }
-	}
+	 }
 
 
-    # DATABASES = {
-    #    'default': {
-    #        'ENGINE': 'django.db.backends.sqlite3',
-    #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    #    }         
-    #}  
+     # DATABASES = {
+     #    'default': {
+     #        'ENGINE': 'django.db.backends.sqlite3',
+     #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+     #    }         
+     #}  
 
 3.4 Далее необходимо для инициализации и заполнения вновь созданной БД заново выполнить пункты 1.4 - 1.9 данной инструкции
 Однако, если Вы уже ранее запустили HTTP/OPDS сервер и SCANNER сервер, то потребуется сначала остановить их:
 
-	python3 manage.py sopds_server stop
-	python3 manage.py sopds_scanner stop
+	 python3 manage.py sopds_server stop
+	 python3 manage.py sopds_scanner stop
 	
 #### 4. Настройка конвертации fb2 в EPUB или MOBI (опционально, можно не настраивать)  
 
