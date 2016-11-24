@@ -150,6 +150,7 @@ UBUNTU: для работы с БД Mysql в UBUNTU потребовалось �
     	
     CENTOS: 
       yum install postgresql postgresql-server
+	   /usr/bin/postgresql-setup initdb
       vi /var/lib/pgsql/data/pg_hba.conf
       systemctl enable postgresql
       systemctl start postgresql
