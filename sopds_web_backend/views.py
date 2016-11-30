@@ -163,7 +163,7 @@ def SearchBooksView(request):
                 book_id = 0
                 #mbook = None
             books = Book.objects.filter(id=book_id) 
-            args['breadcrumbs'] = [_('Books'),mbook.title]
+            args['breadcrumbs'] = [_('Books'),books[0].title]
             #books = Book.objects.filter(title=mbook.title, authors__in=mbook.authors.all()).distinct().order_by('-docdate')                
             #args['breadcrumbs'] = [_('Books'),mbook.title]
             args['searchobject'] = 'title'
