@@ -150,20 +150,22 @@ def SearchBooksView(request):
             #try:
             book_id = int(searchterms)
             mbook = Book.objects.get(id=book_id)
-            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).distinct().order_by('-docdate')
+            books = Book.objects.filter(title=mbook.title, authors__in=mbook.authors.all()).exclude(id=book_id).distinct().order_by('-docdate')
             args['breadcrumbs'] = [_('Books'),_('Doubles for book'),mbook.title]
             args['searchobject'] = 'title'
             
+        # Поиск книги по ID. Хотел найти еще и дубликаты к книге, но почему-то не работает запрос правильно. Ума не приложу почему.    
         elif searchtype == 'i':
             try:
                 book_id = int(searchterms)
-                mbook = Book.objects.get(id=book_id)
+                #mbook = Book.objects.get(id=book_id)
             except:
                 book_id = 0
-                mbook = None
-            #books = Book.objects.filter(id=book_id) 
-            books = Book.objects.filter(title__iexact=mbook.title, authors__in=mbook.authors.all()).distinct().order_by('-docdate')                
+                #mbook = None
+            books = Book.objects.filter(id=book_id) 
             args['breadcrumbs'] = [_('Books'),mbook.title]
+            #books = Book.objects.filter(title=mbook.title, authors__in=mbook.authors.all()).distinct().order_by('-docdate')                
+            #args['breadcrumbs'] = [_('Books'),mbook.title]
             args['searchobject'] = 'title'
         
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
@@ -190,7 +192,7 @@ def SearchBooksView(request):
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
                   'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}       
             if summary_DOUBLES_HIDE:
-                title = p['title'] 
+                title = p['title']
                 authors_set = {a['id'] for a in p['authors']}         
                 if title==prev_title and authors_set==prev_authors_set:
                     items[-1]['doubles']+=1
