@@ -34,7 +34,7 @@ def Download(request, book_id, zip_flag):
         
     transname = utils.to_ascii(transname)
         
-    if zip_flag == 1:
+    if zip_flag == '1':
         dlfilename=transname+'.zip'   
         content_type='application/zip' 
     else:    
