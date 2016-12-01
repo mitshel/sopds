@@ -54,6 +54,11 @@ class Book(models.Model):
     authors = models.ManyToManyField('Author', through='bauthor')
     genres = models.ManyToManyField('Genre', through='bgenre')
     series = models.ManyToManyField('Series', through='bseries')
+    
+    class Meta:
+        index_together = [
+            ["filename", "path"],
+        ]    
 
 class Catalog(models.Model):
     parent = models.ForeignKey('self', null=True, db_index=True)
