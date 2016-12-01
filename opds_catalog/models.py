@@ -36,8 +36,8 @@ LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮ
 lang_menu = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
 
 class Book(models.Model):
-    filename = models.CharField(max_length=SIZE_BOOK_FILENAME)
-    path = models.CharField(max_length=SIZE_BOOK_PATH)
+    filename = models.CharField(max_length=SIZE_BOOK_FILENAME,db_index=True)
+    path = models.CharField(max_length=SIZE_BOOK_PATH,db_index=True)
     filesize = models.IntegerField(null=False, default=0)
     format = models.CharField(max_length=SIZE_BOOK_FORMAT)
     catalog = models.ForeignKey('Catalog',db_index=True)
@@ -53,12 +53,7 @@ class Book(models.Model):
     avail = models.IntegerField(null=False, default=0, db_index=True)
     authors = models.ManyToManyField('Author', through='bauthor')
     genres = models.ManyToManyField('Genre', through='bgenre')
-    series = models.ManyToManyField('Series', through='bseries')
-    
-    class Meta:
-        index_together = [
-            ["filename", "path"],
-        ]    
+    series = models.ManyToManyField('Series', through='bseries')  
 
 class Catalog(models.Model):
     parent = models.ForeignKey('self', null=True, db_index=True)
