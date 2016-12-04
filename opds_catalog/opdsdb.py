@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 
 from django.db.models import Q
 from django.utils.translation import ugettext as _
@@ -33,6 +34,12 @@ CMP_TITLE_AUTHORS=1
 # разные константы
 #
 unknown_genre=_('Unknown genre')
+
+##########################################################################
+# объект который мы будем использовать для перекодироки 4х байтного UTF в 3х байтный
+# пока только для аннотации, т.к. там уже "словлена" ошибка при записи в 3х байтный utf8 MYSQL
+#
+utfhigh = re.compile(u'[\U00010000-\U0010ffff]')
 
 def clear_all(verbose=False):
     count = bseries.objects.all().delete()
@@ -67,7 +74,7 @@ def clear_all(verbose=False):
 #
 
 def p(s,size):
-    new = s.encode('utf8', 'replace').decode('utf8')[:size]
+    new = utfhigh.sub(u'',s[:size])
     return new
     
 def getlangcode(s):

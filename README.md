@@ -127,7 +127,7 @@ UBUNTU: для работы с БД Mysql в UBUNTU потребовалось �
     'OPTIONS' : {
         'init_command': """SET default_storage_engine=INNODB; \
                            SET sql_mode='STRICT_TRANS_TABLES'; \
-                           SET NAMES UTF8; \
+                           SET NAMES UTF8 COLLATE utf8_general_ci; \
                            SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED
                         """
     }
