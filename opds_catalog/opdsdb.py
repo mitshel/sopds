@@ -5,7 +5,7 @@ import re
 
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from django.db import transaction
+from django.db import transaction, connection
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
 from opds_catalog.models import SIZE_BOOK_FILENAME, SIZE_BOOK_PATH, SIZE_BOOK_FORMAT, SIZE_BOOK_DOCDATE, SIZE_BOOK_LANG, SIZE_BOOK_TITLE, SIZE_BOOK_ANNOTATION
@@ -42,26 +42,18 @@ unknown_genre=_('Unknown genre')
 utfhigh = re.compile(u'[\U00010000-\U0010ffff]')
 
 def clear_all(verbose=False):
-    count = bseries.objects.all().delete()
-    if verbose: print("From bseries table %s row deleted"%count[0])
-    count = bauthor.objects.all().delete()
-    if verbose: print("From bauthor table %s row deleted"%count[0])
-    count = bgenre.objects.all().delete()    
-    if verbose: print("From bgenre table %s row deleted"%count[0])
-    count = Book.objects.all().delete()
-    if verbose: print("From Book  table %s row deleted"%count[0])
-    count = Catalog.objects.all().delete()
-    if verbose: print("From Catalog table %s row deleted"%count[0])
-    count = Author.objects.all().delete()
-    if verbose: print("From Author table %s row deleted"%count[0])
-    count = Genre.objects.all().delete()
-    if verbose: print("From Genre table %s row deleted"%count[0])
-    count = Series.objects.all().delete()
-    if verbose: print("From Series table %s row deleted"%count[0])
-    count = bookshelf.objects.all().delete()
-    if verbose: print("From bookshelf table %s row deleted"%count[0])
-    count = Counter.objects.all().delete()
-    if verbose: print("From Counter table %s row deleted"%count[0])
+    cursor = connection.cursor()
+    cursor.execute('delete from opds_catalog_bseries')
+    cursor.execute('delete from opds_catalog_bauthor')
+    cursor.execute('delete from opds_catalog_bgenre')
+    cursor.execute('delete from opds_catalog_book')
+    cursor.execute('delete from opds_catalog_catalog')
+    cursor.execute('delete from opds_catalog_author')
+    cursor.execute('delete from opds_catalog_genre')
+    cursor.execute('delete from opds_catalog_series')
+    cursor.execute('delete from opds_catalog_bookshelf')
+    cursor.execute('delete from opds_catalog_counter')
+
 
 # Книги где avail=0 уже известно что удалены
 # Книги где avail=2 это только что прверенные существующие книги
