@@ -320,7 +320,7 @@ class SearchTypesFeed(AuthFeed):
     subtitle = settings.SUBTITLE
 
     def get_object(self, request, searchterms=""):
-        return searchterms
+        return searchterms.replace('+',' ')
 
     def link(self, obj):
         return "/opds/search/{searchTerms}/"
@@ -370,7 +370,7 @@ class SearchBooksFeed(AuthFeed):
     def title(self, obj):
         return "%s | %s (%s)"%(settings.TITLE,_("Books found"),_("doubles hide") if settings.DOUBLES_HIDE else _("doubles show"))    
 
-    def get_object(self, request, searchtype="m", searchterms=None, searchterms0=None, page=1):
+    def get_object(self, request, searchtype="m", searchterms=None, searchterms0=None, page=1):   
         if not isinstance(page, int):
             page = int(page)
         page_num = page if page>0 else 1
