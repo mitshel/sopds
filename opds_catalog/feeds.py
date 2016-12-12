@@ -222,11 +222,11 @@ class CatalogsFeed(AuthFeed):
         op = OPDS_Paginator(catalogs_count, books_count, page_num, settings.MAXITEMS)
         items = []
         
-        for row in catalogs_list[op.d1_first_pos:op.d1_last_pos]:
+        for row in catalogs_list[op.d1_first_pos:op.d1_last_pos+1]:
             p = {'is_catalog':1, 'title': row.cat_name,'id': row.id, 'cat_type':row.cat_type, 'parent_id':row.parent_id}       
             items.append(p)
               
-        for row in books_list[op.d2_first_pos:op.d2_last_pos]:
+        for row in books_list[op.d2_first_pos:op.d2_last_pos+1]:
             p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
@@ -447,7 +447,7 @@ class SearchBooksFeed(AuthFeed):
         start = op.d1_first_pos if ((op.d1_first_pos==0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos-1
         finish = op.d1_last_pos
         
-        for row in books[start:finish]:
+        for row in books[start:finish+1]:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
@@ -467,7 +467,7 @@ class SearchBooksFeed(AuthFeed):
         # "вытягиваем" дубликаты книг со следующей страницы и удаляем первый элемент который с предыдущей страницы и "вытягивал" дубликаты с текущей
         if summary_DOUBLES_HIDE:
             double_flag = True
-            while (finish<books_count) and double_flag:
+            while ((finish+1)<books_count) and double_flag:
                 finish += 1  
                 if books[finish].title==prev_title and {a['id'] for a in books[finish].authors.values()}==prev_authors_set:
                     items[-1]['doubles']+=1
