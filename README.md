@@ -1,6 +1,6 @@
 #### Simple OPDS Catalog - Простой OPDS Каталог  
 #### Author: Dmitry V.Shelepnev  
-#### Версия 0.37
+#### Версия 0.38
 
 #### 1. Простая установка Simple OPDS (используем простую БД sqlite3)
 
