@@ -251,7 +251,7 @@ def SearchSeriesView(request):
         series_count = series.count()
         op = OPDS_Paginator(series_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)        
         items = []
-        for row in series:
+        for row in series[op.d1_first_pos:op.d1_last_pos+1]:
             #p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(series=row).count()}
             p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': row.count_book}
             items.append(p)                     
@@ -290,7 +290,7 @@ def SearchAuthorsView(request):
         op = OPDS_Paginator(authors_count, 0, page_num, MAXITEMS, HALF_PAGES_LINKS)        
         items = []
         
-        for row in authors:
+        for row in authors[op.d1_first_pos:op.d1_last_pos+1]:
             p = {'id':row.id, 'full_name':row.full_name, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(authors=row).count()}
             items.append(p)                     
             
