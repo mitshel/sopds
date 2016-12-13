@@ -235,6 +235,7 @@ def SearchSeriesView(request):
         searchterms = request.GET.get('searchterms', '')
         #searchterms0 = int(request.POST.get('searchterms0', ''))
         page_num = int(request.GET.get('page', '1'))
+        page_num = page_num if page_num>0 else 1
         
         if searchtype == 'm':
             series = Series.objects.filter(search_ser__contains=searchterms.upper())
@@ -277,6 +278,7 @@ def SearchAuthorsView(request):
         searchterms = request.GET.get('searchterms', '')
         #searchterms0 = int(request.POST.get('searchterms0', ''))
         page_num = int(request.GET.get('page', '1'))
+        page_num = page_num if page_num>0 else 1
         
         if searchtype == 'm':
             authors = Author.objects.filter(search_full_name__contains=searchterms.upper()).order_by('search_full_name')   
