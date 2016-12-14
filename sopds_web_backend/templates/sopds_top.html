@@ -18,7 +18,7 @@
             {% if user.is_authenticated %}
                 <li><a href="{% url "web:logout" %}"><i class="fi-torsos"></i>{% trans "Logout" %} ({{ user.username }})</a></li>
             {% if user.is_superuser %}
-            	<li><a href="/admin/"><i class="fi-widget"></i>{% trans "Settings" %}</a></li>
+            	<li><a href="{% url "admin:index" %}"><i class="fi-widget"></i>{% trans "Settings" %}</a></li>
             {% endif %}	                
             {% else %}
                 <li><a href="{% url "web:login" %}"><i class="fi-torsos"></i>{% trans "Login" %}</a></li>
