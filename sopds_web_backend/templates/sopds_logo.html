@@ -4,7 +4,7 @@
   <div class="show-for-medium medium-4 large-3 column" style="padding:0;"><img src="{% static "images/sopds_logo.gif" %}"></div>
 
   <div class="small-12 medium-8 large-9 column" style="padding:0;">
-  <form method="get" action="/web/search/books/" id="searchform" data-abide>
+  <form method="get" action="{% url "web:searchbooks" %}" id="searchform" data-abide>
   {% csrf_token %}
  
     <div class="input-group">  
