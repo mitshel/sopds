@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^genres/(?P<section>\d+)/$',feeds.GenresFeed(), name='genres'), 
     
     url(r'^search/$',feeds.OpenSearch, name='opensearch'),
+    #url(r'search/{searchTerms}/$',feeds.OpenSearch, name='search_template'),
    
     url(r'^search/books/(?P<searchtype>[bmasgued])/(?P<searchterms>.+)/(?P<page>\d+)/',feeds.SearchBooksFeed(), name='searchbooks'),
     url(r'^search/books/(?P<searchtype>[bmasgued])/(?P<searchterms>.+)/',feeds.SearchBooksFeed(), name='searchbooks'),    
