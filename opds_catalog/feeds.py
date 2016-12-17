@@ -260,7 +260,7 @@ class CatalogsFeed(AuthFeed):
             next_url  = None
 
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":start_url,
                 "prev_url":prev_url,
                 "next_url":next_url,
@@ -323,11 +323,11 @@ class SearchTypesFeed(AuthFeed):
         return searchterms.replace('+',' ')
 
     def link(self, obj):
-        return "/opds/search/{searchTerms}/"
+        return "%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/')
 
     def feed_extra_kwargs(self, obj):
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
@@ -502,7 +502,7 @@ class SearchBooksFeed(AuthFeed):
         else:
             next_url  = None
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text/html",
                 "prev_url":prev_url,
@@ -574,7 +574,7 @@ class SelectSeriesFeed(AuthFeed):
 
     def feed_extra_kwargs(self, obj):
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
@@ -653,7 +653,7 @@ class SearchAuthorsFeed(AuthFeed):
         else:
             next_url  = None
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
                 "prev_url":prev_url,
@@ -731,7 +731,7 @@ class SearchSeriesFeed(AuthFeed):
         else:
             next_url  = None
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
                 "prev_url":prev_url,
@@ -773,7 +773,7 @@ class LangFeed(AuthFeed):
     
     def feed_extra_kwargs(self, obj):
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
@@ -819,7 +819,7 @@ class BooksFeed(AuthFeed):
     
     def feed_extra_kwargs(self, obj):
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
@@ -877,7 +877,7 @@ class AuthorsFeed(AuthFeed):
     
     def feed_extra_kwargs(self, obj):
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
@@ -935,7 +935,7 @@ class SeriesFeed(AuthFeed):
     
     def feed_extra_kwargs(self, obj):
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
@@ -993,7 +993,7 @@ class GenresFeed(AuthFeed):
     
     def feed_extra_kwargs(self, obj):
         return {
-                "searchTerm_url":"/opds/search/{searchTerms}/",
+                "searchTerm_url":"%s%s"%(reverse("opds_catalog:opensearch"),'{searchTerms}/'),
                 "start_url":reverse("opds_catalog:main"),
                 "description_mime_type":"text",
         }
