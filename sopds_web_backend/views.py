@@ -38,14 +38,15 @@ def sopds_processor(request):
     if ALPHABET_MENU:
         args['lang_menu'] = lang_menu
     
-    user=request.user
-    if user.is_authenticated():
-        result=[]
-        for row in bookshelf.objects.filter(user=user).order_by('-readtime')[:8]:
-            book = Book.objects.get(id=row.book_id)
-            p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
-            result.append(p)    
-        args['bookshelf']=result
+    if AUTH:
+        user=request.user
+        if user.is_authenticated():
+            result=[]
+            for row in bookshelf.objects.filter(user=user).order_by('-readtime')[:8]:
+                book = Book.objects.get(id=row.book_id)
+                p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
+                result.append(p)    
+            args['bookshelf']=result
         
     books_count = Counter.objects.get_counter(models.counter_allbooks)
     if books_count:
@@ -140,7 +141,7 @@ def SearchBooksView(request):
                 args['breadcrumbs'] = [_('Books'),_('Bookshelf'),request.user.username]
                 #books = bookshelf.objects.filter(user=request.user).select_related('book')              
             else:
-                books={}        
+                books=Book.objects.filter(id=0)     
                 args['breadcrumbs'] = [_('Books'), _('Bookshelf')] 
             args['searchobject'] = 'title'
             args['isbookshelf'] = 1

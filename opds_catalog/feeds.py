@@ -422,7 +422,7 @@ class SearchBooksFeed(AuthFeed):
             if settings.AUTH:
                 books = Book.objects.filter(bookshelf__user=request.user).order_by('-bookshelf__readtime')
             else:
-                books={}  
+                books=Book.objects.filter(id=0)  
         # Поиск дубликатов для книги            
         elif searchtype == 'd':
             book_id = int(searchterms)
