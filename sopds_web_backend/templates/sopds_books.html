@@ -4,8 +4,8 @@
 {% block body %}
 <script>
        function del_bsbook(b_id, b_t) {
-           $('#DeleteBook_btnYes').attr("href",'/web/bs/delete/?book='+b_id);
-           $('#DeleteBook_image').attr("src","/opds/cover/"+b_id+"/");
+           $('#DeleteBook_btnYes').attr("href","{% url "web:bsdel" %}?book="+b_id);
+           $('#DeleteBook_image').attr("src","{% url "opds:covertmpl" %}"+b_id+"/");
            $('#DeleteBook_title').text(b_t);
            $('#DeleteBookModal').foundation('open');
        }
