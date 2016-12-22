@@ -19,12 +19,12 @@ from sopds_web_backend.settings import HALF_PAGES_LINKS
 
 def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None):
     actual_decorator = user_passes_test(
-        lambda u: u.is_authenticated(),
+        lambda u: (u.is_authenticated() if AUTH else True),
         login_url=reverse_lazy(url),
         redirect_field_name=redirect_field_name
-    )
+    ) 
     if function:
-        return actual_decorator(function) if AUTH else function
+        return actual_decorator(function)
     return actual_decorator
 
 def sopds_processor(request):
