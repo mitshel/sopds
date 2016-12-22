@@ -24,7 +24,7 @@ def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None
         redirect_field_name=redirect_field_name
     )
     if function:
-        return actual_decorator(function) if AUTH else function
+        return actual_decorator(function)
     return actual_decorator
 
 def sopds_processor(request):
