@@ -5,8 +5,9 @@ import logging
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
+
 from django.core.management.base import BaseCommand
-from django.db import transaction
+from django.db import transaction, connection, connections
 from django.conf import settings
 
 from opds_catalog.models import Counter
@@ -62,6 +63,12 @@ class Command(BaseCommand):
             self.restart(pid)            
 
     def scan(self):
+        if connection.connection and not connection.is_usable():
+            # destroy the default mysql connection
+            # after this line, when you use ORM methods
+            # django will reconnect to the default mysql
+            del(connections._connections.default)
+                
         scanner=opdsScanner(self.logger)
         with transaction.atomic():
             scanner.scan_all()
