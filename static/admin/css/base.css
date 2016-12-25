@@ -16,12 +16,12 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: #447e9b;
+    color: #a8380f; /* #447e9b; */
     text-decoration: none;
 }
 
 a:focus, a:hover {
-    color: #036;
+    color: #840900; /* #036; */
 }
 
 a:focus {
@@ -60,7 +60,7 @@ h1 {
     margin: 0 0 20px;
     font-weight: 300;
     font-size: 20px;
-    color: #666;
+    color: #f15a23; /* #666; */
 }
 
 h2 {
@@ -373,7 +373,7 @@ table thead th.sorted .sortoptions a.sortremove:after {
 
 table thead th.sorted .sortoptions a.sortremove:focus:after,
 table thead th.sorted .sortoptions a.sortremove:hover:after {
-    color: #447e9b;
+    color: #a8380f; /* #447e9b; */
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus,
@@ -440,7 +440,7 @@ select[multiple] {
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #79aec8;
+    background: #f15a23; /* #79aec8; */
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
@@ -455,7 +455,7 @@ a.button {
 .button:active, input[type=submit]:active, input[type=button]:active,
 .button:focus, input[type=submit]:focus, input[type=button]:focus,
 .button:hover, input[type=submit]:hover, input[type=button]:hover {
-    background: #609ab6;
+    background: #ff6831; /* #609ab6; */
 }
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
@@ -466,13 +466,13 @@ a.button {
     float: right;
     border: none;
     font-weight: 400;
-    background: #417690;
+    background: #a53005; /* #417690; */
 }
 
 .button.default:active, input[type=submit].default:active,
 .button.default:focus, input[type=submit].default:focus,
 .button.default:hover, input[type=submit].default:hover {
-    background: #205067;
+    background: #840900; /* #205067; */
 }
 
 .button[disabled].default,
@@ -513,7 +513,7 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 13px;
     text-align: left;
-    background: #79aec8;
+    background: #f15a23; /* #79aec8; */
     color: #fff;
 }
 
@@ -637,20 +637,20 @@ div.system-message p.system-message-title {
 /* BREADCRUMBS */
 
 div.breadcrumbs {
-    background: #79aec8;
+    background: #fff; /* #79aec8; */
     padding: 10px 40px;
     border: none;
     font-size: 14px;
-    color: #c4dce8;
+    color: #f15a23; /* #c4dce8; */
     text-align: left;
 }
 
 div.breadcrumbs a {
-    color: #fff;
+    color: #a53005; /* #fff; */
 }
 
 div.breadcrumbs a:focus, div.breadcrumbs a:hover {
-    color: #c4dce8;
+    color: #f08f6c; /* #c4dce8; */
 }
 
 /* ACTION ICONS */
@@ -722,7 +722,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .object-tools a:focus, .object-tools a:hover {
-    background-color: #417690;
+    background-color: #a53005; /* #417690;*/
 }
 
 .object-tools a:focus{
@@ -817,9 +817,9 @@ table#change-history tbody th {
     width: auto;
     height: 40px;
     padding: 10px 40px;
-    background: #417690;
+    background: #a53005; /* #417690; */
     line-height: 40px;
-    color: #ffc;
+    color: #ffc; 
     overflow: hidden;
 }
 
@@ -876,8 +876,8 @@ table#change-history tbody th {
 
 #user-tools a:focus, #user-tools a:hover {
     text-decoration: none;
-    border-bottom-color: #79aec8;
-    color: #79aec8;
+    border-bottom-color: #f15a23; /* #79aec8; */
+    color: #f15a23; /* #79aec8; */
 }
 
 /* SIDEBAR */
