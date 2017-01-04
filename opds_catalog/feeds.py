@@ -19,6 +19,10 @@ class AuthFeed(Feed):
     request = None
     def __call__(self,request,*args,**kwargs):
         self.request = request
+        if settings.AUTH:
+            if request.user.is_authenticated():
+                return super().__call__(request,*args,**kwargs)
+        
         bau = BasicAuthMiddleware()
         result=bau.process_request(self.request)
         
