@@ -19,8 +19,7 @@
 Для работы проекта необходимо установить указанные  зависимости: 
 
 	yum install python3                    # команда установки для RedHad, Fedora, CentOS
-	pip3 install -r requirements.txt       # для Python 3.4 и выше
-	pip3 install -r requirements-p33.txt   # для Python 3.3
+	pip3 install -r requirements.txt
 
 1.3 Настраиваем ./sopds/settings.py (настройки в конце файла)
 
