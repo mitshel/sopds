@@ -130,6 +130,5 @@ class Counter(models.Model):
     update_time = models.DateTimeField(null=False, default=timezone.now)
     obj = models.Manager()
     objects = CounterManager()
-
-
+    
 

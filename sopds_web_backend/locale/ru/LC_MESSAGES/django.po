@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-20 18:56+0300\n"
+"POT-Creation-Date: 2017-01-06 21:29+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,6 +18,36 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
 "10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%"
 "100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: .\sopds_web_backend\templates\admin\base.html:30
+msgid "Welcome,"
+msgstr ""
+
+#: .\sopds_web_backend\templates\admin\base.html:35
+#, fuzzy
+#| msgid "File size:"
+msgid "View site"
+msgstr "Размер файла:"
+
+#: .\sopds_web_backend\templates\admin\base.html:40
+msgid "Documentation"
+msgstr ""
+
+#: .\sopds_web_backend\templates\admin\base.html:44
+#, fuzzy
+#| msgid "Enter Password"
+msgid "Change password"
+msgstr "Введите пароль"
+
+#: .\sopds_web_backend\templates\admin\base.html:46
+#, fuzzy
+#| msgid "Logout"
+msgid "Log out"
+msgstr "Выход"
+
+#: .\sopds_web_backend\templates\admin\base.html:56
+msgid "Home"
+msgstr ""
 
 #: .\sopds_web_backend\templates\sopds_authors.html:8
 #, python-format
@@ -110,7 +140,8 @@ msgid ""
 "Bookshelf is available only SimpleOPDS Catalog mode with activated user "
 "authorization."
 msgstr ""
-"Книжная полка доступна только в режиме работы SimpleOPDS Catalog со включенной авторизацией пользователей."
+"Книжная полка доступна только в режиме работы SimpleOPDS Catalog со "
+"включенной авторизацией пользователей."
 
 #: .\sopds_web_backend\templates\sopds_footer.html:22
 msgid "STATISTICS"
