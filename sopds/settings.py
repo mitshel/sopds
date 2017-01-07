@@ -195,23 +195,4 @@ CONSTANCE_CONFIG_FIELDSETS = {
     '6. Log & PID Files': ('SOPDS_SERVER_LOG', 'SOPDS_SCANNER_LOG', 'SOPDS_SERVER_PID','SOPDS_SCANNER_PID'),
 }
 
-#
-# SIMPLE OPDS SETTINGS
-#
-SOPDS_ROOT_LIB = 'W:\\_Downloads\\_Lib.rus.ec - Официальная\\lib.rus.ec\\'
-#SOPDS_ROOT_LIB = '/mnt/SATA1TB-1/КНИГИ/BOOKS/'
-#SOPDS_ROOT_LIB = '/mnt/nfs/КНИГИ/BOOKS/'
-#SOPDS_ROOT_LIB = os.path.join(BASE_DIR,'opds_catalog\\tests\\data\\')
-#SOPDS_ROOT_LIB = "d:\\BOOKS\\"
-
-SOPDS_AUTH = True
-SOPDS_SCAN_SHED_MIN ='0'
-SOPDS_SCAN_SHED_HOUR ='0,12'
-SOPDS_INPX_ENABLE = True
-
-#Конвертеры EPUB и MOBI
-#SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2toepub/unix_dist/fb2toepub')
-#SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2conv/fb2epub')
-#SOPDS_FB2TOMOBI = os.path.join(BASE_DIR,'convert/fb2conv/fb2mobi')
-#SOPDS_FB2TOEPUB = os.path.join(BASE_DIR, 'convert\\fb2epub\\fb2epub.cmd' if sys.platform =='win32' else 'convert/fb2epub/fb2epub' )
 

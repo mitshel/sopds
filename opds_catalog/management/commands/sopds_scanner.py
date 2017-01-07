@@ -8,11 +8,12 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 
 from django.core.management.base import BaseCommand
 from django.db import transaction, connection, connections
-from django.conf import settings
+from django.conf import settings as main_settings
 
 from opds_catalog.models import Counter
 from opds_catalog.sopdscan import opdsScanner
-from opds_catalog.settings import SCANNER_LOG, SCAN_SHED_DAY, SCAN_SHED_DOW, SCAN_SHED_HOUR, SCAN_SHED_MIN, LOGLEVEL, SCANNER_PID
+#from opds_catalog.settings import SCANNER_LOG, SCAN_SHED_DAY, SCAN_SHED_DOW, SCAN_SHED_HOUR, SCAN_SHED_MIN, LOGLEVEL, SCANNER_PID
+from opds_catalog import settings 
 
 class Command(BaseCommand):
     help = 'Scan Books Collection.'
@@ -23,16 +24,16 @@ class Command(BaseCommand):
         parser.add_argument('--daemon',action='store_true', dest='daemonize', default=False, help='Daemonize server')
         
     def handle(self, *args, **options): 
-        self.pidfile = os.path.join(settings.BASE_DIR, SCANNER_PID)
+        self.pidfile = os.path.join(main_settings.BASE_DIR, settings.SCANNER_PID)
         action = options['command']            
         self.logger = logging.getLogger('')
         self.logger.setLevel(logging.DEBUG)
         formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
 
-        if LOGLEVEL!=logging.NOTSET:
+        if settings.LOGLEVEL!=logging.NOTSET:
             # Создаем обработчик для записи логов в файл
-            fh = logging.FileHandler(SCANNER_LOG)
-            fh.setLevel(LOGLEVEL)
+            fh = logging.FileHandler(settings.SCANNER_LOG)
+            fh.setLevel(settings.LOGLEVEL)
             fh.setFormatter(formatter)
             self.logger.addHandler(fh)
 
@@ -76,9 +77,9 @@ class Command(BaseCommand):
             
     def start(self):
         writepid(self.pidfile)
-        self.stdout.write('Startup scheduled book-scan (min=%s, hour=%s, day_of_week=%s, day=%s).'%(SCAN_SHED_MIN,SCAN_SHED_HOUR,SCAN_SHED_DOW,SCAN_SHED_DAY))
+        self.stdout.write('Startup scheduled book-scan (min=%s, hour=%s, day_of_week=%s, day=%s).'%(settings.SCAN_SHED_MIN,settings.SCAN_SHED_HOUR,settings.SCAN_SHED_DOW,settings.SCAN_SHED_DAY))
         sched = BlockingScheduler()
-        sched.add_job(self.scan, 'cron', day=SCAN_SHED_DAY, day_of_week=SCAN_SHED_DOW, hour=SCAN_SHED_HOUR, minute=SCAN_SHED_MIN)
+        sched.add_job(self.scan, 'cron', day=settings.SCAN_SHED_DAY, day_of_week=settings.SCAN_SHED_DOW, hour=settings.SCAN_SHED_HOUR, minute=settings.SCAN_SHED_MIN)
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
         self.stdout.write("Quit the server with %s.\n"%quit_command)  
         try:
@@ -118,7 +119,7 @@ def daemonize():
     os.umask(0)
 
     std_in = open("/dev/null", 'r')
-    std_out = open(SCANNER_LOG, 'a+')
+    std_out = open(settings.SCANNER_LOG, 'a+')
     os.dup2(std_in.fileno(), sys.stdin.fileno())
     os.dup2(std_out.fileno(), sys.stdout.fileno())
     os.dup2(std_out.fileno(), sys.stderr.fileno())    
