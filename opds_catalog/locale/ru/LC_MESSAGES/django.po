@@ -263,10 +263,8 @@ msgid "Unknown genre"
 msgstr "Неизвестный жанр"
 
 #: .\opds_catalog\tests\test_feeds.py:76
-#, fuzzy, python-format
-#| msgid "All books by %(author)s"
 msgid "All books by %(full_name)s"
-msgstr "Все книги автора %(author)s"
+msgstr "Все книги автора %(full_name)s"
 
 #~ msgid "Book name:"
 #~ msgstr "Название:"

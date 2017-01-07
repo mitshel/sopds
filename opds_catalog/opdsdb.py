@@ -4,7 +4,7 @@ import os
 import re
 
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _ , ugettext_noop as _noop
 from django.db import transaction, connection
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
@@ -33,7 +33,8 @@ CMP_TITLE_AUTHORS=1
 ##########################################################################
 # разные константы
 #
-unknown_genre=_('Unknown genre')
+unknown_genre_en =_noop('Unknown genre') 
+unknown_genre=_(unknown_genre_en)
 
 ##########################################################################
 # объект который мы будем использовать для перекодироки 4х байтного UTF в 3х байтный

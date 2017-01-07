@@ -136,7 +136,7 @@ class feedsTestCase(TestCase):
         self.assertEquals(response.status_code, 200)
         response = c.get(reverse('opds:genres'));
         self.assertEquals(response.status_code, 200)
-        self.assertIn(opdsdb.unknown_genre, response.content.decode()) 
+        self.assertIn(opdsdb.unknown_genre_en, response.content.decode()) 
         response = c.get(reverse('opds:genres', kwargs={'section':232}));
         self.assertEquals(response.status_code, 200)
         self.assertIn("prose_contemporary", response.content.decode())         
