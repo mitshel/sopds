@@ -15,6 +15,8 @@ from opds_catalog.sopdscan import opdsScanner
 #from opds_catalog.settings import SCANNER_LOG, SCAN_SHED_DAY, SCAN_SHED_DOW, SCAN_SHED_HOUR, SCAN_SHED_MIN, LOGLEVEL, SCANNER_PID
 from opds_catalog import settings 
 
+
+
 class Command(BaseCommand):
     help = 'Scan Books Collection.'
 
@@ -74,16 +76,36 @@ class Command(BaseCommand):
         with transaction.atomic():
             scanner.scan_all()
         Counter.objects.update_known_counters()  
+        
+    def update_shedule(self):
+        self.SCAN_SHED_DAY = settings.SCAN_SHED_DAY
+        self.SCAN_SHED_DOW = settings.SCAN_SHED_DOW
+        self.SCAN_SHED_HOUR = settings.SCAN_SHED_HOUR
+        self.SCAN_SHED_MIN = settings.SCAN_SHED_MIN
+        self.stdout.write('Reconfigure scheduled book-scan (min=%s, hour=%s, day_of_week=%s, day=%s).'%(self.SCAN_SHED_MIN,self.SCAN_SHED_HOUR,self.SCAN_SHED_DOW,self.SCAN_SHED_DAY))
+        self.sched.reschedule_job('scan', trigger='cron', day=self.SCAN_SHED_DAY, day_of_week=self.SCAN_SHED_DOW, hour=self.SCAN_SHED_HOUR, minute=self.SCAN_SHED_MIN)
+    
+    def check_settings(self):
+        settings.constance_update_shedules()
+        if self.SCAN_SHED_MIN==settings.SCAN_SHED_MIN and self.SCAN_SHED_HOUR==settings.SCAN_SHED_HOUR and self.SCAN_SHED_DOW==settings.SCAN_SHED_DOW and self.SCAN_SHED_DAY==settings.SCAN_SHED_DAY:
+            return
+        settings.constance_update_all()
+        self.update_shedule()
             
     def start(self):
         writepid(self.pidfile)
-        self.stdout.write('Startup scheduled book-scan (min=%s, hour=%s, day_of_week=%s, day=%s).'%(settings.SCAN_SHED_MIN,settings.SCAN_SHED_HOUR,settings.SCAN_SHED_DOW,settings.SCAN_SHED_DAY))
-        sched = BlockingScheduler()
-        sched.add_job(self.scan, 'cron', day=settings.SCAN_SHED_DAY, day_of_week=settings.SCAN_SHED_DOW, hour=settings.SCAN_SHED_HOUR, minute=settings.SCAN_SHED_MIN)
+        self.SCAN_SHED_DAY = settings.SCAN_SHED_DAY
+        self.SCAN_SHED_DOW = settings.SCAN_SHED_DOW
+        self.SCAN_SHED_HOUR = settings.SCAN_SHED_HOUR
+        self.SCAN_SHED_MIN = settings.SCAN_SHED_MIN
+        self.stdout.write('Startup scheduled book-scan (min=%s, hour=%s, day_of_week=%s, day=%s).'%(self.SCAN_SHED_MIN,self.SCAN_SHED_HOUR,self.SCAN_SHED_DOW,self.SCAN_SHED_DAY))
+        self.sched = BlockingScheduler()
+        self.sched.add_job(self.scan, 'cron', day=self.SCAN_SHED_DAY, day_of_week=self.SCAN_SHED_DOW, hour=self.SCAN_SHED_HOUR, minute=self.SCAN_SHED_MIN, id='scan')
+        self.sched.add_job(self.check_settings, 'cron', minute='*/10', id='check')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
         self.stdout.write("Quit the server with %s.\n"%quit_command)  
         try:
-            sched.start()
+            self.sched.start()
         except (KeyboardInterrupt, SystemExit):
             pass            
     

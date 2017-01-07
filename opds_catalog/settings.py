@@ -125,7 +125,15 @@ def constance_updated(sender, updated_key, new_value, **kwargs):
         value = new_value
     key=updated_key.replace('SOPDS_','')
     setattr(sys.modules[__name__], key, value)
-    print(key, value, MAXITEMS)
+ 
+def constance_update_shedules():
+    setattr(sys.modules[__name__], 'SCAN_SHED_MIN', config.SOPDS_SCAN_SHED_MIN)
+    setattr(sys.modules[__name__], 'SCAN_SHED_HOUR', config.SOPDS_SCAN_SHED_HOUR)
+    setattr(sys.modules[__name__], 'SCAN_SHED_DAY', config.SOPDS_SCAN_SHED_DAY)
+    setattr(sys.modules[__name__], 'SCAN_SHED_DOW', config.SOPDS_SCAN_SHED_DOW)   
+
+def constance_update_all():
+    pass
     
 # Переопределяем некоторые функции для SQLite, которые работают неправлено
 from django.db.backends.signals import connection_created
