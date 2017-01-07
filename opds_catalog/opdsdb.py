@@ -53,7 +53,10 @@ def clear_all(verbose=False):
     cursor.execute('delete from opds_catalog_series')
     cursor.execute('delete from opds_catalog_bookshelf')
     cursor.execute('delete from opds_catalog_counter')
-
+    
+def clear_genres(verbose=False):
+    cursor = connection.cursor()
+    cursor.execute('delete from opds_catalog_genre')
 
 # Книги где avail=0 уже известно что удалены
 # Книги где avail=2 это только что прверенные существующие книги

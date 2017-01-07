@@ -250,6 +250,14 @@ MySQL по сравнению с sqlite работает гораздо быст
 
     python3 manage.py sopds_util clear [--verbose]
     
+Сохранить свой справочник жанров в файл opds_catalog/fixtures/mygenres.json:
+
+    python3 manage.py sopds_util save_mygenres
+    
+Загрузить свой справочник жанров из файла opds_catalog/fixtures/mygenres.json:
+
+    python3 manage.py sopds_util load_mygenres   
+    
 Если вы используете MySQL и при очистке БД у вас возникла ошибка (2006, 'MySQL server has gone away'),
 то добавьте в файл настройки /etc/my.cnf следующие настройки, после чего перезапустите сервер БД:  
 

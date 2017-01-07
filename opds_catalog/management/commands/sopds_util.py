@@ -11,7 +11,7 @@ class Command(BaseCommand):
     verbose = False
         
     def add_arguments(self, parser):
-        parser.add_argument('command', help='Use [ clear | info ]')
+        parser.add_argument('command', help='Use [ clear | info | save_mygenres | load_mygenres ]')
         parser.add_argument('--verbose',action='store_true', dest='verbose', default=False, help='Set verbosity level for books collection scan.')  
         parser.add_argument('--nogenres',action='store_true', dest='nogenres', default=False, help='Not install genres fom fixtures.')              
 
@@ -26,6 +26,10 @@ class Command(BaseCommand):
             self.clear()        
         elif action == "info":
             self.info()
+        elif action == "save_mygenres":
+            self.save_mygenres()
+        elif action == "load_mygenres":
+            self.load_mygenres()
 
     def clear(self):
         with transaction.atomic():
@@ -40,6 +44,16 @@ class Command(BaseCommand):
         self.stdout.write('Catalogs count = %s'%Counter.objects.get_counter(models.counter_allcatalogs))
         self.stdout.write('Authors count  = %s'%Counter.objects.get_counter(models.counter_allauthors))
         self.stdout.write('Genres count   = %s'%Counter.objects.get_counter(models.counter_allgenres))
-        self.stdout.write('Series count   = %s'%Counter.objects.get_counter(models.counter_allseries))        
+        self.stdout.write('Series count   = %s'%Counter.objects.get_counter(models.counter_allseries))  
+        
+    def save_mygenres(self):     
+        call_command('dumpdata', 'opds_catalog.genre','--output','opds_catalog/fixtures/mygenres.json', app_label='opds_catalog')  
+        self.stdout.write('Genre dump saved in opds_catalog/fixtures/mygenres.json')
+        
+    def load_mygenres(self):  
+        opdsdb.clear_genres(self.verbose)   
+        call_command('loaddata', 'mygenres.json', app_label='opds_catalog')  
+        Counter.objects.update_known_counters()
+        self.stdout.write('Genres load from opds_catalog/fixtures/mygenres.json')
         
 
