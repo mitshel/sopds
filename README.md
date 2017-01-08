@@ -1,6 +1,6 @@
 #### Simple OPDS Catalog - Простой OPDS Каталог  
 #### Author: Dmitry V.Shelepnev  
-#### Версия 0.38
+#### Версия 0.40
 
 #### 1. Простая установка Simple OPDS (используем простую БД sqlite3)
 
@@ -53,7 +53,7 @@
 1.9 Запускаем SCANNER сервер (опционально, необходим для автоматизированного периодического пересканирования коллекции)  
 Перед запуском SCANNER сервера необходимо убедится, что сканирование, запущеное в п.1.6 уже завершено,
 т.к. может возникнуть ситуация с запуском параллельного процесса сканирования, что может привести к ошибкам.
-Примите во внимание, что в  настройках, указанных в п.1.3 задан периодический запуск сканирования 2 раза 
+Примите во внимание, что в  настройках по умолчанию задан периодический запуск сканирования 2 раза 
 в день 12:00 и 0:00.
 
 	python3 manage.py sopds_scanner start --daemon
@@ -287,7 +287,7 @@ MySQL по сравнению с sqlite работает гораздо быст
 **SOPDS_ROOT_LIB** - содержит путь к каталогу, в котором расположена ваша коллекция книг.  
 
 **SOPDS_BOOK_EXTENSIONS** - Список форматов книг, которые будут включаться в каталог.  
-(по умолчанию SOPDS_BOOK_EXTENSIONS = ['.pdf', '.djvu', '.fb2', '.epub'])  
+(по умолчанию SOPDS_BOOK_EXTENSIONS = '.pdf .djvu .fb2 .epub')  
 	
 **SOPDS_DOUBLES_HIDE** - Скрывает, найденные дубликаты в выдачах книг.  
 (по умолчанию SOPDS_DOUBLES_HIDE = True)  
@@ -332,7 +332,7 @@ MySQL по сравнению с sqlite работает гораздо быст
 (по умолчанию SOPDS_FB2TOMOBI = "")  
 
 **SOPDS_TEMP_DIR** задает путь к временному каталогу, который используется для копирования оригинала и результата конвертации.  
-(по умолчанию SOPDS_TEMP_DIR = os.path.join(settings.BASE_DIR,'tmp'))  
+(по умолчанию SOPDS_TEMP_DIR = os.path.join(BASE_DIR,'tmp'))  
 
 **SOPDS_TITLE_AS_FILENAME** - Если True, то при скачивании вместо оригинального имени файла книги выдает транслитерацию названия книги.  
 (по умолчанию SOPDS_TITLE_AS_FILENAME = True)  
@@ -341,18 +341,18 @@ MySQL по сравнению с sqlite работает гораздо быст
 (по умолчанию SOPDS_ALPHABET_MENU = True)  
 
 **SOPDS_NOCOVER_PATH** - Файл обложки, которая будет демонстрироваться для книг без обложек.  
-(по умолчанию SOPDS_NOCOVER_PATH = os.path.join(settings.BASE_DIR,'static/images/nocover.jpg'))
+(по умолчанию SOPDS_NOCOVER_PATH = os.path.join(BASE_DIR,'static/images/nocover.jpg'))
 
 **SOPDS_AUTH** - Включение BASIC - авторизации.  
-(по умолчанию SOPDS_AUTH = False)  
+(по умолчанию SOPDS_AUTH = True)  
 
 **SOPDS_SERVER_LOG** и **SOPDS_SCANNER_LOG** задают размещение LOG файлов этих процессов.  
-(по умолчанию SOPDS_SERVER_LOG = os.path.join(settings.BASE_DIR,'opds_catalog/log/sopds_server.log'))  
-(по умолчанию SOPDS_SCANNER_LOG = os.path.join(settings.BASE_DIR,'opds_catalog/log/sopds_scanner.log'))  
+(по умолчанию SOPDS_SERVER_LOG = os.path.join(BASE_DIR,'opds_catalog/log/sopds_server.log'))  
+(по умолчанию SOPDS_SCANNER_LOG = os.path.join(BASE_DIR,'opds_catalog/log/sopds_scanner.log'))  
 
 **SOPDS_SERVER_PID** и **SOPDS_SCANNER_PID** задают размещение PID файлов этих процессов при демонизации.  
-(по умолчанию SOPDS_SERVER_PID = os.path.join(settings.BASE_DIR,'opds_catalog/tmp/sopds_server.pid'))  
-(по умолчанию SOPDS_SCANNER_PID = os.path.join(settings.BASE_DIR,'opds_catalog/tmp/sopds_scanner.pid'))  
+(по умолчанию SOPDS_SERVER_PID = os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_server.pid'))  
+(по умолчанию SOPDS_SCANNER_PID = os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_scanner.pid'))  
 
 Параметры **SOPDS_SCAN_SHED_XXX** устанавливают значения шедулера, для периодического сканирования коллекции книг при помощи **manage.py sopds_scanner start**.  Возможные значения можно найти на следующей странице: # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#module-apscheduler.triggers.cron  
 Изменения указанных ниже параметров через Web-интерфейс или командную строку проверяется процессом sopds_scanner каждые 10 минут. 
