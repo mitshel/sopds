@@ -66,9 +66,6 @@ class Command(BaseCommand):
 
     def scan(self):
         if connection.connection and not connection.is_usable():
-            # destroy the default mysql connection
-            # after this line, when you use ORM methods
-            # django will reconnect to the default mysql
             del(connections._connections.default)
                 
         scanner=opdsScanner(self.logger)
@@ -85,6 +82,8 @@ class Command(BaseCommand):
         self.sched.reschedule_job('scan', trigger='cron', day=self.SCAN_SHED_DAY, day_of_week=self.SCAN_SHED_DOW, hour=self.SCAN_SHED_HOUR, minute=self.SCAN_SHED_MIN)
     
     def check_settings(self):
+        if connection.connection and not connection.is_usable():
+            del(connections._connections.default)        
         settings.constance_update_all()
         if self.SCAN_SHED_MIN==config.SOPDS_SCAN_SHED_MIN and \
            self.SCAN_SHED_HOUR==config.SOPDS_SCAN_SHED_HOUR and \
