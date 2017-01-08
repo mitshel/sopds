@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import sys
+from collections import OrderedDict
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -152,38 +153,45 @@ STATIC_ROOT = 'static'
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
-CONSTANCE_CONFIG = {
-    'SOPDS_ROOT_LIB': ('books/',_('Absolute path to books collection directory')),
-    'SOPDS_BOOK_EXTENSIONS': ('.pdf .djvu .fb2 .epub', _('List of managed book files extensions')),
-    'SOPDS_DOUBLES_HIDE': (True,_('This flag hides found doublicates')),
-    'SOPDS_COVER_SHOW': (True,_('This flag activate showing cover of books')),
-    'SOPDS_FB2PARSE': (True,_('This flag activate extraction metadata from fb2 files')),
-    'SOPDS_ZIPSCAN': (True,_('This flag activate zip files scanning')),
-    'SOPDS_ZIPCODEPAGE': ('cp866',_('Set codepage for filenames inside zipfile')),
-    'SOPDS_INPX_ENABLE': (False,_('Enables read metadata from inpx-file (and stop scanning deeper from ipx-file place)')),
-    'SOPDS_INPX_SKIP_UNCHANGED': (True,_('Skip scanning INPX with unchanged size after previous scan')),
-    'SOPDS_INPX_TEST_ZIP': (False,_('Test avialability zip files listed in INPX before add in collection')),
-    'SOPDS_INPX_TEST_FILES': (False,_('Test avialability book files listed in INPX before add in collection')),
-    'SOPDS_DELETE_LOGICAL': (False,'Logical deleting unavialable files'),
-    'SOPDS_SPLITITEMS': (300,_('Max subitems count in alphabet menuitem')),
-    'SOPDS_MAXITEMS': (60,_('Max items on page')),
-    'SOPDS_FB2TOEPUB': ('',_('Path to FB2-EPUB converter program')),
-    'SOPDS_FB2TOMOBI': ('',_('Path to FB2-MOBI converter program')),
-    'SOPDS_TEMP_DIR': (os.path.join(BASE_DIR,'tmp'),_('Path to temporary files directory')),
-    'SOPDS_TITLE_AS_FILENAME': (True,_('Create downloaded filename from book title')),
-    'SOPDS_ALPHABET_MENU': (True,_('Enable alphabet submenu')),
-    'SOPDS_NOCOVER_PATH': (os.path.join(BASE_DIR,'static/images/nocover.jpg'),_('Path to image file showing for book without embedded cover')),
-    'SOPDS_AUTH': (True,_('Enable authentication')),
-    'SOPDS_SERVER_LOG': (os.path.join(BASE_DIR,'opds_catalog/log/sopds_server.log'),_('Path to logfile for sopds_server process')),
-    'SOPDS_SCANNER_LOG': (os.path.join(BASE_DIR,'opds_catalog/log/sopds_scanner.log'),_('Path to logfile for sopds_scanner process')),
-    'SOPDS_SERVER_PID': (os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_server.pid'),_('Path to pidfile for sopds_server process')),
-    'SOPDS_SCANNER_PID': (os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_scanner.pid'),_('Path to pidfile for sopds_scanner process')),
-    'SOPDS_SCAN_SHED_MIN': ('0',_('sheduled minutes for sopds_scanner (cron syntax)')),
-    'SOPDS_SCAN_SHED_HOUR': ('0,12',_('sheduled hours for sopds_scanner (cron syntax)')),
-    'SOPDS_SCAN_SHED_DAY': ('*',_('sheduled day for sopds_scanner (cron syntax)')),
-    'SOPDS_SCAN_SHED_DOW': ('*',_('sheduled day of weeks for sopds_scanner (cron syntax)')),
-    'SOPDS_SCAN_START_DIRECTLY': (False,_('Turn once scanning directly')),                        
-}
+CONSTANCE_CONFIG = OrderedDict([
+    ('SOPDS_ROOT_LIB', ('books/',_('Absolute path to books collection directory'))),
+    ('SOPDS_BOOK_EXTENSIONS', ('.pdf .djvu .fb2 .epub', _('List of managed book files extensions'))),
+    ('SOPDS_SCAN_START_DIRECTLY', (False,_('Turn once scanning directly'))),
+    
+    ('SOPDS_AUTH', (True,_('Enable authentication'))),
+    ('SOPDS_ALPHABET_MENU', (True,_('Enable alphabet submenu'))),   
+    ('SOPDS_DOUBLES_HIDE', (True,_('This flag hides found doublicates'))),
+    ('SOPDS_COVER_SHOW', (True,_('This flag activate showing cover of books'))),
+    ('SOPDS_SPLITITEMS', (300,_('Max subitems count in alphabet menuitem'))),
+    ('SOPDS_MAXITEMS', (60,_('Max items on page'))),
+    ('SOPDS_TITLE_AS_FILENAME', (True,_('Create downloaded filename from book title'))),
+    ('SOPDS_NOCOVER_PATH', (os.path.join(BASE_DIR,'static/images/nocover.jpg'),_('Path to image file showing for book without embedded cover'))),    
+        
+    
+    ('SOPDS_FB2PARSE', (True,_('This flag activate extraction metadata from fb2 files'))),
+    ('SOPDS_ZIPSCAN', (True,_('This flag activate zip files scanning'))),
+    ('SOPDS_ZIPCODEPAGE', ('cp866',_('Set codepage for filenames inside zipfile'))),
+    ('SOPDS_INPX_ENABLE', (False,_('Enables read metadata from inpx-file (and stop scanning deeper from ipx-file place)'))),
+    ('SOPDS_INPX_SKIP_UNCHANGED', (True,_('Skip scanning INPX with unchanged size after previous scan'))),
+    ('SOPDS_INPX_TEST_ZIP', (False,_('Test avialability zip files listed in INPX before add in collection'))),
+    ('SOPDS_INPX_TEST_FILES', (False,_('Test avialability book files listed in INPX before add in collection'))),
+    ('SOPDS_DELETE_LOGICAL', (False,_('Logical deleting unavialable files'))),
+    
+    ('SOPDS_SCAN_SHED_MIN', ('0',_('sheduled minutes for sopds_scanner (cron syntax)'))),
+    ('SOPDS_SCAN_SHED_HOUR', ('0,12',_('sheduled hours for sopds_scanner (cron syntax)'))),
+    ('SOPDS_SCAN_SHED_DAY', ('*',_('sheduled day for sopds_scanner (cron syntax)'))),
+    ('SOPDS_SCAN_SHED_DOW', ('*',_('sheduled day of weeks for sopds_scanner (cron syntax)'))),  
+    
+    ('SOPDS_FB2TOEPUB', ('',_('Path to FB2-EPUB converter program'))),
+    ('SOPDS_FB2TOMOBI', ('',_('Path to FB2-MOBI converter program'))),
+    ('SOPDS_TEMP_DIR', (os.path.join(BASE_DIR,'tmp'),_('Path to temporary files directory'))),
+
+    ('SOPDS_SERVER_LOG', (os.path.join(BASE_DIR,'opds_catalog/log/sopds_server.log'),_('Path to logfile for sopds_server process'))),
+    ('SOPDS_SCANNER_LOG', (os.path.join(BASE_DIR,'opds_catalog/log/sopds_scanner.log'),_('Path to logfile for sopds_scanner process'))),
+    ('SOPDS_SERVER_PID', (os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_server.pid'),_('Path to pidfile for sopds_server process'))),
+    ('SOPDS_SCANNER_PID', (os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_scanner.pid'),_('Path to pidfile for sopds_scanner process'))),
+                      
+])
 
 CONSTANCE_CONFIG_FIELDSETS = {
     '1. General Options': ('SOPDS_ROOT_LIB', 'SOPDS_BOOK_EXTENSIONS','SOPDS_SCAN_START_DIRECTLY'),
