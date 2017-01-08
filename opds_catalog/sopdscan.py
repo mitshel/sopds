@@ -192,8 +192,6 @@ class opdsScanner:
                 zip_process_error = 1
             self.bad_archives+=zip_process_error
 
-
-
     def processfile(self,name,full_path,file,cat,archive=0,file_size=0):
         (n,e)=os.path.splitext(name)
         if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():

@@ -135,8 +135,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 #LANGUAGE_CODE = 'en-US'
 LANGUAGE_CODE = 'ru-RU'
-
-3
     
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'sopds/locale'),

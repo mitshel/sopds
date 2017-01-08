@@ -363,6 +363,8 @@ def CatalogsView(request):
         breadcrumbs_list.insert(0, (_('ROOT'), 0))  
     breadcrumbs_list.insert(0, (_('Catalogs'),-1))    
     args['breadcrumbs_cat'] =  breadcrumbs_list  
+    
+    print(args['paginator'], catalogs_count, books_count, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)
       
     return render(request,'sopds_catalogs.html', args)  
 

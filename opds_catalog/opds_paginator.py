@@ -27,7 +27,7 @@ class Paginator:
         self.d2_last_pos =  d2_MAXITEMS*self.page_num - 1;
         self.d2_last_pos = self.d2_last_pos if self.d2_last_pos<self.d2_count else (self.d2_count-1 if self.d2_count else 0)
         
-        self.num_pages = self.count//self.MAXITEMS + 1 if self.count%self.MAXITEMS else 0
+        self.num_pages = self.count//self.MAXITEMS + 1
         self.firstpage = self.page_num - self.HALF_PAGES_LINK
         self.lastpage = self.page_num + self.HALF_PAGES_LINK
         if self.firstpage<1:
@@ -39,7 +39,7 @@ class Paginator:
             self.lastpage = self.num_pages
             if self.firstpage<1:
                 self.firstpage = 1
-                
+        
         self.has_previous = (self.page_num > 1)
         self.has_next = (self.page_num < self.num_pages)
         self.previous_page_number = (self.page_num-1) if self.page_num>1 else 1
