@@ -99,7 +99,7 @@ class Command(BaseCommand):
            self.SCAN_SHED_DAY==config.SOPDS_SCAN_SHED_DAY):
             self.update_shedule()
         if config.SOPDS_SCAN_START_DIRECTLY:
-            config.SOPDS_SCAN_START_DIRECTLY
+            config.SOPDS_SCAN_START_DIRECTLY = False
             self.stdout.write('Startup scannyng directly by SOPDS_SCAN_START_DIRECTLY flag.')
             self.scan()
                        
