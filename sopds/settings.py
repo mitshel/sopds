@@ -181,11 +181,12 @@ CONSTANCE_CONFIG = {
     'SOPDS_SCAN_SHED_MIN': ('0',_('sheduled minutes for sopds_scanner (cron syntax)')),
     'SOPDS_SCAN_SHED_HOUR': ('0,12',_('sheduled hours for sopds_scanner (cron syntax)')),
     'SOPDS_SCAN_SHED_DAY': ('*',_('sheduled day for sopds_scanner (cron syntax)')),
-    'SOPDS_SCAN_SHED_DOW': ('*',_('sheduled day of weeks for sopds_scanner (cron syntax)')),                       
+    'SOPDS_SCAN_SHED_DOW': ('*',_('sheduled day of weeks for sopds_scanner (cron syntax)')),
+    'SOPDS_SCAN_START_DIRECTLY': (False,_('Turn once scanning directly')),                        
 }
 
 CONSTANCE_CONFIG_FIELDSETS = {
-    '1. General Options': ('SOPDS_ROOT_LIB', 'SOPDS_BOOK_EXTENSIONS',),
+    '1. General Options': ('SOPDS_ROOT_LIB', 'SOPDS_BOOK_EXTENSIONS','SOPDS_SCAN_START_DIRECTLY'),
     '2. Server Options': ('SOPDS_AUTH', 'SOPDS_ALPHABET_MENU', 'SOPDS_DOUBLES_HIDE', 'SOPDS_COVER_SHOW', 'SOPDS_SPLITITEMS', 'SOPDS_MAXITEMS', 'SOPDS_TITLE_AS_FILENAME', 'SOPDS_NOCOVER_PATH'),    
     '3. Scanner Options': ('SOPDS_FB2PARSE','SOPDS_ZIPSCAN','SOPDS_ZIPCODEPAGE', 'SOPDS_INPX_ENABLE', 'SOPDS_INPX_SKIP_UNCHANGED', 'SOPDS_INPX_TEST_ZIP', 'SOPDS_INPX_TEST_FILES', 'SOPDS_DELETE_LOGICAL'),
     '4. Scanner Shedule': ('SOPDS_SCAN_SHED_MIN', 'SOPDS_SCAN_SHED_HOUR', 'SOPDS_SCAN_SHED_DAY','SOPDS_SCAN_SHED_DOW'),

@@ -18,6 +18,7 @@ from constance import config
 
 class Command(BaseCommand):
     help = 'Scan Books Collection.'
+    scan_is_active = False
 
     def add_arguments(self, parser):
         parser.add_argument('command', help='Use [ scan | start | stop | restart ]')
@@ -65,6 +66,12 @@ class Command(BaseCommand):
             self.restart(pid)            
 
     def scan(self):
+        if self.scan_is_active:
+            self.stdout.write('Scan process already active. Skip currend job.')
+            return
+        
+        self.scan_is_active = True
+        
         if connection.connection and not connection.is_usable():
             del(connections._connections.default)
                 
@@ -72,6 +79,7 @@ class Command(BaseCommand):
         with transaction.atomic():
             scanner.scan_all()
         Counter.objects.update_known_counters()  
+        self.scan_is_active = False
         
     def update_shedule(self):
         self.SCAN_SHED_DAY = config.SOPDS_SCAN_SHED_DAY
@@ -85,13 +93,16 @@ class Command(BaseCommand):
         if connection.connection and not connection.is_usable():
             del(connections._connections.default)        
         settings.constance_update_all()
-        if self.SCAN_SHED_MIN==config.SOPDS_SCAN_SHED_MIN and \
+        if not (self.SCAN_SHED_MIN==config.SOPDS_SCAN_SHED_MIN and \
            self.SCAN_SHED_HOUR==config.SOPDS_SCAN_SHED_HOUR and \
            self.SCAN_SHED_DOW==config.SOPDS_SCAN_SHED_DOW and \
-           self.SCAN_SHED_DAY==config.SOPDS_SCAN_SHED_DAY:
-            return
-        self.update_shedule()
-            
+           self.SCAN_SHED_DAY==config.SOPDS_SCAN_SHED_DAY):
+            self.update_shedule()
+        if config.SOPDS_SCAN_START_DIRECTLY:
+            config.SOPDS_SCAN_START_DIRECTLY
+            self.stdout.write('Startup scannyng directly by SOPDS_SCAN_START_DIRECTLY flag.')
+            self.scan()
+                       
     def start(self):
         writepid(self.pidfile)
         self.SCAN_SHED_DAY = config.SOPDS_SCAN_SHED_DAY
