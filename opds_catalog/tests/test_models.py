@@ -3,7 +3,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.conf import settings
+from django.conf import settings as main_settings
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, bauthor, bgenre, bseries
 from opds_catalog import models
@@ -11,7 +11,7 @@ from opds_catalog import opdsdb
 
 class modelsTestCase(TestCase):
     testdatetime = datetime(2016, 1, 1, 0, 0)
-    if settings.USE_TZ:
+    if main_settings.USE_TZ:
         testdatetime = testdatetime.replace(tzinfo=timezone.get_current_timezone())
 
     def setUp(self):

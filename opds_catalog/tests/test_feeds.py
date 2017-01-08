@@ -4,14 +4,16 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from django.utils.translation import ugettext as _
 
-from opds_catalog import settings, opdsdb
+from opds_catalog import opdsdb
+from opds_catalog import settings
+from constance import config
 
 
 class feedsTestCase(TestCase):
     fixtures = ['testdb.json']
     
     def setUp(self):
-        settings.AUTH=False           
+        config.SOPDS_AUTH=False           
   
     def test_MainFeed(self):
         c = Client()
@@ -111,7 +113,7 @@ class feedsTestCase(TestCase):
         c = Client()
         response = c.get('/opds/books/0/')
         self.assertEquals(response.status_code, 200)
-        if settings.ALPHABET_MENU:
+        if config.SOPDS_ALPHABET_MENU:
             response = c.get(reverse('opds:lang_books'));
             self.assertEquals(response.status_code, 200)
             self.assertIn(_("Cyrillic"), response.content.decode()) 
@@ -122,7 +124,7 @@ class feedsTestCase(TestCase):
         c = Client()
         response = c.get('/opds/authors/0/')
         self.assertEquals(response.status_code, 200)
-        if settings.ALPHABET_MENU:        
+        if config.SOPDS_ALPHABET_MENU:        
             response = c.get(reverse('opds:lang_authors'));
             self.assertEquals(response.status_code, 200)
             self.assertIn(_("Cyrillic"), response.content.decode())  

@@ -7,7 +7,8 @@ from django.core.management.base import BaseCommand
 from django.core.management import call_command
 
 #from opds_catalog.settings import SERVER_LOG, SERVER_PID
-from opds_catalog import settings
+#from opds_catalog import settings
+from constance import config
 
 class Command(BaseCommand):
     help = 'HTTP/OPDS built-in server'
@@ -20,7 +21,7 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        self.pidfile = os.path.join(main_settings.BASE_DIR, settings.SERVER_PID)
+        self.pidfile = os.path.join(main_settings.BASE_DIR, config.SOPDS_SERVER_PID)
         action = options['command']
         self.addr = options['host']
         self.port = int(options['port'])
@@ -76,7 +77,7 @@ def daemonize():
     os.umask(0)
 
     std_in = open("/dev/null", 'r')
-    std_out = open(settings.SERVER_LOG, 'a+')
+    std_out = open(config.SOPDS_SERVER_LOG, 'a+')
     os.dup2(std_in.fileno(), sys.stdin.fileno())
     os.dup2(std_out.fileno(), sys.stdout.fileno())
     os.dup2(std_out.fileno(), sys.stderr.fileno())    

@@ -12,7 +12,8 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre
 #from opds_catalog.settings import MAXITEMS, DOUBLES_HIDE, AUTH, VERSION, ALPHABET_MENU, SPLITITEMS, FB2TOEPUB, FB2TOMOBI
-from opds_catalog import settings as settings
+from opds_catalog import settings
+from constance import config
 from opds_catalog.models import lang_menu
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
@@ -20,7 +21,7 @@ from sopds_web_backend.settings import HALF_PAGES_LINKS
 
 def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None):
     actual_decorator = user_passes_test(
-        lambda u: (u.is_authenticated() if settings.AUTH else True),
+        lambda u: (u.is_authenticated() if config.SOPDS_AUTH else True),
         login_url=reverse_lazy(url),
         redirect_field_name=redirect_field_name
     ) 
@@ -30,16 +31,16 @@ def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None
 
 def sopds_processor(request):
     args={}
-    args['sopds_auth']=settings.AUTH
+    args['sopds_auth']=config.SOPDS_AUTH
     args['sopds_version']=settings.VERSION
-    args['alphabet'] = settings.ALPHABET_MENU
-    args['splititems'] = settings.SPLITITEMS
-    args['fb2tomobi'] = (settings.FB2TOMOBI!="")
-    args['fb2toepub'] = (settings.FB2TOEPUB!="")
-    if settings.ALPHABET_MENU:
+    args['alphabet'] = config.SOPDS_ALPHABET_MENU
+    args['splititems'] = config.SOPDS_SPLITITEMS
+    args['fb2tomobi'] = (config.SOPDS_FB2TOMOBI!="")
+    args['fb2toepub'] = (config.SOPDS_FB2TOEPUB!="")
+    if config.SOPDS_ALPHABET_MENU:
         args['lang_menu'] = lang_menu
     
-    if settings.AUTH:
+    if config.SOPDS_AUTH:
         user=request.user
         if user.is_authenticated():
             result=[]
@@ -137,7 +138,7 @@ def SearchBooksView(request):
                                    
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
-            if settings.AUTH:
+            if config.SOPDS_AUTH:
                 books = Book.objects.filter(bookshelf__user=request.user).order_by('-bookshelf__readtime')
                 args['breadcrumbs'] = [_('Books'),_('Bookshelf'),request.user.username]
                 #books = bookshelf.objects.filter(user=request.user).select_related('book')              
@@ -176,7 +177,7 @@ def SearchBooksView(request):
         
         # Фильтруем дубликаты и формируем выдачу затребованной страницы
         books_count = books.count()
-        op = OPDS_Paginator(books_count, 0, page_num, settings.MAXITEMS, HALF_PAGES_LINKS)
+        op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)
         items = []
         
         prev_title = ''
@@ -184,7 +185,7 @@ def SearchBooksView(request):
         
         # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
         # свои дубликаты если они есть
-        summary_DOUBLES_HIDE =  settings.DOUBLES_HIDE and (searchtype != 'd')
+        summary_DOUBLES_HIDE =  config.SOPDS_DOUBLES_HIDE and (searchtype != 'd')
         start = op.d1_first_pos if ((op.d1_first_pos==0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos-1
         finish = op.d1_last_pos
         
@@ -252,7 +253,7 @@ def SearchSeriesView(request):
             
         # Создаем результирующее множество
         series_count = series.count()
-        op = OPDS_Paginator(series_count, 0, page_num, settings.MAXITEMS, HALF_PAGES_LINKS)        
+        op = OPDS_Paginator(series_count, 0, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)        
         items = []
         for row in series[op.d1_first_pos:op.d1_last_pos+1]:
             #p = {'id':row.id, 'ser':row.ser, 'lang_code': row.lang_code, 'book_count': Book.objects.filter(series=row).count()}
@@ -291,7 +292,7 @@ def SearchAuthorsView(request):
                         
         # Создаем результирующее множество
         authors_count = authors.count()
-        op = OPDS_Paginator(authors_count, 0, page_num, settings.MAXITEMS, HALF_PAGES_LINKS)        
+        op = OPDS_Paginator(authors_count, 0, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)        
         items = []
         
         for row in authors[op.d1_first_pos:op.d1_last_pos+1]:
@@ -335,7 +336,7 @@ def CatalogsView(request):
     books_count = books_list.count()
     
     # Получаем результирующий список
-    op = OPDS_Paginator(catalogs_count, books_count, page_num, settings.MAXITEMS, HALF_PAGES_LINKS)
+    op = OPDS_Paginator(catalogs_count, books_count, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)
     items = []
     
     for row in catalogs_list[op.d1_first_pos:op.d1_last_pos+1]:

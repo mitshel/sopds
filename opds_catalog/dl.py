@@ -11,15 +11,16 @@ from django.http import HttpResponse, Http404
 from opds_catalog.models import Book, bookshelf
 from opds_catalog import settings, utils, opdsdb, fb2parse
 import opds_catalog.zipf as zipfile
+from constance import config
 
 def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """
     book = Book.objects.get(id=book_id)
 
-    if settings.AUTH and request.user.is_authenticated():
+    if config.SOPDS_AUTH and request.user.is_authenticated():
         bookshelf.objects.get_or_create(user=request.user, book=book)
 
-    full_path=os.path.join(settings.ROOT_LIB,book.path)
+    full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     
     if book.cat_type==opdsdb.CAT_INP:
         # Убираем из пути INPX файл
@@ -27,7 +28,7 @@ def Download(request, book_id, zip_flag):
         path, inpx_file = os.path.split(inpx_path)
         full_path = os.path.join(path,zip_name)
         
-    if settings.TITLE_AS_FILENAME:
+    if config.SOPDS_TITLE_AS_FILENAME:
         transname=utils.translit(book.title+'.'+book.format)
     else:
         transname=utils.translit(book.filename)
@@ -98,7 +99,7 @@ def Cover(request, book_id):
     book = Book.objects.get(id=book_id)
     response = HttpResponse()
     c0=0
-    full_path=os.path.join(settings.ROOT_LIB,book.path)
+    full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     if book.cat_type==opdsdb.CAT_INP:
         # Убираем из пути INPX файл
         inpx_path, zip_name = os.path.split(full_path)
@@ -132,9 +133,9 @@ def Cover(request, book_id):
                 c0=0
 
     if c0==0:
-        if os.path.exists(settings.NOCOVER_PATH):
+        if os.path.exists(config.SOPDS_NOCOVER_PATH):
             response["Content-Type"]='image/jpeg'
-            f=open(settings.NOCOVER_PATH,"rb")
+            f=open(config.SOPDS_NOCOVER_PATH,"rb")
             response.write(f.read())
             f.close()
         else:
@@ -149,17 +150,17 @@ def ConvertFB2(request, book_id, convert_type):
     if book.format!='fb2':
         raise Http404
 
-    if settings.AUTH and request.user.is_authenticated():
+    if config.SOPDS_AUTH and request.user.is_authenticated():
         bookshelf.objects.get_or_create(user=request.user, book=book)
 
-    full_path=os.path.join(settings.ROOT_LIB,book.path)
+    full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     if book.cat_type==opdsdb.CAT_INP:
         # Убираем из пути INPX файл
         inpx_path, zip_name = os.path.split(full_path)
         path, inpx_file = os.path.split(inpx_path)
         full_path = os.path.join(path,zip_name)  
             
-    if settings.TITLE_AS_FILENAME:
+    if config.SOPDS_TITLE_AS_FILENAME:
         transname=utils.translit(book.title+'.'+book.format)
     else:
         transname=utils.translit(book.filename)      
@@ -170,10 +171,10 @@ def ConvertFB2(request, book_id, convert_type):
     dlfilename="%s.%s"%(n,convert_type)
     
     if convert_type=='epub':
-        converter_path=settings.FB2TOEPUB
+        converter_path=config.SOPDS_FB2TOEPUB
         content_type='application/epub+zip'
     elif convert_type=='mobi':
-        converter_path=settings.FB2TOMOBI
+        converter_path=config.SOPDS_FB2TOMOBI
         content_type='application/x-mobipocket-ebook'
     else:
         content_type='application/octet-stream'
@@ -187,11 +188,11 @@ def ConvertFB2(request, book_id, convert_type):
         except FileNotFoundError:
             raise Http404        
         z = zipfile.ZipFile(fz, 'r', allowZip64=True)
-        z.extract(book.filename,settings.TEMP_DIR)
-        tmp_fb2_path=os.path.join(settings.TEMP_DIR,book.filename)
+        z.extract(book.filename,config.SOPDS_TEMP_DIR)
+        tmp_fb2_path=os.path.join(config.SOPDS_TEMP_DIR,book.filename)
         file_path=tmp_fb2_path        
         
-    tmp_conv_path=os.path.join(settings.TEMP_DIR,dlfilename)
+    tmp_conv_path=os.path.join(config.SOPDS_TEMP_DIR,dlfilename)
     popen_args = ("\"%s\" \"%s\" \"%s\""%(converter_path,file_path,tmp_conv_path))
     proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE)
     #proc = subprocess.Popen((converter_path.encode('utf8'),file_path.encode('utf8'),tmp_conv_path.encode('utf8')), shell=True, stdout=subprocess.PIPE)

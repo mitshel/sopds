@@ -4,8 +4,10 @@ from django.test import TestCase
 
 from opds_catalog import opdsdb
 from opds_catalog.sopdscan import opdsScanner
-from opds_catalog import settings
+#from opds_catalog import settings
 from opds_catalog.models import Book, Catalog, Author, Genre, Series
+
+from constance import config
 
 class scanTestCase(TestCase):
     test_module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,7 +16,7 @@ class scanTestCase(TestCase):
     test_zip = "books.zip"
 
     def setUp(self):
-        settings.ROOT_LIB = self.test_ROOTLIB
+        config.SOPDS_ROOT_LIB = self.test_ROOTLIB
 
     def test_processfile(self):
         """ Тестирование процедуры processfile (извлекает метаданные из книги и помещает в БД) """

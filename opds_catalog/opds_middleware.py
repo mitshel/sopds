@@ -5,8 +5,8 @@ from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 
-from opds_catalog import settings
-
+#from opds_catalog import settings
+from constance import config
 
 class BasicAuthMiddleware(object):
     header = "HTTP_AUTHORIZATION"
@@ -19,7 +19,7 @@ class BasicAuthMiddleware(object):
         return response
 
     def process_request(self,request):
-        if not settings.AUTH:
+        if not config.SOPDS_AUTH:
             return
             
         # AuthenticationMiddleware is required so that request.user exists.

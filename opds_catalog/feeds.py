@@ -15,11 +15,13 @@ from opds_catalog import settings
 from opds_catalog.opds_middleware import BasicAuthMiddleware
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
+from constance import config
+
 class AuthFeed(Feed):
     request = None
     def __call__(self,request,*args,**kwargs):
         self.request = request
-        if settings.AUTH:
+        if config.SOPDS_AUTH:
             if request.user.is_authenticated():
                 return super().__call__(request,*args,**kwargs)
         
@@ -159,16 +161,16 @@ class MainFeed(AuthFeed):
         mainitems = [
                     {"id":1, "title":_("By catalogs"), "link":"opds_catalog:catalogs",
                      "descr": _("Catalogs: %(catalogs)s, books: %(books)s."),"counters":{"catalogs":Counter.objects.get_counter(models.counter_allcatalogs),"books":Counter.objects.get_counter(models.counter_allbooks)}},
-                    {"id":2, "title":_("By authors"), "link":("opds_catalog:lang_authors" if settings.ALPHABET_MENU else "opds_catalog:nolang_authors"),
+                    {"id":2, "title":_("By authors"), "link":("opds_catalog:lang_authors" if config.SOPDS_ALPHABET_MENU else "opds_catalog:nolang_authors"),
                      "descr": _("Authors: %(authors)s."),"counters":{"authors":Counter.objects.get_counter(models.counter_allauthors)}},
-                    {"id":3, "title":_("By titles"), "link":("opds_catalog:lang_books" if settings.ALPHABET_MENU else "opds_catalog:nolang_books"),
+                    {"id":3, "title":_("By titles"), "link":("opds_catalog:lang_books" if config.SOPDS_ALPHABET_MENU else "opds_catalog:nolang_books"),
                      "descr": _("Books: %(books)s."),"counters":{"books":Counter.objects.get_counter(models.counter_allbooks)}},
                     {"id":4, "title":_("By genres"), "link":"opds_catalog:genres",
                      "descr": _("Genres: %(genres)s."),"counters":{"genres":Counter.objects.get_counter(models.counter_allgenres)}},
-                    {"id":5, "title":_("By series"), "link":("opds_catalog:lang_series" if settings.ALPHABET_MENU else "opds_catalog:nolang_series"),
+                    {"id":5, "title":_("By series"), "link":("opds_catalog:lang_series" if config.SOPDS_ALPHABET_MENU else "opds_catalog:nolang_series"),
                      "descr": _("Series: %(series)s."),"counters":{"series":Counter.objects.get_counter(models.counter_allseries)}},
         ]
-        if settings.AUTH and self.request.user.is_authenticated():
+        if config.SOPDS_AUTH and self.request.user.is_authenticated():
             mainitems += [
                         {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
                          "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.filter(user=self.request.user).count(),"username":self.request.user.username}},
@@ -223,7 +225,7 @@ class CatalogsFeed(AuthFeed):
         books_count = books_list.count()
         
         # Получаем результирующий список
-        op = OPDS_Paginator(catalogs_count, books_count, page_num, settings.MAXITEMS)
+        op = OPDS_Paginator(catalogs_count, books_count, page_num, config.SOPDS_MAXITEMS)
         items = []
         
         for row in catalogs_list[op.d1_first_pos:op.d1_last_pos+1]:
@@ -372,7 +374,7 @@ class SearchBooksFeed(AuthFeed):
     subtitle = settings.SUBTITLE
     
     def title(self, obj):
-        return "%s | %s (%s)"%(settings.TITLE,_("Books found"),_("doubles hide") if settings.DOUBLES_HIDE else _("doubles show"))    
+        return "%s | %s (%s)"%(settings.TITLE,_("Books found"),_("doubles hide") if config.SOPDS_DOUBLES_HIDE else _("doubles show"))    
 
     def get_object(self, request, searchtype="m", searchterms=None, searchterms0=None, page=1):   
         if not isinstance(page, int):
@@ -423,7 +425,7 @@ class SearchBooksFeed(AuthFeed):
             books = Book.objects.filter(genres=genre_id).order_by('search_title','-docdate')    
         # Поиск книг на книжной полке            
         elif searchtype == 'u':
-            if settings.AUTH:
+            if config.SOPDS_AUTH:
                 books = Book.objects.filter(bookshelf__user=request.user).order_by('-bookshelf__readtime')
             else:
                 books=Book.objects.filter(id=0)  
@@ -439,7 +441,7 @@ class SearchBooksFeed(AuthFeed):
                  
         # Фильтруем дубликаты
         books_count = books.count()
-        op = OPDS_Paginator(books_count, 0, page_num,settings.MAXITEMS)
+        op = OPDS_Paginator(books_count, 0, page_num,config.SOPDS_MAXITEMS)
         items = []
         
         prev_title = ''
@@ -447,7 +449,7 @@ class SearchBooksFeed(AuthFeed):
         
         # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
         # свои дубликаты если они есть
-        summary_DOUBLES_HIDE =  settings.DOUBLES_HIDE and (searchtype != 'd')
+        summary_DOUBLES_HIDE =  config.SOPDS_DOUBLES_HIDE and (searchtype != 'd')
         start = op.d1_first_pos if ((op.d1_first_pos==0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos-1
         finish = op.d1_last_pos
         
@@ -534,9 +536,9 @@ class SearchBooksFeed(AuthFeed):
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":1}),"application/%s+zip"%item['format'], "http://opds-spec.org/acquisition/open-access"),
             opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
         ]
-        if (settings.FB2TOEPUB!="") and (item['format']=='fb2'):
+        if (config.SOPDS_FB2TOEPUB!="") and (item['format']=='fb2'):
             enclosure += [opdsEnclosure(reverse("opds_catalog:convert", kwargs={"book_id":item['id'],"convert_type":"epub"}),"application/epub+zip","http://opds-spec.org/acquisition/open-access")] 
-        if (settings.FB2TOMOBI!="") and (item['format']=='fb2'):
+        if (config.SOPDS_FB2TOMOBI!="") and (item['format']=='fb2'):
             enclosure += [opdsEnclosure(reverse("opds_catalog:convert", kwargs={"book_id":item['id'],"convert_type":"mobi"}),"application/mobi","http://opds-spec.org/acquisition/open-access")] 
 
         return enclosure
@@ -634,7 +636,7 @@ class SearchAuthorsFeed(AuthFeed):
             
         # Создаем результирующее множество
         authors_count = authors.count()
-        op = OPDS_Paginator(authors_count, 0, page_num, settings.MAXITEMS)        
+        op = OPDS_Paginator(authors_count, 0, page_num, config.SOPDS_MAXITEMS)        
         items = []
         
         for row in authors[op.d1_first_pos:op.d1_last_pos+1]:
@@ -712,7 +714,7 @@ class SearchSeriesFeed(AuthFeed):
         
         # Создаем результирующее множество
         series_count = series.count()
-        op = OPDS_Paginator(series_count, 0, page_num, settings.MAXITEMS)        
+        op = OPDS_Paginator(series_count, 0, page_num, config.SOPDS_MAXITEMS)        
         items = []
         
         for row in series[op.d1_first_pos:op.d1_last_pos+1]:
@@ -860,7 +862,7 @@ class BooksFeed(AuthFeed):
 
     def item_link(self, item):
         title_full = len(item.id)<item.l
-        if item.cnt>=settings.SPLITITEMS and not title_full:
+        if item.cnt>=config.SOPDS_SPLITITEMS and not title_full:
             return reverse("opds_catalog:chars_books", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
             return reverse("opds_catalog:searchbooks", \
@@ -918,7 +920,7 @@ class AuthorsFeed(AuthFeed):
 
     def item_link(self, item):
         last_name_full = len(item.id)<item.l
-        if (item.cnt>=settings.SPLITITEMS) and not last_name_full:
+        if (item.cnt>=config.SOPDS_SPLITITEMS) and not last_name_full:
             return reverse("opds_catalog:chars_authors", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
             return reverse("opds_catalog:searchauthors", \
@@ -976,7 +978,7 @@ class SeriesFeed(AuthFeed):
 
     def item_link(self, item):
         series_full = len(item.id)<item.l
-        if item.cnt>=settings.SPLITITEMS and not series_full:
+        if item.cnt>=config.SOPDS_SPLITITEMS and not series_full:
             return reverse("opds_catalog:chars_series", kwargs={"lang_code":self.lang_code,"chars":item.id})
         else:
             return reverse("opds_catalog:searchseries", \

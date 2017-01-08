@@ -7,7 +7,8 @@ Created on 14 нояб. 2016 г.
 # -*- coding: utf-8 -*-
 import os
 import zipfile
-from opds_catalog import settings
+#from opds_catalog import settings
+from constance import config
 
 sAuthor = 'AUTHOR'
 sGenre  = 'GENRE'
@@ -32,8 +33,8 @@ class Inpx:
         self.inpx_itemseparator = ':'
         self.append_callback = append_callback
         self.inpskip_callback = inpskip_callback
-        self.TEST_ZIP = settings.INPX_TEST_ZIP
-        self.TEST_FILES = settings.INPX_TEST_FILES
+        self.TEST_ZIP = config.SOPDS_INPX_TEST_ZIP
+        self.TEST_FILES = config.SOPDS_INPX_TEST_FILES
         self.error = 0       
         
     def parse(self):
