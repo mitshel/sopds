@@ -24,12 +24,6 @@
 1.3 Настраиваем ./sopds/settings.py (настройки в конце файла)
 
 	LANGUAGE_CODE = 'ru-RU'
-	
-	SOPDS_ROOT_LIB = < Путь к каталогу с книгами >
-	SOPDS_AUTH = < False | True >
-	SOPDS_SCAN_SHED_MIN  = '0'
-	SOPDS_SCAN_SHED_HOUR = '0,12'
-	SOPDS_INPX_ENABLE = < False | True >
     
 1.4 Производим инициализацию базы данных и заполнение начальными данными (жанры)
 
@@ -40,19 +34,23 @@
 
 	python3 manage.py createsuperuser
 	
-1.6 Вручную запускаем разовое сканирование коллекции книг  
+1.6 Настраиваем путь к Вашему каталогу с книгами (Однако Вы можете сначала запустить sopds_server согласно п.1.8. и настроить указанный параметр через веб-интерфейс)
+
+	python3 manage.py sopds_util setconf SOPDS_ROOT_LIB 'Путь к каталогу с книгами'
+		
+1.7 Вручную запускаем разовое сканирование коллекции книг  
 (Выполняется относительно долго: например, моя коллекция книг в архивах объемом 180Гб сканировалась в БД MYSQL - 1час)
 
 	python3 manage.py sopds_scanner scan --daemon
 
-1.7 Запускаем встроенный HTTP/OPDS сервер
+1.8 Запускаем встроенный HTTP/OPDS сервер
 
 	python3 manage.py sopds_server start --daemon
 	
 Однако наилучшим способом, все же является настройка в качестве HTTP/OPDS серверов Apache или Nginx 
 (точка входа ./sopds/wsgi.py)
 	
-1.8 Запускаем SCANNER сервер (опционально, необходим для автоматизированного периодического пересканирования коллекции)  
+1.9 Запускаем SCANNER сервер (опционально, необходим для автоматизированного периодического пересканирования коллекции)  
 Перед запуском SCANNER сервера необходимо убедится, что сканирование, запущеное в п.1.6 уже завершено,
 т.к. может возникнуть ситуация с запуском параллельного процесса сканирования, что может привести к ошибкам.
 Примите во внимание, что в  настройках, указанных в п.1.3 задан периодический запуск сканирования 2 раза 
@@ -258,12 +256,18 @@ MySQL по сравнению с sqlite работает гораздо быст
 
     python3 manage.py sopds_util load_mygenres   
     
-Если вы используете MySQL и при очистке БД у вас возникла ошибка (2006, 'MySQL server has gone away'),
-то добавьте в файл настройки /etc/my.cnf следующие настройки, после чего перезапустите сервер БД:  
+Посмотреть все параметры конфигурации:
 
-    wait_timeout = 600
-    max_allowed_packet = 64M
-             
+    python3 manage.py sopds_util getconf  
+    
+Посмотреть значение конкретного параметр конфигурации:
+
+    python3 manage.py sopds_util getconf SOPDS_ROOT_LIB
+    
+Задать значение конкретного параметр конфигурации:
+
+    python3 manage.py sopds_util setconf SOPDS_ROOT_LIB '\home\files\books'
+                 
 Запустить однократное сканирование коллекции книг:
 
     python3 manage.py sopds_scanner scan [--verbose] [--daemon]
@@ -351,9 +355,13 @@ MySQL по сравнению с sqlite работает гораздо быст
 (по умолчанию SOPDS_SCANNER_PID = os.path.join(settings.BASE_DIR,'opds_catalog/tmp/sopds_scanner.pid'))  
 
 Параметры **SOPDS_SCAN_SHED_XXX** устанавливают значения шедулера, для периодического сканирования коллекции книг при помощи **manage.py sopds_scanner start**.  Возможные значения можно найти на следующей странице: # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#module-apscheduler.triggers.cron  
+Изменения указанных ниже параметров через Web-интерфейс или командную строку проверяется процессом sopds_scanner каждые 10 минут. 
+В случае обнаружения изменений sopds_scanner автоматически вносит соответсвующие изменения в планировщик.
+
 (по умолчанию SOPDS_SCAN_SHED_MIN = '0')  
-(по умолчанию SOPDS_SCAN_SHED_HOUR = '0')  
+(по умолчанию SOPDS_SCAN_SHED_HOUR = '0,12')  
 (по умолчанию SOPDS_SCAN_SHED_DAY = '*')  
 (по умолчанию SOPDS_SCAN_SHED_DOW = '*')  
+
 
 
