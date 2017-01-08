@@ -101,7 +101,7 @@ class Command(BaseCommand):
         if config.SOPDS_SCAN_START_DIRECTLY:
             config.SOPDS_SCAN_START_DIRECTLY = False
             self.stdout.write('Startup scannyng directly by SOPDS_SCAN_START_DIRECTLY flag.')
-            self.scan()
+            self.sched.add_job(self.scan, id='scan_directly')
                        
     def start(self):
         writepid(self.pidfile)
