@@ -6,7 +6,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<link rel="shortcut icon" type="image/icon" href="{% static "images/favicon.ico" %}"/>    
-    <title>{{ app_title }}</title>
+    <title>{{ app_title }} {% if breadcrumbs.0 %} / {{ breadcrumbs.0 }} {% endif %}</title>
     <link rel="stylesheet" type="text/css" href="{% static "css/sopds.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "foundation-icons/foundation-icons.css" %}">   
 </head>

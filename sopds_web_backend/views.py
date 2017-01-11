@@ -31,6 +31,7 @@ def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None
 
 def sopds_processor(request):
     args={}
+    args['app_title']=settings.TITLE
     args['sopds_auth']=config.SOPDS_AUTH
     args['sopds_version']=settings.VERSION
     args['alphabet'] = config.SOPDS_ALPHABET_MENU
@@ -361,8 +362,9 @@ def CatalogsView(request):
             breadcrumbs_list.insert(0, (cat.cat_name, cat.id))
             cat = cat.parent
         breadcrumbs_list.insert(0, (_('ROOT'), 0))  
-    breadcrumbs_list.insert(0, (_('Catalogs'),-1))    
+    #breadcrumbs_list.insert(0, (_('Catalogs'),-1))    
     args['breadcrumbs_cat'] =  breadcrumbs_list  
+    args['breadcrumbs'] =  [_('Catalogs')]
       
     return render(request,'sopds_catalogs.html', args)  
 
