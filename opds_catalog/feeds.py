@@ -12,7 +12,7 @@ from django.db.models import Count, Min
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, lang_menu
 from opds_catalog import models
 from opds_catalog import settings
-from opds_catalog.opds_middleware import BasicAuthMiddleware
+from opds_catalog.middleware import BasicAuthMiddleware
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
 from constance import config

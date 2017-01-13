@@ -50,8 +50,8 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',    
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',  
-    #'opds_catalog.opds_middleware.BasicAuthMiddleware',  
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',   
+    'opds_catalog.middleware.SOPDSLocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -134,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
-LANGUAGE_CODE = 'en-US'
+#LANGUAGE_CODE = 'en-US'
 #LANGUAGE_CODE = 'ru-RU'
     
 LOCALE_PATHS = (
@@ -153,7 +153,15 @@ STATIC_ROOT = 'static'
 
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 
+CONSTANCE_ADDITIONAL_FIELDS = {
+    'language_select': ['django.forms.fields.ChoiceField', {
+        'widget': 'django.forms.Select',
+        'choices': (("ru-RU", "Russian"), ("en-US", "English"))
+    }],
+}
+
 CONSTANCE_CONFIG = OrderedDict([
+    ('SOPDS_LANGUAGE', ('en-US',_('Select language'),'language_select')),    
     ('SOPDS_ROOT_LIB', ('books/',_('Absolute path to books collection directory'))),
     ('SOPDS_BOOK_EXTENSIONS', ('.pdf .djvu .fb2 .epub', _('List of managed book files extensions'))),
     ('SOPDS_SCAN_START_DIRECTLY', (False,_('Turn once scanning directly'))),
@@ -194,7 +202,7 @@ CONSTANCE_CONFIG = OrderedDict([
 ])
 
 CONSTANCE_CONFIG_FIELDSETS = {
-    '1. General Options': ('SOPDS_ROOT_LIB', 'SOPDS_BOOK_EXTENSIONS','SOPDS_SCAN_START_DIRECTLY'),
+    '1. General Options': ('SOPDS_LANGUAGE', 'SOPDS_ROOT_LIB', 'SOPDS_BOOK_EXTENSIONS','SOPDS_SCAN_START_DIRECTLY'),
     '2. Server Options': ('SOPDS_AUTH', 'SOPDS_ALPHABET_MENU', 'SOPDS_DOUBLES_HIDE', 'SOPDS_COVER_SHOW', 'SOPDS_SPLITITEMS', 'SOPDS_MAXITEMS', 'SOPDS_TITLE_AS_FILENAME', 'SOPDS_NOCOVER_PATH'),    
     '3. Scanner Options': ('SOPDS_FB2PARSE','SOPDS_ZIPSCAN','SOPDS_ZIPCODEPAGE', 'SOPDS_INPX_ENABLE', 'SOPDS_INPX_SKIP_UNCHANGED', 'SOPDS_INPX_TEST_ZIP', 'SOPDS_INPX_TEST_FILES', 'SOPDS_DELETE_LOGICAL'),
     '4. Scanner Shedule': ('SOPDS_SCAN_SHED_MIN', 'SOPDS_SCAN_SHED_HOUR', 'SOPDS_SCAN_SHED_DAY','SOPDS_SCAN_SHED_DOW'),

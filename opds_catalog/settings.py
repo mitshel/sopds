@@ -1,6 +1,7 @@
 import logging
 import os
 from django.conf import settings
+from django.utils import translation
 from constance import config
 
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
@@ -16,13 +17,21 @@ if loglevel.lower() in loglevels:
 else:
     LOGLEVEL=logging.NOTSET
     
+from django.dispatch import receiver
+#from constance.signals import config_updated
+#
+#@receiver(config_updated)
+#def constance_updated(sender, updated_key, new_value, **kwargs):
+#    if updated_key == 'SOPDS_LANGUAGE':
+#        translation.activate(new_value)
+#        print(new_value)
+    
     
 def constance_update_all():
     pass
     
 # Переопределяем некоторые функции для SQLite, которые работают неправлено
 from django.db.backends.signals import connection_created
-from django.dispatch import receiver
 
 def sopds_upper(s):
     return s.upper()

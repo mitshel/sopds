@@ -4,9 +4,11 @@ from django.http import HttpResponse
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
+from django.utils import translation
 
 #from opds_catalog import settings
 from constance import config
+
 
 class BasicAuthMiddleware(object):
     header = "HTTP_AUTHORIZATION"
@@ -48,3 +50,10 @@ class BasicAuthMiddleware(object):
             return None
 
         return self.unauthed()
+
+class SOPDSLocaleMiddleware:
+
+    def process_request(self, request):
+            request.LANG = config.SOPDS_LANGUAGE
+            translation.activate(request.LANG)
+            request.LANGUAGE_CODE = request.LANG
