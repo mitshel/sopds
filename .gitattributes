@@ -1,4 +1,7 @@
-assets/ linguist-vendored=false
-convert/ linguist-vendored=false 
-static/ linguist-vendored=false 
-sopds_web_backend/static/ linguist-vendored=false 
+opds_catalog linguist-vendored
+sopds linguist-vendored
+sopds_web_backend linguist-vendored
+ssets/* linguist-vendored=false
+convert/* linguist-vendored=false 
+static/* linguist-vendored=false 
+sopds_web_backend/static/* linguist-vendored=false 
