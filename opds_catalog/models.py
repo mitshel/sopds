@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _lazy
 
 counter_allbooks = 'allbooks'
 counter_allcatalogs = 'allcatalogs'
@@ -33,7 +33,7 @@ SIZE_SERIES          = 150
 LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯабвгдеёжзийклмнопрстуфхцчшщьыъэюя',
              2:'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
              3:'0123456789'}
-lang_menu = {1:_('Cyrillic'), 2:_('Latin'), 3:_('Digits'), 9:_('Other symbols'), 0:_('Show all')}
+lang_menu = {1:_lazy('Cyrillic'), 2:_lazy('Latin'), 3:_lazy('Digits'), 9:_lazy('Other symbols'), 0:_lazy('Show all')}
 
 class Book(models.Model):
     filename = models.CharField(max_length=SIZE_BOOK_FILENAME,db_index=True)
