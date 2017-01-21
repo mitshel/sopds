@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-08 20:39+0300\n"
+"POT-Creation-Date: 2017-01-21 17:25+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -191,30 +191,25 @@ msgstr "Найдены серии"
 msgid "Select language"
 msgstr "Выбор алфавита"
 
-#: .\opds_catalog\feeds.py:790 .\opds_catalog\models.py:36
-#: .\opds_catalog\tests\test_feeds.py:106
+#: .\opds_catalog\feeds.py:790 .\opds_catalog\tests\test_feeds.py:106
 #: .\opds_catalog\tests\test_feeds.py:119
 #: .\opds_catalog\tests\test_feeds.py:130
 msgid "Cyrillic"
 msgstr "Кириллица (РУС)"
 
-#: .\opds_catalog\feeds.py:791 .\opds_catalog\models.py:36
-#: .\opds_catalog\tests\test_feeds.py:107
+#: .\opds_catalog\feeds.py:791 .\opds_catalog\tests\test_feeds.py:107
 msgid "Latin"
 msgstr "Латинница (LAT)"
 
-#: .\opds_catalog\feeds.py:792 .\opds_catalog\models.py:36
-#: .\opds_catalog\tests\test_feeds.py:108
+#: .\opds_catalog\feeds.py:792 .\opds_catalog\tests\test_feeds.py:108
 msgid "Digits"
 msgstr "Цифры (0..9)"
 
-#: .\opds_catalog\feeds.py:793 .\opds_catalog\models.py:36
-#: .\opds_catalog\tests\test_feeds.py:109
+#: .\opds_catalog\feeds.py:793 .\opds_catalog\tests\test_feeds.py:109
 msgid "Other symbols"
 msgstr "Другие символы"
 
-#: .\opds_catalog\feeds.py:794 .\opds_catalog\models.py:36
-#: .\opds_catalog\tests\test_feeds.py:110
+#: .\opds_catalog\feeds.py:794 .\opds_catalog\tests\test_feeds.py:110
 msgid "Show all"
 msgstr "Показать все"
 

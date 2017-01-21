@@ -30,7 +30,7 @@
 </p>
 <p style="font-size:90%;">
 <b>{% trans "Last collection scan date:" %}</b> 
-<span class="label">{{ stats.lastscan_date }}</span> 
+<span class="label"> {% if stats.lastscan_date %}{{ stats.lastscan_date }}{% else %}{%  trans "Never" %}{% endif %}</span>
 </p>
 </div>
 <div class="large-4 columns" style="padding:0; margin-top:1rem;">

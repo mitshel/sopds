@@ -124,6 +124,14 @@ class CounterManager(models.Manager):
             
         return counter
 
+    def get_lastscan(self):
+        try:
+            lastscan = self.get(name='allbooks').update_time
+        except ObjectDoesNotExist:
+            lastscan = None
+
+        return lastscan
+
 class Counter(models.Model):
     name = models.CharField(primary_key=True, null=False, blank=False, max_length=16)
     value = models.IntegerField(null=False, default=0)

@@ -60,7 +60,7 @@ def sopds_processor(request):
                    
     args['random_book'] = random_book
     stats = { d['name']:d['value'] for d in Counter.obj.all().values() }
-    stats['lastscan_date']=Counter.obj.get(name='allbooks').update_time
+    stats['lastscan_date']=Counter.objects.get_lastscan()
     args['stats'] = stats
   
     return args
