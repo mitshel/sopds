@@ -11,7 +11,9 @@ from django.http import HttpResponse, Http404
 from opds_catalog.models import Book, bookshelf
 from opds_catalog import settings, utils, opdsdb, fb2parse
 import opds_catalog.zipf as zipfile
+
 from constance import config
+from PIL import Image
 
 def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """
@@ -94,7 +96,7 @@ def Download(request, book_id, zip_flag):
 
     return response
 
-def Cover(request, book_id):
+def Cover(request, book_id, thumbnail = False):
     """ Загрузка обложки """
     book = Book.objects.get(id=book_id)
     response = HttpResponse()
@@ -127,6 +129,11 @@ def Cover(request, book_id):
                 s=fb2.cover_image.cover_data
                 dstr=base64.b64decode(s)
                 response["Content-Type"]=fb2.cover_image.getattr('content-type')
+                if thumbnail:
+                    #thumb = Image.open(io.StringIO(dstr))
+                    thumb = Image.fromstring(dstr)
+                    thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.ANTIALIAS)
+                    thumb = Image.tostring(dstr)
                 response.write(dstr)
                 c0=1
             except:
@@ -142,6 +149,10 @@ def Cover(request, book_id):
             raise Http404
 
     return response
+
+def Thumbnail(request, book_id):
+    return Cover(request, book_id, True)
+
 
 def ConvertFB2(request, book_id, convert_type):
     """ Выдача файла книги после конвертации в EPUB или mobi """
