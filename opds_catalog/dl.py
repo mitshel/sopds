@@ -128,12 +128,15 @@ def Cover(request, book_id, thumbnail = False):
             try:
                 s=fb2.cover_image.cover_data
                 dstr=base64.b64decode(s)
-                response["Content-Type"]=fb2.cover_image.getattr('content-type')
                 if thumbnail:
-                    #thumb = Image.open(io.StringIO(dstr))
-                    thumb = Image.fromstring(dstr)
+                    response["Content-Type"] = 'image/jpeg'
+                    thumb = Image.open(io.BytesIO(dstr)).convert('RGB')
                     thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.ANTIALIAS)
-                    thumb = Image.tostring(dstr)
+                    tfile = io.BytesIO()
+                    thumb.save(tfile, 'JPEG')
+                    dstr = tfile.getvalue()
+                else:
+                    response["Content-Type"] = fb2.cover_image.getattr('content-type')
                 response.write(dstr)
                 c0=1
             except:
