@@ -49,7 +49,7 @@
 		<div class="large-12 column">	
 		    <table><tr>	
 		    <td width="100px" style="padding:0rem 0rem;">
-			     <img src="{% url 'opds_catalog:cover' b.id %}" type="image/jpeg" width="80px">
+			     <img src="{% url 'opds_catalog:thumb' b.id %}" type="image/jpeg" width="80px">
 			</td>
 			<td style="font-size:80%; padding:1rem 1rem;">
 				<b>{% trans "Book title:" %}</b> {{ b.title }} <br>

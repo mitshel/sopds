@@ -10,7 +10,7 @@
    <div class="column">
    <span data-tooltip aria-haspopup="true" class="has-tip" data-disable-hover="false" tabindex="1" title="{{b.title}}">
     <a href="{% url "web:searchbooks" %}?searchtype=i&searchterms={{b.book_id}}">
-       <img class="thumbnail" src="{% url 'opds_catalog:cover' b.book_id %}" type="image/jpeg" alt="{{b.title}}">
+       <img class="thumbnail" src="{% url 'opds_catalog:thumb' b.book_id %}" type="image/jpeg" alt="{{b.title}}">
     </a>   
    </span></div>
 {% endfor %}
@@ -39,7 +39,7 @@
 	</div>
 	<div class="large-12 columns clearfix">    
 	{% if random_book %}
-		<img class="float-left" src="{% url 'opds_catalog:cover' random_book.id %}" type="image/jpeg" width="80px" style="padding:0.3rem;">
+		<img class="float-left" src="{% url 'opds_catalog:thumb' random_book.id %}" type="image/jpeg" width="80px" style="padding:0.3rem;">
 		<p style="font-size:80%;line-height:1rem;margin-bottom:0.25rem; margin-top:0.25rem;"><b><a href="{% url "web:searchbooks" %}?searchtype=i&searchterms={{random_book.id}}">{{ random_book.title }}</a> </b></p>
 		<div style="font-size:70%;text-align:justify;"> {{ random_book.annotation | truncatechars:400}} </div>	
 	{% endif %}	

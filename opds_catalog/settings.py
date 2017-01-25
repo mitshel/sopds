@@ -10,7 +10,7 @@ VERSION = "0.42-dev"
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
 SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%VERSION)
 ICON = getattr(settings, "SOPDS_ICON", "/static/images/favicon.ico")
-THUMB_SIZE = 50
+THUMB_SIZE = 100
 
 loglevel = getattr(settings, "SOPDS_LOGLEVEL", "info")
 if loglevel.lower() in loglevels:
