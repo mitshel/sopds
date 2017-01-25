@@ -47,7 +47,7 @@ urlpatterns = [
     url(r'^download/(?P<book_id>[0-9]+)/(?P<zip_flag>[0-1])/$',dl.Download, name='download'),
     url(r'^cover/(?P<book_id>[0-9]+)/$',dl.Cover, name='cover'),
     url(r'^thumb/(?P<book_id>[0-9]+)/$',dl.Thumbnail, name='thumb'),
-    url(r'^cover/$',dl.Cover, name='covertmpl'),  
+    url(r'^thumb/$',dl.Cover, name='covertmpl'),
         
     url(r'^',feeds.MainFeed(), name='main'),
 ]
