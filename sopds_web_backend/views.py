@@ -502,6 +502,11 @@ def BSDelView(request):
     bookshelf.objects.filter(user=request.user, book=book).delete()
     
     return redirect("%s?searchtype=u"%reverse("web:searchbooks"))
+
+@sopds_login(url='web:login')
+def BSClearView(request):
+    bookshelf.objects.filter(user=request.user).delete()
+    return redirect("%s?searchtype=u" % reverse("web:searchbooks"))
     
 def hello(request):
     args = {}

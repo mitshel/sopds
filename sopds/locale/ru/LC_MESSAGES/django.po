@@ -21,7 +21,7 @@ msgstr ""
 
 #: .\sopds\settings.py:164
 msgid "Select language"
-msgstr ""
+msgstr "Выбор языка"
 
 #: .\sopds\settings.py:165
 msgid "Absolute path to books collection directory"

@@ -29,6 +29,20 @@
   </button>
 </div>
 
+ {% if isbookshelf %}
+ <div id="ConfirmModal" class="reveal tiny text-center" data-reveal>
+  <h5 id="ConfirmModalTitle">{% trans "Confirm to clear your bookshelf." %}</h5>
+  <p></p>
+  <p class="text-center"><a href="{% url "web:bsclear" %}" class="secondary button" id="Confirm_btnYes">{% trans "Clear" %}</a>
+                         &nbsp;&nbsp;&nbsp;<a class="close button" data-close>{% trans "Cancel" %}</a></p>
+  <button class="close-button" data-close aria-label="Close modal" type="button">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+ <a class="alert button small" data-open="ConfirmModal">{%  trans "Clear bookshelf" %}</a>
+ {% endif %}
+
 {%  for b in books %}
 		<div class="large-12 column">
 			<b>{{ b.title }}</b>
@@ -46,7 +60,7 @@
 		    {% endif %}
 		</div>
 		
-		<div class="large-12 column">	
+		<div class="large-12 column">
 		    <table><tr>	
 		    <td width="100px" style="padding:0rem 0rem;">
 			     <img src="{% url 'opds_catalog:thumb' b.id %}" type="image/jpeg" width="80px">
