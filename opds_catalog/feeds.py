@@ -294,8 +294,8 @@ class CatalogsFeed(AuthFeed):
             return (opdsEnclosure(reverse("opds_catalog:cat_tree", kwargs={"cat_id":item['id']}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
         else:
             return (
-                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":0}),"application/fb2" ,"http://opds-spec.org/acquisition/open-access"),
-                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":1}),"application/fb2+zip", "http://opds-spec.org/acquisition/open-access"),
+                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":0}),"application/%s"%item['format'] ,"http://opds-spec.org/acquisition/open-access"),
+                opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":1}),"application/%s+zip"%item['format'], "http://opds-spec.org/acquisition/open-access"),
                 opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
                 opdsEnclosure(reverse("opds_catalog:thumb", kwargs={"book_id": item['id']}), "image/jpeg","http://opds-spec.org/thumbnail"),
             )

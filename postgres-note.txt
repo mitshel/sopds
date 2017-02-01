@@ -1,0 +1,20 @@
+locale -a
+sudo locale-gen ru_RU.UTF-8
+locale -a
+
+узнаем кодировку:
+select name, setting from pg_settings where name like '%_encoding';
+select name, setting from pg_settings where name like 'lc_%';
+
+Создаем БД в нужной кодировке:
+create database sopds2
+with owner sopds
+ENCODING 'UTF8'
+LC_COLLATE = 'ru_RU.UTF-8'
+LC_CTYPE = 'ru_RU.UTF-8';
+
+create database sopds2
+with owner sopds
+ENCODING 'UTF8'
+LC_COLLATE = 'С'
+LC_CTYPE = 'С';
