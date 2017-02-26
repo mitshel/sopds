@@ -13,15 +13,17 @@ class FB2StructureException(Exception):
             print(traceback.print_exc())
 
 class Namespace(object):
-    FICTION_BOOK = 'http://www.gribuser.ru/xml/fictionbook/2.0'
+    FICTION_BOOK20 = 'http://www.gribuser.ru/xml/fictionbook/2.0'
+    FICTION_BOOK21 = 'http://www.gribuser.ru/xml/fictionbook/2.1'
     XLINK = 'http://www.w3.org/1999/xlink'
 
 class FB2Base(BookFile):
     def __init__(self, file, original_filename, mimetype):
         BookFile.__init__(self, file, original_filename, mimetype)
-        self.__namespaces = {'fb': Namespace.FICTION_BOOK, 'xlink': Namespace.XLINK}
+        self.__namespaces = {'xlink': Namespace.XLINK}
         try:
             tree = self.__create_tree__()
+            self.__detect_namespaces(tree)
             self.__detect_title(tree)
             self.__detect_authors(tree)
             self.__detect_tags(tree)
@@ -45,7 +47,7 @@ class FB2Base(BookFile):
             tree = self.__create_tree__()
             res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:coverpage/fb:image', namespaces=self.__namespaces)
             cover_id = res[0].get('{' + Namespace.XLINK + '}href')[1:]
-            res = tree.xpath('//fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
+            res = tree.xpath('/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
             content = base64.b64decode(res[0].text)
             with open(os.path.join(working_dir, 'cover.jpeg'), 'wb') as cover_file:
                 cover_file.write(content)
@@ -58,17 +60,21 @@ class FB2Base(BookFile):
             tree = self.__create_tree__()
             res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:coverpage/fb:image', namespaces=self.__namespaces)
             cover_id = res[0].get('{' + Namespace.XLINK + '}href')[1:]
-            res = tree.xpath('//fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
+            res = tree.xpath('/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
             content = base64.b64decode(res[0].text)
             return content
         except Exception as err:
-            print(err)
             return None
+
+    def __detect_namespaces(self, tree):
+        tag = tree.getroot().tag
+        self.__namespaces['fb'] = Namespace.FICTION_BOOK20 if tag.find(Namespace.FICTION_BOOK20)>0 else Namespace.FICTION_BOOK21
+        return None
 
     def __detect_title(self, tree):
         res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:book-title', namespaces=self.__namespaces)
         if len(res) == 0:
-            res = tree.xpath('/FictionBook/description/title-info/book-title')
+            res = tree.xpath('/*[local-name() = "FictionBook"]/*[local-name() = "description"]/*[local-name() = "title-info"]/*[local-name() = "book-title"]')
         if len(res) > 0:
             self.__set_title__(res[0].text)
 
@@ -160,7 +166,7 @@ class FB2(FB2Base):
 
     def __create_tree__(self):
         try:
-            self.file.seek(0, 0)
+            self.file.seek(0,0)
             return etree.parse(self.file)
         except:
             raise FB2StructureException('the file is not a valid XML')

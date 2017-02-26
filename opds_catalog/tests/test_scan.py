@@ -65,7 +65,7 @@ class scanTestCase(TestCase):
         self.assertEqual(book.catalog.path, self.test_zip)
         self.assertEqual(book.catalog.cat_name, self.test_zip)
         self.assertEqual(book.catalog.cat_type, 1)
-        self.assertEqual(book.docdate, "130552595662030000")
+        self.assertEqual(book.docdate, "2014-09-15")
         self.assertEqual(book.title, "Любовь в жизни Обломова")
         self.assertEqual(book.avail, 2)
         self.assertEqual(book.authors.count(), 1)
@@ -86,7 +86,7 @@ class scanTestCase(TestCase):
         self.assertEqual(book.path, self.test_zip)
         self.assertEqual(book.cat_type, 1)
         self.assertEqual(book.title, "Драконьи Услуги")
-        self.assertEqual(book.authors.get(full_name="Куприянов Денис").search_full_name, "КУПРИЯНОВ ДЕНИС")
+        self.assertEqual(book.authors.get(full_name="Куприянов Денис Валерьевич").search_full_name, "КУПРИЯНОВ ДЕНИС ВАЛЕРЬЕВИЧ")
 
     def test_scanall(self):
         """ Тестирование процедуры scanall (извлекает метаданные из книг и помещает в БД) """

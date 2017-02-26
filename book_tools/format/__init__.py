@@ -2,6 +2,7 @@
 import os
 import zipfile
 from xml import sax
+from io import BytesIO
 
 from book_tools.format.mimetype import Mimetype
 
@@ -42,9 +43,9 @@ class __detector:
         else:
             return Mimetype.OCTET_STREAM
 
-def detect_mime(file):
+def detect_mime(file, original_filename):
     FB2_ROOT = 'FictionBook'
-    mime = __detector.file(file.name)
+    mime = __detector.file(original_filename)
 
     try:
         if mime == Mimetype.XML or mime == Mimetype.FB2:
@@ -76,7 +77,8 @@ def detect_mime(file):
 def create_bookfile(file, original_filename):
     if isinstance(file, str):
         file = open(file, 'rb')
-    mimetype = detect_mime(file)
+    file = BytesIO(file.read())
+    mimetype = detect_mime(file,original_filename)
     if mimetype == Mimetype.EPUB:
         return EPub(file, original_filename)
     elif mimetype == Mimetype.FB2:

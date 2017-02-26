@@ -260,7 +260,7 @@ class BookMobi(object):
             f = open(file, 'rb')
         else:
             f = file
-        self.filename = f.name
+
         self.f = f
         self.f.seek(0,0)
         # palm database header

@@ -5,13 +5,13 @@ import time
 import datetime
 import logging
 import re
+
 from book_tools.format import create_bookfile
 
 from django.db import transaction
 
 from opds_catalog import fb2parse, opdsdb
 from opds_catalog import inpx_parser
-#from opds_catalog import settings
 import opds_catalog.zipf as zipfile
 
 from constance import config
@@ -207,9 +207,9 @@ class opdsScanner:
 
                 try:
                     book_data = create_bookfile(file, name)
-                except:
+                except Exception as err:
                     book_data = None
-                    self.logger.warning(rel_path + ' - ' + name + ' Book parse error, skipping...')
+                    self.logger.warning(rel_path + ' - ' + name + ' Book parse error, skipping... (Error: %s)'%err)
                     self.bad_books += 1
 
                 if book_data:
