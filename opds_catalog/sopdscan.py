@@ -5,6 +5,7 @@ import time
 import datetime
 import logging
 import re
+from book_tools.format import create_bookfile
 
 from django.db import transaction
 
@@ -193,6 +194,58 @@ class opdsScanner:
             self.bad_archives+=zip_process_error
 
     def processfile(self,name,full_path,file,cat,archive=0,file_size=0):
+        (n, e) = os.path.splitext(name)
+        if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():
+            rel_path=os.path.relpath(full_path,config.SOPDS_ROOT_LIB)
+            self.logger.debug("Attempt to add book "+rel_path+"/"+name)
+            if opdsdb.findbook(name, rel_path, 1) == None:
+                if archive==0:
+                    cat=opdsdb.addcattree(rel_path,archive)
+
+                if isinstance(file, str):
+                    f = open(file, 'rb')
+                else:
+                    f = file
+
+                try:
+                    book_data = create_bookfile(f, name)
+                except:
+                    book_data = None
+                    self.logger.warning(rel_path + ' - ' + name + ' Book parse error, skipping')
+                    self.bad_books += 1
+
+                if book_data:
+                    lang = book_data.language_code.strip(self.strip_symbols) if book_data.language_code else ''
+                    title = book_data.title.strip(self.strip_symbols) if book_data.title else n
+                    annotation = book_data.description if book_data.description else ''
+                    annotation = annotation.strip(self.strip_symbols) if isinstance(annotation, str) else annotation.decode().strip(self.strip_symbols)
+                    docdate = ''
+
+                    book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
+                    self.books_added+=1
+
+                    if archive!=0:
+                        self.books_in_archives+=1
+                    self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
+
+                    for a in book_data.authors:
+                        author_name = a.get('name','Unknown author').strip(self.strip_symbols)
+                        author=opdsdb.addauthor(author_name)
+                        opdsdb.addbauthor(book,author)
+
+                    for genre in book_data.tags:
+                        opdsdb.addbgenre(book,opdsdb.addgenre(genre.lower().strip(self.strip_symbols)))
+
+                    for ser in self.fb2parser.series.attrss:
+                        ser_name=ser.get('title').strip()
+                        ser_no = ser.get('index', '0').strip()
+                        ser_no = int(ser_no) if ser_no.isdigit() else 0
+                        opdsdb.addbseries(book,ser_name,ser_no)
+            else:
+                self.books_skipped+=1
+                self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
+
+    def processfile0(self,name,full_path,file,cat,archive=0,file_size=0):
         (n,e)=os.path.splitext(name)
         if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():
             rel_path=os.path.relpath(full_path,config.SOPDS_ROOT_LIB)
