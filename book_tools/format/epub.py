@@ -50,6 +50,7 @@ class EPub(BookFile):
         self.__initialize()
 
     def __initialize(self):
+        self.file.seek(0,0)
         self.__zip_file = zipfile.ZipFile(self.file)
         self.issues = []
         try:

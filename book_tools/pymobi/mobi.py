@@ -262,6 +262,7 @@ class BookMobi(object):
             f = file
         self.filename = f.name
         self.f = f
+        self.f.seek(0,0)
         # palm database header
         header = f.read(78)
         for key, u_fmt, offset in self.palmdb_format:
@@ -555,6 +556,14 @@ class BookMobi(object):
             cover_rn += self.mobi['firstImageIndex']
             self.saveRecordImage(cover_rn, '%s_cover' % basename)
         print('Unpack MOBI successfully')
+
+    def unpackMobiCover(self):
+        if 201 in self.mobi_exth:
+            cover_rn, = struct.unpack('>L', self.mobi_exth[201])
+            cover_rn += self.mobi['firstImageIndex']
+            rec = self.loadRecord(cover_rn)
+            return rec
+        return None
 
     def removeSrcs(self, outmobi, outsrcs=None):
         srcs_rn = self.mobi['srcsRecordNumber']

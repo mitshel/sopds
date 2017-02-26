@@ -195,6 +195,7 @@ class opdsScanner:
                 zip_process_error = 1
             self.bad_archives+=zip_process_error
 
+    # Новая версия (0.42) процедуры извлечения метаданных из файлов книг fb2, epub, mobi
     def processfile(self,name,full_path,file,cat,archive=0,file_size=0):
         (n, e) = os.path.splitext(name)
         if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():
@@ -246,6 +247,7 @@ class opdsScanner:
                 self.books_skipped+=1
                 self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
 
+    # Старая версия (до 0.41) процедуры извлечения метаданных из файлов книг только fb2
     def processfile0(self,name,full_path,file,cat,archive=0,file_size=0):
         (n,e)=os.path.splitext(name)
         if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():

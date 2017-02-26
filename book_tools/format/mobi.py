@@ -35,3 +35,13 @@ class Mobipocket(BookFile):
                 return (None, False)
         finally:
             shutil.rmtree(tmp_dir)
+
+    def extract_cover_memory(self):
+        try:
+            image = BookMobi(self.file).unpackMobiCover()
+        except Exception as err:
+            print(err)
+            image = None
+
+        return image
+

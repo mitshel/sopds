@@ -77,7 +77,6 @@ def create_bookfile(file, original_filename):
     if isinstance(file, str):
         file = open(file, 'rb')
     mimetype = detect_mime(file)
-    file.seek(0,0)
     if mimetype == Mimetype.EPUB:
         return EPub(file, original_filename)
     elif mimetype == Mimetype.FB2:

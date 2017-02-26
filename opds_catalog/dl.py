@@ -97,7 +97,7 @@ def Download(request, book_id, zip_flag):
 
     return response
 
-
+# Новая версия (0.42) процедуры извлечения обложек из файлов книг fb2, epub, mobi
 def Cover(request, book_id, thumbnail=False):
     """ Загрузка обложки """
     book = Book.objects.get(id=book_id)
@@ -153,6 +153,7 @@ def Cover(request, book_id, thumbnail=False):
 
     return response
 
+# Старая версия (до 0.41) процедуры извлечения обложек из файлов книг только fb2
 def Cover0(request, book_id, thumbnail = False):
     """ Загрузка обложки """
     book = Book.objects.get(id=book_id)
