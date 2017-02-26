@@ -27,6 +27,7 @@ class FB2Base(BookFile):
             self.__detect_tags(tree)
             self.__detect_series_info(tree)
             self.__detect_language(tree)
+            self.__detect_docdate(tree)
             description = self.__detect_description(tree)
             if description:
                 self.description = description.strip()
@@ -70,6 +71,22 @@ class FB2Base(BookFile):
             res = tree.xpath('/FictionBook/description/title-info/book-title')
         if len(res) > 0:
             self.__set_title__(res[0].text)
+
+        return None
+
+    def __detect_docdate(self, tree):
+        is_attrib = 1
+        res = tree.xpath('/fb:FictionBook/fb:description/fb:document-info/fb:date/@value', namespaces=self.__namespaces)
+        if len(res) == 0:
+            res = tree.xpath('/FictionBook/description/document-info/date/@value')
+        if len(res) == 0:
+            is_attrib = 0
+            res = tree.xpath('/fb:FictionBook/fb:description/fb:document-info/fb:date', namespaces=self.__namespaces)
+        if len(res) == 0:
+            is_attrib = 0
+            res = tree.xpath('/FictionBook/description/document-info/date')
+        if len(res) > 0:
+            self.__set_docdate__(res[0] if is_attrib else res[0].text)
 
         return None
 

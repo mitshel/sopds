@@ -17,6 +17,7 @@ class BookFile(object):
         self.series_info = None
         self.language_code = None
         self.issues = []
+        self.docdate = ''
 
     def __enter__(self):
         return self
@@ -46,6 +47,12 @@ class BookFile(object):
             title = title.strip()
             if title:
                 self.title = title
+
+    def __set_docdate__(self, docdate):
+        if docdate and BookFile.__is_text(docdate):
+            docdate = docdate.strip()
+            if docdate:
+                self.docdate = docdate
 
     def __add_author__(self, name, sortkey=None):
         if not name or not BookFile.__is_text(name):

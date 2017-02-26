@@ -217,7 +217,7 @@ class opdsScanner:
                     title = book_data.title.strip(self.strip_symbols) if book_data.title else n
                     annotation = book_data.description if book_data.description else ''
                     annotation = annotation.strip(self.strip_symbols) if isinstance(annotation, str) else annotation.decode('utf8').strip(self.strip_symbols)
-                    docdate = ''
+                    docdate = book_data.docdate if book_data.docdate else ''
 
                     book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
                     self.books_added+=1

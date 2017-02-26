@@ -102,6 +102,12 @@ class EPub(BookFile):
         if len(res) > 0:
             self.__set_title__(res[0].text)
 
+        res = tree.xpath('/opf:package/opf:metadata/dc:date[@event="modification"]', namespaces=namespaces)
+        if len(res) == 0:
+            res = tree.xpath('/opf:package/opf:metadata/dc:date', namespaces=namespaces)
+        if len(res) > 0:
+            self.__set_docdate__(res[0].text)
+
         res = tree.xpath('/opf:package/opf:metadata/dc:creator[@role="aut"]', namespaces=namespaces)
         if len(res) == 0:
             res = tree.xpath('/opf:package/opf:metadata/dc:creator', namespaces=namespaces)
