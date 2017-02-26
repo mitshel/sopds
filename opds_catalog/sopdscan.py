@@ -182,7 +182,9 @@ class opdsScanner:
                     try:
                         self.logger.debug('Start process ZIP file = '+file+' book file = '+n)
                         file_size=z.getinfo(n).file_size
-                        self.processfile(n,file,z.open(n),cat,opdsdb.CAT_ZIP,file_size)
+                        bookfile = z.open(n)
+                        self.processfile(n,file,bookfile,cat,opdsdb.CAT_ZIP,file_size)
+                        bookfile.close()
                     except zipfile.BadZipFile:
                         self.logger.warning('Error processing ZIP file = '+file+' book file = '+n)
                         zip_process_error = 1
@@ -202,23 +204,18 @@ class opdsScanner:
                 if archive==0:
                     cat=opdsdb.addcattree(rel_path,archive)
 
-                if isinstance(file, str):
-                    f = open(file, 'rb')
-                else:
-                    f = file
-
                 try:
-                    book_data = create_bookfile(f, name)
+                    book_data = create_bookfile(file, name)
                 except:
                     book_data = None
-                    self.logger.warning(rel_path + ' - ' + name + ' Book parse error, skipping')
+                    self.logger.warning(rel_path + ' - ' + name + ' Book parse error, skipping...')
                     self.bad_books += 1
 
                 if book_data:
                     lang = book_data.language_code.strip(self.strip_symbols) if book_data.language_code else ''
                     title = book_data.title.strip(self.strip_symbols) if book_data.title else n
                     annotation = book_data.description if book_data.description else ''
-                    annotation = annotation.strip(self.strip_symbols) if isinstance(annotation, str) else annotation.decode().strip(self.strip_symbols)
+                    annotation = annotation.strip(self.strip_symbols) if isinstance(annotation, str) else annotation.decode('utf8').strip(self.strip_symbols)
                     docdate = ''
 
                     book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
@@ -230,6 +227,10 @@ class opdsScanner:
 
                     for a in book_data.authors:
                         author_name = a.get('name','Unknown author').strip(self.strip_symbols)
+                        # Если в имени автора нет запятой, то фамилию переносим из конца в начало
+                        if author_name.find(',')<0:
+                            author_names = author_name.split()
+                            author_name = ' '.join([author_names[-1],' '.join(author_names[:-1])])
                         author=opdsdb.addauthor(author_name)
                         opdsdb.addbauthor(book,author)
 

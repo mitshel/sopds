@@ -145,7 +145,7 @@ class EPub(BookFile):
             return xpath('/opf:package/opf:manifest/opf:item[@href="%s"]' % ref)
 
         def image_infos(node):
-            path = os.path.normpath(prefix + node.get('href'))
+            path = os.path.normpath(prefix + node.get('href')).replace('\\','/')
             try:
                 fileinfo = self.__zip_file.getinfo(path)
             except:
@@ -172,43 +172,45 @@ class EPub(BookFile):
                 raise Exception('unknown mimetype %s' % mime)
 
         try:
-            return image_infos(xpath('/opf:package/opf:manifest/opf:item[@properties="cover-image"]'))
-        except:
+            node = xpath('/opf:package/opf:manifest/opf:item[@properties="cover-image"]')
+            return image_infos(node)
+        except Exception as err:
             pass
 
         try:
             node = xpath('/opf:package/opf:metadata/opf:meta[@name="cover"]')
             return image_infos(xpath('/opf:package/opf:manifest/opf:item[@id="%s"]' % node.get('content')))
-        except:
+        except Exception as err:
             pass
 
         try:
             node = xpath('/opf:package/opf:metadata/meta[@name="cover"]')
             return image_infos(xpath('/opf:package/opf:manifest/opf:item[@id="%s"]' % node.get('content')))
-        except:
+        except Exception as err:
             pass
 
         try:
             node = xpath('/package/metadata/meta[@name="cover"]')
             return image_infos(xpath('/package/manifest/item[@id="%s"]' % node.get('content')))
-        except:
+        except Exception as err:
             pass
 
         try:
             node = xpath('/opf:package/opf:guide/opf:reference[@type="other.ms-coverimage-standard"][@title="Cover"]')
             return image_infos(item_for_href(node.get('href')))
-        except:
+        except Exception as err:
             pass
 
         try:
             node = xpath('/opf:package/opf:guide/opf:reference[@type="other.ms-coverimage-standard"]')
             return image_infos(item_for_href(node.get('href')))
-        except:
+        except Exception as err:
             pass
 
         try:
-            return image_infos(xpath('/opf:package/opf:manifest/opf:item[@id="cover"]'))
-        except:
+            node = xpath('/opf:package/opf:manifest/opf:item[@id="cover"]')
+            return image_infos(node)
+        except Exception as err:
             pass
 
         return []
@@ -402,3 +404,10 @@ class EPub(BookFile):
             shutil.move(os.path.join(working_dir, name), os.path.join(working_dir, split[-1]))
             shutil.rmtree(os.path.join(working_dir, split[0]))
         return (split[-1] if len(split) > 0 else None, False)
+
+    def extract_cover_memory(self):
+        if len(self.cover_fileinfos) == 0:
+            return None
+        name = self.cover_fileinfos[-1]['filename']
+        content = self.__zip_file.open(name).read()
+        return content

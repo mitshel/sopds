@@ -52,6 +52,18 @@ class FB2Base(BookFile):
         except:
             return (None, False)
 
+    def extract_cover_memory(self):
+        try:
+            tree = self.__create_tree__()
+            res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:coverpage/fb:image', namespaces=self.__namespaces)
+            cover_id = res[0].get('{' + Namespace.XLINK + '}href')[1:]
+            res = tree.xpath('//fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
+            content = base64.b64decode(res[0].text)
+            return content
+        except Exception as err:
+            print(err)
+            return None
+
     def __detect_title(self, tree):
         res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:book-title', namespaces=self.__namespaces)
         if len(res) == 0:
@@ -131,6 +143,7 @@ class FB2(FB2Base):
 
     def __create_tree__(self):
         try:
+            self.file.seek(0, 0)
             return etree.parse(self.file)
         except:
             raise FB2StructureException('the file is not a valid XML')

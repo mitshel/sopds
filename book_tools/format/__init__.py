@@ -8,6 +8,7 @@ from book_tools.format.mimetype import Mimetype
 from book_tools.format.util import list_zip_file_infos
 from book_tools.format.epub import EPub
 from book_tools.format.fb2 import FB2, FB2Zip
+from book_tools.format.other import Dummy
 #from fbreader.format.pdf import PDF
 #from fbreader.format.msword import MSWord
 from book_tools.format.mobi import Mobipocket
@@ -22,6 +23,8 @@ class __detector:
     @staticmethod
     def file(filename):
         (n, e) = os.path.splitext(filename)
+        if e.lower() == '.xml':
+            return Mimetype.XML
         if e.lower() == '.fb2':
             return Mimetype.FB2
         elif e.lower()=='.epub' or e.lower()=='.zip':
@@ -62,7 +65,8 @@ def detect_mime(file):
                         pass
         elif mime == Mimetype.OCTET_STREAM:
             mobiflag =  file.read(68)
-            if mobiflag.decode()[60:] == 'BOOKMOBI':
+            mobiflag = mobiflag[60:]
+            if mobiflag.decode() == 'BOOKMOBI':
                 return Mimetype.MOBI
     except:
         pass
@@ -82,16 +86,8 @@ def create_bookfile(file, original_filename):
         return FB2Zip(file, original_filename)
     elif mimetype == Mimetype.MOBI:
         return Mobipocket(file, original_filename)
-#    elif mimetype == Mimetype.PDF:
-#        return PDF(path, original_filename)
-#    elif mimetype == Mimetype.MSWORD:
-#        return MSWord(path, original_filename)
-#    elif mimetype == Mimetype.RTF:
-#        return RTF(path, original_filename)
-#    elif mimetype == Mimetype.DJVU:
-#        return DjVu(path, original_filename)
-#    elif mimetype in [Mimetype.TEXT]:
-#        return Dummy(path, original_filename, mimetype)
+    elif mimetype in [Mimetype.TEXT, Mimetype.PDF, Mimetype.MSWORD, Mimetype.RTF, Mimetype.DJVU]:
+       return Dummy(file, original_filename, mimetype)
     else:
         raise Exception('File type \'%s\' is not supported, sorry' % mimetype)
 

@@ -34,6 +34,9 @@ class BookFile(object):
     def extract_cover_internal(self, working_dir):
         return (None, False)
 
+    def extract_cover_memory(self):
+        return None
+
     @staticmethod
     def __is_text(text):
         return isinstance(text, str)
