@@ -164,7 +164,7 @@ CONSTANCE_ADDITIONAL_FIELDS = {
 CONSTANCE_CONFIG = OrderedDict([
     ('SOPDS_LANGUAGE', ('en-US',_('Select language'),'language_select')),    
     ('SOPDS_ROOT_LIB', ('books/',_('Absolute path to books collection directory'))),
-    ('SOPDS_BOOK_EXTENSIONS', ('.pdf .djvu .fb2 .epub', _('List of managed book files extensions'))),
+    ('SOPDS_BOOK_EXTENSIONS', ('.pdf .djvu .fb2 .epub .mobi', _('List of managed book files extensions'))),
     ('SOPDS_SCAN_START_DIRECTLY', (False,_('Turn once scanning directly'))),
     
     ('SOPDS_AUTH', (True,_('Enable authentication'))),
