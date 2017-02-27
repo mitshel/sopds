@@ -59,6 +59,8 @@ class FB2Base(BookFile):
         try:
             tree = self.__create_tree__()
             res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:coverpage/fb:image', namespaces=self.__namespaces)
+            if len(res) == 0:
+                res = tree.xpath('/fb:FictionBook/fb:body/fb:image', namespaces=self.__namespaces)
             cover_id = res[0].get('{' + Namespace.XLINK + '}href')[1:]
             print(cover_id)
             res = tree.xpath('/fb:FictionBook/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
