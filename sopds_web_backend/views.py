@@ -195,7 +195,7 @@ def SearchBooksView(request):
             if summary_DOUBLES_HIDE:
                 title = p['title']
                 authors_set = {a['id'] for a in p['authors']}         
-                if title==prev_title and authors_set==prev_authors_set:
+                if title.upper()==prev_title.upper() and authors_set==prev_authors_set:
                     items[-1]['doubles']+=1
                 else:
                     items.append(p)                   
@@ -209,7 +209,7 @@ def SearchBooksView(request):
             double_flag = True
             while ((finish+1)<books_count) and double_flag:
                 finish += 1  
-                if books[finish].title==prev_title and {a['id'] for a in books[finish].authors.values()}==prev_authors_set:
+                if books[finish].title.upper()==prev_title.upper() and {a['id'] for a in books[finish].authors.values()}==prev_authors_set:
                     items[-1]['doubles']+=1
                 else:
                     double_flag = False   
