@@ -9,6 +9,7 @@ from book_tools.format.mimetype import Mimetype
 from book_tools.format.util import list_zip_file_infos
 from book_tools.format.epub import EPub
 from book_tools.format.fb2 import FB2, FB2Zip
+from book_tools.format.fb2sax import FB2sax
 from book_tools.format.other import Dummy
 #from fbreader.format.pdf import PDF
 #from fbreader.format.msword import MSWord
@@ -82,7 +83,8 @@ def create_bookfile(file, original_filename):
     if mimetype == Mimetype.EPUB:
         return EPub(file, original_filename)
     elif mimetype == Mimetype.FB2:
-        return FB2(file, original_filename)
+        #return FB2(file, original_filename)
+        return FB2sax(file, original_filename)
     elif mimetype == Mimetype.FB2_ZIP:
         return FB2Zip(file, original_filename)
     elif mimetype == Mimetype.MOBI:

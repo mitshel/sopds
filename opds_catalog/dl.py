@@ -130,7 +130,6 @@ def Cover(request, book_id, thumbnail=False):
     except:
         book_data = None
         image = None
-        print('create_bookfile exception !!!')
 
     if image:
         response["Content-Type"] = 'image/jpeg'

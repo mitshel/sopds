@@ -7,6 +7,7 @@ import logging
 import re
 
 from book_tools.format import create_bookfile
+from book_tools.format.util import strip_symbols
 
 from django.db import transaction
 
@@ -20,7 +21,6 @@ class opdsScanner:
     def __init__(self, logger=None):
         self.fb2parser=None
         self.init_parser()
-        self.strip_symbols = ' »«\'\"\&\n-.#\\\`'
 
         if logger:
             self.logger = logger
@@ -131,10 +131,10 @@ class opdsScanner:
                  
         name = "%s.%s"%(meta_data[inpx_parser.sFile],meta_data[inpx_parser.sExt])
         
-        lang=meta_data[inpx_parser.sLang].strip(self.strip_symbols)
-        title=meta_data[inpx_parser.sTitle].strip(self.strip_symbols)
+        lang=meta_data[inpx_parser.sLang].strip(strip_symbols)
+        title=meta_data[inpx_parser.sTitle].strip(strip_symbols)
         annotation=''
-        docdate=meta_data[inpx_parser.sDate].strip(self.strip_symbols)
+        docdate=meta_data[inpx_parser.sDate].strip(strip_symbols)
         
         
         book=opdsdb.addbook(name,self.rel_path,self.inp_cat,meta_data[inpx_parser.sExt],title,annotation,docdate,lang,meta_data[inpx_parser.sSize],opdsdb.CAT_INP)
@@ -147,7 +147,7 @@ class opdsScanner:
             opdsdb.addbauthor(book,author)
 
         for g in meta_data[inpx_parser.sGenre]:
-            opdsdb.addbgenre(book,opdsdb.addgenre(g.lower().strip(self.strip_symbols)))
+            opdsdb.addbgenre(book,opdsdb.addgenre(g.lower().strip(strip_symbols)))
             
         for s in meta_data[inpx_parser.sSeries]:
             ser=opdsdb.addseries(s.strip())
@@ -213,10 +213,10 @@ class opdsScanner:
                     self.bad_books += 1
 
                 if book_data:
-                    lang = book_data.language_code.strip(self.strip_symbols) if book_data.language_code else ''
-                    title = book_data.title.strip(self.strip_symbols) if book_data.title else n
+                    lang = book_data.language_code.strip(strip_symbols) if book_data.language_code else ''
+                    title = book_data.title.strip(strip_symbols) if book_data.title else n
                     annotation = book_data.description if book_data.description else ''
-                    annotation = annotation.strip(self.strip_symbols) if isinstance(annotation, str) else annotation.decode('utf8').strip(self.strip_symbols)
+                    annotation = annotation.strip(strip_symbols) if isinstance(annotation, str) else annotation.decode('utf8').strip(strip_symbols)
                     docdate = book_data.docdate if book_data.docdate else ''
 
                     book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
@@ -227,7 +227,7 @@ class opdsScanner:
                     self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
 
                     for a in book_data.authors:
-                        author_name = a.get('name','Unknown author').strip(self.strip_symbols)
+                        author_name = a.get('name','Unknown author').strip(strip_symbols)
                         # Если в имени автора нет запятой, то фамилию переносим из конца в начало
                         if author_name.find(',')<0:
                             author_names = author_name.split()
@@ -236,7 +236,7 @@ class opdsScanner:
                         opdsdb.addbauthor(book,author)
 
                     for genre in book_data.tags:
-                        opdsdb.addbgenre(book,opdsdb.addgenre(genre.lower().strip(self.strip_symbols)))
+                        opdsdb.addbgenre(book,opdsdb.addgenre(genre.lower().strip(strip_symbols)))
 
                     for ser in self.fb2parser.series.attrss:
                         ser_name=ser.get('title').strip()
@@ -272,9 +272,9 @@ class opdsScanner:
                     f.close()
 
                     if len(self.fb2parser.lang.getvalue())>0:
-                        lang=self.fb2parser.lang.getvalue()[0].strip(self.strip_symbols)
+                        lang=self.fb2parser.lang.getvalue()[0].strip(strip_symbols)
                     if len(self.fb2parser.book_title.getvalue())>0:
-                        title=self.fb2parser.book_title.getvalue()[0].strip(self.strip_symbols)
+                        title=self.fb2parser.book_title.getvalue()[0].strip(strip_symbols)
                     if len(self.fb2parser.annotation.getvalue())>0:
                         annotation=('\n'.join(self.fb2parser.annotation.getvalue()))
                     if len(self.fb2parser.docdate.getvalue())>0:
@@ -298,14 +298,14 @@ class opdsScanner:
 
                     idx=0
                     for l in self.fb2parser.author_last.getvalue():
-                        last_name=l.strip(self.strip_symbols)
-                        first_name=self.fb2parser.author_first.getvalue()[idx].strip(self.strip_symbols)
+                        last_name=l.strip(strip_symbols)
+                        first_name=self.fb2parser.author_first.getvalue()[idx].strip(strip_symbols)
                         #author=opdsdb.addauthor(first_name,last_name)
                         author=opdsdb.addauthor("%s %s"%(last_name,first_name))
                         opdsdb.addbauthor(book,author)
                         idx+=1
                     for l in self.fb2parser.genre.getvalue():
-                        opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(self.strip_symbols)))
+                        opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(strip_symbols)))
                     for l in self.fb2parser.series.attrss:
                         ser_name=l.get('name')
                         if ser_name:

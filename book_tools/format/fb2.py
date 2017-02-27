@@ -206,3 +206,5 @@ class FB2Zip(FB2Base):
     def __exit__(self, kind, value, traceback):
         self.__zip_file.__exit__(kind, value, traceback)
         pass
+
+

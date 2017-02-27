@@ -1,6 +1,8 @@
 #import PythonMagick
 from PIL import Image, ImageFile
 
+strip_symbols = ' »«\'\"\&\n-.#\\\`'
+
 def list_zip_file_infos(zipfile):
     return [info for info in zipfile.infolist() if not info.filename.endswith('/')]
 
