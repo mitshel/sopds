@@ -20,7 +20,7 @@ class Namespace(object):
 class FB2Base(BookFile):
     def __init__(self, file, original_filename, mimetype):
         BookFile.__init__(self, file, original_filename, mimetype)
-        self.__namespaces = {'xlink': Namespace.XLINK}
+        self.__namespaces = {'fb':Namespace.FICTION_BOOK20,'xlink': Namespace.XLINK}
         try:
             tree = self.__create_tree__()
             self.__detect_namespaces(tree)
@@ -47,7 +47,7 @@ class FB2Base(BookFile):
             tree = self.__create_tree__()
             res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:coverpage/fb:image', namespaces=self.__namespaces)
             cover_id = res[0].get('{' + Namespace.XLINK + '}href')[1:]
-            res = tree.xpath('/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
+            res = tree.xpath('/fb:FictionBook/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
             content = base64.b64decode(res[0].text)
             with open(os.path.join(working_dir, 'cover.jpeg'), 'wb') as cover_file:
                 cover_file.write(content)
@@ -60,15 +60,17 @@ class FB2Base(BookFile):
             tree = self.__create_tree__()
             res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:coverpage/fb:image', namespaces=self.__namespaces)
             cover_id = res[0].get('{' + Namespace.XLINK + '}href')[1:]
-            res = tree.xpath('/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
+            print(cover_id)
+            res = tree.xpath('/fb:FictionBook/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
             content = base64.b64decode(res[0].text)
             return content
         except Exception as err:
+            print("exception Extract %s"%err)
             return None
 
     def __detect_namespaces(self, tree):
-        tag = tree.getroot().tag
-        self.__namespaces['fb'] = Namespace.FICTION_BOOK20 if tag.find(Namespace.FICTION_BOOK20)>0 else Namespace.FICTION_BOOK21
+        if tree.getroot().tag.find(Namespace.FICTION_BOOK21) > 0:
+            self.__namespaces['fb'] = Namespace.FICTION_BOOK21
         return None
 
     def __detect_title(self, tree):
