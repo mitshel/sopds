@@ -172,8 +172,8 @@ class FB2(FB2Base):
         try:
             self.file.seek(0,0)
             return etree.parse(self.file)
-        except:
-            raise FB2StructureException('the file is not a valid XML')
+        except Exception as err:
+            raise FB2StructureException('the file is not a valid XML (%s)'%err)
 
     def __exit__(self, kind, value, traceback):
         pass
