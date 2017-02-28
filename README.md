@@ -209,18 +209,18 @@ MySQL по сравнению с sqlite работает гораздо быст
   к сожалению конвертер не совершенный и не все книги может конвертировать, но большинство все-таки конвертируется 
 - далее, необходимо скопировать архив в папку **./convert/fb2toepub** и разархивировать 
 - далее, компилируем проект командой make, в результате в папке  unix_dist появится исполняемый файл fb2toepub 
-- в конфигурационном файле ./sopds/settings.py необходимо задать путь к этому конвертеру, например таким образом:  
+- При помощи веб-интерфейса администратора или указанных ниже команд консоли задать путь к этому конвертеру:  
 
->     SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2toepub/unix_dist/fb2toepub')
+>     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2toepub/unix_dist/fb2toepub"
 
 - В результате OPDS-клиенту будут предоставлятся ссылки на FB2-книгу в формате epub  
 
 4.2 Конвертер fb2epub http://code.google.com/p/epub-tools/ (конвертер написан на Java, так что в вашей системе должнен быть установлен как минимум JDK 1.5)  
 - также сначала скачать последнюю версию по ссылке выше (текущая уже находится в проекте)  
 - скопировать jar-файл например в каталог **./convert/fb2epub** (Здесь уже лежит shell-скрипт для запуска jar-файла)  
-- Соответственно прописать пути в файле конфигурации **./sopds/settings.py** к shell-скрипту fb2epub (данный конвертер работает также и в Windows) 
+- При помощи веб-интерфейса администратора или указанных ниже команд консоли задать путь shell-скрипту fb2epub (или fb2epub.cmd для Windows) 
 
->     SOPDS_FB2TOEPUB = os.path.join(BASE_DIR, 'convert\\fb2epub\\fb2epub.cmd' if sys.platform =='win32' else 'convert/fb2epub/fb2epub' )
+>     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2epub/fb2epub"
 
 4.3 Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447  
 - Необходимо установить python 2.7 и пакеты lxml, cssutils:   
@@ -234,10 +234,10 @@ MySQL по сравнению с sqlite работает гораздо быст
   (текущая версия утилиты уже находится в каталоге fb2conv проекта)  
 - скопировать архив проекта в **./convert/fb2conv** (Здесь уже подготовлены shell-скрипты для запуска конвертера) и разархивировать его  
 - Для конвертации в MOBI нужно архив с утилитой KindleGen положить в каталог с конвертером и разархивировать  
-- В конфигурационном файле **./sopds/settings.py** задать пути к соответствующим скриптам:  
+- При помощи веб-интерфейса администратора или указанных ниже команд консоли задать пути к соответствующим скриптам:  
    
->     SOPDS_FB2TOEPUB = os.path.join(BASE_DIR,'convert/fb2conv/fb2epub')
->     SOPDS_FB2TOMOBI = os.path.join(BASE_DIR,'convert/fb2conv/fb2mobi')
+>     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2conv/fb2epub"
+>     python3 manage.py sopds_util setconf SOPDS_FB2TOMOBI "convert/fb2conv/fb2mobi"
 
 #### 5. Консольные команды Simple OPDS  
 
@@ -295,8 +295,10 @@ MySQL по сравнению с sqlite работает гораздо быст
 **SOPDS_DOUBLES_HIDE** - Скрывает, найденные дубликаты в выдачах книг.  
 (по умолчанию SOPDS_DOUBLES_HIDE = True)  
 	
-**SOPDS_FB2PARSE** - Извлекать метаинформацию из книг fb2.  
-(по умолчанию SOPDS_FB2PARSE = True)  
+**SOPDS_FB2SAX** - Программа может извлекать метаданные из FB2 двумя парсерами 
+  - FB2sax - штатный парсер, используемый в SOPDS с версии 0.01, этот парсер более быстрый, и извлекает метаданные даже из невалидных файлов FB2
+  - FB2xpath - появился в версии 0.42, работает помеделеннее, не терпит невалидных FB2
+(по умолчанию SOPDS_FB2SAX = True)  
 	
 **SOPDS_COVER_SHOW** - способ показа обложек (False - не показывать, True - извлекать обложки на лету и показывать).  
 (по умолчанию SOPDS COVER_SHOW = True)  
