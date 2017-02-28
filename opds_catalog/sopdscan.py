@@ -10,6 +10,7 @@ from book_tools.format import create_bookfile
 from book_tools.format.util import strip_symbols
 
 from django.db import transaction
+from django.utils.translation import ugettext as _
 
 from opds_catalog import fb2parse, opdsdb
 from opds_catalog import inpx_parser
@@ -228,7 +229,7 @@ class opdsScanner:
                     self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
 
                     for a in book_data.authors:
-                        author_name = a.get('name','Unknown author').strip(strip_symbols)
+                        author_name = a.get('name',_('Unknown author')).strip(strip_symbols)
                         # Если в имени автора нет запятой, то фамилию переносим из конца в начало
                         if author_name.find(',')<0:
                             author_names = author_name.split()
