@@ -113,9 +113,9 @@ class FB2Base(BookFile):
 
         def add_author_from_node(node):
             first_name = subnode_text(node, 'first-name')
-            middle_name = subnode_text(node, 'middle-name')
+            #middle_name = subnode_text(node, 'middle-name')
             last_name = subnode_text(node, 'last-name')
-            self.__add_author__(' '.join([first_name, middle_name, last_name]), last_name)
+            self.__add_author__(' '.join([first_name, last_name]), last_name)
 
         res = tree.xpath('/fb:FictionBook/fb:description/fb:title-info/fb:author', namespaces=self.__namespaces)
         if len(res) == 0:

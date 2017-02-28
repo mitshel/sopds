@@ -229,7 +229,7 @@ class opdsScanner:
                     for a in book_data.authors:
                         author_name = a.get('name','Unknown author').strip(strip_symbols)
                         # Если в имени автора нет запятой, то фамилию переносим из конца в начало
-                        if author_name.find(',')>=0:
+                        if author_name.find(',')<0:
                             author_names = author_name.split()
                             author_name = ' '.join([author_names[-1],' '.join(author_names[:-1])])
                         author=opdsdb.addauthor(author_name)

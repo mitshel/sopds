@@ -169,7 +169,7 @@ class fb2parser:
           self.lang.tagopen(name)
           self.book_title.tagopen(name)
           self.annotation.tagopen(name)
-          self.docdate.tagopen(name)
+          self.docdate.tagopen(name,attrs)
           self.series.tagopen(name,attrs)
           if self.rc!=0:
              if self.cover_name.tagopen(name,attrs):
@@ -245,7 +245,6 @@ class fb2parser:
         except StopIteration:
             pass
         except Exception as err:
-            print(err)
             self.parse_errormsg=err
             self.parse_error=1
 
@@ -262,7 +261,7 @@ class FB2sax(BookFile):
         self.file.seek(0, 0)
         self.fb2parser.parse(self.file)
         if self.fb2parser.parse_error != 0:
-            raise FB2StructureException('FB2sax parse error')
+            raise FB2StructureException('FB2sax parse error (%s)'%self.fb2parser.parse_errormsg)
         self.__detect_title()
         self.__detect_authors()
         self.__detect_tags()
@@ -293,8 +292,8 @@ class FB2sax(BookFile):
         return None
 
     def __detect_docdate(self):
-        res = ''
-        if len(self.fb2parser.docdate.getvalue()) > 0:
+        res = self.fb2parser.docdate.getattr('value') or ''
+        if len(res)==0 and len(self.fb2parser.docdate.getvalue()) > 0:
             res = self.fb2parser.docdate.getvalue()[0].strip();
         if len(res) > 0:
             self.__set_docdate__(res)
