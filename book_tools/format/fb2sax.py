@@ -320,8 +320,9 @@ class FB2sax(BookFile):
 
     def __detect_series_info(self):
         for s in self.fb2parser.series.attrss:
-            ser_name = s.get('name').strip(strip_symbols)
+            ser_name = s.get('name')
             if ser_name:
+                ser_name = ser_name.strip(strip_symbols)
                 ser_no = s.get('number', '0').strip(strip_symbols)
                 ser_no = int(ser_no) if ser_no.isdigit() else None
 
