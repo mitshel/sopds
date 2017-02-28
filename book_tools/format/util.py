@@ -1,5 +1,5 @@
 #import PythonMagick
-from PIL import Image, ImageFile
+#from PIL import Image, ImageFile
 
 strip_symbols = ' »«\'\"\&\n-.#\\\`'
 

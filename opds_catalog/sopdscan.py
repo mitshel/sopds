@@ -48,10 +48,12 @@ class opdsScanner:
     def log_options(self):
         self.logger.info(' ***** Starting sopds-scan...')
         self.logger.debug('OPTIONS SET')
-        if config.SOPDS_ROOT_LIB!=None:       self.logger.debug('root_lib = '+config.SOPDS_ROOT_LIB)
-        if config.SOPDS_FB2TOEPUB!=None: self.logger.debug('fb2toepub = '+config.SOPDS_FB2TOEPUB)
-        if config.SOPDS_FB2TOMOBI!=None: self.logger.debug('fb2tomobi = '+config.SOPDS_FB2TOMOBI)
-        if config.SOPDS_TEMP_DIR!=None:       self.logger.debug('temp_dir = '+config.SOPDS_TEMP_DIR)
+        if config.SOPDS_ROOT_LIB!=None:       self.logger.debug('root_lib = %s'%config.SOPDS_ROOT_LIB)
+        if config.SOPDS_FB2TOEPUB!=None: self.logger.debug('fb2toepub = %s'%config.SOPDS_FB2TOEPUB)
+        if config.SOPDS_FB2TOMOBI!=None: self.logger.debug('fb2tomobi = %s'%config.SOPDS_FB2TOMOBI)
+        if config.SOPDS_TEMP_DIR!=None:       self.logger.debug('temp_dir = %s'%config.SOPDS_TEMP_DIR)
+        if config.SOPDS_FB2SAX != None:       self.logger.debug('FB2SAX = %s'%config.SOPDS_FB2SAX)
+
 
     def log_stats(self):
         self.t2=datetime.timedelta(seconds=time.time())
@@ -195,7 +197,6 @@ class opdsScanner:
                 zip_process_error = 1
             self.bad_archives+=zip_process_error
 
-    # Новая версия (0.42) процедуры извлечения метаданных из файлов книг fb2, epub, mobi
     def processfile(self,name,full_path,file,cat,archive=0,file_size=0):
         (n, e) = os.path.splitext(name)
         if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():
@@ -243,79 +244,6 @@ class opdsScanner:
                         ser_no = ser.get('index', '0').strip()
                         ser_no = int(ser_no) if ser_no.isdigit() else 0
                         opdsdb.addbseries(book,ser_name,ser_no)
-            else:
-                self.books_skipped+=1
-                self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
-
-    # Старая версия (до 0.41) процедуры извлечения метаданных из файлов книг только fb2
-    def processfile0(self,name,full_path,file,cat,archive=0,file_size=0):
-        (n,e)=os.path.splitext(name)
-        if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():
-            rel_path=os.path.relpath(full_path,config.SOPDS_ROOT_LIB)
-            self.logger.debug("Attempt to add book "+rel_path+"/"+name)
-            self.fb2parser.reset()
-            if opdsdb.findbook(name,rel_path,1)==None:
-                if archive==0:
-                    cat=opdsdb.addcattree(rel_path,archive)
-                title=''
-                lang=''
-                annotation=''
-                docdate=''
-                book_is_valid = True
-
-                if e.lower()=='.fb2' and config.SOPDS_FB2PARSE:
-                    if isinstance(file, str):
-                        f=open(file,'rb')
-                    else:
-                        f=file
-                    self.fb2parser.parse(f)
-                    f.close()
-
-                    if len(self.fb2parser.lang.getvalue())>0:
-                        lang=self.fb2parser.lang.getvalue()[0].strip(strip_symbols)
-                    if len(self.fb2parser.book_title.getvalue())>0:
-                        title=self.fb2parser.book_title.getvalue()[0].strip(strip_symbols)
-                    if len(self.fb2parser.annotation.getvalue())>0:
-                        annotation=('\n'.join(self.fb2parser.annotation.getvalue()))
-                    if len(self.fb2parser.docdate.getvalue())>0:
-                        docdate=self.fb2parser.docdate.getvalue()[0].strip();
-
-                    if self.fb2parser.parse_error!=0:
-                        errormsg=''
-                        self.logger.warning(rel_path+' - '+name+' fb2 parse error ['+errormsg+']')
-                        book_is_valid = False
-                        self.bad_books+=1
-
-                if book_is_valid:
-                    if title=='': title=n
-
-                    book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
-                    self.books_added+=1
-
-                    if archive!=0:
-                        self.books_in_archives+=1
-                    self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
-
-                    idx=0
-                    for l in self.fb2parser.author_last.getvalue():
-                        last_name=l.strip(strip_symbols)
-                        first_name=self.fb2parser.author_first.getvalue()[idx].strip(strip_symbols)
-                        #author=opdsdb.addauthor(first_name,last_name)
-                        author=opdsdb.addauthor("%s %s"%(last_name,first_name))
-                        opdsdb.addbauthor(book,author)
-                        idx+=1
-                    for l in self.fb2parser.genre.getvalue():
-                        opdsdb.addbgenre(book,opdsdb.addgenre(l.lower().strip(strip_symbols)))
-                    for l in self.fb2parser.series.attrss:
-                        ser_name=l.get('name')
-                        if ser_name:
-                            ser=opdsdb.addseries(ser_name.strip())
-                            sser_no=l.get('number','0').strip()
-                            if sser_no.isdigit():
-                                ser_no=int(sser_no)
-                            else:
-                                ser_no=0
-                            opdsdb.addbseries(book,ser,ser_no)
             else:
                 self.books_skipped+=1
                 self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")

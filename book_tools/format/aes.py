@@ -1,6 +1,6 @@
-import gzip, os
+#import gzip, os
 #from Crypto.Cipher import AES
-from tempfile import mktemp
+#from tempfile import mktemp
 
 def encrypt(file_name, key, working_dir):
     '''
