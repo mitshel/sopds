@@ -51,6 +51,14 @@ class scanTestCase(TestCase):
         self.assertEqual(book.genres.get(genre="antique").section, opdsdb.unknown_genre)
         self.assertEqual(book.genres.get(genre="antique").subsection, "antique")
 
+    def test_processfile_fb2sax(self):
+        config.SOPDS_FB2SAX = True
+        self.test_processfile_fb2()
+
+    def test_processfile_fb2xpath(self):
+        config.SOPDS_FB2SAX = False
+        self.test_processfile_fb2()
+
     def test_processfile_epub(self):
         """ Тестирование процедуры processfile (извлекает метаданные из книги EPUB и помещает в БД) """
         opdsdb.clear_all()
