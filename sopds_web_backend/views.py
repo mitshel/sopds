@@ -35,6 +35,8 @@ def sopds_processor(request):
     args['splititems'] = config.SOPDS_SPLITITEMS
     args['fb2tomobi'] = (config.SOPDS_FB2TOMOBI!="")
     args['fb2toepub'] = (config.SOPDS_FB2TOEPUB!="")
+    args['nozip'] = settings.NOZIP_FORMATS
+
     if config.SOPDS_ALPHABET_MENU:
         args['lang_menu'] = lang_menu
     

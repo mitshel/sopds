@@ -5,6 +5,7 @@ from django.utils import translation
 from constance import config
 
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
+NOZIP_FORMATS = ['epub', 'mobi']
 
 VERSION = "0.42-dev"
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")

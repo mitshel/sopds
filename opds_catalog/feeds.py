@@ -293,12 +293,19 @@ class CatalogsFeed(AuthFeed):
         if item['is_catalog']:
             return (opdsEnclosure(reverse("opds_catalog:cat_tree", kwargs={"cat_id":item['id']}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
         else:
-            return (
+            enclosure = [
                 opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":0}),"application/%s"%item['format'] ,"http://opds-spec.org/acquisition/open-access"),
                 opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id":item['id'],"zip_flag":1}),"application/%s+zip"%item['format'], "http://opds-spec.org/acquisition/open-access"),
                 opdsEnclosure(reverse("opds_catalog:cover", kwargs={"book_id":item['id']}),"image/jpeg", "http://opds-spec.org/image"),
                 opdsEnclosure(reverse("opds_catalog:thumb", kwargs={"book_id": item['id']}), "image/jpeg","http://opds-spec.org/thumbnail"),
-            )
+
+            ]
+            if (config.SOPDS_FB2TOEPUB!="") and (item['format']=='fb2'):
+                enclosure += [opdsEnclosure(reverse("opds_catalog:convert", kwargs={"book_id":item['id'],"convert_type":"epub"}),"application/epub+zip","http://opds-spec.org/acquisition/open-access")]
+            if (config.SOPDS_FB2TOMOBI!="") and (item['format']=='fb2'):
+                enclosure += [opdsEnclosure(reverse("opds_catalog:convert", kwargs={"book_id":item['id'],"convert_type":"mobi"}),"application/mobi","http://opds-spec.org/acquisition/open-access")]
+
+            return enclosure
     
     def item_description(self, item):
         if item['is_catalog']:
