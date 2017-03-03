@@ -17,33 +17,41 @@ from constance import config
 
 class __detector:
     @staticmethod
-    def file(filename):
-        (n, e) = os.path.splitext(filename)
-        if e.lower() == '.xml':
+    def format(fmt):
+        if fmt.lower() == 'xml':
             return Mimetype.XML
-        if e.lower() == '.fb2':
+        elif fmt.lower() == 'fb2':
             return Mimetype.FB2
-        elif e.lower()=='.epub' or e.lower()=='.zip':
+        elif fmt.lower() =='epub':
+            return Mimetype.EPUB
+        elif fmt.lower() =='mobi':
+            return Mimetype.MOBI
+        elif fmt.lower() == 'zip':
             return Mimetype.ZIP
-        elif e.lower()=='.pdf':
+        elif fmt.lower() =='pdf':
             return Mimetype.PDF
-        elif e.lower()=='.doc' or e.lower()=='.docx':
+        elif fmt.lower() =='doc' or fmt.lower()=='docx':
             return Mimetype.MSWORD
-        elif e.lower()=='.djvu':
+        elif fmt.lower() =='djvu':
             return Mimetype.DJVU
-        elif e.lower()=='.txt':
+        elif fmt.lower() =='txt':
             return Mimetype.TEXT
-        elif e.lower()=='.rtf':
+        elif fmt.lower() =='rtf':
             return Mimetype.RTF
         else:
             return Mimetype.OCTET_STREAM
+
+    @staticmethod
+    def file(filename):
+        (n, e) = os.path.splitext(filename)
+        return format(e[1:])
 
 def detect_mime(file, original_filename):
     FB2_ROOT = 'FictionBook'
     mime = __detector.file(original_filename)
 
     try:
-        if mime == Mimetype.XML or mime == Mimetype.FB2:
+        if mime == Mimetype.XML:
             if FB2_ROOT == __xml_root_tag(file):
                 return Mimetype.FB2
         elif mime == Mimetype.ZIP:
