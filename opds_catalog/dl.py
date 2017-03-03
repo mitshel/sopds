@@ -12,7 +12,7 @@ from opds_catalog.models import Book, bookshelf
 from opds_catalog import settings, utils, opdsdb, fb2parse
 import opds_catalog.zipf as zipfile
 
-from book_tools.format import create_bookfile, __detector
+from book_tools.format import create_bookfile, mime_detector
 from book_tools.format.mimetype import Mimetype
 
 from constance import config
@@ -45,7 +45,7 @@ def Download(request, book_id, zip_flag):
         content_type= Mimetype.FB2_ZIP if book.format=='fb2' else Mimetype.ZIP
     else:    
         dlfilename=transname
-        content_type = __detector.format(book.format)
+        content_type = mime_detector.fmt(book.format)
 
     response = HttpResponse()
     response["Content-Type"]='%s; name="%s"'%(content_type,dlfilename)
@@ -240,7 +240,7 @@ def ConvertFB2(request, book_id, convert_type):
         converter_path=config.SOPDS_FB2TOEPUB
     elif convert_type=='mobi':
         converter_path=config.SOPDS_FB2TOMOBI
-    content_type=__detector.format(convert_type)
+    content_type=mime_detector.fmt(convert_type)
 
     if book.cat_type==opdsdb.CAT_NORMAL:
         tmp_fb2_path=None

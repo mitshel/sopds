@@ -15,9 +15,9 @@ from book_tools.format.mobi import Mobipocket
 
 from constance import config
 
-class __detector:
+class mime_detector:
     @staticmethod
-    def format(fmt):
+    def fmt(fmt):
         if fmt.lower() == 'xml':
             return Mimetype.XML
         elif fmt.lower() == 'fb2':
@@ -44,11 +44,11 @@ class __detector:
     @staticmethod
     def file(filename):
         (n, e) = os.path.splitext(filename)
-        return format(e[1:])
+        return mime_detector.fmt(e[1:])
 
 def detect_mime(file, original_filename):
     FB2_ROOT = 'FictionBook'
-    mime = __detector.file(original_filename)
+    mime = mime_detector.file(original_filename)
 
     try:
         if mime == Mimetype.XML:

@@ -12,7 +12,7 @@ from opds_catalog import settings
 from opds_catalog.middleware import BasicAuthMiddleware
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
-from book_tools.format import __detector as detector
+from book_tools.format import mime_detector
 from book_tools.format.mimetype import Mimetype
 
 from constance import config
@@ -294,7 +294,7 @@ class CatalogsFeed(AuthFeed):
         if item['is_catalog']:
             return (opdsEnclosure(reverse("opds_catalog:cat_tree", kwargs={"cat_id":item['id']}),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
         else:
-            mime = detector.format(item['format'])
+            mime = mime_detector.fmt(item['format'])
             enclosure = [opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id": item['id'], "zip_flag": 0}), mime, "http://opds-spec.org/acquisition/open-access"),]
             if not item['format'] in settings.NOZIP_FORMATS:
                 mimezip = Mimetype.FB2_ZIP if mime == Mimetype.FB2 else "%s+zip" % mime
@@ -541,7 +541,7 @@ class SearchBooksFeed(AuthFeed):
         return item['registerdate'] 
          
     def item_enclosures(self, item):
-        mime = detector.format(item['format'])
+        mime = mime_detector.fmt(item['format'])
         enclosure = [
             opdsEnclosure(reverse("opds_catalog:download", kwargs={"book_id": item['id'], "zip_flag": 0}), mime, "http://opds-spec.org/acquisition/open-access"), ]
         if not item['format'] in settings.NOZIP_FORMATS:
