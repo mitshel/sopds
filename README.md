@@ -16,6 +16,7 @@
 - Pillow 2.9.0
 - apscheduler 3.3.0
 - django-constance[database] 1.3
+- lxml
 
 Для работы проекта необходимо установить указанные  зависимости: 
 
