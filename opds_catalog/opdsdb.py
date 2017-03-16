@@ -48,6 +48,7 @@ def pg_optimize(verbose=False):
         if verbose:
             print('No PostgreSql connection backend detected...')
     else:
+        print('Start PostgreSql tables optimization...')
         cursor = connection.cursor()
         cursor.execute('alter table opds_catalog_book SET ( fillfactor = 50)')
         cursor.execute('VACUUM FULL opds_catalog_book')
