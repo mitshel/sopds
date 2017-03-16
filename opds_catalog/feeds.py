@@ -5,6 +5,7 @@ from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.db.models import Count, Min
+from django.utils.html import strip_tags
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bookshelf, Counter, lang_menu
 from opds_catalog import models
@@ -235,7 +236,7 @@ class CatalogsFeed(AuthFeed):
               
         for row in books_list[op.d2_first_pos:op.d2_last_pos+1]:
             p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
-                  'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
+                  'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
                   'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
             items.append(p)
@@ -465,7 +466,7 @@ class SearchBooksFeed(AuthFeed):
         
         for row in books[start:finish+1]:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
-                  'registerdate': row.registerdate, 'id': row.id, 'annotation': row.annotation, \
+                  'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
                   'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}       
             if summary_DOUBLES_HIDE:
