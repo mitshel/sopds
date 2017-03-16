@@ -1,6 +1,6 @@
 #### Simple OPDS Catalog - Простой OPDS Каталог  
 #### Author: Dmitry V.Shelepnev  
-#### Версия 0.42
+#### Версия 0.43
 
 #### 1. Простая установка Simple OPDS (используем простую БД sqlite3)
 
@@ -257,6 +257,10 @@ MySQL по сравнению с sqlite работает гораздо быст
 Загрузить свой справочник жанров из файла opds_catalog/fixtures/mygenres.json:
 
     python3 manage.py sopds_util load_mygenres   
+    
+Только при использовании PostgerSQL. Оптимизация таблицы opds_catalog_book (fillfactor = 50). После этого сканирование происходит значительно быстрее:
+
+    python3 manage.py sopds_util pg_optimize  
     
 Посмотреть все параметры конфигурации:
 
