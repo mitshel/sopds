@@ -243,7 +243,7 @@ class opdsScanner:
 
                     if book_data.series_info:
                         ser = opdsdb.addseries(book_data.series_info['title'])
-                        ser_no = book_data.series_info['index']
+                        ser_no = book_data.series_info['index']  or '0'
                         ser_no = int(ser_no) if ser_no.isdigit() else 0
                         opdsdb.addbseries(book,ser,ser_no)
             else:

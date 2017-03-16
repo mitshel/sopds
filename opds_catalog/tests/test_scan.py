@@ -166,5 +166,5 @@ class scanTestCase(TestCase):
         self.assertEquals(Book.objects.all().count(), 6)
         self.assertEquals(Author.objects.all().count(), 6)
         self.assertEquals(Genre.objects.all().count(), 5)
-        self.assertEquals(Series.objects.all().count(), 0)
+        self.assertEquals(Series.objects.all().count(), 1)
         self.assertEquals(Catalog.objects.all().count(), 2)
