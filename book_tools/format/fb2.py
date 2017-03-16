@@ -149,10 +149,11 @@ class FB2Base(BookFile):
         if len(res) > 0:
             title = BookFile.__normalise_string__(res[0].get('name'))
             index = BookFile.__normalise_string__(res[0].get('number'))
+
             if title:
                 self.series_info = {
                     'title': title,
-                    'index': index or None
+                    'index': index
                 }
 
     def __detect_description(self, tree):

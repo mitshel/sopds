@@ -240,11 +240,12 @@ class opdsScanner:
                     for genre in book_data.tags:
                         opdsdb.addbgenre(book,opdsdb.addgenre(genre.lower().strip(strip_symbols)))
 
-                    for ser in self.fb2parser.series.attrss:
-                        ser_name=ser.get('title').strip()
-                        ser_no = ser.get('index', '0').strip()
+
+                    if book_data.series_info:
+                        ser = opdsdb.addseries(book_data.series_info['title'])
+                        ser_no = book_data.series_info['index']
                         ser_no = int(ser_no) if ser_no.isdigit() else 0
-                        opdsdb.addbseries(book,ser_name,ser_no)
+                        opdsdb.addbseries(book,ser,ser_no)
             else:
                 self.books_skipped+=1
                 self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")

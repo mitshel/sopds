@@ -319,19 +319,17 @@ class FB2sax(BookFile):
             self.__add_tag__(genre.lower().strip(strip_symbols))
 
     def __detect_series_info(self):
-        for s in self.fb2parser.series.attrss:
+        if len(self.fb2parser.series.attrss)>0:
+            s = self.fb2parser.series.attrss[0]
             ser_name = s.get('name')
             if ser_name:
-                ser_name = ser_name.strip(strip_symbols)
-                ser_no = s.get('number', '0').strip(strip_symbols)
-                ser_no = int(ser_no) if ser_no.isdigit() else None
+                title = ser_name.strip(strip_symbols)
+                index = s.get('number', '0').strip(strip_symbols)
 
                 self.series_info = {
-                    'title': ser_name,
-                    'index': ser_no
+                    'title': title,
+                    'index': index
                 }
-
-        return None
 
     def __detect_description(self):
         res = ''
