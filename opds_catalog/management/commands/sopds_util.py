@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import transaction
+from django.db import connection
 from django.conf import settings as main_settings
 
 from opds_catalog import opdsdb
@@ -14,7 +15,7 @@ class Command(BaseCommand):
     verbose = False
         
     def add_arguments(self, parser):
-        parser.add_argument('command', action="store", nargs='*', help='Use [ clear | info | save_mygenres | load_mygenres | setconf | getconf ]') 
+        parser.add_argument('command', action="store", nargs='*', help='Use [ clear | info | save_mygenres | load_mygenres | setconf | getconf | pg_optimize ]')
         parser.add_argument('--verbose',action='store_true', dest='verbose', default=False, help='Set verbosity level for books collection scan.')  
         parser.add_argument('--nogenres',action='store_true', dest='nogenres', default=False, help='Not install genres fom fixtures.')              
 
@@ -39,7 +40,9 @@ class Command(BaseCommand):
             self.setconf(self.confparam, self.confvalue)         
         elif action == "getconf":
             self.confparam = options['command'][1] if len(options['command'])>1 else None
-            self.getconf(self.confparam)   
+            self.getconf(self.confparam)
+        elif action == "pg_optimize":
+            self.pg_optimize()
 
     def clear(self):
         with transaction.atomic():
@@ -47,6 +50,7 @@ class Command(BaseCommand):
         if not self.nogenres:
             call_command('loaddata', 'genre.json', app_label='opds_catalog') 
         Counter.objects.update_known_counters()
+        opdsdb.pg_optimize(False)
         
     def info(self):
         Counter.objects.update_known_counters()
@@ -77,6 +81,10 @@ class Command(BaseCommand):
             call_command('constance', 'get', confparam, app_label='opds_catalog')
         else:
             call_command('constance', 'list', app_label='opds_catalog')
+
+    def pg_optimize(self):
+        opdsdb.pg_optimize(True)
+
 
             
 

@@ -42,6 +42,17 @@ unknown_genre=_(unknown_genre_en)
 #
 utfhigh = re.compile(u'[\U00010000-\U0010ffff]')
 
+def pg_optimize(verbose=False):
+    """ TODO: Table optimizations for Postgre """
+    if connection.vendor != 'postgresql':
+        if verbose:
+            print('No PostgreSql connection backend detected...')
+    else:
+        cursor = connection.cursor()
+        cursor.execute('alter table opds_catalog_book SET ( fillfactor = 50)')
+        cursor.execute('VACUUM FULL opds_catalog_book')
+        print('PostgreSql tables internal structure optimized...')
+
 def clear_all(verbose=False):
     cursor = connection.cursor()
     cursor.execute('delete from opds_catalog_bseries')

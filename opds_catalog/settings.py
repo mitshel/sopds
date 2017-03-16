@@ -27,8 +27,7 @@ from django.dispatch import receiver
 #    if updated_key == 'SOPDS_LANGUAGE':
 #        translation.activate(new_value)
 #        print(new_value)
-    
-    
+
 def constance_update_all():
     pass
     
