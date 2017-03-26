@@ -1,0 +1,11 @@
+{% extends "sopds_main.html" %}
+{% load i18n %}
+{% block body %}
+<script>
+	var BookID = {{ book_id }};
+	document.addEventListener("DOMContentLoaded", function(event) { 
+		$('#ReaderBlock').load('{% url 'opds_catalog:read' book_id %}', function() {});
+	});
+</script>
+<div id="ReaderBlock"></div>
+{% endblock %}{# body #}

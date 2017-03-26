@@ -548,3 +548,10 @@ def LogoutView(request):
     args = {}
     args['breadcrumbs'] = [_('Logout')]
     return redirect(reverse('web:main'))
+
+@sopds_login(url='web:login')
+def BookReaderView(request,book_id):   
+    args = {}
+    args['current'] = 'reader'      
+    args['book_id'] = book_id   
+    return render(request, 'BookReader.html', args)
