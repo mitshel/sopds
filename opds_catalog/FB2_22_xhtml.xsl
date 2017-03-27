@@ -28,18 +28,15 @@
 				</style>
 			</head>
 			<body>
+				<h4 align="center">
+					<xsl:value-of select="fb:description/fb:title-info/fb:book-title"/>
+				</h4>
 
-
-						<h4 align="center">
-        					<xsl:value-of select="fb:description/fb:title-info/fb:book-title"/>
-						</h4>
-
-<xsl:for-each select="fb:description/fb:title-info/fb:coverpage/fb:image">
-		<xsl:call-template name="image"/>
-		</xsl:for-each>
+				<xsl:for-each select="fb:description/fb:title-info/fb:coverpage/fb:image">
+					<xsl:call-template name="image"/>
+				</xsl:for-each>
 
 				<xsl:for-each select="fb:description/fb:title-info/fb:annotation">
-
 					<div>
 						<xsl:call-template name="annotation"/>
 					</div>
@@ -100,7 +97,7 @@
 			</xsl:when>
 			<xsl:otherwise>
 				<li>
-					<a href="#TOC_{generate-id()}"><xsl:value-of select="normalize-space(fb:title/fb:p[1] | @name)"/></a>
+					<a href="#TOC_{position()}"><xsl:value-of select="normalize-space(fb:title/fb:p[1] | @name)"/></a>
 					<xsl:if test="fb:section">
 						<ul><xsl:apply-templates select="fb:section" mode="toc"/></ul>
 					</xsl:if>
@@ -118,7 +115,7 @@
 	</xsl:template>
 
 	<xsl:template match="fb:section">
-		<a name="TOC_{generate-id()}"></a>
+		<a name="TOC_{position()}"></a>
 		<xsl:if test="@id">
 			<xsl:element name="a">
 				<xsl:attribute name="name"><xsl:value-of select="@id"/></xsl:attribute>
@@ -133,7 +130,7 @@
 		<xsl:choose>
 			<xsl:when test="count(ancestor::node()) &lt; 9">
 				<xsl:element name="{concat('h',count(ancestor::node())-3)}">
-					<a name="TOC_{generate-id()}"></a>
+					<a name="TOC_{position()}"></a>
 					<xsl:if test="@id">
 						<xsl:element name="a">
 							<xsl:attribute name="name"><xsl:value-of select="@id"/></xsl:attribute>
@@ -175,7 +172,7 @@
 	</xsl:template>
 	<!-- p -->
 	<xsl:template match="fb:p">
-		<div align="justify"><xsl:if test="@id">
+		<div id="{position()}" align="justify"><xsl:if test="@id">
 				<xsl:element name="a">
 					<xsl:attribute name="name"><xsl:value-of select="@id"/></xsl:attribute>
 				</xsl:element>

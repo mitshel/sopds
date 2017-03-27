@@ -1,6 +1,3 @@
-import logging
-logging.basicConfig(filename='/var/www/sopds2/example.log',level=logging.DEBUG)
-
 from django.conf.urls import url
 from sopds_web_backend import views
 
@@ -18,5 +15,7 @@ urlpatterns = [
     url(r'^logout/$',views.LogoutView, name='logout'),
     url(r'^bs/delete/$',views.BSDelView, name='bsdel'),
     url(r'^bs/clear/$', views.BSClearView, name='bsclear'),
+    url(r'^bs/setpos/(?P<book_id>[0-9]+)/$', views.BSSetPos, name='setpos'),
+    url(r'^bs/getpos/(?P<book_id>[0-9]+)/$', views.BSGetPos, name='getpos'),
     url(r'^$',views.hello, name='main'),
 ]
