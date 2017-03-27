@@ -27,15 +27,20 @@
 	}
 	
 	var SetPos = function(){
-		var CurrentPos = window.scrollY;
-		$.ajax( {
-			url: '{% url 'web:setpos' book_id %}?pos='+CurrentPos,
-			type: 'GET',
-			cache: false,
-			success: function() {
-				window.setTimeout(SetPos, 10000);
-			}
-		});		
+		var Reader = $('#ReaderBlock');
+		xPos = window.scrollY;
+		Reader.find('div').each(function(idx,el){
+			var elem = $(el);
+			if ((elem.offset().top+elem.height()) > xPos) {
+				var CurrentPos = $(el).attr('id');
+				$.ajax( {
+					url: '{% url 'web:setpos' book_id %}?pos='+CurrentPos,
+					type: 'GET',
+					cache: false
+				});	
+				return false;
+			};
+		})	
 	}
 	
 	var GetPos = function(){
@@ -43,13 +48,18 @@
 			url: '{% url 'web:getpos' book_id %}',
 			type: 'GET',
 			cache: false,
-			success: function(data) {
-				window.scrollTo(0,data);
+			success: function(lineID) {
+				var Reader = $('#ReaderBlock');
+				Reader.find('div').each(function(idx,el){
+					if ($(el).attr('id') == lineID) {
+						window.scrollTo(0,$(el).offset().top);
+					};
+				})
 			}
 		});		
 	}
 
-	var LoadBook = function(){
+	LoadBook = function(){
 		if (localStorage.getItem(BookID)){
 			$("#ReaderBlock").html(LZString.decompress(localStorage.getItem(BookID)));
 			GetPos();

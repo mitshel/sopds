@@ -114,7 +114,7 @@
 		<div><xsl:apply-templates/></div>
 	</xsl:template>
 
-	<xsl:template match="fb:section">
+	<xsl:template match="fb:section" name="section">
 		<a name="TOC_{position()}"></a>
 		<xsl:if test="@id">
 			<xsl:element name="a">
@@ -171,12 +171,17 @@
 		</h5>
 	</xsl:template>
 	<!-- p -->
-	<xsl:template match="fb:p">
-		<div id="{position()}" align="justify"><xsl:if test="@id">
-				<xsl:element name="a">
-					<xsl:attribute name="name"><xsl:value-of select="@id"/></xsl:attribute>
-				</xsl:element>
-			</xsl:if>	&#160;&#160;&#160;<xsl:apply-templates/></div>
+    <xsl:template match="fb:p">
+	    <xsl:variable name="count">
+	        <xsl:number/>
+	    </xsl:variable>
+        <div id="{1+count(ancestor::fb:section/preceding-sibling::fb:section)}.{$count}" align="justify">
+			<xsl:if test="@id">
+					<xsl:element name="a">
+						<xsl:attribute name="name"><xsl:value-of select="@id"/></xsl:attribute>
+					</xsl:element>
+			</xsl:if>	&#160;&#160;&#160;<xsl:apply-templates/>
+		</div>
 	</xsl:template>
 	<!-- strong -->
 	<xsl:template match="fb:strong">
