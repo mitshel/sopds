@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import RedirectView
+from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.views import logout
 
 urlpatterns = [
@@ -22,5 +24,6 @@ urlpatterns = [
     url(r'^web/', include('sopds_web_backend.urls', namespace='web', app_name='opds_web_backend')),
     url(r'^admin/', admin.site.urls),
     #url(r'^logout/$', logout, {'next_page':'/web/'},name='logout'),   
-    url(r'^', include('sopds_web_backend.urls', namespace='web', app_name='opds_web_backend')),
+    #url(r'^', include('sopds_web_backend.urls', namespace='web', app_name='opds_web_backend')),
+    url(r'^', RedirectView.as_view(url=reverse_lazy("web:main"))),
 ]
