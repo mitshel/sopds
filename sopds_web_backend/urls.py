@@ -17,3 +17,5 @@ urlpatterns = [
     url(r'^bs/clear/$', views.BSClearView, name='bsclear'),
     url(r'^$',views.hello, name='main'),
 ]
+
+#handler403 = 'views.handler403'

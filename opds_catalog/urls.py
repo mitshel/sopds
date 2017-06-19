@@ -51,3 +51,4 @@ urlpatterns = [
         
     url(r'^$',feeds.MainFeed(), name='main'),
 ]
+

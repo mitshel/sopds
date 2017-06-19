@@ -8,12 +8,14 @@ from django.contrib.auth import authenticate, login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.html import strip_tags
+from django.http import HttpResponseForbidden
 
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre, lang_menu
 from opds_catalog import settings
 from constance import config
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
+
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 
@@ -524,7 +526,7 @@ def LoginView(request):
         username = request.POST['username']
         password = request.POST['password']
     except KeyError:
-        return render(request, 'sopds_login.html', args) 
+        return render(request, 'sopds_login.html', args)
     
     next_url = request.GET.get('next',reverse("web:main"))
 
@@ -535,12 +537,15 @@ def LoginView(request):
             return redirect(next_url)
         else:
             args['system_message']={'text':_('This account is not active!'),'type':'alert'}
-            return render(request, 'sopds_login.html', args)
+            return handler403(request,args)
+            #return render(request, 'sopds_login.html', args)
     else:
         args['system_message']={'text':_('User does not exist or the password is incorrect!'),'type':'alert'}
-        return render(request, 'sopds_login.html', args)
-    
-    return render(request, 'sopds_login.html', args)
+        return handler403(request,args)
+        #return render(request, 'sopds_login.html', args)
+
+    return handler403(request,args)
+    #return render(request, 'sopds_login.html', args)
 
 @sopds_login(url='web:login')
 def LogoutView(request):
@@ -548,3 +553,8 @@ def LogoutView(request):
     args = {}
     args['breadcrumbs'] = [_('Logout')]
     return redirect(reverse('web:main'))
+
+def handler403(request,args):
+    response = render(request, 'sopds_login.html', args)
+    response.status_code = 403
+    return response
