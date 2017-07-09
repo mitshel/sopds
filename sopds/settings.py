@@ -54,6 +54,7 @@ MIDDLEWARE_CLASSES = [
     'opds_catalog.middleware.SOPDSLocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.CacheMiddleware',
 ]
 
 ROOT_URLCONF = 'sopds.urls'
@@ -146,6 +147,8 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+CACHE_BACKEND = "locmem://"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
