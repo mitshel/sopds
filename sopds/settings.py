@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,8 +55,8 @@ MIDDLEWARE_CLASSES = [
     'opds_catalog.middleware.SOPDSLocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.CacheMiddleware',
-    'opds_catalog.middleware.DisableAnonymouseCachingMiddleware',
+    #'django.middleware.cache.CacheMiddleware',
+    'opds_catalog.middleware.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'sopds.urls'
