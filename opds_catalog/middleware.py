@@ -2,13 +2,9 @@ import base64
 
 from django.http import HttpResponse
 from django.contrib import auth
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import resolve
 from django.utils import translation
-from django.utils.cache import add_never_cache_headers
 from django.middleware.cache import FetchFromCacheMiddleware as DjangoFetchFromCacheMiddleware
 
-#from opds_catalog import settings
 from constance import config
 
 
@@ -61,11 +57,6 @@ class SOPDSLocaleMiddleware:
             request.LANGUAGE_CODE = request.LANG
 
 class FetchFromCacheMiddleware(DjangoFetchFromCacheMiddleware):
-
-#    def process_response(self, request, response):
-#        if not request.user.is_authenticated():
-#            add_never_cache_headers(response)
-#        return response
 
     def process_request(self, request):
         if not request.user.is_authenticated():
