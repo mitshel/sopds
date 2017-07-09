@@ -55,6 +55,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.CacheMiddleware',
+    'opds_catalog.middleware.DisableAnonymouseCachingMiddleware',
 ]
 
 ROOT_URLCONF = 'sopds.urls'

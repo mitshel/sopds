@@ -5,6 +5,7 @@ from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 from django.utils import translation
+from django.utils.cache import add_never_cache_headers
 
 #from opds_catalog import settings
 from constance import config
@@ -57,3 +58,10 @@ class SOPDSLocaleMiddleware:
             request.LANG = config.SOPDS_LANGUAGE
             translation.activate(request.LANG)
             request.LANGUAGE_CODE = request.LANG
+
+class DisableAnonymouseCachingMiddleware:
+
+    def process_response(self, request, response):
+        if not request.user.is_authenticated():
+            add_never_cache_headers(response)
+        return response
