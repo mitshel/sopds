@@ -72,7 +72,7 @@ def sopds_processor(request):
     return args
 
 # Create your views here.
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SearchBooksView(request):
     #Read searchtype, searchterms, searchterms0, page from form
@@ -232,7 +232,7 @@ def SearchBooksView(request):
         
     return render(request,'sopds_books.html', args)
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SearchSeriesView(request):
     #Read searchtype, searchterms, searchterms0, page from form
@@ -276,7 +276,7 @@ def SearchSeriesView(request):
                                               
     return render(request,'sopds_series.html', args)
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SearchAuthorsView(request):
     #Read searchtype, searchterms, searchterms0, page from form    
@@ -316,7 +316,7 @@ def SearchAuthorsView(request):
                                     
     return render(request,'sopds_authors.html', args)
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def CatalogsView(request):   
     args = {}
@@ -375,7 +375,7 @@ def CatalogsView(request):
       
     return render(request,'sopds_catalogs.html', args)  
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BooksView(request):   
     args = {}
@@ -410,7 +410,7 @@ def BooksView(request):
       
     return render(request,'sopds_selectbook.html', args)      
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def AuthorsView(request):   
     args = {}
@@ -445,7 +445,7 @@ def AuthorsView(request):
       
     return render(request,'sopds_selectauthor.html', args)
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SeriesView(request):   
     args = {}
@@ -480,7 +480,7 @@ def SeriesView(request):
       
     return render(request,'sopds_selectseries.html', args)
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def GenresView(request):   
     args = {}
@@ -504,7 +504,7 @@ def GenresView(request):
        
     return render(request,'sopds_selectgenres.html', args)
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BSDelView(request):
     if request.GET:
@@ -518,7 +518,7 @@ def BSDelView(request):
     
     return redirect("%s?searchtype=u"%reverse("web:searchbooks"))
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BSClearView(request):
     bookshelf.objects.filter(user=request.user).delete()
@@ -558,7 +558,7 @@ def LoginView(request):
     return handler403(request,args)
     #return render(request, 'sopds_login.html', args)
 
-@vary_on_headers("X-Requested-With")
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def LogoutView(request):
     logout(request)
