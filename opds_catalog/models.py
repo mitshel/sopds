@@ -40,7 +40,7 @@ class Book(models.Model):
     path = models.CharField(max_length=SIZE_BOOK_PATH,db_index=True)
     filesize = models.IntegerField(null=False, default=0)
     format = models.CharField(max_length=SIZE_BOOK_FORMAT)
-    catalog = models.ForeignKey('Catalog',db_index=True)
+    catalog = models.ForeignKey('Catalog',db_index=True, on_delete=models.CASCADE)
     cat_type = models.IntegerField(null=False, default=0)
     registerdate = models.DateTimeField(null=False, default=timezone.now)
     docdate = models.CharField(max_length=SIZE_BOOK_DOCDATE,db_index=True)
@@ -56,7 +56,7 @@ class Book(models.Model):
     series = models.ManyToManyField('Series', through='bseries')  
 
 class Catalog(models.Model):
-    parent = models.ForeignKey('self', null=True, db_index=True)
+    parent = models.ForeignKey('self', null=True, db_index=True, on_delete=models.CASCADE)
     cat_name = models.CharField(max_length=SIZE_CAT_CATNAME, db_index=True)
     path = models.CharField(max_length=SIZE_CAT_PATH, db_index=True)
     cat_type = models.IntegerField(null=False, default=0)
@@ -69,8 +69,8 @@ class Author(models.Model):
 
 
 class bauthor(models.Model):
-    book = models.ForeignKey('Book', db_index=True)
-    author = models.ForeignKey('Author', db_index=True)
+    book = models.ForeignKey('Book', db_index=True, on_delete=models.CASCADE)
+    author = models.ForeignKey('Author', db_index=True, on_delete=models.CASCADE)
 #    class Meta:
 #        index_together = [
 #            ["book", "author"],
@@ -82,8 +82,8 @@ class Genre(models.Model):
     subsection = models.CharField(max_length=SIZE_GENRE_SUBSECTION, db_index=True)
 
 class bgenre(models.Model):
-    book = models.ForeignKey('Book', db_index=True)
-    genre = models.ForeignKey('Genre', db_index=True)
+    book = models.ForeignKey('Book', db_index=True, on_delete=models.CASCADE)
+    genre = models.ForeignKey('Genre', db_index=True, on_delete=models.CASCADE)
 
 class Series(models.Model):
     ser = models.CharField(max_length=SIZE_SERIES, db_index=True)
@@ -91,8 +91,8 @@ class Series(models.Model):
     lang_code = models.IntegerField(null=False, default=9,db_index=True)
 
 class bseries(models.Model):
-    book = models.ForeignKey('Book', db_index=True)
-    ser = models.ForeignKey('Series', db_index=True)
+    book = models.ForeignKey('Book', db_index=True, on_delete=models.CASCADE)
+    ser = models.ForeignKey('Series', db_index=True, on_delete=models.CASCADE)
     ser_no = models.IntegerField(null=False, default=0)
 #    class Meta:
 #        index_together = [
@@ -100,8 +100,8 @@ class bseries(models.Model):
 #        ]
 
 class bookshelf(models.Model):
-    user = models.ForeignKey(User, db_index=True)
-    book = models.ForeignKey(Book, db_index=True)
+    user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, db_index=True, on_delete=models.CASCADE)
     readtime = models.DateTimeField(null=False, default=timezone.now, db_index=True)
 
 
