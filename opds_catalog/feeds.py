@@ -41,7 +41,8 @@ class opdsEnclosure(Enclosure):
         super(opdsEnclosure,self).__init__(url, 0, mime_type)
 
 class opdsFeed(Atom1Feed):
-    content_type = 'text/xml; charset=utf-8'
+    #content_type = 'text/xml; charset=utf-8'
+    content_type = 'application/atom+xml; charset=utf-8'
         
     def root_attributes(self):
         attrs = {}
