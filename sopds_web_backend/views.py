@@ -198,7 +198,7 @@ def SearchBooksView(request):
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')}
             if summary_DOUBLES_HIDE:
                 title = p['title']
                 authors_set = {a['id'] for a in p['authors']}         
@@ -355,7 +355,7 @@ def CatalogsView(request):
         p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
               'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
               'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-              'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
+              'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')}
         items.append(p)
                     
     args['paginator'] = op.get_data_dict()
