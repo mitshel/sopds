@@ -123,7 +123,8 @@ def SearchBooksView(request):
             except:
                 ser_id = 0
                 ser = ""
-            books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')    
+            #books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')
+            books = Book.objects.filter(series=ser_id).order_by('bseries__ser_no','search_title','-docdate')
             args['breadcrumbs'] = [_('Books'),_('Search by series'),ser]
             args['searchobject'] = 'series'
             
