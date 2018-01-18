@@ -16,6 +16,7 @@ from constance import config
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
 from sopds_web_backend.settings import HALF_PAGES_LINKS
+from django.http import HttpResponse
 
 def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None):
     actual_decorator = user_passes_test(
@@ -507,6 +508,29 @@ def BSDelView(request):
     return redirect("%s?searchtype=u"%reverse("web:searchbooks"))
 
 @sopds_login(url='web:login')
+def BSSetPos(request,book_id):
+    if request.GET:
+        pos = request.GET.get('pos', None)
+    else:
+        pos = None
+       
+    pos = float(pos)
+
+    bookshelf.objects.filter(user=request.user, book=book_id).update(position=pos)
+
+    response = HttpResponse()
+    response.write('OK')
+
+    return response
+
+@sopds_login(url='web:login')
+def BSGetPos(request,book_id):
+    pos = bookshelf.objects.get(user=request.user, book=book_id).position
+    response = HttpResponse()
+    response.write(pos)
+    return response
+
+@sopds_login(url='web:login')
 def BSClearView(request):
     bookshelf.objects.filter(user=request.user).delete()
     return redirect("%s?searchtype=u" % reverse("web:searchbooks"))
@@ -548,3 +572,10 @@ def LogoutView(request):
     args = {}
     args['breadcrumbs'] = [_('Logout')]
     return redirect(reverse('web:main'))
+
+@sopds_login(url='web:login')
+def BookReaderView(request,book_id):   
+    args = {}
+    args['current'] = 'reader'      
+    args['book_id'] = book_id   
+    return render(request, 'BookReader.html', args)

@@ -1,0 +1,110 @@
+{% extends "sopds_main.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block body %}
+<script>
+	var BookID = {{ book_id }};
+	var delay = 1000;
+	var timeout = null;
+	
+	var waitForLoad = function(){
+		if (typeof jQuery != "undefined") {
+			LoadBook();
+			$(window).bind('scroll',function(){
+				clearTimeout(timeout);
+				timeout = setTimeout(function(){
+					SetPos();
+				},delay);
+			});
+		} else {
+			window.setTimeout(waitForLoad, 500);
+		}
+	};
+	window.setTimeout(waitForLoad, 500);  
+	
+	var ChangeBookDate = function(ID){
+		
+	}
+	
+	var SetPos = function(){
+		var Reader = $('#ReaderBlock');
+		xPos = window.scrollY;
+		Reader.find('div').each(function(idx,el){
+			var elem = $(el);
+			if ((elem.offset().top+elem.height()) > xPos) {
+				var CurrentPos = $(el).attr('id');
+				$.ajax( {
+					url: '{% url 'web:setpos' book_id %}?pos='+CurrentPos,
+					type: 'GET',
+					cache: false
+				});	
+				return false;
+			};
+		})	
+	}
+	
+	var GetPos = function(){
+		$.ajax( {
+			url: '{% url 'web:getpos' book_id %}',
+			type: 'GET',
+			cache: false,
+			success: function(lineID) {
+				var Reader = $('#ReaderBlock');
+				Reader.find('div').each(function(idx,el){
+					if ($(el).attr('id') == lineID) {
+						window.scrollTo(0,$(el).offset().top);
+					};
+				})
+			}
+		});		
+	}
+
+	LoadBook = function(){
+		if (localStorage.getItem(BookID)){
+			$("#ReaderBlock").html(LZString.decompress(localStorage.getItem(BookID)));
+			GetPos();
+		} else {
+			$.ajax( {
+				url: '{% url 'opds_catalog:read' book_id %}',
+				type: 'GET',
+				cache: true,
+				success: function(html) {
+					$("#ReaderBlock").html(html);
+					
+					var StoreDates = {};
+					if (localStorage.getItem('StoreDates')) {
+						StoreDates = JSON.parse(localStorage.getItem('StoreDates'));
+					}
+					StoreDates[BookID] = Date();
+					
+					var CompressedBook = LZString.compress(html);
+					
+					var StoreBook = function(){
+						try {
+							localStorage.setItem(BookID,CompressedBook);
+							localStorage.setItem('StoreDates',JSON.stringify(StoreDates));
+							$('#DownloadBook').hide();
+						} catch (err) {
+							var Old = Date();
+							var OldBookID;
+							$.each(StoreDates,function(idx,el){
+								if (Old > el) {
+									Old = el;
+									OldBookID = idx;
+								}
+							})
+							localStorage.removeItem(OldBookID);
+							delete StoreDates[OldBookID];
+							StoreBook();
+						}
+					}
+					StoreBook();
+					
+					GetPos();
+				}
+			});	
+		}
+	}
+</script>
+<div id="ReaderBlock"><div id="DownloadBook" style="text-align: center;"><img src="{% static "images/download.gif" %}" style="width: 200px;height: 200px;"></div></div>
+{% endblock %}{# body #}
