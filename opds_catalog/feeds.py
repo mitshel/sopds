@@ -319,12 +319,14 @@ class CatalogsFeed(AuthFeed):
             if item['authors']: s += _("<b>Authors: </b>%(authors)s<br/>")
             if item['genres']: s += _("<b>Genres: </b>%(genres)s<br/>")
             if item['series']: s += _("<b>Series: </b>%(series)s<br/>")
+            if item['ser_no']: s += _("<b>No in Series: </b>%(ser_no)s<br/>")
             s += _("<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>")
             s +="<p class='book'>%(annotation)s</p>"
             return s%{'title':item['title'],'filename':item['filename'], 'filesize':item['filesize'],'docdate':item['docdate'],'annotation':item['annotation'],
                       'authors':", ".join(a['full_name'] for a in item['authors']),
                       'genres':", ".join(g['subsection'] for g in item['genres']),
-                      'series':", ".join(s['ser'] for s in item['series']),                     
+                      'series':", ".join(s['ser'] for s in item['series']),
+                      'ser_no': ", ".join(str(s['ser_no']) for s in item['ser_no']),
                       }
                             
 def OpenSearch(request):
@@ -418,7 +420,8 @@ class SearchBooksFeed(AuthFeed):
                 ser_id = int(searchterms)
             except:
                 ser_id = 0
-            books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')    
+            #books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')
+            books = Book.objects.filter(series=ser_id).order_by('bseries__ser_no', 'search_title', '-docdate')
         # Поиск книг по автору и серии
         elif searchtype == "as":
             try:
@@ -427,7 +430,7 @@ class SearchBooksFeed(AuthFeed):
             except:
                 ser_id = 0
                 author_id = 0 
-            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None).order_by('search_title','-docdate')
+            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None).order_by('bseries__ser_no', 'search_title', '-docdate')
         # Поиск книг по жанру
         elif searchtype == 'g':
             try:
@@ -569,6 +572,7 @@ class SearchBooksFeed(AuthFeed):
         if item['authors']: s += _("<b>Authors: </b>%(authors)s<br/>")
         if item['genres']: s += _("<b>Genres: </b>%(genres)s<br/>")
         if item['series']: s += _("<b>Series: </b>%(series)s<br/>")
+        if item['ser_no']: s += _("<b>No in Series: </b>%(ser_no)s<br/>")
         s += _("<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>")
         if item['doubles']: s += _("<b>Doubles count: </b>%(doubles)s<br/>")
         s +="<p class='book'>%(annotation)s</p>"
@@ -576,7 +580,8 @@ class SearchBooksFeed(AuthFeed):
                   'doubles':item['doubles'],'annotation':item['annotation'],
                   'authors':", ".join(a['full_name'] for a in item['authors']),
                   'genres':", ".join(g['subsection'] for g in item['genres']),
-                  'series':", ".join(s['ser'] for s in item['series']),                     
+                  'series':", ".join(s['ser'] for s in item['series']),
+                  'ser_no': ", ".join(str(s['ser_no']) for s in item['ser_no']),
                   }                        
 
 class SelectSeriesFeed(AuthFeed):
