@@ -85,6 +85,10 @@
 				{% if b.doubles > 0 %}
 				<b>{% trans "Doubles for book:" %}</b> <a href="{% url "web:searchbooks" %}?searchtype=d&searchterms={{b.id}}">{{ b.title }} ({{b.doubles}}шт.)</a>
 				{% endif %}
+				{% if b.readtime %}
+				   <b>{% trans "Дата прочтения:" %}</b> {{ b.readtime }}<br>
+				{% endif %}
+
 			</td>
 			</tr>
 			<tr>

@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.views.decorators.vary import vary_on_headers
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.html import strip_tags
+from django.db.models import Q
 from django.http import HttpResponseForbidden
 
 from opds_catalog import models
@@ -180,6 +181,12 @@ def SearchBooksView(request):
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
         #if len(books)>0:
         #    books = books.select_related('authors','genres','series')
+
+        # Добавляем Left Join с таблицей BookShelfб чтобы вытащить дату прочтения книги из книжной полки
+        #books = books.filter(Q(bookshelf__isnull=True)|Q(bookshelf__user=request.user))
+        #books = books.prefetch_related('bookshelf_set')
+        #print(books.query)
+
         
         # Фильтруем дубликаты и формируем выдачу затребованной страницы
         books_count = books.count()
@@ -199,7 +206,9 @@ def SearchBooksView(request):
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')}
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')
+                  #,'readtime':row.bookshelf_set.filter(user=request.user).values('readtime')[0]['readtime']
+                 }
             if summary_DOUBLES_HIDE:
                 title = p['title']
                 authors_set = {a['id'] for a in p['authors']}         
