@@ -83,10 +83,10 @@
 				<b>{% trans "File size:" %}</b> {{ b.filesize }}Кб.<br>
 				<b>{% trans "Changes date:" %}</b> {{ b.docdate }} <br>	
 				{% if b.doubles > 0 %}
-				<b>{% trans "Doubles for book:" %}</b> <a href="{% url "web:searchbooks" %}?searchtype=d&searchterms={{b.id}}">{{ b.title }} ({{b.doubles}}шт.)</a>
+				<b>{% trans "Doubles for book:" %}</b> <a href="{% url "web:searchbooks" %}?searchtype=d&searchterms={{b.id}}">{{ b.title }} ({{b.doubles}}шт.)</a><br>
 				{% endif %}
 				{% if b.readtime %}
-				   <b>{% trans "Дата прочтения:" %}</b> {{ b.readtime }}<br>
+                    <b>{% trans "Read date:" %}</b> <span class="label small">{{ b.readtime.0.readtime }}</span><br>
 				{% endif %}
 
 			</td>

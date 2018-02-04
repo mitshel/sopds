@@ -205,9 +205,9 @@ def SearchBooksView(request):
         for row in books[start:finish+1]:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')
-                  #,'readtime':row.bookshelf_set.filter(user=request.user).values('readtime')[0]['readtime']
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
+                  'authors': row.authors.values(), 'genres': row.genres.values(), 'series': row.series.values(),'ser_no': row.bseries_set.values('ser_no'),\
+                  'readtime':row.bookshelf_set.filter(user=request.user).values('readtime')
                  }
             if summary_DOUBLES_HIDE:
                 title = p['title']
@@ -364,8 +364,10 @@ def CatalogsView(request):
     for row in books_list[op.d2_first_pos:op.d2_last_pos+1]:
         p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
               'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-              'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-              'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')}
+              'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
+              'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no'),\
+              'readtime': row.bookshelf_set.filter(user=request.user).values('readtime')
+             }
         items.append(p)
                     
     args['paginator'] = op.get_data_dict()
