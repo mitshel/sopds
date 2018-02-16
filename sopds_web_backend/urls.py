@@ -2,6 +2,8 @@
 from django.conf.urls import url
 from sopds_web_backend import views
 
+app_name='opds_web_backend'
+
 urlpatterns = [
     url(r'^search/books/$',views.SearchBooksView, name='searchbooks'),
     url(r'^search/authors/$',views.SearchAuthorsView, name='searchauthors'),

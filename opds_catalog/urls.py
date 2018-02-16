@@ -2,6 +2,8 @@
 from django.conf.urls import url
 from opds_catalog import feeds, dl
 
+app_name='opds_catalog'
+
 urlpatterns = [
     url(r'^catalogs/$',feeds.CatalogsFeed(), name='catalogs'),
     url(r'^catalogs/(?P<cat_id>[0-9]+)/$',feeds.CatalogsFeed(), name='cat_tree'),
