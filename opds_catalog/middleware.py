@@ -1,10 +1,9 @@
 import base64
-from django.utils.deprecation import MiddlewareMixin
-
 from django.http import HttpResponse
 from django.contrib import auth
 from django.utils import translation
 from django.middleware.cache import FetchFromCacheMiddleware as DjangoFetchFromCacheMiddleware
+from django.utils.deprecation import MiddlewareMixin
 
 from constance import config
 
@@ -49,6 +48,7 @@ class BasicAuthMiddleware(object):
             return None
 
         return self.unauthed()
+
 
 class SOPDSLocaleMiddleware(MiddlewareMixin):
 

@@ -62,7 +62,7 @@ class FB2Base(BookFile):
             if len(res) == 0:
                 res = tree.xpath('/fb:FictionBook/fb:body//fb:image', namespaces=self.__namespaces)
             cover_id = res[0].get('{' + Namespace.XLINK + '}href')[1:]
-            print(cover_id)
+            #print(cover_id)
             res = tree.xpath('/fb:FictionBook/fb:binary[@id="%s"]' % cover_id, namespaces=self.__namespaces)
             content = base64.b64decode(res[0].text)
             return content
