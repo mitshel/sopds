@@ -23,7 +23,7 @@ from sopds_web_backend.settings import HALF_PAGES_LINKS
 
 def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None):
     actual_decorator = user_passes_test(
-        lambda u: (u.is_authenticated() if config.SOPDS_AUTH else True),
+        lambda u: (u.is_authenticated if config.SOPDS_AUTH else True),
         login_url=reverse_lazy(url),
         redirect_field_name=redirect_field_name
     ) 
@@ -47,12 +47,12 @@ def sopds_processor(request):
     
     if config.SOPDS_AUTH:
         user=request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             result=[]
             for row in bookshelf.objects.filter(user=user).order_by('-readtime')[:8]:
                 book = Book.objects.get(id=row.book_id)
-                p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
-                result.append(p)    
+                p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}
+                result.append(p)
             args['bookshelf']=result
         
     books_count = Counter.objects.get_counter(models.counter_allbooks)

@@ -1,4 +1,5 @@
 import base64
+from django.utils.deprecation import MiddlewareMixin
 
 from django.http import HttpResponse
 from django.contrib import auth
@@ -49,7 +50,7 @@ class BasicAuthMiddleware(object):
 
         return self.unauthed()
 
-class SOPDSLocaleMiddleware:
+class SOPDSLocaleMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
             request.LANG = config.SOPDS_LANGUAGE
@@ -59,7 +60,7 @@ class SOPDSLocaleMiddleware:
 class FetchFromCacheMiddleware(DjangoFetchFromCacheMiddleware):
 
     def process_request(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return None
         else:
             return super(FetchFromCacheMiddleware, self).process_request(request)

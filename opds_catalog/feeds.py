@@ -24,7 +24,7 @@ class AuthFeed(Feed):
     def __call__(self,request,*args,**kwargs):
         self.request = request
         if config.SOPDS_AUTH:
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 return super().__call__(request,*args,**kwargs)
         
         bau = BasicAuthMiddleware()
@@ -173,7 +173,7 @@ class MainFeed(AuthFeed):
                     {"id":5, "title":_("By series"), "link":("opds_catalog:lang_series" if config.SOPDS_ALPHABET_MENU else "opds_catalog:nolang_series"),
                      "descr": _("Series: %(series)s."),"counters":{"series":Counter.objects.get_counter(models.counter_allseries)}},
         ]
-        if config.SOPDS_AUTH and self.request.user.is_authenticated():
+        if config.SOPDS_AUTH and self.request.user.is_authenticated:
             mainitems += [
                         {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
                          "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.filter(user=self.request.user).count(),"username":self.request.user.username}},

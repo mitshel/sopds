@@ -12,8 +12,8 @@ env:
     - DJANGO='django>=2.0'
 
 install:
-    - travis_retry pip install -r requirements.txt
     - travis_retry pip install $DJANGO
+    - travis_retry pip install -r requirements.txt
 
 script:
     - python manage.py test
