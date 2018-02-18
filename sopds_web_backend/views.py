@@ -41,6 +41,7 @@ def sopds_processor(request):
     args['fb2tomobi'] = (config.SOPDS_FB2TOMOBI!="")
     args['fb2toepub'] = (config.SOPDS_FB2TOEPUB!="")
     args['nozip'] = settings.NOZIP_FORMATS
+    args['cache_t']=0
 
     if config.SOPDS_ALPHABET_MENU:
         args['lang_menu'] = lang_menu
@@ -238,7 +239,9 @@ def SearchBooksView(request):
         args['searchterms']=searchterms;
         args['searchtype']=searchtype;
         args['books']=items   
-        args['current'] = 'search'  
+        args['current'] = 'search'
+        args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
+        args['cache_t']=config.SOPDS_CACHE_TIME
         
     return render(request,'sopds_books.html', args)
 
@@ -283,7 +286,9 @@ def SearchSeriesView(request):
         args['searchobject'] = 'series'
         args['current'] = 'search'        
         args['breadcrumbs'] = [_('Series'),_('Search'),searchterms]
-                                              
+        args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
+        args['cache_t']=config.SOPDS_CACHE_TIME
+
     return render(request,'sopds_series.html', args)
 
 @vary_on_headers("HTTP_ACCEPT_LANGUAGE")
@@ -323,6 +328,8 @@ def SearchAuthorsView(request):
         args['searchobject'] = 'author'
         args['current'] = 'search'       
         args['breadcrumbs'] = [_('Authors'),_('Search'),searchterms]
+        args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
+        args['cache_t']=config.SOPDS_CACHE_TIME
                                     
     return render(request,'sopds_authors.html', args)
 
@@ -384,6 +391,8 @@ def CatalogsView(request):
     #breadcrumbs_list.insert(0, (_('Catalogs'),-1))    
     args['breadcrumbs_cat'] =  breadcrumbs_list  
     args['breadcrumbs'] =  [_('Catalogs')]
+    args['cache_id'] = '%s:%s:%s' % (args['current'],cat_id, op.page_num)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
       
     return render(request,'sopds_catalogs.html', args)  
 
@@ -419,6 +428,8 @@ def BooksView(request):
     args['current'] = 'book'      
     args['lang_code'] = lang_code   
     args['breadcrumbs'] =  [_('Books'),_('Select'),lang_menu[lang_code],chars]
+    args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
       
     return render(request,'sopds_selectbook.html', args)      
 
@@ -454,6 +465,8 @@ def AuthorsView(request):
     args['current'] = 'author'      
     args['lang_code'] = lang_code   
     args['breadcrumbs'] =  [_('Authors'),_('Select'),lang_menu[lang_code],chars]
+    args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
       
     return render(request,'sopds_selectauthor.html', args)
 
@@ -489,6 +502,8 @@ def SeriesView(request):
     args['current'] = 'series'      
     args['lang_code'] = lang_code   
     args['breadcrumbs'] =  [_('Series'),_('Select'),lang_menu[lang_code],chars]
+    args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
       
     return render(request,'sopds_selectseries.html', args)
 
@@ -512,7 +527,9 @@ def GenresView(request):
           
     args['items']=items
     args['current'] = 'genre'  
-    args['parent_id'] = section_id     
+    args['parent_id'] = section_id
+    args['cache_id'] = '%s:%s' % (args['current'],section_id)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
        
     return render(request,'sopds_selectgenres.html', args)
 
