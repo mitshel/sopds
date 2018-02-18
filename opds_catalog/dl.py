@@ -7,6 +7,7 @@ import io
 import subprocess
 
 from django.http import HttpResponse, Http404
+from django.views.decorators.cache import cache_page
 
 from opds_catalog.models import Book, bookshelf
 from opds_catalog import settings, utils, opdsdb, fb2parse
@@ -93,6 +94,7 @@ def Download(request, book_id, zip_flag):
     return response
 
 # Новая версия (0.42) процедуры извлечения обложек из файлов книг fb2, epub, mobi
+@cache_page(config.SOPDS_CACHE_TIME)
 def Cover(request, book_id, thumbnail=False):
     """ Загрузка обложки """
     book = Book.objects.get(id=book_id)
