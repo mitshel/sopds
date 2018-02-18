@@ -2,7 +2,7 @@
 #### Author: Dmitry V.Shelepnev
 #### Version 0.45-devel
 
-[README_RUS.md](README_RUS.md)
+[Инструкция на русском языке: README_RUS.md](README_RUS.md)
 
 #### 1. Simple installation of SimpleOPDS (by using sqlite3 database)
 
