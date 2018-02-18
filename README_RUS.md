@@ -336,7 +336,7 @@ MySQL по сравнению с sqlite работает гораздо быст
 **SOPDS_MAXITEMS** - Количество выдаваемых результатов на одну страницу.  
 (по умолчанию SOPDS_MAXITEMS = 60)  
 
-**SOPDS_FB2TOEPUB** и **SOPDS_FB2TOMOBI** задают пути к програмам - конвертерам из FB2 в EPUB и MOBI/  
+**SOPDS_FB2TOEPUB** и **SOPDS_FB2TOMOBI** задают пути к програмам - конвертерам из FB2 в EPUB и MOBI.
 (по умолчанию SOPDS_FB2TOEPUB = "")  
 (по умолчанию SOPDS_FB2TOMOBI = "")  
 

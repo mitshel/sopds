@@ -325,7 +325,7 @@ However, please note that using data from INPX will result in the absence of ann
 **SOPDS_MAXITEMS** - The number of results to be displayed per page.
 (the default is SOPDS_MAXITEMS = 60)
 
-**SOPDS_FB2TOEPUB** and **SOPDS_FB2TOMOBI** set the paths to the programs - converters from FB2 to EPUB and MOBI /
+**SOPDS_FB2TOEPUB** and **SOPDS_FB2TOMOBI** set the paths to the programs - converters from FB2 to EPUB and MOBI.
 (by default SOPDS_FB2TOEPUB = "")
 (by default SOPDS_FB2TOMOBI = "")
 
