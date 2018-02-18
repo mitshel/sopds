@@ -2,6 +2,8 @@
 #### Author: Dmitry V.Shelepnev  
 #### Версия 0.45-devel
 
+[English README.md](README.md)
+
 #### 1. Простая установка SimpleOPDS (используем простую БД sqlite3)
 
 1.1 Установка проекта  
@@ -365,7 +367,7 @@ MySQL по сравнению с sqlite работает гораздо быст
 
 Параметры **SOPDS_SCAN_SHED_XXX** устанавливают значения шедулера, для периодического сканирования коллекции книг при помощи **manage.py sopds_scanner start**.  Возможные значения можно найти на следующей странице: # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#module-apscheduler.triggers.cron  
 Изменения указанных ниже параметров через Web-интерфейс или командную строку проверяется процессом sopds_scanner каждые 10 минут. 
-В случае обнаружения изменений sopds_scanner автоматически вносит соответсвующие изменения в планировщик.
+В случае обнаружения изменений sopds_scanner автоматически вносит соответсвующие изменения в планировщик.  
 
 (по умолчанию SOPDS_SCAN_SHED_MIN = '0')  
 (по умолчанию SOPDS_SCAN_SHED_HOUR = '0,12')  
