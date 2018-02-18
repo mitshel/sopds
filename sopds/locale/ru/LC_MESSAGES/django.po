@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-04 14:38+0300\n"
+"POT-Creation-Date: 2018-02-18 17:59+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,54 +35,58 @@ msgstr "Список расширений файлов, для включени�
 msgid "Turn once scanning directly"
 msgstr "Запустить внеочередное однократное сканирование коллекции книг"
 
-#: .\sopds\settings.py:176
+#: .\sopds\settings.py:175
+msgid "Pages cache time"
+msgstr "Время хранения страницы в кэше"
+
+#: .\sopds\settings.py:177
 msgid "Enable authentication"
 msgstr "Включить аутентификацию"
 
-#: .\sopds\settings.py:177
+#: .\sopds\settings.py:178
 msgid "Enable alphabet submenu"
 msgstr "Включить субменю выбора алфавита"
 
-#: .\sopds\settings.py:178
+#: .\sopds\settings.py:179
 msgid "This flag hides found doublicates"
 msgstr "Флаг прячет найденные дубликаты книг"
 
-#: .\sopds\settings.py:179
+#: .\sopds\settings.py:180
 msgid "This flag activate showing cover of books"
 msgstr "Флаг активирует показ обложек книг"
 
-#: .\sopds\settings.py:180
+#: .\sopds\settings.py:181
 msgid "Max subitems count in alphabet menuitem"
 msgstr "Максимальное число подэлементов в элементах алфавитных меню"
 
-#: .\sopds\settings.py:181
+#: .\sopds\settings.py:182
 msgid "Max items on page"
 msgstr "Максимальное число элементов на странице"
 
-#: .\sopds\settings.py:182
+#: .\sopds\settings.py:183
 msgid "Create downloaded filename from book title"
 msgstr "Имя загружаемого файла формировать из названия книги"
 
-#: .\sopds\settings.py:183
+#: .\sopds\settings.py:184
 msgid "Path to image file showing for book without embedded cover"
 msgstr "Путь к изображению, для показа в качестве обложки для книг без обложек"
 
-#: .\sopds\settings.py:186
+#: .\sopds\settings.py:187
 msgid "This flag activate SAX Parser for FB2 instead of lxml.xpath"
 msgstr ""
 "Флаг активирует стандартный FB2sax парсер (быстрее, парсит даже невалидные "
 "fb2). При отключенной опции будет использован FB2xpath парсер (немного "
 "медленне, требователен к валидности fb2, появился в версии 0.42)"
 
-#: .\sopds\settings.py:187
+#: .\sopds\settings.py:188
 msgid "This flag activate zip files scanning"
 msgstr "Флаг разрешает сканированеи содержимого ZIP файлов"
 
-#: .\sopds\settings.py:188
+#: .\sopds\settings.py:189
 msgid "Set codepage for filenames inside zipfile"
 msgstr "Codepage для имен файлов внутри ZIP"
 
-#: .\sopds\settings.py:189
+#: .\sopds\settings.py:190
 msgid ""
 "Enables read metadata from inpx-file (and stop scanning deeper from ipx-file "
 "place)"
@@ -90,68 +94,68 @@ msgstr ""
 "Считываем метаданные книг з INPX-файлов (при этом не сканируем файлы и "
 "каталоги, расположенные на уровне или ниже найденого INPX)"
 
-#: .\sopds\settings.py:190
+#: .\sopds\settings.py:191
 msgid "Skip scanning INPX with unchanged size after previous scan"
 msgstr ""
 "Не сканируем INPX, если его размер не изменился с предидущего сканирования"
 
-#: .\sopds\settings.py:191
+#: .\sopds\settings.py:192
 msgid "Test avialability zip files listed in INPX before add in collection"
 msgstr ""
 "Проверяем наличие zip файлов, перечисленных в INPX перед добавлением их "
 "содержимого в коллекцию"
 
-#: .\sopds\settings.py:192
+#: .\sopds\settings.py:193
 msgid "Test avialability book files listed in INPX before add in collection"
 msgstr ""
 "Тестируем наличие книг, перечисленных в INPX перед добавлением их "
 "содержимого в коллекцию"
 
-#: .\sopds\settings.py:193
+#: .\sopds\settings.py:194
 msgid "Logical deleting unavialable files"
 msgstr "Логическое удаление отсутствующих файлов"
 
-#: .\sopds\settings.py:195
+#: .\sopds\settings.py:196
 msgid "sheduled minutes for sopds_scanner (cron syntax)"
 msgstr "минуты для планировщика sopds_Scanner (как в cron)"
 
-#: .\sopds\settings.py:196
+#: .\sopds\settings.py:197
 msgid "sheduled hours for sopds_scanner (cron syntax)"
 msgstr "часы для планировщика sopds_Scanner (как в cron)"
 
-#: .\sopds\settings.py:197
+#: .\sopds\settings.py:198
 msgid "sheduled day for sopds_scanner (cron syntax)"
 msgstr "дни для планировщика sopds_Scanner (как в cron)"
 
-#: .\sopds\settings.py:198
+#: .\sopds\settings.py:199
 msgid "sheduled day of weeks for sopds_scanner (cron syntax)"
 msgstr "дни недели для планировщика sopds_Scanner (как в cron)"
 
-#: .\sopds\settings.py:200
+#: .\sopds\settings.py:201
 msgid "Path to FB2-EPUB converter program"
 msgstr "Путь к конвертеру FB2-EPUB"
 
-#: .\sopds\settings.py:201
+#: .\sopds\settings.py:202
 msgid "Path to FB2-MOBI converter program"
 msgstr "Путь к конвертеру FB2-MOBI"
 
-#: .\sopds\settings.py:202
+#: .\sopds\settings.py:203
 msgid "Path to temporary files directory"
 msgstr "Путь к временному каталогу"
 
-#: .\sopds\settings.py:204
+#: .\sopds\settings.py:205
 msgid "Path to logfile for sopds_server process"
 msgstr "Путь к логфайлу для процесса sopds_server"
 
-#: .\sopds\settings.py:205
+#: .\sopds\settings.py:206
 msgid "Path to logfile for sopds_scanner process"
 msgstr "Путь к логфайлу для процесса sopds_scanner"
 
-#: .\sopds\settings.py:206
+#: .\sopds\settings.py:207
 msgid "Path to pidfile for sopds_server process"
 msgstr "Путь к pid-файлу для процесса sopds_server"
 
-#: .\sopds\settings.py:207
+#: .\sopds\settings.py:208
 msgid "Path to pidfile for sopds_scanner process"
 msgstr "Путь к pid-файлу для процесса sopds_scanner"
 

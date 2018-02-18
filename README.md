@@ -363,3 +363,6 @@ In case of detection of changes, sopds_scanner automatically makes the appropria
 
 **SOPDS_SCAN_START_DIRECTLY** - setting this parameter to True will cause the next check of the sopds_scanner flag (every 10 minutes)  
 an extraordinary scan of the collection will be launched, and the specified flag will again be reset to False.  
+
+**SOPDS_CACHE_TIME** - Pages cache time
+(default is SOPDS_CACHE_TIME = 1200)
