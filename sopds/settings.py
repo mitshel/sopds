@@ -152,7 +152,6 @@ USE_TZ = True
 
 CACHE_BACKEND = "locmem://"
 CACHE_MIDDLEWARE_KEY_PREFIX = "sopds"
-SOPDS_CACHE_TIME = 1200
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
