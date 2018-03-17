@@ -203,49 +203,54 @@ class opdsScanner:
         if e.lower() in config.SOPDS_BOOK_EXTENSIONS.split():
             rel_path=os.path.relpath(full_path,config.SOPDS_ROOT_LIB)
             self.logger.debug("Attempt to add book "+rel_path+"/"+name)
-            if opdsdb.findbook(name, rel_path, 1) == None:
-                if archive==0:
-                    cat=opdsdb.addcattree(rel_path,archive)
+            try:
+                if opdsdb.findbook(name, rel_path, 1) == None:
+                    if archive==0:
+                        cat=opdsdb.addcattree(rel_path,archive)
 
-                try:
-                    book_data = create_bookfile(file, name)
-                except Exception as err:
-                    book_data = None
-                    self.logger.warning(rel_path + ' - ' + name + ' Book parse error, skipping... (Error: %s)'%err)
-                    self.bad_books += 1
+                    try:
+                        book_data = create_bookfile(file, name)
+                    except Exception as err:
+                        book_data = None
+                        self.logger.warning(rel_path + ' - ' + name + ' Book parse error, skipping... (Error: %s)'%err)
+                        self.bad_books += 1
 
-                if book_data:
-                    lang = book_data.language_code.strip(strip_symbols) if book_data.language_code else ''
-                    title = book_data.title.strip(strip_symbols) if book_data.title else n
-                    annotation = book_data.description if book_data.description else ''
-                    annotation = annotation.strip(strip_symbols) if isinstance(annotation, str) else annotation.decode('utf8').strip(strip_symbols)
-                    docdate = book_data.docdate if book_data.docdate else ''
+                    if book_data:
+                        lang = book_data.language_code.strip(strip_symbols) if book_data.language_code else ''
+                        title = book_data.title.strip(strip_symbols) if book_data.title else n
+                        annotation = book_data.description if book_data.description else ''
+                        annotation = annotation.strip(strip_symbols) if isinstance(annotation, str) else annotation.decode('utf8').strip(strip_symbols)
+                        docdate = book_data.docdate if book_data.docdate else ''
 
-                    book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
-                    self.books_added+=1
+                        book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
+                        self.books_added+=1
 
-                    if archive!=0:
-                        self.books_in_archives+=1
-                    self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
+                        if archive!=0:
+                            self.books_in_archives+=1
+                        self.logger.debug("Book "+rel_path+"/"+name+" Added ok.")
 
-                    for a in book_data.authors:
-                        author_name = a.get('name',_('Unknown author')).strip(strip_symbols)
-                        # Если в имени автора нет запятой, то фамилию переносим из конца в начало
-                        if author_name and author_name.find(',')<0:
-                            author_names = author_name.split()
-                            author_name = ' '.join([author_names[-1],' '.join(author_names[:-1])])
-                        author=opdsdb.addauthor(author_name)
-                        opdsdb.addbauthor(book,author)
+                        for a in book_data.authors:
+                            author_name = a.get('name',_('Unknown author')).strip(strip_symbols)
+                            # Если в имени автора нет запятой, то фамилию переносим из конца в начало
+                            if author_name and author_name.find(',')<0:
+                                author_names = author_name.split()
+                                author_name = ' '.join([author_names[-1],' '.join(author_names[:-1])])
+                            author=opdsdb.addauthor(author_name)
+                            opdsdb.addbauthor(book,author)
 
-                    for genre in book_data.tags:
-                        opdsdb.addbgenre(book,opdsdb.addgenre(genre.lower().strip(strip_symbols)))
+                        for genre in book_data.tags:
+                            opdsdb.addbgenre(book,opdsdb.addgenre(genre.lower().strip(strip_symbols)))
 
 
-                    if book_data.series_info:
-                        ser = opdsdb.addseries(book_data.series_info['title'])
-                        ser_no = book_data.series_info['index']  or '0'
-                        ser_no = int(ser_no) if ser_no.isdigit() else 0
-                        opdsdb.addbseries(book,ser,ser_no)
-            else:
-                self.books_skipped+=1
-                self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
+                        if book_data.series_info:
+                            ser = opdsdb.addseries(book_data.series_info['title'])
+                            ser_no = book_data.series_info['index']  or '0'
+                            ser_no = int(ser_no) if ser_no.isdigit() else 0
+                            opdsdb.addbseries(book,ser,ser_no)
+                else:
+                    self.books_skipped+=1
+                    self.logger.debug("Book "+rel_path+"/"+name+" Already in DB.")
+            except UnicodeEncodeError as err:
+                self.logger.warning(rel_path + ' - ' + name + ' Book UnicodeEncodeError error, skipping... (Error: %s)' % err)
+                self.bad_books += 1
+
