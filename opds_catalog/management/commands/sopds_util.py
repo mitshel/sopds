@@ -78,9 +78,10 @@ class Command(BaseCommand):
             
     def getconf(self, confparam):  
         if confparam:
-            call_command('constance', 'get', confparam, app_label='opds_catalog')
+            call_command('constance', 'get', confparam)
         else:
-            call_command('constance', 'list', app_label='opds_catalog')
+            # call_command('constance', 'list', app_label='opds_catalog')
+            call_command('constance', 'list')
 
     def pg_optimize(self):
         opdsdb.pg_optimize(True)
