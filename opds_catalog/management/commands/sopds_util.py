@@ -48,7 +48,7 @@ class Command(BaseCommand):
         with transaction.atomic():
             opdsdb.clear_all(self.verbose)
         if not self.nogenres:
-            call_command('loaddata', 'genre.json', app_label='opds_catalog') 
+            call_command('loaddata', 'genre.json')
         Counter.objects.update_known_counters()
         opdsdb.pg_optimize(False)
         
@@ -61,18 +61,18 @@ class Command(BaseCommand):
         self.stdout.write('Series count   = %s'%Counter.objects.get_counter(models.counter_allseries))  
         
     def save_mygenres(self):     
-        call_command('dumpdata', 'opds_catalog.genre','--output','opds_catalog/fixtures/mygenres.json', app_label='opds_catalog')  
+        call_command('dumpdata', 'opds_catalog.genre','--output','opds_catalog/fixtures/mygenres.json')
         self.stdout.write('Genre dump saved in opds_catalog/fixtures/mygenres.json')
         
     def load_mygenres(self):  
         opdsdb.clear_genres(self.verbose)   
-        call_command('loaddata', 'mygenres.json', app_label='opds_catalog')  
+        call_command('loaddata', 'mygenres.json')
         Counter.objects.update_known_counters()
         self.stdout.write('Genres load from opds_catalog/fixtures/mygenres.json')
         
     def setconf(self, confparam, confvalue):  
         if confparam and confvalue:
-            call_command('constance', 'set',confparam, confvalue, app_label='opds_catalog')
+            call_command('constance', 'set',confparam, confvalue)
             self.stdout.write('Config parameter %s set to %s'%(confparam, confvalue))
             
             
@@ -80,7 +80,6 @@ class Command(BaseCommand):
         if confparam:
             call_command('constance', 'get', confparam)
         else:
-            # call_command('constance', 'list', app_label='opds_catalog')
             call_command('constance', 'list')
 
     def pg_optimize(self):

@@ -59,12 +59,12 @@ def clear_all(verbose=False):
     cursor.execute('delete from opds_catalog_bseries')
     cursor.execute('delete from opds_catalog_bauthor')
     cursor.execute('delete from opds_catalog_bgenre')
+    cursor.execute('delete from opds_catalog_bookshelf')
     cursor.execute('delete from opds_catalog_book')
     cursor.execute('delete from opds_catalog_catalog')
     cursor.execute('delete from opds_catalog_author')
     cursor.execute('delete from opds_catalog_genre')
     cursor.execute('delete from opds_catalog_series')
-    cursor.execute('delete from opds_catalog_bookshelf')
     cursor.execute('delete from opds_catalog_counter')
     
 def clear_genres(verbose=False):
