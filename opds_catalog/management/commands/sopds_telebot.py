@@ -7,10 +7,10 @@ from django.core.management.base import BaseCommand
 from django.db import transaction, connection, connections
 from django.conf import settings as main_settings
 
-from opds_catalog.models import Counter
-from opds_catalog.sopdscan import opdsScanner
+from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre, lang_menu
 from opds_catalog import settings 
 from constance import config
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
@@ -56,12 +56,40 @@ class Command(BaseCommand):
             pid = open(self.pidfile, "r").read()
             self.restart(pid)
 
+    def startCommand(self, bot, update):
+        bot.sendMessage(chat_id=update.message.chat_id, text="Здравствуйте %s! Для поиска книги, введите ее полное наименование или часть:"%(update.message.from_user.username))
+        self.logger.info("Start talking with user: %s"%update.message.from_user)
+
+    def textMessage(self, bot, update):
+        book_name=update.message.text
+        response = 'Выполняю поиск книги: %s' % (book_name)
+        self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, book_name))
+        bot.send_message(chat_id=update.message.chat_id, text=response)
+        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
+        books = Book.objects.filter(search_title__contains=book_name.upper()).order_by('search_title', '-docdate')
+        response = "Найдено %s книг. Выберите нужную для скачивания."%books.count()
+        bot.send_message(chat_id=update.message.chat_id, text=response)
+        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
+        if books.count()>0:
+            for b in books:
+                bot.send_message(chat_id=update.message.chat_id, text=b.title)
+                # bot.send_message(chat_id=update.message.chat_id, text=(', '.join(a['full_name']) for a in b.authors.values()) )
+                bot.send_message(chat_id=update.message.chat_id, text="Скачать книгу: %s\n\n"%b.filename)
+
     def start(self):
         writepid(self.pidfile)
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
         self.stdout.write("Quit the sopds_telebot with %s.\n"%quit_command)
         try:
-            self.sched.start()
+            updater = Updater(token=config.SOPDS_TELEBOT_API_TOKEN)
+
+            start_command_handler = CommandHandler('start', self.startCommand)
+            text_message_handler = MessageHandler(Filters.text, self.textMessage)
+
+            updater.dispatcher.add_handler(start_command_handler)
+            updater.dispatcher.add_handler(text_message_handler)
+            updater.start_polling(clean=True)
+            updater.idle()
         except (KeyboardInterrupt, SystemExit):
             pass            
     
