@@ -1,6 +1,6 @@
 #### SimpleOPDS Catalog - Простой OPDS Каталог
 #### Author: Dmitry V.Shelepnev  
-#### Версия 0.45-devel
+#### Версия 0.45
 
 [English README.md](README.md)
 
