@@ -173,6 +173,8 @@ CONSTANCE_CONFIG = OrderedDict([
     ('SOPDS_BOOK_EXTENSIONS', ('.pdf .djvu .fb2 .epub .mobi', _('List of managed book files extensions'))),
     ('SOPDS_SCAN_START_DIRECTLY', (False,_('Turn once scanning directly'))),
     ('SOPDS_CACHE_TIME', (1200, _('Pages cache time'))),
+
+    ('SOPDS_TELEBOT_API_TOKEN', ('', _('Telegramm API Token'))),
     
     ('SOPDS_AUTH', (True,_('Enable authentication'))),
     ('SOPDS_ALPHABET_MENU', (True,_('Enable alphabet submenu'))),   
@@ -204,8 +206,10 @@ CONSTANCE_CONFIG = OrderedDict([
 
     ('SOPDS_SERVER_LOG', (os.path.join(BASE_DIR,'opds_catalog/log/sopds_server.log'),_('Path to logfile for sopds_server process'))),
     ('SOPDS_SCANNER_LOG', (os.path.join(BASE_DIR,'opds_catalog/log/sopds_scanner.log'),_('Path to logfile for sopds_scanner process'))),
+    ('SOPDS_TELEBOT_LOG', (os.path.join(BASE_DIR, 'opds_catalog/log/sopds_telebot.log'), _('Path to logfile for sopds_telebot process'))),
     ('SOPDS_SERVER_PID', (os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_server.pid'),_('Path to pidfile for sopds_server process'))),
     ('SOPDS_SCANNER_PID', (os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_scanner.pid'),_('Path to pidfile for sopds_scanner process'))),
+    ('SOPDS_TELEBOT_PID', (os.path.join(BASE_DIR, 'opds_catalog/tmp/sopds_telebot.pid'), _('Path to pidfile for sopds_telebot process'))),
                       
 ])
 
@@ -214,8 +218,9 @@ CONSTANCE_CONFIG_FIELDSETS = {
     '2. Server Options': ('SOPDS_AUTH', 'SOPDS_ALPHABET_MENU', 'SOPDS_DOUBLES_HIDE', 'SOPDS_COVER_SHOW', 'SOPDS_SPLITITEMS', 'SOPDS_MAXITEMS', 'SOPDS_TITLE_AS_FILENAME', 'SOPDS_NOCOVER_PATH'),    
     '3. Scanner Options': ('SOPDS_FB2SAX','SOPDS_ZIPSCAN','SOPDS_ZIPCODEPAGE', 'SOPDS_INPX_ENABLE', 'SOPDS_INPX_SKIP_UNCHANGED', 'SOPDS_INPX_TEST_ZIP', 'SOPDS_INPX_TEST_FILES', 'SOPDS_DELETE_LOGICAL'),
     '4. Scanner Shedule': ('SOPDS_SCAN_SHED_MIN', 'SOPDS_SCAN_SHED_HOUR', 'SOPDS_SCAN_SHED_DAY','SOPDS_SCAN_SHED_DOW'),
-    '5. Converters Options': ('SOPDS_FB2TOEPUB', 'SOPDS_FB2TOMOBI', 'SOPDS_TEMP_DIR'),   
-    '6. Log & PID Files': ('SOPDS_SERVER_LOG', 'SOPDS_SCANNER_LOG', 'SOPDS_SERVER_PID','SOPDS_SCANNER_PID'),
+    '5. Telegramm Bot Options': ('SOPDS_TELEBOT_API_TOKEN'),
+    '6. Converters Options': ('SOPDS_FB2TOEPUB', 'SOPDS_FB2TOMOBI', 'SOPDS_TEMP_DIR'),
+    '7. Log & PID Files': ('SOPDS_SERVER_LOG', 'SOPDS_SCANNER_LOG', 'SOPDS_TELEBOT_LOG','SOPDS_SERVER_PID','SOPDS_SCANNER_PID','SOPDS_TELEBOT_PID'),
 }
 
 
