@@ -22,7 +22,7 @@ or from github.com with the following command:
 
 The following dependencies should be established for the project:
 
-    yum install python3                            # setup command for RedHad, Fedora, CentOS
+    yum install python3                            # setup command for RHEL, Fedora, CentOS
     python3 -m pip install -r requirements.txt
 
 1.3 We initialize the database and fill in the initial data (genres)
@@ -67,8 +67,7 @@ If all previous steps were successful, then the library can be accessed by the f
 >     HTTP-version: http://<Your server>:8001/
 
 It should be taken into account that by default the project uses a simple sqlite3 database, which
-is one-user. Therefore, until the scanning process is completed, the
-previous attempts to access the server may result in an error
+is one-user. Therefore, until the scanning process is completed, the attempts to access the server may result in an error
 "A server error occurred." Please contact the administrator. "
 To eliminate this problem, you need to use multi-user databases, for example MYSQL.
 
