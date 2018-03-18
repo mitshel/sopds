@@ -19,6 +19,58 @@ from book_tools.format.mimetype import Mimetype
 from constance import config
 from PIL import Image
 
+def getFileName(book):
+    if config.SOPDS_TITLE_AS_FILENAME:
+        transname = utils.translit(book.title + '.' + book.format)
+    else:
+        transname = utils.translit(book.filename)
+
+    return utils.to_ascii(transname)
+
+
+def getFileData(book):
+    full_path = os.path.join(config.SOPDS_ROOT_LIB, book.path)
+    if book.cat_type==opdsdb.CAT_INP:
+        # Убираем из пути INPX файл
+        inpx_path, zip_name = os.path.split(full_path)
+        path, inpx_file = os.path.split(inpx_path)
+        full_path = os.path.join(path,zip_name)
+
+    z = None
+    fz = None
+    s = None
+    if book.cat_type==opdsdb.CAT_NORMAL:
+        file_path=os.path.join(full_path, book.filename)
+        try:
+            fo=codecs.open(file_path, "rb")
+            s = fo.read()
+        except FileNotFoundError:
+            s = None
+
+    elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
+        try:
+            fz=codecs.open(full_path, "rb")
+            z = zipfile.ZipFile(fz, 'r', allowZip64=True)
+            fo= z.open(book.filename)
+            s=fo.read()
+        except FileNotFoundError:
+            s = None
+
+    fo.close()
+    if z: z.close()
+    if fz: fz.close()
+
+    return s
+
+def getFileDataZip(s,transname):
+    dio = io.BytesIO()
+    zo = zipfile.ZipFile(dio, 'w', zipfile.ZIP_DEFLATED)
+    zo.writestr(transname, s)
+    zo.close()
+    buf = dio.getvalue()
+
+    return buf
+
 def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """
     book = Book.objects.get(id=book_id)
