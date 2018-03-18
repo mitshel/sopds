@@ -43,7 +43,7 @@ class Command(BaseCommand):
                       
     def start(self):
         writepid(self.pidfile)
-        call_command('runserver',addrport='%s:%s'%(self.addr,self.port), use_reloader=False, app_label='opds_catalog')
+        call_command('runserver',addrport='%s:%s'%(self.addr,self.port), use_reloader=False)
 
     def stop(self, pid):
         try:
