@@ -208,7 +208,7 @@ def SearchBooksView(request):
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
                   'authors': row.authors.values(), 'genres': row.genres.values(), 'series': row.series.values(),'ser_no': row.bseries_set.values('ser_no'),\
-                  'readtime':row.bookshelf_set.filter(user=request.user).values('readtime')
+                  'readtime':row.bookshelf_set.filter(user=request.user).values('readtime') if config.SOPDS_AUTH else None
                  }
             if summary_DOUBLES_HIDE:
                 title = p['title']
