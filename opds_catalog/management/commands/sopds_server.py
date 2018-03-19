@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from django.core.management import call_command
 
 #from opds_catalog.settings import SERVER_LOG, SERVER_PID
-#from opds_catalog import settings
+#from opds_cgit branchtalog import settings
 from constance import config
 
 class Command(BaseCommand):
