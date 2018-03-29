@@ -39,37 +39,45 @@ def getFileData(book):
     z = None
     fz = None
     s = None
+    fo = None
+
+    #print("************ ТИП КНИГИ: %s"%book.cat_type)
+
     if book.cat_type==opdsdb.CAT_NORMAL:
         file_path=os.path.join(full_path, book.filename)
         try:
+            #print("************ ПУТЬ К КНИГЕ: %s" % file_path)
             fo=codecs.open(file_path, "rb")
-            s = fo.read()
+            #s = fo.read()
         except FileNotFoundError:
-            s = None
+            #s = None
+            fo = None
 
     elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
         try:
             fz=codecs.open(full_path, "rb")
             z = zipfile.ZipFile(fz, 'r', allowZip64=True)
             fo= z.open(book.filename)
-            s=fo.read()
+            #s=fo.read()
         except FileNotFoundError:
-            s = None
+            #s = None
+            fo = None
 
-    fo.close()
-    if z: z.close()
-    if fz: fz.close()
+    #if fo: fo.close()
+    #if z: z.close()
+    #if fz: fz.close()
 
-    return s
+    return fo
 
-def getFileDataZip(s,transname):
+def getFileDataZip(fo,transname):
     dio = io.BytesIO()
     zo = zipfile.ZipFile(dio, 'w', zipfile.ZIP_DEFLATED)
-    zo.writestr(transname, s)
+    zo.writestr(transname, fo.read())
     zo.close()
-    buf = dio.getvalue()
+    dio.seek(0)
+    #buf = dio.getvalue()
 
-    return buf
+    return dio
 
 def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """

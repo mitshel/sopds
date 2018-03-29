@@ -11,8 +11,8 @@ from django.urls import reverse
 from opds_catalog.models import Book, Author
 from opds_catalog import settings, dl
 from constance import config
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Document
 
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
@@ -111,7 +111,7 @@ class Command(BaseCommand):
         authors = ', '.join([a['full_name'] for a in book.authors.values()])
         response = '<b>%(title)s</b>\n%(author)s\n<b>Аннотация:</b>%(annotation)s\n' % {'title': book.title, 'author': authors, 'annotation':book.annotation}
 
-        buttons = [InlineKeyboardButton(book.format.upper(), callback_data='/getfile%s'%book_id)]
+        buttons = [InlineKeyboardButton(book.format.upper(), callback_data='/getfileorig%s'%book_id)]
                                         # url=config.SOPDS_SITE_ROOT+reverse("opds_catalog:download", kwargs={"book_id": book.id, "zip_flag": 0}))]
         if not book.format in settings.NOZIP_FORMATS:
             buttons += [InlineKeyboardButton(book.format.upper()+'.ZIP', callback_data='/getfilezip%s'%book_id)]
@@ -127,8 +127,9 @@ class Command(BaseCommand):
         bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
         self.logger.info("Send download buttons.")
 
-    def getBookFile(self, bot, update):
-        book_id_set=re.findall(r'\d+$',update.message.text)
+    def getBookFile(self, bot, update, user_data):
+        query = update.callback_query
+        book_id_set=re.findall(r'\d+$',query.data)
         if len(book_id_set)==1:
             try:
                 book_id=int(book_id_set[0])
@@ -141,35 +142,35 @@ class Command(BaseCommand):
 
         if book==None:
             response = 'Книга по указанной Вами ссылке не найдена, попробуйте повторить поиск книги сначала.'
-            bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
+            bot.sendMessage(chat_id=query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
 
-        filename=dl.getFileName(book)
-        bot.send_document(chat_id=update.message.chat_id, document=dl.getFileData(book),filename=filename)
-        self.logger.info("Send file: %s" % filename)
+        filename = dl.getFileName(book)
+        document = None
 
-    def getBookFileZip(self, bot, update):
-        book_id_set=re.findall(r'\d+$',update.message.text)
-        if len(book_id_set)==1:
-            try:
-                book_id=int(book_id_set[0])
-                book=Book.objects.get(id=book_id)
-            except:
-                book=None
+        if re.match(r'/getfileorig',query.data):
+            document = dl.getFileData(book)
+            #document = config.SOPDS_SITE_ROOT + reverse("opds_catalog:download",kwargs={"book_id": book.id, "zip_flag": 0})
+
+
+        if re.match(r'/getfilezip',query.data):
+            document = dl.getFileDataZip(dl.getFileData(book), filename)
+            #document = config.SOPDS_SITE_ROOT + reverse("opds_catalog:download", kwargs={"book_id": book.id, "zip_flag": 1})
+            filename = filename + '.zip'
+
+        if document:
+            bot.send_document(chat_id=query.message.chat_id,document=document,filename=filename)
+            self.logger.info("Send file: %s" % filename)
         else:
-            book_id=None
-            book=None
-
-        if book==None:
-            response = 'Книга по указанной Вами ссылке не найдена, попробуйте повторить поиск книги сначала.'
-            bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
-            self.logger.info("Not find download links: %s" % response)
+            response = 'Возникла техническая ошибка, обратитесь к администратору сайта.'
+            bot.sendMessage(chat_id=query.message.chat_id, text=response, parse_mode='HTML')
+            self.logger.info("Book get error: %s" % response)
             return
 
-        filename=dl.getFileName(book)
-        bot.send_document(chat_id=update.message.chat_id, document=dl.getFileDataZip(dl.getFileData(book),filename),filename=filename+'.zip')
-        self.logger.info("Send file: %s" % (filename+'.zip'))
+        user_data['type'] = query.data;
+
+        return
 
     def start(self):
         writepid(self.pidfile)
@@ -181,14 +182,12 @@ class Command(BaseCommand):
             start_command_handler = CommandHandler('start', self.startCommand)
             getBook_handler = MessageHandler(Filters.text, self.getBooks)
             download_handler = RegexHandler('^/download\d+$',self.downloadBooks)
-            sendfile_handler = RegexHandler('^/getfile\d+$', self.getBookFile)
-            sendfilezip_handler = RegexHandler('^/getfilezip\d+$', self.getBookFileZip)
 
             updater.dispatcher.add_handler(start_command_handler)
             updater.dispatcher.add_handler(getBook_handler)
             updater.dispatcher.add_handler(download_handler)
-            updater.dispatcher.add_handler(sendfile_handler)
-            updater.dispatcher.add_handler(sendfilezip_handler)
+            updater.dispatcher.add_handler(CallbackQueryHandler(self.getBookFile, pass_user_data=True))
+
             updater.start_polling(clean=True)
             updater.idle()
         except (KeyboardInterrupt, SystemExit):
