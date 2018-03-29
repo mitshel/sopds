@@ -80,12 +80,12 @@ class Command(BaseCommand):
         books = Book.objects.filter(search_title__contains=book_name.upper()).order_by('search_title', '-docdate')
         bcount = books.count()
 
-        response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.' if bcount==0 else 'Найдено %s книг(и). Выберите нужную для скачивания.'%bcount
+        response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.' if bcount==0 else 'Найдено %s книг(и) (Показано только 20 первых). \nВыберите нужную для скачивания.'%bcount
         bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
 
         if books.count()>0:
-            for b in books:
+            for b in books[0:20]:
                 authors = ', '.join([a['full_name'] for a in b.authors.values()])
                 response='<b>%(title)s</b>\n%(author)s\n/download%(link)s\n\n'%{'title':b.title, 'author':authors,'link':b.id}
                 bot.send_message(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
