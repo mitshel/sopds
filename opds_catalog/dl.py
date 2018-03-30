@@ -103,7 +103,7 @@ def getFileDataConv(book, convert_type):
 
     tmp_fb2_path = os.path.join(config.SOPDS_TEMP_DIR, book.filename)
     tmp_conv_path = os.path.join(config.SOPDS_TEMP_DIR, dlfilename)
-    fw = open(tmp_fb2_path,'w')
+    fw = open(tmp_fb2_path,'wb')
     fw.write(fo.read())
     fw.close()
     fo.close()
