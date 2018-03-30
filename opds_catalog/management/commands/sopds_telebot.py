@@ -86,7 +86,7 @@ class Command(BaseCommand):
         q_objects.add(Q(search_title__contains=book_name.upper()), Q.OR)
         q_objects.add( Q(authors__search_full_name__contains=book_name.upper()), Q.OR)
 
-        books = Book.objects.filter(q_objects).order_by('search_title', '-docdate')
+        books = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
         bcount = books.count()
 
         response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.' if bcount==0 else 'Найдено %s книг(и) (Показано только 10 первых). \nВыберите нужную для скачивания.'%bcount
