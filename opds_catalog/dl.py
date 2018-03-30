@@ -41,12 +41,9 @@ def getFileData(book):
     s = None
     fo = None
 
-    #print("************ ТИП КНИГИ: %s"%book.cat_type)
-
     if book.cat_type==opdsdb.CAT_NORMAL:
         file_path=os.path.join(full_path, book.filename)
         try:
-            #print("************ ПУТЬ К КНИГЕ: %s" % file_path)
             fo=codecs.open(file_path, "rb")
             #s = fo.read()
         except FileNotFoundError:
@@ -69,7 +66,9 @@ def getFileData(book):
 
     return fo
 
-def getFileDataZip(fo,transname):
+def getFileDataZip(book):
+    transname = getFileName(book)
+    fo = getFileData(book)
     dio = io.BytesIO()
     zo = zipfile.ZipFile(dio, 'w', zipfile.ZIP_DEFLATED)
     zo.writestr(transname, fo.read())
@@ -78,6 +77,57 @@ def getFileDataZip(fo,transname):
     #buf = dio.getvalue()
 
     return dio
+
+def getFileDataConv(book, convert_type):
+
+    if book.format != 'fb2':
+       return None
+
+    fo = getFileData(book)
+
+    if not fo:
+        return None
+
+    transname = getFileName(book)
+
+    (n, e) = os.path.splitext(transname)
+    dlfilename = "%s.%s" % (n, convert_type)
+
+    if convert_type == 'epub':
+        converter_path = config.SOPDS_FB2TOEPUB
+    elif convert_type == 'mobi':
+        converter_path = config.SOPDS_FB2TOMOBI
+    else:
+        fo.close()
+        return None
+
+    tmp_fb2_path = os.path.join(config.SOPDS_TEMP_DIR, book.filename)
+    tmp_conv_path = os.path.join(config.SOPDS_TEMP_DIR, dlfilename)
+    fw = open(tmp_fb2_path,'w')
+    fw.write(fo.read())
+    fw.close()
+    fo.close()
+
+    popen_args = ("\"%s\" \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, tmp_conv_path))
+    proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE)
+    out = proc.stdout.readlines()
+    os.remove(tmp_fb2_path)
+
+    if os.path.isfile(tmp_conv_path):
+        fo = codecs.open(tmp_conv_path, "rb")
+    else:
+        return None
+
+    # Как то нужно удалять временный файл после отдачи его
+    # os.remove(tmp_conv_path)
+
+    return fo
+
+def getFileDataEpub(book):
+    return getFileDataConv(book,'epub')
+
+def getFileDataMobi(book):
+    return getFileDataConv(book,'mobi')
 
 def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """
