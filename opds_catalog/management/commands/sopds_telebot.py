@@ -84,7 +84,6 @@ class Command(BaseCommand):
         if len(book_name) < 3:
             return
 
-        #books = Book.objects.filter(search_title__contains=book_name.upper()).order_by('search_title', '-docdate')
         q_objects = Q()
         q_objects.add(Q(search_title__contains=book_name.upper()), Q.OR)
         q_objects.add( Q(authors__search_full_name__contains=book_name.upper()), Q.OR)
@@ -98,7 +97,7 @@ class Command(BaseCommand):
             self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
             return
 
-        response = 'Найдено %s книг(и). \nВыберите нужную для скачивания.' % books_count
+        response = 'Найдено %s книг(и). \nФормирую список, через несколько секунд выберите нужную для скачивания:' % books_count
         bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
 
