@@ -150,8 +150,8 @@ class Command(BaseCommand):
         response = ''
         for b in items:
             authors = ', '.join([a['full_name'] for a in b['authors']])
-            doubles = ' (дубл.:%s)'%b['doubles'] if b['doubles'] else ''
-            response+='<b>%(title)s</b>%(dbl)s\n%(author)s\n/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
+            doubles = '(дубликатов:%s) '%b['doubles'] if b['doubles'] else ''
+            response+='<b>%(title)s</b>\n%(author)s\n%(dbl)s/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
 
         buttons = [InlineKeyboardButton('1 <<', callback_data='/p1'),
                    InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='/p%s'%op.previous_page_number),
