@@ -103,7 +103,7 @@ class Command(BaseCommand):
 
         page_num = 1
         #op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)
-        op = OPDS_Paginator(books_count, 0, page_num, 5, HALF_PAGES_LINKS)
+        op = OPDS_Paginator(books_count, 0, page_num, 8, HALF_PAGES_LINKS)
         items = []
 
         prev_title = ''
