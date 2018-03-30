@@ -6,6 +6,7 @@ import re
 
 from django.core.management.base import BaseCommand
 from django.conf import settings as main_settings
+from django.db.models import Q
 from django.urls import reverse
 
 from opds_catalog.models import Book, Author
@@ -13,6 +14,8 @@ from opds_catalog import settings, dl
 from constance import config
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Document
+
+
 
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
@@ -59,7 +62,8 @@ class Command(BaseCommand):
             self.restart(pid)
 
     def startCommand(self, bot, update):
-        bot.sendMessage(chat_id=update.message.chat_id, text="Здравствуйте %s! Для поиска книги, введите ее полное наименование или часть:"%(update.message.from_user.username))
+        bot.sendMessage(chat_id=update.message.chat_id, text="%s\nЗдравствуйте %s! Для поиска книги, введите часть ее наименования или автора:"%
+                                                             (settings.SUBTITLE,update.message.from_user.username))
         self.logger.info("Start talking with user: %s"%update.message.from_user)
 
     def getBooks(self, bot, update):
@@ -77,7 +81,12 @@ class Command(BaseCommand):
         if len(book_name) < 3:
             return
 
-        books = Book.objects.filter(search_title__contains=book_name.upper()).order_by('search_title', '-docdate')
+        #books = Book.objects.filter(search_title__contains=book_name.upper()).order_by('search_title', '-docdate')
+        q_objects = Q()
+        q_objects.add(Q(search_title__contains=book_name.upper()), Q.OR)
+        q_objects.add( Q(authors__search_full_name__contains=book_name.upper()), Q.OR)
+
+        books = Book.objects.filter(q_objects).order_by('search_title', '-docdate')
         bcount = books.count()
 
         response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.' if bcount==0 else 'Найдено %s книг(и) (Показано только 20 первых). \nВыберите нужную для скачивания.'%bcount
