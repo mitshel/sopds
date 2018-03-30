@@ -6,11 +6,14 @@ import re
 
 from django.core.management.base import BaseCommand
 from django.conf import settings as main_settings
+from django.utils.html import strip_tags
 from django.db.models import Q
 from django.urls import reverse
 
 from opds_catalog.models import Book, Author
 from opds_catalog import settings, dl
+from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
+from sopds_web_backend.settings import HALF_PAGES_LINKS
 from constance import config
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Document
@@ -87,17 +90,79 @@ class Command(BaseCommand):
         q_objects.add( Q(authors__search_full_name__contains=book_name.upper()), Q.OR)
 
         books = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
-        bcount = books.count()
+        books_count = books.count()
 
-        response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.' if bcount==0 else 'Найдено %s книг(и) (Показано только 10 первых). \nВыберите нужную для скачивания.'%bcount
+        if books_count == 0:
+            response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.'
+            bot.send_message(chat_id=update.message.chat_id, text=response)
+            self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
+            return
+
+        response = 'Найдено %s книг(и). \nВыберите нужную для скачивания.' % books_count
         bot.send_message(chat_id=update.message.chat_id, text=response)
-        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
+        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
 
-        if bcount>0:
-            for b in books[0:10]:
-                authors = ', '.join([a['full_name'] for a in b.authors.values()])
-                response='<b>%(title)s</b>\n%(author)s\n/download%(link)s\n\n'%{'title':b.title, 'author':authors,'link':b.id}
-                bot.send_message(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
+        page_num = 1
+        #op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)
+        op = OPDS_Paginator(books_count, 0, page_num, 5, HALF_PAGES_LINKS)
+        items = []
+
+        prev_title = ''
+        prev_authors_set = set()
+
+        # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
+        # свои дубликаты если они есть
+        summary_DOUBLES_HIDE = config.SOPDS_DOUBLES_HIDE
+        start = op.d1_first_pos if ((op.d1_first_pos == 0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos - 1
+        finish = op.d1_last_pos
+
+        for row in books[start:finish + 1]:
+            p = {'doubles': 0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
+                 'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
+                 'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize // 1000, \
+                 'authors': row.authors.values(), 'genres': row.genres.values(), 'series': row.series.values(),
+                 'ser_no': row.bseries_set.values('ser_no')
+                 }
+            if summary_DOUBLES_HIDE:
+                title = p['title']
+                authors_set = {a['id'] for a in p['authors']}
+                if title.upper() == prev_title.upper() and authors_set == prev_authors_set:
+                    items[-1]['doubles'] += 1
+                else:
+                    items.append(p)
+                prev_title = title
+                prev_authors_set = authors_set
+            else:
+                items.append(p)
+
+        # "вытягиваем" дубликаты книг со следующей страницы и удаляем первый элемент который с предыдущей страницы и "вытягивал" дубликаты с текущей
+        if summary_DOUBLES_HIDE:
+            double_flag = True
+            while ((finish + 1) < books_count) and double_flag:
+                finish += 1
+                if books[finish].title.upper() == prev_title.upper() and {a['id'] for a in books[
+                    finish].authors.values()} == prev_authors_set:
+                    items[-1]['doubles'] += 1
+                else:
+                    double_flag = False
+
+            if op.d1_first_pos != 0:
+                items.pop(0)
+
+        response = ''
+        for b in items:
+            authors = ', '.join([a['full_name'] for a in b['authors']])
+            response+='<b>%(title)s</b>\n%(author)s\n/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id']}
+
+        buttons = [InlineKeyboardButton('1 <<', callback_data='/p1'),
+                   InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='/p%s'%op.previous_page_number),
+                   InlineKeyboardButton('[ %s ]'%op.number , callback_data='/p%s'%op.number),
+                   InlineKeyboardButton('> %s'%op.next_page_number , callback_data='/p%s'%op.next_page_number),
+                   InlineKeyboardButton('>> %s'%op.num_pages, callback_data='/p%s'%op.num_pages)]
+
+        markup = InlineKeyboardMarkup([buttons]) if op.num_pages>1 else None
+
+        bot.send_message(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
 
     def downloadBooks(self, bot, update):
         book_id_set=re.findall(r'\d+$',update.message.text)
