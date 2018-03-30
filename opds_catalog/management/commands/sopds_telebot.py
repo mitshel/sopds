@@ -139,8 +139,7 @@ class Command(BaseCommand):
             double_flag = True
             while ((finish + 1) < books_count) and double_flag:
                 finish += 1
-                if books[finish].title.upper() == prev_title.upper() and {a['id'] for a in books[
-                    finish].authors.values()} == prev_authors_set:
+                if books[finish].title.upper() == prev_title.upper() and {a['id'] for a in books[finish].authors.values()} == prev_authors_set:
                     items[-1]['doubles'] += 1
                 else:
                     double_flag = False
@@ -151,7 +150,8 @@ class Command(BaseCommand):
         response = ''
         for b in items:
             authors = ', '.join([a['full_name'] for a in b['authors']])
-            response+='<b>%(title)s</b>\n%(author)s\n/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id']}
+            doubles = ' (дубл.:%s)'%b['doubles'] if b['doubles'] else ''
+            response+='<b>%(title)s</b>%(dbl)s\n%(author)s\n/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
 
         buttons = [InlineKeyboardButton('1 <<', callback_data='/p1'),
                    InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='/p%s'%op.previous_page_number),
