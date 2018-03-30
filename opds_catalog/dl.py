@@ -60,11 +60,15 @@ def getFileData(book):
             #s = None
             fo = None
 
-    #if fo: fo.close()
-    #if z: z.close()
-    #if fz: fz.close()
+    dio = io.BytesIO()
+    dio.write(fo.read())
+    dio.seek(0)
 
-    return fo
+    if fo: fo.close()
+    if z: z.close()
+    if fz: fz.close()
+
+    return dio
 
 def getFileDataZip(book):
     transname = getFileName(book)
@@ -74,7 +78,6 @@ def getFileDataZip(book):
     zo.writestr(transname, fo.read())
     zo.close()
     dio.seek(0)
-    #buf = dio.getvalue()
 
     return dio
 
@@ -118,10 +121,14 @@ def getFileDataConv(book, convert_type):
     else:
         return None
 
-    # Как то нужно удалять временный файл после отдачи его
-    # os.remove(tmp_conv_path)
+    dio = io.BytesIO()
+    dio.write(fo.read())
+    dio.seek(0)
 
-    return fo
+    fo.close()
+    os.remove(tmp_conv_path)
+
+    return dio
 
 def getFileDataEpub(book):
     return getFileDataConv(book,'epub')

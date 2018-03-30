@@ -166,6 +166,7 @@ class Command(BaseCommand):
 
         if document:
             bot.send_document(chat_id=query.message.chat_id,document=document,filename=filename)
+            document.close()
             self.logger.info("Send file: %s" % filename)
         else:
             response = 'Возникла техническая ошибка, обратитесь к администратору сайта.'
