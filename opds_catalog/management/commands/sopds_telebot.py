@@ -131,7 +131,7 @@ class Command(BaseCommand):
 
         buttons = [InlineKeyboardButton('1 <<', callback_data='%s%s%s'%(query,query_delimiter,1)),
                    InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.previous_page_number)),
-                   InlineKeyboardButton('[ %s ]'%op.number , callback_data='%s%s%s'%(query,query_delimiter,op.number)),
+                   InlineKeyboardButton('[ %s ]'%op.number , callback_data='%s%s%s'%(query,query_delimiter,'current')),
                    InlineKeyboardButton('> %s'%op.next_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.next_page_number)),
                    InlineKeyboardButton('>> %s'%op.num_pages, callback_data='%s%s%s'%(query,query_delimiter,op.num_pages))]
 
@@ -173,6 +173,8 @@ class Command(BaseCommand):
     def getBooksPage(self, bot, update, user_data):
         callback_query = update.callback_query
         (query,page_num) = callback_query.data.split(query_delimiter, maxsplit=1)
+        if (page_num == 'current'):
+            return
         try:
             page_num = int(page_num)
         except:
