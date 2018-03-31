@@ -113,7 +113,7 @@ def getFileDataConv(book, convert_type):
 
     popen_args = ("\"%s\" \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, tmp_conv_path))
     proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE)
-    #out = proc.stdout.readlines()
+    out = proc.stdout.readlines()
 
     if os.path.isfile(tmp_conv_path):
         fo = codecs.open(tmp_conv_path, "rb")
