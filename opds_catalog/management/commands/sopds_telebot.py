@@ -18,7 +18,7 @@ from constance import config
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Document
 
-
+query_delimiter = "####"
 
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
@@ -69,41 +69,17 @@ class Command(BaseCommand):
                                                              (settings.SUBTITLE,update.message.from_user.username))
         self.logger.info("Start talking with user: %s"%update.message.from_user)
 
-    def getBooks(self, bot, update):
-        book_name=update.message.text
-        self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, book_name))
-
-        if len(book_name)<3:
-            response = 'Слишком короткая строка для поиска, попробуйте еще раз.'
-        else:
-            response = 'Выполняю поиск книги: %s' % (book_name)
-
-        bot.send_message(chat_id=update.message.chat_id, text=response)
-        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
-
-        if len(book_name) < 3:
-            return
-
+    def BookFilter(self, query):
         q_objects = Q()
-        q_objects.add(Q(search_title__contains=book_name.upper()), Q.OR)
-        q_objects.add( Q(authors__search_full_name__contains=book_name.upper()), Q.OR)
-
+        q_objects.add(Q(search_title__contains=query.upper()), Q.OR)
+        q_objects.add( Q(authors__search_full_name__contains=query.upper()), Q.OR)
         books = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
+
+        return books
+
+    def BookPager(self, books, page_num, query):
         books_count = books.count()
-
-        if books_count == 0:
-            response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.'
-            bot.send_message(chat_id=update.message.chat_id, text=response)
-            self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
-            return
-
-        response = 'Найдено %s книг(и). \nФормирую список, через несколько секунд выберите нужную для скачивания:' % books_count
-        bot.send_message(chat_id=update.message.chat_id, text=response)
-        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
-
-        page_num = 1
-        #op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)
-        op = OPDS_Paginator(books_count, 0, page_num, 8, HALF_PAGES_LINKS)
+        op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_TELEBOT_MAXITEMS, HALF_PAGES_LINKS)
         items = []
 
         prev_title = ''
@@ -153,15 +129,59 @@ class Command(BaseCommand):
             doubles = '(дубликатов:%s) '%b['doubles'] if b['doubles'] else ''
             response+='<b>%(title)s</b>\n%(author)s\n%(dbl)s/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
 
-        buttons = [InlineKeyboardButton('1 <<', callback_data='/p1'),
-                   InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='/p%s'%op.previous_page_number),
-                   InlineKeyboardButton('[ %s ]'%op.number , callback_data='/p%s'%op.number),
-                   InlineKeyboardButton('> %s'%op.next_page_number , callback_data='/p%s'%op.next_page_number),
-                   InlineKeyboardButton('>> %s'%op.num_pages, callback_data='/p%s'%op.num_pages)]
+        buttons = [InlineKeyboardButton('1 <<', callback_data='%s%s%s'%(query,query_delimiter,1)),
+                   InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.previous_page_number)),
+                   InlineKeyboardButton('[ %s ]'%op.number , callback_data='%s%s%s'%(query,query_delimiter,op.number)),
+                   InlineKeyboardButton('> %s'%op.next_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.next_page_number)),
+                   InlineKeyboardButton('>> %s'%op.num_pages, callback_data='%s%s%s'%(query,query_delimiter,op.num_pages))]
 
         markup = InlineKeyboardMarkup([buttons]) if op.num_pages>1 else None
 
-        bot.send_message(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
+        return {'message':response, 'buttons':markup}
+
+    def getBooks(self, bot, update):
+        query=update.message.text
+        self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
+
+        if len(query)<3:
+            response = 'Слишком короткая строка для поиска, попробуйте еще раз.'
+        else:
+            response = 'Выполняю поиск книги: %s' % (query)
+
+        bot.send_message(chat_id=update.message.chat_id, text=response)
+        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
+
+        if len(query) < 3:
+            return
+
+        books = self.BookFilter(query)
+        books_count = books.count()
+
+        if books_count == 0:
+            response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.'
+            bot.send_message(chat_id=update.message.chat_id, text=response)
+            self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
+            return
+
+        response = 'Найдено %s книг(и). \nФормирую список, через несколько секунд выберите нужную для скачивания:' % books_count
+        bot.send_message(chat_id=update.message.chat_id, text=response)
+        self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
+
+        response = self.BookPager(books, 1, query)
+        bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+
+    def getBooksPage(self, bot, update, user_data):
+        callback_query = update.callback_query
+        (query,page_num) = callback_query.data.split(query_delimiter, maxsplit=1)
+        try:
+            page_num = int(page_num)
+        except:
+            page_num = 1
+
+        books = self.BookFilter(query)
+        response = self.BookPager(books, page_num, query)
+        bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+        return
 
     def downloadBooks(self, bot, update):
         book_id_set=re.findall(r'\d+$',update.message.text)
@@ -195,10 +215,12 @@ class Command(BaseCommand):
         markup = InlineKeyboardMarkup([buttons])
         bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
         self.logger.info("Send download buttons.")
+        return
 
     def getBookFile(self, bot, update, user_data):
-        query = update.callback_query
-        book_id_set=re.findall(r'\d+$',query.data)
+        callback_query = update.callback_query
+        query = callback_query.data
+        book_id_set=re.findall(r'\d+$',query)
         if len(book_id_set)==1:
             try:
                 book_id=int(book_id_set[0])
@@ -211,45 +233,52 @@ class Command(BaseCommand):
 
         if book==None:
             response = 'Книга по указанной Вами ссылке не найдена, попробуйте повторить поиск книги сначала.'
-            bot.sendMessage(chat_id=query.message.chat_id, text=response, parse_mode='HTML')
+            bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
 
         filename = dl.getFileName(book)
         document = None
 
-        if re.match(r'/getfileorig',query.data):
+        if re.match(r'/getfileorig',query):
             document = dl.getFileData(book)
             #document = config.SOPDS_SITE_ROOT + reverse("opds_catalog:download",kwargs={"book_id": book.id, "zip_flag": 0})
 
-        if re.match(r'/getfilezip',query.data):
+        if re.match(r'/getfilezip',query):
             document = dl.getFileDataZip(book)
             #document = config.SOPDS_SITE_ROOT + reverse("opds_catalog:download", kwargs={"book_id": book.id, "zip_flag": 1})
             filename = filename + '.zip'
 
-        if re.match(r'/getfileepub',query.data):
+        if re.match(r'/getfileepub',query):
             document = dl.getFileDataEpub(book)
             #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "epub"}))]
             filename = filename + '.epub'
 
-        if re.match(r'/getfilemobi',query.data):
+        if re.match(r'/getfilemobi',query):
             document = dl.getFileDataMobi(book)
             #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "mobi"}))]
             filename = filename + '.mobi'
 
         if document:
-            bot.send_document(chat_id=query.message.chat_id,document=document,filename=filename)
+            bot.send_document(chat_id=callback_query.message.chat_id,document=document,filename=filename)
             document.close()
             self.logger.info("Send file: %s" % filename)
         else:
             response = 'Возникла техническая ошибка, обратитесь к администратору сайта.'
-            bot.sendMessage(chat_id=query.message.chat_id, text=response, parse_mode='HTML')
+            bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Book get error: %s" % response)
             return
 
-        user_data['type'] = query.data;
+        user_data['type'] = query;
 
         return
+
+    def botCallback(self, bot, update, user_data):
+        query = update.callback_query
+        if re.match(r'/getfile', query.data):
+            return self.getBookFile(bot, update, user_data)
+        else:
+            return self.getBooksPage(bot, update, user_data)
 
     def start(self):
         writepid(self.pidfile)
@@ -265,7 +294,7 @@ class Command(BaseCommand):
             updater.dispatcher.add_handler(start_command_handler)
             updater.dispatcher.add_handler(getBook_handler)
             updater.dispatcher.add_handler(download_handler)
-            updater.dispatcher.add_handler(CallbackQueryHandler(self.getBookFile, pass_user_data=True))
+            updater.dispatcher.add_handler(CallbackQueryHandler(self.botCallback, pass_user_data=True))
 
             updater.start_polling(clean=True)
             updater.idle()
