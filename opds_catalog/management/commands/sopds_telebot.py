@@ -8,6 +8,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings as main_settings
 from django.utils.html import strip_tags
 from django.db.models import Q
+from django.db import transaction, connection, connections
 from django.urls import reverse
 
 from opds_catalog.models import Book, Author
@@ -70,6 +71,9 @@ class Command(BaseCommand):
         self.logger.info("Start talking with user: %s"%update.message.from_user)
 
     def BookFilter(self, query):
+        if connection.connection and not connection.is_usable():
+            del(connections._connections.default)
+
         q_objects = Q()
         q_objects.add(Q(search_title__contains=query.upper()), Q.OR)
         q_objects.add( Q(authors__search_full_name__contains=query.upper()), Q.OR)
