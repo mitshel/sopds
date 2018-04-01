@@ -9,6 +9,7 @@ from django.conf import settings as main_settings
 from django.utils.html import strip_tags
 from django.db.models import Q
 from django.db import transaction, connection, connections
+from django.contrib.auth.models import User
 from django.urls import reverse
 
 from opds_catalog.models import Book, Author
@@ -21,6 +22,28 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Document
 from telegram.error import InvalidToken
 
 query_delimiter = "####"
+
+
+def CheckAuthDecorator(func):
+    def wrapper(self, bot, update):
+
+        if not config.SOPDS_TELEBOT_AUTH:
+            return func(self, bot, update)
+
+        query = update.message if update.message else update.callback_query.message
+        username = update.message.from_user.username if update.message else update.callback_query.from_user.username
+        users = User.objects.filter(username__iexact=username)
+
+        if users and users[0].is_active:
+            return func(self, bot, update)
+
+        bot.sendMessage(chat_id=query.chat_id,
+                        text="Здравствуйте %s!\nК сожалению у Вас отсутствует доступ к информации. Обратитесь к администратору бота." % username)
+        self.logger.info("Denied access for user: %s" % username)
+
+        return
+
+    return wrapper
 
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
@@ -66,10 +89,13 @@ class Command(BaseCommand):
             pid = open(self.pidfile, "r").read()
             self.restart(pid)
 
+    @CheckAuthDecorator
     def startCommand(self, bot, update):
+
         bot.sendMessage(chat_id=update.message.chat_id, text="%s\nЗдравствуйте %s! Для поиска книги, введите часть ее наименования или автора:"%
                                                              (settings.SUBTITLE,update.message.from_user.username))
         self.logger.info("Start talking with user: %s"%update.message.from_user)
+        return
 
     def BookFilter(self, query):
         if connection.connection and not connection.is_usable():
@@ -144,6 +170,7 @@ class Command(BaseCommand):
 
         return {'message':response, 'buttons':markup}
 
+    @CheckAuthDecorator
     def getBooks(self, bot, update):
         query=update.message.text
         self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
@@ -175,7 +202,8 @@ class Command(BaseCommand):
         response = self.BookPager(books, 1, query)
         bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
 
-    def getBooksPage(self, bot, update, user_data):
+    @CheckAuthDecorator
+    def getBooksPage(self, bot, update):
         callback_query = update.callback_query
         (query,page_num) = callback_query.data.split(query_delimiter, maxsplit=1)
         if (page_num == 'current'):
@@ -190,6 +218,7 @@ class Command(BaseCommand):
         bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
         return
 
+    @CheckAuthDecorator
     def downloadBooks(self, bot, update):
         book_id_set=re.findall(r'\d+$',update.message.text)
         if len(book_id_set)==1:
@@ -197,6 +226,7 @@ class Command(BaseCommand):
                 book_id=int(book_id_set[0])
                 book=Book.objects.get(id=book_id)
             except:
+                book_id = None
                 book=None
         else:
             book_id=None
@@ -224,7 +254,8 @@ class Command(BaseCommand):
         self.logger.info("Send download buttons.")
         return
 
-    def getBookFile(self, bot, update, user_data):
+    @CheckAuthDecorator
+    def getBookFile(self, bot, update):
         callback_query = update.callback_query
         query = callback_query.data
         book_id_set=re.findall(r'\d+$',query)
@@ -276,16 +307,16 @@ class Command(BaseCommand):
             self.logger.info("Book get error: %s" % response)
             return
 
-        user_data['type'] = query;
-
         return
 
-    def botCallback(self, bot, update, user_data):
+    @CheckAuthDecorator
+    def botCallback(self, bot, update):
         query = update.callback_query
+
         if re.match(r'/getfile', query.data):
-            return self.getBookFile(bot, update, user_data)
+            return self.getBookFile(bot, update)
         else:
-            return self.getBooksPage(bot, update, user_data)
+            return self.getBooksPage(bot, update)
 
     def start(self):
         writepid(self.pidfile)
@@ -300,7 +331,7 @@ class Command(BaseCommand):
             updater.dispatcher.add_handler(start_command_handler)
             updater.dispatcher.add_handler(getBook_handler)
             updater.dispatcher.add_handler(download_handler)
-            updater.dispatcher.add_handler(CallbackQueryHandler(self.botCallback, pass_user_data=True))
+            updater.dispatcher.add_handler(CallbackQueryHandler(self.botCallback))
 
             updater.start_polling(clean=True)
             updater.idle()
