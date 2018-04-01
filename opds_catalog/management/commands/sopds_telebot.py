@@ -18,6 +18,7 @@ from sopds_web_backend.settings import HALF_PAGES_LINKS
 from constance import config
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Document
+from telegram.error import InvalidToken
 
 query_delimiter = "####"
 
@@ -292,7 +293,6 @@ class Command(BaseCommand):
         self.stdout.write("Quit the sopds_telebot with %s.\n"%quit_command)
         try:
             updater = Updater(token=config.SOPDS_TELEBOT_API_TOKEN)
-
             start_command_handler = CommandHandler('start', self.startCommand)
             getBook_handler = MessageHandler(Filters.text, self.getBooks)
             download_handler = RegexHandler('^/download\d+$',self.downloadBooks)
@@ -304,6 +304,10 @@ class Command(BaseCommand):
 
             updater.start_polling(clean=True)
             updater.idle()
+        except InvalidToken:
+            self.stdout.write('Invalid telegram token.\nSet correct token for telegram API by command:\n python3 manage.py sopds_util setconf SOPDS_TELEBOT_API_TOKEN "<token>"')
+            self.logger.error('Invalid telegram token.')
+
         except (KeyboardInterrupt, SystemExit):
             pass            
     
