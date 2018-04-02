@@ -30,6 +30,9 @@ def CheckAuthDecorator(func):
         if not config.SOPDS_TELEBOT_AUTH:
             return func(self, bot, update)
 
+        if connection.connection and not connection.is_usable():
+            del(connections._connections.default)
+
         query = update.message if update.message else update.callback_query.message
         username = update.message.from_user.username if update.message else update.callback_query.from_user.username
         users = User.objects.filter(username__iexact=username)
