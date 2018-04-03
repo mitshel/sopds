@@ -72,6 +72,25 @@ is one-user. Therefore, until the scanning process is completed, the attempts to
 "A server error occurred." Please contact the administrator. "
 To eliminate this problem, you need to use multi-user databases, for example MYSQL.
 
+1.10 If necessary, configure and run Telegram-bot
+
+The process of creating bots in telegrams is very simple, to create your bot in Telegram, you need to connect to
+channel [@BotFather] (https://telegram.me/botfather) and give the command to create a new bot **/newbot**. Then enter the name of the bot
+(for example: **myopds**), and then the user name for this bot, which necessarily ends with "bot" (for example: **myopds_bot**).
+As a result, you will be given API_TOKEN, which you need to use in the following commands that will start your personal
+telegram-bot, which will allow you, using the Telegram instant messenger to get quick access to your personal library.
+
+    python3 manage.py sopds_util setconf SOPDS_TELEBOT_API_TOKEN "<Telegram API Token>"
+    python3 manage.py sopds_util setconf SOPDS_TELEBOT_AUTH False
+    python3 manage.py sopds_telebot start --daemon
+    
+Team,
+
+    python3 manage.py sopds_util setconf SOPDS_TELEBOT_AUTH True
+    
+you can limit the use of your bot by Telegram users. In this case, your bot will serve only those
+users whose name in the telegram matches the existing user name in your Simple OPDS database.
+
 #### 2. Configuring the MySQL database (optional, but very desirable for increasing performance).
 2.1 To work with a large number of books, it is highly advisable not to use sqlite, but to configure MySQL databases to work. MySQL is much faster than sqlite. In addition, SQLite is a single-user database, i.e. during scanning access to a DB it will be impossible.
 
@@ -366,3 +385,12 @@ an extraordinary scan of the collection will be launched, and the specified flag
 
 **SOPDS_CACHE_TIME** - Pages cache time
 (default is SOPDS_CACHE_TIME = 1200)
+
+**SOPDS_TELEBOT_API_TOKEN** - API TOKEN for Telegram Bot
+
+**SOPDS_TELEBOT_AUTH** - If True, the Bot will grant access to the library, only to users whose name in the Telegram matches the name
+existing user in the Simple OPDS database.
+(by default SOPDS_TELEBOT_AUTH = True)
+
+**SOPDS_TELEBOT_MAXITEMS** - The maximum number of simultaneously displayed items in the Telegram message
+(by default SOPDS_TELEBOT_MAXITEMS = 10)
