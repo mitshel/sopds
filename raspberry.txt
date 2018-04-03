@@ -1,6 +1,6 @@
 ##
-## Установка на RaspberryPI
-## БД SQLITE
+## РЈСЃС‚Р°РЅРѕРІРєР° РЅР° RaspberryPI
+## Р‘Р” SQLITE
 ##
 sudo apt-get update
 sudo apt-get install git
@@ -22,7 +22,7 @@ sudo python3 manage.py sopds_scanner start --daemon
 sudo python3 manage.py sopds_server start --daemon
 
 ##
-## Настраиваем MYSQL
+## РќР°СЃС‚СЂР°РёРІР°РµРј MYSQL
 ##
 ##
 sudo apt-get install mysql-server
@@ -35,7 +35,7 @@ mysql > ^C
 cd /home/sopds
 sudo vi sopds/settings.py
 
-# Убираем комментарии в настройке БД Mysql
+# РЈР±РёСЂР°РµРј РєРѕРјРјРµРЅС‚Р°СЂРёРё РІ РЅР°СЃС‚СЂРѕР№РєРµ Р‘Р” Mysql
 DATABASES = {   
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -51,7 +51,7 @@ DATABASES = {
 }
 
 
-# Комментируем настройку БД SQLITE
+# РљРѕРјРјРµРЅС‚РёСЂСѓРµРј РЅР°СЃС‚СЂРѕР№РєСѓ Р‘Р” SQLITE
 #
 #
 #DATABASES = {
@@ -62,8 +62,8 @@ DATABASES = {
 #}
 
 ##
-## Дальше все как обычно
-## при миграции струкутуры появится желтый Warning - ничего страшного
+## Р”Р°Р»СЊС€Рµ РІСЃРµ РєР°Рє РѕР±С‹С‡РЅРѕ
+## РїСЂРё РјРёРіСЂР°С†РёРё СЃС‚СЂСѓРєСѓС‚СѓСЂС‹ РїРѕСЏРІРёС‚СЃСЏ Р¶РµР»С‚С‹Р№ Warning - РЅРёС‡РµРіРѕ СЃС‚СЂР°С€РЅРѕРіРѕ
 ##
 ##
 sudo python3 manage.py migrate

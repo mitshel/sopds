@@ -10,15 +10,16 @@ from django.utils.html import strip_tags
 from django.db.models import Q
 from django.db import transaction, connection, connections
 from django.contrib.auth.models import User
-from django.urls import reverse
+from django.utils.translation import ugettext as _
+from django.utils import translation
 
-from opds_catalog.models import Book, Author
+from opds_catalog.models import Book
 from opds_catalog import settings, dl
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from constance import config
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Document
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import InvalidToken
 
 query_delimiter = "####"
@@ -26,7 +27,6 @@ query_delimiter = "####"
 
 def CheckAuthDecorator(func):
     def wrapper(self, bot, update):
-
         if not config.SOPDS_TELEBOT_AUTH:
             return func(self, bot, update)
 
@@ -41,8 +41,8 @@ def CheckAuthDecorator(func):
             return func(self, bot, update)
 
         bot.sendMessage(chat_id=query.chat_id,
-                        text="Здравствуйте %s!\nК сожалению у Вас отсутствует доступ к информации. Обратитесь к администратору бота." % username)
-        self.logger.info("Denied access for user: %s" % username)
+                        text=_("Hello %s!\nUnfortunately you do not have access to information. Please contact the bot administrator.") % username)
+        self.logger.info(_("Denied access for user: %s") % username)
 
         return
 
@@ -50,6 +50,8 @@ def CheckAuthDecorator(func):
 
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
+    can_import_settings = True
+    leave_locale_alone = True
 
     def add_arguments(self, parser):
         parser.add_argument('command', help='Use [ start | stop | restart ]')
@@ -62,6 +64,7 @@ class Command(BaseCommand):
         self.logger = logging.getLogger('')
         self.logger.setLevel(logging.DEBUG)
         formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+        translation.activate(config.SOPDS_LANGUAGE)
 
         if settings.LOGLEVEL!=logging.NOTSET:
             # Создаем обработчик для записи логов в файл
@@ -95,8 +98,8 @@ class Command(BaseCommand):
     @CheckAuthDecorator
     def startCommand(self, bot, update):
 
-        bot.sendMessage(chat_id=update.message.chat_id, text="%s\nЗдравствуйте %s! Для поиска книги, введите часть ее наименования или автора:"%
-                                                             (settings.SUBTITLE,update.message.from_user.username))
+        bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
+                                                             {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
         self.logger.info("Start talking with user: %s"%update.message.from_user)
         return
 
@@ -160,7 +163,7 @@ class Command(BaseCommand):
         response = ''
         for b in items:
             authors = ', '.join([a['full_name'] for a in b['authors']])
-            doubles = '(дубликатов:%s) '%b['doubles'] if b['doubles'] else ''
+            doubles = _("(doubles:%s) ")%b['doubles'] if b['doubles'] else ''
             response+='<b>%(title)s</b>\n%(author)s\n%(dbl)s/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
 
         buttons = [InlineKeyboardButton('1 <<', callback_data='%s%s%s'%(query,query_delimiter,1)),
@@ -179,9 +182,9 @@ class Command(BaseCommand):
         self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
 
         if len(query)<3:
-            response = 'Слишком короткая строка для поиска, попробуйте еще раз.'
+            response = _("Too short for search, please try again.")
         else:
-            response = 'Выполняю поиск книги: %s' % (query)
+            response = _("I'm searching for the book: %s") % (query)
 
         bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
@@ -193,12 +196,12 @@ class Command(BaseCommand):
         books_count = books.count()
 
         if books_count == 0:
-            response = 'По Вашему запросу ничего не найдено, попробуйте еще раз.'
+            response = _("No results were found for your query, please try again.")
             bot.send_message(chat_id=update.message.chat_id, text=response)
             self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
             return
 
-        response = 'Найдено %s книг(и). \nФормирую список, через несколько секунд выберите нужную для скачивания:' % books_count
+        response = _("Found %s books.\nI create list, after a few seconds, select the file to download:") % books_count
         bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
 
@@ -236,13 +239,13 @@ class Command(BaseCommand):
             book=None
 
         if book==None:
-            response = 'Книга по указанной Вами ссылке не найдена, попробуйте повторить поиск книги сначала.'
+            response = _("The book on the link you specified is not found, try to repeat the book search first.")
             bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
 
         authors = ', '.join([a['full_name'] for a in book.authors.values()])
-        response = '<b>%(title)s</b>\n%(author)s\n<b>Аннотация:</b>%(annotation)s\n' % {'title': book.title, 'author': authors, 'annotation':book.annotation}
+        response = ('<b>%(title)s</b>\n%(author)s\n<b>'+_("Annotation:")+'</b>%(annotation)s\n') % {'title': book.title, 'author': authors, 'annotation':book.annotation}
 
         buttons = [InlineKeyboardButton(book.format.upper(), callback_data='/getfileorig%s'%book_id)]
         if not book.format in settings.NOZIP_FORMATS:
@@ -273,7 +276,7 @@ class Command(BaseCommand):
             book=None
 
         if book==None:
-            response = 'Книга по указанной Вами ссылке не найдена, попробуйте повторить поиск книги сначала.'
+            response = _("The book on the link you specified is not found, try to repeat the book search first.")
             bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
@@ -305,7 +308,7 @@ class Command(BaseCommand):
             document.close()
             self.logger.info("Send file: %s" % filename)
         else:
-            response = 'Возникла техническая ошибка, обратитесь к администратору сайта.'
+            response = _("There was a technical error, please contact the Bot administrator.")
             bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Book get error: %s" % response)
             return
