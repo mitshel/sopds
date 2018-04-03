@@ -27,6 +27,7 @@ query_delimiter = "####"
 
 def CheckAuthDecorator(func):
     def wrapper(self, bot, update):
+
         if not config.SOPDS_TELEBOT_AUTH:
             return func(self, bot, update)
 
@@ -58,13 +59,13 @@ class Command(BaseCommand):
         parser.add_argument('--verbose',action='store_true', dest='verbose', default=False, help='Set verbosity level for SimpleOPDS telebot.')
         parser.add_argument('--daemon',action='store_true', dest='daemonize', default=False, help='Daemonize server')
         
-    def handle(self, *args, **options): 
+    def handle(self, *args, **options):
+        translation.activate(config.SOPDS_LANGUAGE)
         self.pidfile = os.path.join(main_settings.BASE_DIR, config.SOPDS_TELEBOT_PID)
         action = options['command']            
         self.logger = logging.getLogger('')
         self.logger.setLevel(logging.DEBUG)
         formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
-        translation.activate(config.SOPDS_LANGUAGE)
 
         if settings.LOGLEVEL!=logging.NOTSET:
             # Создаем обработчик для записи логов в файл
@@ -97,7 +98,6 @@ class Command(BaseCommand):
 
     @CheckAuthDecorator
     def startCommand(self, bot, update):
-
         bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
                                                              {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
         self.logger.info("Start talking with user: %s"%update.message.from_user)
