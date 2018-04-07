@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-03 22:20+0300\n"
+"POT-Creation-Date: 2018-04-07 16:38+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -259,6 +259,76 @@ msgstr "секция"
 msgid "subsection"
 msgstr "подсекция"
 
+#: .\opds_catalog\management\commands\sopds_telebot.py:45
+#, python-format
+msgid ""
+"Hello %s!\n"
+"Unfortunately you do not have access to information. Please contact the bot "
+"administrator."
+msgstr ""
+"Здравствуйте %s!\n"
+"К сожалению у Вас отсутствует доступ к информации. Обратитесь к "
+"администратору бота."
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:46
+#, python-format
+msgid "Denied access for user: %s"
+msgstr "Отказ в доступе для пользователя: %s"
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:65
+#, python-format
+msgid ""
+"%(subtitle)s\n"
+"Hello %(username)s! To search for a book, enter part of her title or author:"
+msgstr ""
+"%(subtitle)s\n"
+"Здравствуйте %(username)s! Для поиска книги, введите часть ее наименования "
+"или автора:"
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:168
+#, python-format
+msgid "(doubles:%s) "
+msgstr "(дубликатов:%s) "
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:187
+msgid "Too short for search, please try again."
+msgstr "Слишком короткая строка для поиска, попробуйте еще раз."
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:189
+#, python-format
+msgid "I'm searching for the book: %s"
+msgstr "Выполняю поиск книги: %s"
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:201
+msgid "No results were found for your query, please try again."
+msgstr "По Вашему запросу ничего не найдено, попробуйте еще раз."
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:206
+#, python-format
+msgid ""
+"Found %s books.\n"
+"I create list, after a few seconds, select the file to download:"
+msgstr ""
+"Найдено %s книг(и). \n"
+"Формирую список, через несколько секунд выберите нужную для скачивания:"
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:244
+#: .\opds_catalog\management\commands\sopds_telebot.py:281
+msgid ""
+"The book on the link you specified is not found, try to repeat the book "
+"search first."
+msgstr ""
+"Книга по указанной Вами ссылке не найдена, попробуйте повторить поиск книги "
+"сначала."
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:250
+msgid "Annotation:"
+msgstr "Аннотация:"
+
+#: .\opds_catalog\management\commands\sopds_telebot.py:313
+msgid "There was a technical error, please contact the Bot administrator."
+msgstr "Возникла техническая ошибка, обратитесь к администратору Бота."
+
 #: .\opds_catalog\sopdscan.py:233
 msgid "Unknown author"
 msgstr "Неизвестный автор"
@@ -267,59 +337,6 @@ msgstr "Неизвестный автор"
 #, python-format
 msgid "All books by %(full_name)s"
 msgstr "Все книги автора %(full_name)s"
-
-#~ msgid ""
-#~ "Hello %s!\n"
-#~ "Unfortunately you do not have access to information. Please contact the "
-#~ "bot administrator."
-#~ msgstr ""
-#~ "Здравствуйте %s!\n"
-#~ "К сожалению у Вас отсутствует доступ к информации. Обратитесь к "
-#~ "администратору бота."
-
-#~ msgid "Denied access for user: %s"
-#~ msgstr "Отказ в доступе для пользователя: %s"
-
-#~ msgid ""
-#~ "%(subtitle)s\n"
-#~ "Hello %(username)s! To search for a book, enter part of her title or "
-#~ "author:"
-#~ msgstr ""
-#~ "%(subtitle)s\n"
-#~ "Здравствуйте %(username)s! Для поиска книги, введите часть ее "
-#~ "наименования или автора:"
-
-#~ msgid "(doubles:%s) "
-#~ msgstr "(дубликатов:%s) "
-
-#~ msgid "Too short for search, please try again."
-#~ msgstr "Слишком короткая строка для поиска, попробуйте еще раз."
-
-#~ msgid "I'm searching for the book: %s"
-#~ msgstr "Выполняю поиск книги: %s"
-
-#~ msgid "No results were found for your query, please try again."
-#~ msgstr "По Вашему запросу ничего не найдено, попробуйте еще раз."
-
-#~ msgid ""
-#~ "Found %s books.\n"
-#~ "I create list, after a few seconds, select the file to download:"
-#~ msgstr ""
-#~ "Найдено %s книг(и). \n"
-#~ "Формирую список, через несколько секунд выберите нужную для скачивания:"
-
-#~ msgid ""
-#~ "The book on the link you specified is not found, try to repeat the book "
-#~ "search first."
-#~ msgstr ""
-#~ "Книга по указанной Вами ссылке не найдена, попробуйте повторить поиск "
-#~ "книги сначала."
-
-#~ msgid "Annotation:"
-#~ msgstr "Аннотация:"
-
-#~ msgid "There was a technical error, please contact the Bot administrator."
-#~ msgstr "Возникла техническая ошибка, обратитесь к администратору Бота."
 
 #~ msgid "Book name:"
 #~ msgstr "Название:"

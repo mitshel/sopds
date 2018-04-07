@@ -24,10 +24,18 @@ from telegram.error import InvalidToken
 
 query_delimiter = "####"
 
+def cmdtrans(func):
+    def wrapper(self, bot, update):
+        translation.activate(config.SOPDS_LANGUAGE)
+        result =  func(self, bot, update)
+        translation.deactivate()
+        return result
+
+    return wrapper
+
 
 def CheckAuthDecorator(func):
     def wrapper(self, bot, update):
-
         if not config.SOPDS_TELEBOT_AUTH:
             return func(self, bot, update)
 
@@ -60,7 +68,6 @@ class Command(BaseCommand):
         parser.add_argument('--daemon',action='store_true', dest='daemonize', default=False, help='Daemonize server')
         
     def handle(self, *args, **options):
-        translation.activate(config.SOPDS_LANGUAGE)
         self.pidfile = os.path.join(main_settings.BASE_DIR, config.SOPDS_TELEBOT_PID)
         action = options['command']            
         self.logger = logging.getLogger('')
@@ -96,6 +103,7 @@ class Command(BaseCommand):
             pid = open(self.pidfile, "r").read()
             self.restart(pid)
 
+    @cmdtrans
     @CheckAuthDecorator
     def startCommand(self, bot, update):
         bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
@@ -176,6 +184,7 @@ class Command(BaseCommand):
 
         return {'message':response, 'buttons':markup}
 
+    @cmdtrans
     @CheckAuthDecorator
     def getBooks(self, bot, update):
         query=update.message.text
@@ -208,6 +217,7 @@ class Command(BaseCommand):
         response = self.BookPager(books, 1, query)
         bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
 
+    @cmdtrans
     @CheckAuthDecorator
     def getBooksPage(self, bot, update):
         callback_query = update.callback_query
@@ -224,6 +234,7 @@ class Command(BaseCommand):
         bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
         return
 
+    @cmdtrans
     @CheckAuthDecorator
     def downloadBooks(self, bot, update):
         book_id_set=re.findall(r'\d+$',update.message.text)
@@ -260,6 +271,7 @@ class Command(BaseCommand):
         self.logger.info("Send download buttons.")
         return
 
+    @cmdtrans
     @CheckAuthDecorator
     def getBookFile(self, bot, update):
         callback_query = update.callback_query
@@ -315,6 +327,7 @@ class Command(BaseCommand):
 
         return
 
+    @cmdtrans
     @CheckAuthDecorator
     def botCallback(self, bot, update):
         query = update.callback_query
