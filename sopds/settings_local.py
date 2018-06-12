@@ -1,3 +1,3 @@
-from deployment_settings import *
+from sopds.settings import *
 
 DEBUG = True
