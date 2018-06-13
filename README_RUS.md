@@ -19,7 +19,7 @@
    
    	sudo apt-get install python3-venv
    
-   Создаём папку виртуального окружения
+   Создаём папку виртуального окружения env
    
    	python3 -m venv env
    
