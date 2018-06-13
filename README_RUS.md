@@ -20,15 +20,14 @@
    
    Создаём папку виртуального окружения
    
-   python3 -m venv env
+   	python3 -m venv env
    
    Запускаем окружение
-   
-   source env/bin/activate
+   	source env/bin/activate
    
    Обновляем установщик пакетов
    
-   pip3 install --upgrade pip
+   	pip3 install --upgrade pip
 
 1.2 Зависимости.  
 - Требуется Python не ниже версии 3.4
