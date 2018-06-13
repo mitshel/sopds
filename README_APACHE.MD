@@ -1,6 +1,6 @@
 На примере ubuntu
 
-  apt-get install libapache2-mod-wsgi-py3
+    apt-get install libapache2-mod-wsgi-py3
   
     <VirtualHost *:80>
       ServerAdmin webmaster@localhost
