@@ -8,7 +8,7 @@
     <VirtualHost *:80>
         ServerAdmin sopsd@localhost
         ServerName sopds
-        DocumentRoot ##### путь_к_папке/sopds
+        DocumentRoot #### путь_к_папке/sopds
         
         ErrorLog ${APACHE_LOG_DIR}/sopds_error.log
         CustomLog ${APACHE_LOG_DIR}/sopds_access.log combined
