@@ -1,6 +1,5 @@
 На примере ubuntu
-    
-    Устанавливаем пакет
+Устанавливаем пакет
     
     apt-get install libapache2-mod-wsgi-py3
 
@@ -8,9 +7,8 @@
 
     <VirtualHost *:80>
         ServerAdmin sopsd@localhost
-        ServerName sopds.loc
-        ServerAlias sopds.loc
-        DocumentRoot /home/z/sopds
+        ServerName sopds
+        DocumentRoot ##### путь_к_папке/sopds
         
         ErrorLog ${APACHE_LOG_DIR}/sopds_error.log
         CustomLog ${APACHE_LOG_DIR}/sopds_access.log combined
