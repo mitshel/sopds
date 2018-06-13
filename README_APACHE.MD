@@ -27,33 +27,33 @@
         Require all granted
     </Directory>
     
-    Alias   /static    "/путь_к_папке/sopds/static"
+    Alias   /static "/путь_к_папке/sopds/static"
     </VirtualHost>
 
 Если используется виртуальное окружение
 
-<VirtualHost *:80>
-   ServerAdmin sopsd@localhost
-   ServerName sopds
+    <VirtualHost *:80>
+        ServerAdmin sopsd@localhost
+        ServerName sopds
+        
+        ErrorLog ${APACHE_LOG_DIR}/sopds_error.log
+        CustomLog ${APACHE_LOG_DIR}/sopds_access.log combined
+    
+        WSGIScriptAlias / /путь_к_папке/sopds/sopds/wsgi.py
 
-   ErrorLog ${APACHE_LOG_DIR}/sopds_error.log
-CustomLog ${APACHE_LOG_DIR}/sopds_access.log combined
-
-   WSGIScriptAlias / /путь_к_папке/sopds/sopds/wsgi.py
-
-   WSGIDaemonProcess sopds processes=4 python-path=/путь_к_папке/sopds python-home=/путь_к_папке_виртуального_окружения/lib/python3.5/site-packages
-   WSGIProcessGroup sopds
-   WSGIScriptReloading On
-   WSGIPassAuthorization On
-
-   <Directory "/путь_к_папке/sopds/sopds/">
-      Require all granted
-   </Directory>
-   
-   <Directory "/путь_к_папке/sopds/static/">
-      Require all granted
-   </Directory>
-
-   Alias   /static    "/путь_к_папке/sopds/static"
-
-</VirtualHost>
+        WSGIDaemonProcess sopds processes=2 threads=15 python-path=/путь_к_папке/sopds python-home=/путь_к_папке_виртуального_окружения/lib/python3.5/site-packages
+        WSGIProcessGroup sopds
+        WSGIScriptReloading On
+        WSGIPassAuthorization On
+    
+    <Directory "/путь_к_папке/sopds/sopds/">
+        Require all granted
+    </Directory>
+    
+    <Directory "/путь_к_папке/sopds/static/">
+        Require all granted
+    </Directory>
+    
+    Alias   /static    "/путь_к_папке/sopds/static"
+    
+    </VirtualHost>
