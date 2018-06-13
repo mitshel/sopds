@@ -57,3 +57,11 @@
     Alias   /static    "/путь_к_папке/sopds/static"
     
     </VirtualHost>
+    
+Включаем конфиг командой
+
+    sudo a2ensite конфиг_sopds
+    
+Перезапускаем апач
+
+    sudo service apache2 restart
