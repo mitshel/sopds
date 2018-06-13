@@ -1,7 +1,11 @@
 На примере ubuntu
-
+    
+    Устанавливаем пакет
+    
     apt-get install libapache2-mod-wsgi-py3
-  
+
+Прописываем настройки апача по пути /etc/apache2/sites-available/ в существующий конфиг или в новый, например в sopds.conf
+
     <VirtualHost *:80>
       ServerAdmin webmaster@localhost
       ServerName sopds.yourlib.com
@@ -24,3 +28,4 @@
       Alias   /static    "/home/sopds/static"
   </VirtualHost>
   
+Если используется виртуальное окружение
