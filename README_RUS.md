@@ -15,13 +15,20 @@
 1.1.1 Виртуальное окружение.
    На примере ubuntu
    Устанавливаем пакет виртуального окружения
-   sudo apt-get install python3-venv
+   
+   	sudo apt-get install python3-venv
    
    Создаём папку виртуального окружения
+   
    python3 -m venv env
    
-   Запускаем
+   Запускаем окружение
+   
    source env/bin/activate
+   
+   Обновляем установщик пакетов
+   
+   pip3 install --upgrade pip
 
 1.2 Зависимости.  
 - Требуется Python не ниже версии 3.4
