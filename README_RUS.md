@@ -70,7 +70,7 @@
 
 	python3 manage.py sopds_server start --daemon
 	
-Однако наилучшим способом, все же является настройка в качестве HTTP/OPDS серверов [Apache] (Apache.md) или Nginx 
+Однако наилучшим способом, все же является настройка в качестве HTTP/OPDS серверов [Apache](README_APACHE.MD) или Nginx 
 (точка входа ./sopds/wsgi.py)
 	
 1.8 Чтобы не дожидаться начала сканирования по расписанию, можно сообщить процессу sopds_scanner о необходимости
