@@ -23,6 +23,7 @@
    	python3 -m venv env
    
    Запускаем окружение
+   
    	source env/bin/activate
    
    Обновляем установщик пакетов
