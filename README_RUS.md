@@ -246,8 +246,11 @@ MySQL по сравнению с sqlite работает гораздо быст
 
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2epub/fb2epub"
 
-4.3 Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447  
-- Необходимо установить python 2.7 и пакеты lxml, cssutils:   
+4.3 Конвертер fb2conv (конвертация в epub и mobi)  
+    http://www.the-ebook.org/forum/viewtopic.php?t=28447  
+    https://github.com/rupor-github/fb2mobi/releases  
+- Необходимо установить python 2.7 (однако для последней версии с GitHub этого делать уже не нужно, т.к. она использует как и SOPDS python3) 
+  и пакеты lxml, cssutils:   
   
          yum install python  
          yum install python-lxml  

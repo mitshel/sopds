@@ -71,9 +71,11 @@ class Inpx:
                 continue
             
             zip_file_name = os.path.join(self.inpx_catalog,"%s%s"%(inp_name,'.zip'))
+
             # Если решили проверять на наличие ZIP файла или книги в ZIP, а самого ZIP файла нет - то пропускаем обработку всего ZIP файла
             if (self.TEST_ZIP or self.TEST_FILES) and not os.path.isfile(zip_file_name):
                 continue
+
             if self.inpskip_callback(self.inpx_file, inp_name,finpx.getinfo(inp_file).file_size):
                 continue             
             
