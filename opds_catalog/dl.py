@@ -31,9 +31,10 @@ def getFileName(book):
 def getFileData(book):
     full_path = os.path.join(config.SOPDS_ROOT_LIB, book.path)
     if book.cat_type==opdsdb.CAT_INP:
-        # Убираем из пути INPX файл
-        inpx_path, zip_name = os.path.split(full_path)
-        path, inpx_file = os.path.split(inpx_path)
+        # Убираем из пути INPX и INP файл
+        inp_path, zip_name = os.path.split(full_path)
+        inpx_path, inp_name = os.path.split(inp_path)
+        path, inpx_name = os.path.split(inpx_path)
         full_path = os.path.join(path,zip_name)
 
     z = None
@@ -148,9 +149,10 @@ def Download(request, book_id, zip_flag):
     full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     
     if book.cat_type==opdsdb.CAT_INP:
-        # Убираем из пути INPX файл
-        inpx_path, zip_name = os.path.split(full_path)
-        path, inpx_file = os.path.split(inpx_path)
+        # Убираем из пути INPX и INP файл
+        inp_path, zip_name = os.path.split(full_path)
+        inpx_path, inp_name = os.path.split(inp_path)
+        path, inpx_name = os.path.split(inpx_path)
         full_path = os.path.join(path,zip_name)
         
     if config.SOPDS_TITLE_AS_FILENAME:
@@ -220,10 +222,11 @@ def Cover(request, book_id, thumbnail=False):
     response = HttpResponse()
     full_path = os.path.join(config.SOPDS_ROOT_LIB, book.path)
     if book.cat_type == opdsdb.CAT_INP:
-        # Убираем из пути INPX файл
-        inpx_path, zip_name = os.path.split(full_path)
-        path, inpx_file = os.path.split(inpx_path)
-        full_path = os.path.join(path, zip_name)
+        # Убираем из пути INPX и INP файл
+        inp_path, zip_name = os.path.split(full_path)
+        inpx_path, inp_name = os.path.split(inp_path)
+        path, inpx_name = os.path.split(inpx_path)
+        full_path = os.path.join(path,zip_name)
 
     try:
         if book.cat_type == opdsdb.CAT_NORMAL:
@@ -276,10 +279,11 @@ def Cover0(request, book_id, thumbnail = False):
     c0=0
     full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     if book.cat_type==opdsdb.CAT_INP:
-        # Убираем из пути INPX файл
-        inpx_path, zip_name = os.path.split(full_path)
-        path, inpx_file = os.path.split(inpx_path)
-        full_path = os.path.join(path,zip_name)   
+        # Убираем из пути INPX и INP файл
+        inp_path, zip_name = os.path.split(full_path)
+        inpx_path, inp_name = os.path.split(inp_path)
+        path, inpx_name = os.path.split(inpx_path)
+        full_path = os.path.join(path,zip_name)
          
     if book.format=='fb2':        
         fb2=fb2parse.fb2parser(1)
@@ -342,10 +346,11 @@ def ConvertFB2(request, book_id, convert_type):
 
     full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     if book.cat_type==opdsdb.CAT_INP:
-        # Убираем из пути INPX файл
-        inpx_path, zip_name = os.path.split(full_path)
-        path, inpx_file = os.path.split(inpx_path)
-        full_path = os.path.join(path,zip_name)  
+        # Убираем из пути INPX и INP файл
+        inp_path, zip_name = os.path.split(full_path)
+        inpx_path, inp_name = os.path.split(inp_path)
+        path, inpx_name = os.path.split(inpx_path)
+        full_path = os.path.join(path,zip_name)
             
     if config.SOPDS_TITLE_AS_FILENAME:
         transname=utils.translit(book.title+'.'+book.format)

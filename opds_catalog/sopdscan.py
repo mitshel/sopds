@@ -115,17 +115,17 @@ class opdsScanner:
         
         self.log_stats()
 
-    def inpskip_callback(self, inpx, inp_name, inp_size):
+    def inpskip_callback(self, inpx, inp_file, inp_size):
+
+        self.rel_path=os.path.relpath(os.path.join(inpx,inp_file),config.SOPDS_ROOT_LIB)
+        print(self.rel_path,inp_size)
         
-        self.zip_file = os.path.join(inpx,"%s%s"%(inp_name,'.zip'))
-        self.rel_path=os.path.relpath(self.zip_file,config.SOPDS_ROOT_LIB)            
-        
-        if opdsdb.arc_skip(self.rel_path,inp_size):
-            self.logger.info('Skip ZIP for INP archive '+self.zip_file+'. Not changed.')
+        if config.SOPDS_INPX_SKIP_UNCHANGED and opdsdb.inp_skip(self.rel_path,inp_size):
+            self.logger.info('Skip INP metafile '+inp_file+'. Not changed.')
             result = 1               
         else:    
-            self.logger.info('Start process ZIP for INP archive = '+self.zip_file) 
-            self.inp_cat = opdsdb.addcattree(self.rel_path, opdsdb.CAT_INP, inp_size)
+            self.logger.info('Start process INP metafile = '+inp_file)
+            self.inp_cat = opdsdb.addcattree(self.rel_path, opdsdb.CAT_INPX, inp_size)
             result = 0
          
         return result
@@ -138,23 +138,26 @@ class opdsScanner:
         title=meta_data[inpx_parser.sTitle].strip(strip_symbols)
         annotation=''
         docdate=meta_data[inpx_parser.sDate].strip(strip_symbols)
-        
-        
-        book=opdsdb.addbook(name,self.rel_path,self.inp_cat,meta_data[inpx_parser.sExt],title,annotation,docdate,lang,meta_data[inpx_parser.sSize],opdsdb.CAT_INP)
-        self.books_added+=1
-        self.books_in_archives+=1
-        self.logger.debug("Book "+self.rel_path+"/"+name+" Added ok.")    
-        
-        for a in meta_data[inpx_parser.sAuthor]:
-            author=opdsdb.addauthor(a.replace(',',' '))
-            opdsdb.addbauthor(book,author)
 
-        for g in meta_data[inpx_parser.sGenre]:
-            opdsdb.addbgenre(book,opdsdb.addgenre(g.lower().strip(strip_symbols)))
-            
-        for s in meta_data[inpx_parser.sSeries]:
-            ser=opdsdb.addseries(s.strip())
-            opdsdb.addbseries(book,ser,0)                         
+        rel_path_current = os.path.join(self.rel_path,meta_data[inpx_parser.sFolder])
+
+        if opdsdb.findbook(name, rel_path_current, 1) == None:
+            cat = opdsdb.addcattree(rel_path_current, opdsdb.CAT_INP)
+            book=opdsdb.addbook(name,rel_path_current,cat,meta_data[inpx_parser.sExt],title,annotation,docdate,lang,meta_data[inpx_parser.sSize],opdsdb.CAT_INP)
+            self.books_added+=1
+            self.books_in_archives+=1
+            self.logger.debug("Book "+rel_path_current+"/"+name+" Added ok.")
+
+            for a in meta_data[inpx_parser.sAuthor]:
+                author=opdsdb.addauthor(a.replace(',',' '))
+                opdsdb.addbauthor(book,author)
+
+            for g in meta_data[inpx_parser.sGenre]:
+                opdsdb.addbgenre(book,opdsdb.addgenre(g.lower().strip(strip_symbols)))
+
+            for s in meta_data[inpx_parser.sSeries]:
+                ser=opdsdb.addseries(s.strip())
+                opdsdb.addbseries(book,ser,0)
                    
     def processinpx(self,name,full_path,file):
         rel_file=os.path.relpath(file,config.SOPDS_ROOT_LIB)
