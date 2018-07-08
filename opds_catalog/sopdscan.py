@@ -118,7 +118,6 @@ class opdsScanner:
     def inpskip_callback(self, inpx, inp_file, inp_size):
 
         self.rel_path=os.path.relpath(os.path.join(inpx,inp_file),config.SOPDS_ROOT_LIB)
-        print(self.rel_path,inp_size)
         
         if config.SOPDS_INPX_SKIP_UNCHANGED and opdsdb.inp_skip(self.rel_path,inp_size):
             self.logger.info('Skip INP metafile '+inp_file+'. Not changed.')

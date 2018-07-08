@@ -68,7 +68,7 @@ class Inpx:
 
         for inp_file in filelist:
             (inp_name,inp_ext) = os.path.splitext(inp_file)
-            
+
             # Если файл не INP то пропускаем
             if inp_ext.upper() != '.INP':
                 continue
@@ -102,12 +102,13 @@ class Inpx:
                     continue
 
                 # Если решили проверять на наличие ZIP файла или книги в ZIP, а самого ZIP файла нет - то пропускаем вызов callback
-                if (self.TEST_ZIP or self.TEST_FILES) and not os.path.isfile(meta_data[sFolder]):
+                zip_file = os.path.join(self.inpx_catalog, meta_data[sFolder])
+                if (self.TEST_ZIP or self.TEST_FILES) and not os.path.isfile(zip_file):
                     continue
 
                 # Если нужно выполнить проверку книги в ZIP, а ее там не оказалось, то пропускаем вызов callback
                 if self.TEST_FILES:
-                    if not "%s.%s"(meta_data[sFile],meta_data[sExt]) in zipfile.ZipFile(meta_data[sFolder], "r").namelist():
+                    if not "%s.%s"%(meta_data[sFile],meta_data[sExt]) in zipfile.ZipFile(zip_file, "r").namelist():
                         continue
 
                 self.append_callback(self.inpx_file, inp_name, meta_data)
