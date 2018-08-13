@@ -18,8 +18,7 @@ from django.contrib import admin
 from django.views.generic import RedirectView
 from django.urls import reverse_lazy
 
-
-from django.contrib.auth.views import logout
+# from django.contrib.auth import logout
 
 urlpatterns = [
     url(r'^opds/', include('opds_catalog.urls', namespace='opds')),
