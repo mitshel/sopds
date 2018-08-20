@@ -49,6 +49,9 @@
 
 	yum install python3                            # команда установки для RHEL, Fedora, CentOS
 	python3 -m pip install -r requirements.txt
+	
+для постгресса - pip install psycopg2-binary
+		pip3 install psycopg2
    
 1.3 Производим инициализацию базы данных и заполнение начальными данными (жанры)
 
