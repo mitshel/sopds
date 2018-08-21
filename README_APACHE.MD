@@ -5,33 +5,37 @@
 
 Прописываем настройки апача по пути /etc/apache2/sites-available/ в существующий конфиг или в новый, например в sopds.conf
 
+    Define sopds_dir /путь_к_папке/sopds
+    
     <VirtualHost *:80>
         ServerAdmin sopsd@localhost
         ServerName sopds
-        DocumentRoot /путь_к_папке/sopds
+        DocumentRoot ${sopds_dir}
         
         ErrorLog ${APACHE_LOG_DIR}/sopds_error.log
         CustomLog ${APACHE_LOG_DIR}/sopds_access.log combined
         
-        WSGIScriptAlias / /путь_к_папке/sopds/sopds/wsgi.py
-        WSGIDaemonProcess sopds processes=2 threads=15 python-path=/путь_к_папке/sopds
+        WSGIScriptAlias / ${sopds_dir}/sopds/wsgi.py
+        WSGIDaemonProcess sopds processes=2 threads=15 python-path=${sopds_dir}
         WSGIProcessGroup sopds
         WSGIScriptReloading On
         WSGIPassAuthorization On
         
-    <Directory "/путь_к_папке/sopds/sopds/">
+    <Directory ${sopds_dir}/sopds/>
         Require all granted
     </Directory>
     
-    <Directory "/путь_к_папке/sopds/static/">
+    <Directory ${sopds_dir}/static/>
         Require all granted
     </Directory>
     
-    Alias   /static "/путь_к_папке/sopds/static"
+    Alias   /static ${sopds_dir}/static
     </VirtualHost>
 
 Если используется виртуальное окружение
 
+    Define sopds_dir /путь_к_папке/sopds
+    
     <VirtualHost *:80>
         ServerAdmin sopsd@localhost
         ServerName sopds
@@ -39,24 +43,28 @@
         ErrorLog ${APACHE_LOG_DIR}/sopds_error.log
         CustomLog ${APACHE_LOG_DIR}/sopds_access.log combined
     
-        WSGIScriptAlias / /путь_к_папке/sopds/sopds/wsgi.py
+        WSGIScriptAlias / ${sopds_dir}/sopds/wsgi.py
 
-        WSGIDaemonProcess sopds processes=2 threads=15 python-path=/путь_к_папке/sopds python-home=/путь_к_папке_виртуального_окружения/lib/python3.5/site-packages
+        WSGIDaemonProcess sopds processes=2 threads=15 display-name=%{GROUP} python-path=${sopds_dir} python-home=${sopds_dir}/env
         WSGIProcessGroup sopds
         WSGIScriptReloading On
         WSGIPassAuthorization On
     
-    <Directory "/путь_к_папке/sopds/sopds/">
+    <Directory ${sopds_dir}/sopds/>
         Require all granted
     </Directory>
     
-    <Directory "/путь_к_папке/sopds/static/">
+    <Directory ${sopds_dir}/static/>
         Require all granted
     </Directory>
     
-    Alias   /static    "/путь_к_папке/sopds/static"
+    Alias /static ${sopds_dir}/static
     
     </VirtualHost>
+    
+python-home=${sopds_dir}/env - путь к папке виртуального окружения
+display-name=%{GROUP} - необязательный параметр, меняет имя отображаемое для процеса при использовании команды **ps**
+
     
 Включаем конфиг командой
 
