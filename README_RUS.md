@@ -27,7 +27,7 @@
    
    	source env/bin/activate
 	
-	для выхода из виртуального окружения - deactivate
+   для выхода из виртуального окружения - ***deactivate***
 
    
    Обновляем установщик пакетов
@@ -50,8 +50,7 @@
 	yum install python3                            # команда установки для RHEL, Fedora, CentOS
 	python3 -m pip install -r requirements.txt
 	
-для постгресса - pip install psycopg2-binary
-		pip3 install psycopg2
+Для работы с БД PostgreSQL `pip3 install {psycopg2-binary,psycopg2}`
    
 1.3 Производим инициализацию базы данных и заполнение начальными данными (жанры)
 
