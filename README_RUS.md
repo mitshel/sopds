@@ -32,9 +32,10 @@
    	pip3 install --upgrade pip
 	
 Все последующие действия выполнять из виртуального окружения.
+
 Для выхода из виртуального окружения - ***deactivate***
 
-1.2 Зависимости.  
+1.2 [requirements.txt](Зависимости).  
 - Требуется Python не ниже версии 3.4
 - Django 1.10
 - Pillow 2.9.0
@@ -186,7 +187,7 @@ MySQL по сравнению с sqlite работает гораздо быст
 	python3 manage.py sopds_scanner stop
 	
 #### 3. Настройка базы данных PostgreSQL (опционально, хороший вариант использования программы SimpleOPDS).
-3.1 PostgreSQL - nявляется хорошим вариантом использования ПО SimpleOPDS.
+3.1 PostgreSQL - является хорошим вариантом использования ПО SimpleOPDS.
 Для использования PostgreSQL этого неоюбходимо установить эту БД и настроить ее (подробное описание можно найти в Интернет, напримр здесь: http://alexxkn.ru/node/42 или здесь: http://www.fight.org.ua/database/install_posqgresql_ubuntu.html):
 
     UBUNTU: 
