@@ -35,7 +35,7 @@
 
 Для выхода из виртуального окружения - ***deactivate***
 
-1.2 [requirements.txt](Зависимости).  
+1.2 [Зависимости.](requirements.txt) 
 - Требуется Python не ниже версии 3.4
 - Django 1.10
 - Pillow 2.9.0
