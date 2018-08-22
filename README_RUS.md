@@ -19,7 +19,7 @@
    
    	sudo apt-get install python3-venv
    
-   Создаём папку виртуального окружения env
+   Создаём папку виртуального окружения env в текущей директории
    
    	python3 -m venv env
    
@@ -27,14 +27,12 @@
    
    	source env/bin/activate
 	
-   для выхода из виртуального окружения - ***deactivate***
-
-   
    Обновляем установщик пакетов
    
    	pip3 install --upgrade pip
 	
 Все последующие действия выполнять из виртуального окружения.
+Для выхода из виртуального окружения - ***deactivate***
 
 1.2 Зависимости.  
 - Требуется Python не ниже версии 3.4
@@ -50,7 +48,7 @@
 	yum install python3                            # команда установки для RHEL, Fedora, CentOS
 	python3 -m pip install -r requirements.txt
 	
-Для работы с БД PostgreSQL `pip3 install {psycopg2-binary,psycopg2}`
+Для работы с БД PostgreSQL нужны ещё 2 пакета -  `pip3 install {psycopg2-binary,psycopg2}`
    
 1.3 Производим инициализацию базы данных и заполнение начальными данными (жанры)
 
