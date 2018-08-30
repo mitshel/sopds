@@ -17,7 +17,6 @@ or from github.com with the following command:
 - Django 1.10
 - Pillow 2.9.0
 - apscheduler 3.3.0
-- django-constance[database] 2.1
 - lxml
 - python-telegram-bot 10
 
