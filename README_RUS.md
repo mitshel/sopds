@@ -17,6 +17,7 @@
 - Django 1.10
 - Pillow 2.9.0
 - apscheduler 3.3.0
+- jango-picklefield
 - lxml
 - python-telegram-bot 10
 
