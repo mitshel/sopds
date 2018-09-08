@@ -17,7 +17,7 @@ or from github.com with the following command:
 - Django 1.10
 - Pillow 2.9.0
 - apscheduler 3.3.0
-- jango-picklefield
+- django-picklefield
 - lxml
 - python-telegram-bot 10
 
