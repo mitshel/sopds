@@ -16,7 +16,7 @@
         CustomLog ${APACHE_LOG_DIR}/sopds_access.log combined
         
         WSGIScriptAlias / ${sopds_dir}/sopds/wsgi.py
-        WSGIDaemonProcess sopds processes=2 threads=15 python-path=${sopds_dir}
+        WSGIDaemonProcess sopds processes=2 threads=15 python-path=${sopds_dir} lang='ru_RU.UTF-8' locale='ru_RU.UTF-8
         WSGIProcessGroup sopds
         WSGIScriptReloading On
         WSGIPassAuthorization On
@@ -45,7 +45,7 @@
     
         WSGIScriptAlias / ${sopds_dir}/sopds/wsgi.py
 
-        WSGIDaemonProcess sopds processes=2 threads=15 display-name=%{GROUP} python-path=${sopds_dir} python-home=${sopds_dir}/env
+        WSGIDaemonProcess sopds processes=2 threads=15 display-name=%{GROUP} python-path=${sopds_dir} python-home=${sopds_dir}/env lang='ru_RU.UTF-8' locale='ru_RU.UTF-8
         WSGIProcessGroup sopds
         WSGIScriptReloading On
         WSGIPassAuthorization On
