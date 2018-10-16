@@ -22,19 +22,16 @@
 	};
 	window.setTimeout(waitForLoad, 500);  
 	
-	var ChangeBookDate = function(ID){
-		
-	}
-	
 	var SetPos = function(){
 		var Reader = $('#ReaderBlock');
+		var i = 0;
 		xPos = window.scrollY;
 		Reader.find('div').each(function(idx,el){
 			var elem = $(el);
+			i++;
 			if ((elem.offset().top+elem.height()) > xPos) {
-				var CurrentPos = $(el).attr('id');
 				$.ajax( {
-					url: '{% url 'web:setpos' book_id %}?pos='+CurrentPos,
+					url: '{% url 'web:setpos' book_id %}?pos='+i,
 					type: 'GET',
 					cache: false
 				});	
@@ -48,21 +45,20 @@
 			url: '{% url 'web:getpos' book_id %}',
 			type: 'GET',
 			cache: false,
-			success: function(lineID) {
+			success: function(line) {
 				var Reader = $('#ReaderBlock');
-				Reader.find('div').each(function(idx,el){
-					if ($(el).attr('id') == lineID) {
-						window.scrollTo(0,$(el).offset().top);
-					};
-				})
+				el = Reader.find('div')[parseInt(line)-1];
+				window.scrollTo(0,$(el).offset().top);
 			}
 		});		
 	}
 
 	LoadBook = function(){
 		if (localStorage.getItem(BookID)){
-			$("#ReaderBlock").html(LZString.decompress(localStorage.getItem(BookID)));
-			GetPos();
+			LZString.decompressE(localStorage.getItem(BookID),function(data){
+				$("#ReaderBlock").html(data);
+				GetPos();
+			})		
 		} else {
 			$.ajax( {
 				url: '{% url 'opds_catalog:read' book_id %}',
