@@ -26,5 +26,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #url(r'^logout/$', logout, {'next_page':'/web/'},name='logout'),   
     #url(r'^', include('sopds_web_backend.urls', namespace='web', app_name='opds_web_backend')),
-    url(r'^', RedirectView.as_view(url=reverse_lazy("web:main"))),
+    url(r'^$', RedirectView.as_view(url=reverse_lazy("web:main"))),
 ]
