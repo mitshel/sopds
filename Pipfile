@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django-picklefield = "*"
+lxml = "*"
+python-telegram-bot = ">=10"
+Django = ">=1.10"
+Pillow = ">=2.9.0"
+APScheduler = ">=3.3.0"
+
+[requires]
+python_version = "3.7"
