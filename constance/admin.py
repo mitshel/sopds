@@ -13,6 +13,7 @@ from django.contrib import admin, messages
 from django.contrib.admin import widgets
 from django.contrib.admin.options import csrf_protect_m
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
+from django.core.files.storage import default_storage
 from django.forms import fields
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -23,6 +24,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
 
 from . import LazyConfig, settings
+from .checks import get_inconsistent_fieldnames
 
 
 config = LazyConfig()
@@ -137,11 +139,8 @@ class ConstanceForm(forms.Form):
     def save(self):
         for file_field in self.files:
             file = self.cleaned_data[file_field]
-            file_path = os.path.join(django_settings.MEDIA_ROOT, file.name)
-            with open(file_path, 'wb+') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
-                self.cleaned_data[file_field] = file.name
+            default_storage.save(file.name, file)
+            self.cleaned_data[file_field] = file.name
 
         for name in settings.CONFIG:
             if getattr(config, name) != self.cleaned_data[name]:
@@ -165,11 +164,7 @@ class ConstanceForm(forms.Form):
         if not settings.CONFIG_FIELDSETS:
             return cleaned_data
 
-        field_name_list = []
-        for fieldset_title, fields_list in settings.CONFIG_FIELDSETS.items():
-            for field_name in fields_list:
-                field_name_list.append(field_name)
-        if field_name_list and set(set(settings.CONFIG.keys()) - set(field_name_list)):
+        if get_inconsistent_fieldnames():
             raise forms.ValidationError(_('CONSTANCE_CONFIG_FIELDSETS is missing '
                                           'field(s) that exists in CONSTANCE_CONFIG.'))
 
@@ -259,8 +254,12 @@ class ConstanceAdmin(admin.ModelAdmin):
         if settings.CONFIG_FIELDSETS:
             context['fieldsets'] = []
             for fieldset_title, fields_list in settings.CONFIG_FIELDSETS.items():
-                fields_exist = all(field in settings.CONFIG for field in fields_list)
-                assert fields_exist, "CONSTANCE_CONFIG_FIELDSETS contains field(s) that does not exist"
+                absent_fields = [field for field in fields_list
+                                 if field not in settings.CONFIG]
+                assert not any(absent_fields), (
+                    "CONSTANCE_CONFIG_FIELDSETS contains field(s) that does "
+                    "not exist: %s" % ', '.join(absent_fields))
+
                 config_values = []
 
                 for name in fields_list:

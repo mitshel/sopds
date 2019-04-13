@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'admin/css/changelists.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}" />
   {{ media.css }}
-  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/../../../../venv/Lib/site-packages/constance/static/admin/css/constance.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/constance.css' %}" />
 {% endblock %}
 
 {% block extrahead %}
@@ -14,7 +14,7 @@
 <script type="text/javascript" src="{{ jsi18nurl|default:'../../jsi18n/' }}"></script>
 {{ block.super }}
 {{ media.js }}
-<script type="text/javascript" src="{% static 'admin/js/../../../../venv/Lib/site-packages/constance/static/admin/js/constance.js' %}"></script>
+<script type="text/javascript" src="{% static 'admin/js/constance.js' %}"></script>
 {% endblock %}
 
 {% block bodyclass %}change-list{% endblock %}
@@ -48,12 +48,12 @@
               <fieldset class="module">
                   <h2>{{ fieldset.title }}</h2>
                   {% with config_values=fieldset.config_values %}
-                    {% include "admin/constance/includes/../../../../venv/Lib/site-packages/constance/templates/admin/constance/includes/results_list.html" %}
+                    {% include "admin/constance/includes/results_list.html" %}
                   {% endwith %}
               </fieldset>
               {% endfor %}
             {% else %}
-              {% include "admin/constance/includes/../../../../venv/Lib/site-packages/constance/templates/admin/constance/includes/results_list.html" %}
+              {% include "admin/constance/includes/results_list.html" %}
             {% endif %}
 
             <p class="paginator">
