@@ -341,8 +341,11 @@ class Command(BaseCommand):
         writepid(self.pidfile)
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
         self.stdout.write("Quit the sopds_telebot with %s.\n"%quit_command)
+        REQUEST_KWARGS={}
+        if config.SOPDS_TELEBOT_AUTH:
+            REQUEST_KWARGS['proxy_url'] = config.SOPDS_TELEBOT_PROXY
         try:
-            updater = Updater(token=config.SOPDS_TELEBOT_API_TOKEN)
+            updater = Updater(token=config.SOPDS_TELEBOT_API_TOKEN, request_kwargs=REQUEST_KWARGS)
             start_command_handler = CommandHandler('start', self.startCommand)
             getBook_handler = MessageHandler(Filters.text, self.getBooks)
             download_handler = RegexHandler('^/download\d+$',self.downloadBooks)

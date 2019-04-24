@@ -396,4 +396,7 @@ existing user in the Simple OPDS database.
 (by default SOPDS_TELEBOT_AUTH = True)
 
 **SOPDS_TELEBOT_MAXITEMS** - The maximum number of simultaneously displayed items in the Telegram message
-(by default SOPDS_TELEBOT_MAXITEMS = 10)
+(by default SOPDS_TELEBOT_MAXITEMS = 10)    
+
+**SOPDS_TELEBOT_PROXY** - Proxy address    
+(example: https://68.183.231.47:8080/)

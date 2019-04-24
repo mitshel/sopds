@@ -410,4 +410,7 @@ MySQL по сравнению с sqlite работает гораздо быст
 (по умолчанию SOPDS_TELEBOT_AUTH = True)
 
 **SOPDS_TELEBOT_MAXITEMS** - Максимальное число одновременно выводимых элеменов в сообщении Telegram
-(по умолчанию SOPDS_TELEBOT_MAXITEMS = 10)
+(по умолчанию SOPDS_TELEBOT_MAXITEMS = 10)    
+
+**SOPDS_TELEBOT_PROXY** - Адрес прокси     
+(например: https://68.183.231.47:8080/)
