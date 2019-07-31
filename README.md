@@ -4,15 +4,15 @@
 
 [Инструкция на русском языке: README_RUS.md](README_RUS.md)
 
-#### 1. Simple installation of SimpleOPDS (by using sqlite3 database)
+# 1. Simple installation of SimpleOPDS (by using sqlite3 database)
 
-1.1 Installing the project
+## 1.1 Installing the project
 You can download the archive with the project from www.sopds.ru,
 or from github.com with the following command:
 
 	git clone https://github.com/mitshel/sopds.git
 
-1.2 Dependencies.
+## 1.2 Dependencies.
 - Requires Python at least version 3.4
 - Django 1.10
 - Pillow 2.9.0
@@ -26,33 +26,33 @@ The following dependencies should be established for the project:
     yum install python3                            # setup command for RHEL, Fedora, CentOS
     python3 -m pip install -r requirements.txt
 
-1.3 We initialize the database and fill in the initial data (genres)
+## 1.3 We initialize the database and fill in the initial data (genres)
 
 	python3 manage.py migrate
 	python3 manage.py sopds_util clear
 
-1.4 Creating a Superuser
+## 1.4 Creating a Superuser
 
 	python3 manage.py createsuperuser
 
-1.5 We adjust the path to your catalog with books and, if necessary, switch the interface language to English
+## 1.5 We adjust the path to your catalog with books and, if necessary, switch the interface language to English
 
 	python3 manage.py sopds_util setconf SOPDS_ROOT_LIB 'Path to the directory with books'
 	python3 manage.py sopds_util setconf SOPDS_LANGUAGE en-EN
 
-1.6 Launch the SCANNER server (optional, required for automated periodic re-scanning of the collection)
+## 1.6 Launch the SCANNER server (optional, required for automated periodic re-scanning of the collection)
     Please note that the default settings specify a periodic scan start 2 times a day 12:00 and 0:00.
 
 	python3 manage.py sopds_scanner start --daemon
 
-1.7 Starting the built-in HTTP / OPDS server
+## 1.7 Starting the built-in HTTP / OPDS server
 
 	python3 manage.py sopds_server start --daemon
 
 However, the best way is still to configure the HTTP / OPDS servers as Apache or Nginx
 (entry point ./sopds/wsgi.py)
 
-1.8 In order not to wait for the start of a scheduled scan, you can tell the sopds_scanner process about the need immediate scanning. You can do this by setting the configuration parameter SOPDS_SCAN_START_DIRECTLY = True two ways:
+## 1.8 In order not to wait for the start of a scheduled scan, you can tell the sopds_scanner process about the need immediate scanning. You can do this by setting the configuration parameter SOPDS_SCAN_START_DIRECTLY = True two ways:
 
 a) from the console using the command
 
@@ -61,7 +61,7 @@ a) from the console using the command
 b) With the help of the Web-interface administration page http://<Your server>:8001/admin/
    (FCONSTANCE -> Settings -> 1. General Options -> SOPDS_SCAN_START_DIRECTLY)
 
-1.9 Access to information
+## 1.9 Access to information
 If all previous steps were successful, then the library can be accessed by the following URLs:
 
 >     OPDS-version: http://<Your server>:8001/opds/
@@ -72,7 +72,7 @@ is one-user. Therefore, until the scanning process is completed, the attempts to
 "A server error occurred." Please contact the administrator. "
 To eliminate this problem, you need to use multi-user databases, for example MYSQL.
 
-1.10 If necessary, configure and run Telegram-bot
+## 1.10 If necessary, configure and run Telegram-bot
 
 The process of creating bots in telegrams is very simple, to create your bot in Telegram, you need to connect to
 channel [@BotFather] (https://telegram.me/botfather) and give the command to create a new bot **/newbot**. Then enter the name of the bot
@@ -91,8 +91,9 @@ Team,
 you can limit the use of your bot by Telegram users. In this case, your bot will serve only those
 users whose name in the telegram matches the existing user name in your Simple OPDS database.
 
-#### 2. Configuring the MySQL database (optional, but very desirable for increasing performance).
-2.1 To work with a large number of books, it is highly advisable not to use sqlite, but to configure MySQL databases to work. MySQL is much faster than sqlite. In addition, SQLite is a single-user database, i.e. during scanning access to a DB it will be impossible.
+# 2. Configuring the MySQL database (optional, but very desirable for increasing performance).
+
+## 2.1 To work with a large number of books, it is highly advisable not to use sqlite, but to configure MySQL databases to work. MySQL is much faster than sqlite. In addition, SQLite is a single-user database, i.e. during scanning access to a DB it will be impossible.
 
  To work with the Mysql database on different systems, you may need to install additional packages:
 
@@ -108,7 +109,7 @@ for example, as follows:
 	mysql> commit;
 	mysql> ^ C
 
-2.2 Then, in the configuration file, you need to comment out the connection strings to the sqlite database and uncomment the connection string to the Mysql database:
+## 2.2 Then, in the configuration file, you need to comment out the connection strings to the sqlite database and uncomment the connection string to the Mysql database:
 
 
 	DATABASES = {
@@ -134,7 +135,7 @@ for example, as follows:
     #}
 
 
-2.4 Using InnoDB instead of MyISAM.
+## 2.4 Using InnoDB instead of MyISAM.
 The above MySQL configuration uses MyISAM as the database engine, which works on most versions of MySQL or MariaDB. However, if you use a relatively new version of Mysql (MariaDB> = 10.2.2, Mysql> = 5.7.9), then you can use the more modern InnoDB engine. It is somewhat faster and supports transactions, which will positively affect the integrity of the database. (On older versions of MySQL, there are problems with it because of restrictions on the maximum length of indexes.) Thus, if you have a modern version of MySQL (MariaDB> = 10.2.2, Mysql> = 5.7.9), then in the Mysql database settings, simply use the following instead of the above OPTIONS parameters:
 
     'OPTIONS' : {
@@ -145,13 +146,14 @@ The above MySQL configuration uses MyISAM as the database engine, which works on
                         """
     }
 
-2.5 Further it is necessary to re-execute points 1.3 - 1.8 of this instruction in order to initialize and fill the newly created database However, if you have already started the HTTP/OPDS server and the SCANNER server, you must first stop them:
+## 2.5 Further it is necessary to re-execute points 1.3 - 1.8 of this instruction in order to initialize and fill the newly created database However, if you have already started the HTTP/OPDS server and the SCANNER server, you must first stop them:
 
 	python3 manage.py sopds_server stop
 	python3 manage.py sopds_scanner stop
 
-#### 3. Configuring the PostgreSQL database (optional, a good option for using the SimpleOPDS program).
-3.1 PostgreSQL is a good way to use SimpleOPDS.
+# 3. Configuring the PostgreSQL database (optional, a good option for using the SimpleOPDS program).
+
+## 3.1 PostgreSQL is a good way to use SimpleOPDS.
 To use PostgreSQL, it is necessary to install this database and configure it (for a detailed description, see the Internet, for example: http://alexxkn.ru/node/42 or here: http://www.fight.org.ua/database/ install_posqgresql_ubuntu.html):
 
 
@@ -187,7 +189,7 @@ Next, you must first create a database "sopds" and a user with the necessary rig
 	 postgres=# create database sopds with owner sopds;
 	 postgres=# \q
 
-3.2 Next in the configuration file, you need to comment out the connection strings to the sqlite database and decompress it accordingly the connection string to the PostgreSQL database:
+## 3.2 Next in the configuration file, you need to comment out the connection strings to the sqlite database and decompress it accordingly the connection string to the PostgreSQL database:
 
 	 DATABASES = {
 	    'default': {
@@ -208,14 +210,14 @@ Next, you must first create a database "sopds" and a user with the necessary rig
      #    }
      #}
 
-3.4 Next, it is necessary to re-execute points 1.3 - 1.8 of this instruction in order to initialize and fill the newly created database However, if you have already started the HTTP/OPDS server and the SCANNER server, you must first stop them:
+## 3.4 Next, it is necessary to re-execute points 1.3 - 1.8 of this instruction in order to initialize and fill the newly created database However, if you have already started the HTTP/OPDS server and the SCANNER server, you must first stop them:
 
 	 python3 manage.py sopds_server stop
 	 python3 manage.py sopds_scanner stop
 
-#### 4. Setting the conversion of fb2 to EPUB or MOBI (optionally, you can not configure it)
+# 4. Setting the conversion of fb2 to EPUB or MOBI (optionally, you can not configure it)
 
-4.1 fb2-to-epub converter http://code.google.com/p/fb2-to-epub-converter/
+## 4.1 fb2-to-epub converter http://code.google.com/p/fb2-to-epub-converter/
 - First you need to download the latest version of the fb2toepub converter from the link above (the current one is already in the project) unfortunately the converter is not perfect and not all books can be converted, but most still converted
 - Further, you need to copy the archive to the folder **./convert/fb2toepub** and unzip
 - Next, we compile the project with the make command, as a result, the executable file fb2toepub appears in the unix_dist folder
@@ -225,14 +227,14 @@ Next, you must first create a database "sopds" and a user with the necessary rig
 
 - As a result, the OPDS client will be provided with links to the FB2-book in the epub format
 
-4.2 fb2epub converter http://code.google.com/p/epub-tools/ (the converter is written in Java, so at least JDK 1.5 should be installed on your system)
+## 4.2 fb2epub converter http://code.google.com/p/epub-tools/ (the converter is written in Java, so at least JDK 1.5 should be installed on your system)
 - also first download the latest version from the link above (the current one is already in the project)
 - copy the jar-file to the directory **./convert/fb2epub** (There is already a shell script to run the jar-file)
 - Set the path to the shell script fb2epub (or fb2epub.cmd for Windows) using the web administrator interface or the following console commands:
 
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2epub/fb2epub"
 
-4.3 Converter fb2conv (converting to epub and mobi)   
+## 4.3 Converter fb2conv (converting to epub and mobi)   
     http://www.the-ebook.org/forum/viewtopic.php?t=28447  
     https://github.com/rupor-github/fb2mobi/releases  
 - It is necessary to install python 2.7 (however, for the latest version with GitHub, you do not need to do this, since it uses the same as SOPDS python3)
@@ -251,7 +253,7 @@ Next, you must first create a database "sopds" and a user with the necessary rig
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2conv/fb2epub"
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOMOBI "convert/fb2conv/fb2mobi"
 
-#### 5. Console commands Simple OPDS
+# 5. Console commands Simple OPDS
 
 Show information about the book collection:
 
@@ -298,7 +300,7 @@ Run the embedded web server:
     python3 manage.py sopds_server start [--host <IP address>] [--port <port N>] [--daemon]
 
 
-#### 6. Options of the cataloger Simple OPDS (www.sopds.ru)  
+# 6. Options of the cataloger Simple OPDS (www.sopds.ru)  
 The Simple OPDS cataloger has additional settings that can be changed using the admin interface http://<Your server>/admin/  
 
 **SOPDS_LANGUAGE** - change the interface language.  
