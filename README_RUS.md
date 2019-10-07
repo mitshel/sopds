@@ -54,7 +54,8 @@
 	python3 -m pip install -r requirements.txt
 	
 Для работы с БД PostgreSQL нужны ещё 2 пакета -  `pip3 install {psycopg2-binary,psycopg2}`
-   
+(для psycorg2 понадобятся ещё 2 пакета: sudo apt install libpq-dev python3-dev)
+
 1.3 Производим инициализацию базы данных и заполнение начальными данными (жанры)
 
 	python3 manage.py migrate
