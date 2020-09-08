@@ -308,12 +308,12 @@ class Command(BaseCommand):
         if re.match(r'/getfileepub',query):
             document = dl.getFileDataEpub(book)
             #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "epub"}))]
-            filename = filename + '.epub'
+            filename = filename.replace('.fb2', '.epub')
 
         if re.match(r'/getfilemobi',query):
             document = dl.getFileDataMobi(book)
             #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "mobi"}))]
-            filename = filename + '.mobi'
+            filename = filename.replace('.fb2', '.mobi')
 
         if document:
             bot.send_document(chat_id=callback_query.message.chat_id,document=document,filename=filename)
