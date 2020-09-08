@@ -345,11 +345,13 @@ class Command(BaseCommand):
             updater = Updater(token=config.SOPDS_TELEBOT_API_TOKEN)
             start_command_handler = CommandHandler('start', self.startCommand)
             getBook_handler = MessageHandler(Filters.text, self.getBooks)
-            download_handler = RegexHandler('^/download\d+$',self.downloadBooks)
+	    #fix deprecated RegexHandler See https://git.io/fxJuV for more info
+            download_handler = MessageHandler(Filters.regex('^/download\d+$'),self.downloadBooks)
 
             updater.dispatcher.add_handler(start_command_handler)
-            updater.dispatcher.add_handler(getBook_handler)
+	    #change order of handlers, to handle download(regexp) before common text(book name)
             updater.dispatcher.add_handler(download_handler)
+            updater.dispatcher.add_handler(getBook_handler)
             updater.dispatcher.add_handler(CallbackQueryHandler(self.botCallback))
 
             updater.start_polling(clean=True)
