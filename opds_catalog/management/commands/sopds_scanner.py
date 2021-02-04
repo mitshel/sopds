@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
     def scan(self):
         if self.scan_is_active:
-            self.stdout.write('Scan process already active. Skip currend job.')
+            self.stdout.write('Scan process already active. Skip current job.')
             return
         
         self.scan_is_active = True
@@ -100,7 +100,7 @@ class Command(BaseCommand):
             self.update_shedule()
         if config.SOPDS_SCAN_START_DIRECTLY:
             config.SOPDS_SCAN_START_DIRECTLY = False
-            self.stdout.write('Startup scannyng directly by SOPDS_SCAN_START_DIRECTLY flag.')
+            self.stdout.write('Startup scanning directly by SOPDS_SCAN_START_DIRECTLY flag.')
             self.sched.add_job(self.scan, id='scan_directly')
                        
     def start(self):
@@ -166,10 +166,3 @@ def daemonize():
 #                raise
     os.close(std_in.fileno())
     os.close(std_out.fileno())
-
-
-    
-
-        
- 
-
