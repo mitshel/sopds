@@ -49,7 +49,7 @@ def CheckAuthDecorator(func):
         if users and users[0].is_active:
             return func(self, update, context)
 
-        bot.sendMessage(chat_id=query.chat_id,
+        context.bot.sendMessage(chat_id=query.chat_id,
                         text=_("Hello %s!\nUnfortunately you do not have access to information. Please contact the bot administrator.") % username)
         self.logger.info(_("Denied access for user: %s") % username)
 
