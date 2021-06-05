@@ -18,16 +18,16 @@ from opds_catalog import settings, dl
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from constance import config
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler, CallbackContext
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import InvalidToken
 
 query_delimiter = "####"
 
 def cmdtrans(func):
-    def wrapper(self, bot, update):
+    def wrapper(self, update: Update, context: CallbackContext):
         translation.activate(config.SOPDS_LANGUAGE)
-        result =  func(self, bot, update)
+        result =  func(self, update, context)
         translation.deactivate()
         return result
 
@@ -35,9 +35,9 @@ def cmdtrans(func):
 
 
 def CheckAuthDecorator(func):
-    def wrapper(self, bot, update):
+    def wrapper(self, update: Update, context: CallbackContext):
         if not config.SOPDS_TELEBOT_AUTH:
-            return func(self, bot, update)
+            return func(self, update, context)
 
         if connection.connection and not connection.is_usable():
             del(connections._connections.default)
@@ -47,7 +47,7 @@ def CheckAuthDecorator(func):
         users = User.objects.filter(username__iexact=username)
 
         if users and users[0].is_active:
-            return func(self, bot, update)
+            return func(self, update, context)
 
         bot.sendMessage(chat_id=query.chat_id,
                         text=_("Hello %s!\nUnfortunately you do not have access to information. Please contact the bot administrator.") % username)
@@ -105,8 +105,8 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def startCommand(self, bot, update):
-        bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
+    def startCommand(self, update: Update, context: CallbackContext):
+        context.bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
                                                              {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
         self.logger.info("Start talking with user: %s"%update.message.from_user)
         return
@@ -174,6 +174,13 @@ class Command(BaseCommand):
             doubles = _("(doubles:%s) ")%b['doubles'] if b['doubles'] else ''
             response+='<b>%(title)s</b>\n%(author)s\n%(dbl)s/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
 
+        #fix for rare empty response
+        if not response:
+            response = self.BookPager(books, page_num -1, query)['message']
+            op.number = page_num - 1
+            op.next_page_number = op.number
+            op.num_pages = op.number
+
         buttons = [InlineKeyboardButton('1 <<', callback_data='%s%s%s'%(query,query_delimiter,1)),
                    InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.previous_page_number)),
                    InlineKeyboardButton('[ %s ]'%op.number , callback_data='%s%s%s'%(query,query_delimiter,'current')),
@@ -186,7 +193,7 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBooks(self, bot, update):
+    def getBooks(self, update: Update, context: CallbackContext):
         query=update.message.text
         self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
 
@@ -195,7 +202,7 @@ class Command(BaseCommand):
         else:
             response = _("I'm searching for the book: %s") % (query)
 
-        bot.send_message(chat_id=update.message.chat_id, text=response)
+        context.bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
 
         if len(query) < 3:
@@ -206,20 +213,20 @@ class Command(BaseCommand):
 
         if books_count == 0:
             response = _("No results were found for your query, please try again.")
-            bot.send_message(chat_id=update.message.chat_id, text=response)
+            context.bot.send_message(chat_id=update.message.chat_id, text=response)
             self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
             return
 
         response = _("Found %s books.\nI create list, after a few seconds, select the file to download:") % books_count
-        bot.send_message(chat_id=update.message.chat_id, text=response)
+        context.bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
 
         response = self.BookPager(books, 1, query)
-        bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+        context.bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBooksPage(self, bot, update):
+    def getBooksPage(self, update: Update, context: CallbackContext):
         callback_query = update.callback_query
         (query,page_num) = callback_query.data.split(query_delimiter, maxsplit=1)
         if (page_num == 'current'):
@@ -231,12 +238,12 @@ class Command(BaseCommand):
 
         books = self.BookFilter(query)
         response = self.BookPager(books, page_num, query)
-        bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+        context.bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
         return
 
     @cmdtrans
     @CheckAuthDecorator
-    def downloadBooks(self, bot, update):
+    def downloadBooks(self, update: Update, context: CallbackContext):
         book_id_set=re.findall(r'\d+$',update.message.text)
         if len(book_id_set)==1:
             try:
@@ -251,7 +258,7 @@ class Command(BaseCommand):
 
         if book==None:
             response = _("The book on the link you specified is not found, try to repeat the book search first.")
-            bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
+            context.bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
 
@@ -267,13 +274,13 @@ class Command(BaseCommand):
             buttons += [InlineKeyboardButton('MOBI', callback_data='/getfilemobi%s'%book_id)]
 
         markup = InlineKeyboardMarkup([buttons])
-        bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
+        context.bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
         self.logger.info("Send download buttons.")
         return
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBookFile(self, bot, update):
+    def getBookFile(self, update: Update, context: CallbackContext):
         callback_query = update.callback_query
         query = callback_query.data
         book_id_set=re.findall(r'\d+$',query)
@@ -289,7 +296,7 @@ class Command(BaseCommand):
 
         if book==None:
             response = _("The book on the link you specified is not found, try to repeat the book search first.")
-            bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
+            context.bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
 
@@ -316,12 +323,12 @@ class Command(BaseCommand):
             filename = filename.replace('.fb2', '.mobi')
 
         if document:
-            bot.send_document(chat_id=callback_query.message.chat_id,document=document,filename=filename)
+            context.bot.send_document(chat_id=callback_query.message.chat_id,document=document,filename=filename)
             document.close()
             self.logger.info("Send file: %s" % filename)
         else:
             response = _("There was a technical error, please contact the Bot administrator.")
-            bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
+            context.bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Book get error: %s" % response)
             return
 
@@ -329,13 +336,13 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def botCallback(self, bot, update):
+    def botCallback(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
         if re.match(r'/getfile', query.data):
-            return self.getBookFile(bot, update)
+            return self.getBookFile(update, context)
         else:
-            return self.getBooksPage(bot, update)
+            return self.getBooksPage(update, context)
 
     def start(self):
         writepid(self.pidfile)
@@ -354,7 +361,7 @@ class Command(BaseCommand):
             updater.dispatcher.add_handler(getBook_handler)
             updater.dispatcher.add_handler(CallbackQueryHandler(self.botCallback))
 
-            updater.start_polling(clean=True)
+            updater.start_polling(drop_pending_updates=True)
             updater.idle()
         except InvalidToken:
             self.stdout.write('Invalid telegram token.\nSet correct token for telegram API by command:\n python3 manage.py sopds_util setconf SOPDS_TELEBOT_API_TOKEN "<token>"')
