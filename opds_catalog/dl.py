@@ -19,6 +19,8 @@ from book_tools.format.mimetype import Mimetype
 from constance import config
 from PIL import Image
 
+from opds_catalog.middleware import BasicAuthMiddleware
+
 def getFileName(book):
     if config.SOPDS_TITLE_AS_FILENAME:
         transname = utils.translit(book.title + '.' + book.format)
@@ -143,8 +145,14 @@ def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """
     book = Book.objects.get(id=book_id)
 
-    if config.SOPDS_AUTH and request.user.is_authenticated:
-        bookshelf.objects.get_or_create(user=request.user, book=book)
+    if config.SOPDS_AUTH:
+        if not request.user.is_authenticated:
+            bau = BasicAuthMiddleware()
+            request = bau.process_request(request)
+            if not hasattr(request, 'user'):
+                return request
+        if request.user.is_authenticated:
+            bookshelf.objects.get_or_create(user=request.user, book=book)
 
     full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     
