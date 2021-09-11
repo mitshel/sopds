@@ -108,7 +108,7 @@ for example, as follows:
 	mysql> commit;
 	mysql> ^ C
 
-2.2 Then, in the configuration file, you need to comment out the connection strings to the sqlite database and uncomment the connection string to the Mysql database:
+2.2 Then, in the configuration file sopds/settings.py, you need to comment out the connection strings to the sqlite database and uncomment the connection string to the Mysql database:
 
 
 	DATABASES = {
@@ -187,7 +187,7 @@ Next, you must first create a database "sopds" and a user with the necessary rig
 	 postgres=# create database sopds with owner sopds;
 	 postgres=# \q
 
-3.2 Next in the configuration file, you need to comment out the connection strings to the sqlite database and decompress it accordingly the connection string to the PostgreSQL database:
+3.2 Next in the configuration file sopds/settings.py, you need to comment out the connection strings to the sqlite database and decompress it accordingly the connection string to the PostgreSQL database:
 
 	 DATABASES = {
 	    'default': {
