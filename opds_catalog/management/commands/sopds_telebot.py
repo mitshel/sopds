@@ -35,9 +35,9 @@ def cmdtrans(func):
 
 
 def CheckAuthDecorator(func):
-    def wrapper(self, bot, update):
+    def wrapper(self, update, context):
         if not config.SOPDS_TELEBOT_AUTH:
-            return func(self, bot, update)
+            return func(self, update, context)
 
         if connection.connection and not connection.is_usable():
             del(connections._connections.default)
@@ -47,7 +47,7 @@ def CheckAuthDecorator(func):
         users = User.objects.filter(username__iexact=username)
 
         if users and users[0].is_active:
-            return func(self, bot, update)
+            return func(self, update, context)
 
         bot.sendMessage(chat_id=query.chat_id,
                         text=_("Hello %s!\nUnfortunately you do not have access to information. Please contact the bot administrator.") % username)
