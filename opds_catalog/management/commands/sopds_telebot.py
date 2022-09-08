@@ -105,9 +105,9 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def startCommand(self, bot, update):
-        bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
-                                                             {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
+    def startCommand(self, update, context):
+        context.bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
+                                                                      {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
         self.logger.info("Start talking with user: %s"%update.message.from_user)
         return
 
