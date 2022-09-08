@@ -186,16 +186,16 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBooks(self, bot, update):
-        query=update.message.text
+    def getBooks(self, update, context):
+        query = update.message.text
         self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
 
-        if len(query)<3:
+        if len(query) < 3:
             response = _("Too short for search, please try again.")
         else:
             response = _("I'm searching for the book: %s") % (query)
 
-        bot.send_message(chat_id=update.message.chat_id, text=response)
+        context.bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
 
         if len(query) < 3:
@@ -206,23 +206,23 @@ class Command(BaseCommand):
 
         if books_count == 0:
             response = _("No results were found for your query, please try again.")
-            bot.send_message(chat_id=update.message.chat_id, text=response)
+            context.bot.send_message(chat_id=update.message.chat_id, text=response)
             self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
             return
 
         response = _("Found %s books.\nI create list, after a few seconds, select the file to download:") % books_count
-        bot.send_message(chat_id=update.message.chat_id, text=response)
+        context.bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
 
         response = self.BookPager(books, 1, query)
-        bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+        context.bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBooksPage(self, bot, update):
+    def getBooksPage(self, update, context):
         callback_query = update.callback_query
-        (query,page_num) = callback_query.data.split(query_delimiter, maxsplit=1)
-        if (page_num == 'current'):
+        query, page_num = callback_query.data.split(query_delimiter, maxsplit=1)
+        if page_num == 'current':
             return
         try:
             page_num = int(page_num)
@@ -231,12 +231,12 @@ class Command(BaseCommand):
 
         books = self.BookFilter(query)
         response = self.BookPager(books, page_num, query)
-        bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+        context.bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
         return
 
     @cmdtrans
     @CheckAuthDecorator
-    def downloadBooks(self, bot, update):
+    def downloadBooks(self, update, context):
         book_id_set=re.findall(r'\d+$',update.message.text)
         if len(book_id_set)==1:
             try:
@@ -251,7 +251,7 @@ class Command(BaseCommand):
 
         if book==None:
             response = _("The book on the link you specified is not found, try to repeat the book search first.")
-            bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
+            context.bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
 
@@ -267,13 +267,13 @@ class Command(BaseCommand):
             buttons += [InlineKeyboardButton('MOBI', callback_data='/getfilemobi%s'%book_id)]
 
         markup = InlineKeyboardMarkup([buttons])
-        bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
+        context.bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
         self.logger.info("Send download buttons.")
         return
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBookFile(self, bot, update):
+    def getBookFile(self, update, context):
         callback_query = update.callback_query
         query = callback_query.data
         book_id_set=re.findall(r'\d+$',query)
@@ -289,7 +289,7 @@ class Command(BaseCommand):
 
         if book==None:
             response = _("The book on the link you specified is not found, try to repeat the book search first.")
-            bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
+            context.bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Not find download links: %s" % response)
             return
 
@@ -316,12 +316,12 @@ class Command(BaseCommand):
             filename = filename + '.mobi'
 
         if document:
-            bot.send_document(chat_id=callback_query.message.chat_id,document=document,filename=filename)
+            context.bot.send_document(chat_id=callback_query.message.chat_id,document=document,filename=filename)
             document.close()
             self.logger.info("Send file: %s" % filename)
         else:
             response = _("There was a technical error, please contact the Bot administrator.")
-            bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
+            context.bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Book get error: %s" % response)
             return
 
@@ -329,13 +329,13 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def botCallback(self, bot, update):
+    def botCallback(self, update, context):
         query = update.callback_query
 
         if re.match(r'/getfile', query.data):
-            return self.getBookFile(bot, update)
+            return self.getBookFile(update, context)
         else:
-            return self.getBooksPage(bot, update)
+            return self.getBooksPage(update, context)
 
     def start(self):
         writepid(self.pidfile)
