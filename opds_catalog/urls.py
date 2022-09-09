@@ -1,5 +1,5 @@
 
-from django.conf.urls import re_path
+from django.urls import re_path
 from opds_catalog import feeds, dl
 
 app_name='opds_catalog'

@@ -8,7 +8,7 @@ import os
 from django import forms, VERSION
 from django.apps import apps
 from django.conf import settings as django_settings
-from django.conf.urls import re_path
+from django.urls import re_path
 from django.contrib import admin, messages
 from django.contrib.admin import widgets
 from django.contrib.admin.options import csrf_protect_m
