@@ -18,16 +18,16 @@ from opds_catalog import settings, dl
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from constance import config
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler, CallbackContext
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import InvalidToken
 
 query_delimiter = "####"
 
 def cmdtrans(func):
-    def wrapper(self, bot, update):
+    def wrapper(self, update: Update, context: CallbackContext):
         translation.activate(config.SOPDS_LANGUAGE)
-        result =  func(self, bot, update)
+        result =  func(self, update, context)
         translation.deactivate()
         return result
 
@@ -35,7 +35,7 @@ def cmdtrans(func):
 
 
 def CheckAuthDecorator(func):
-    def wrapper(self, update, context):
+    def wrapper(self, update: Update, context: CallbackContext):
         if not config.SOPDS_TELEBOT_AUTH:
             return func(self, update, context)
 
@@ -49,7 +49,7 @@ def CheckAuthDecorator(func):
         if users and users[0].is_active:
             return func(self, update, context)
 
-        bot.sendMessage(chat_id=query.chat_id,
+        context.bot.sendMessage(chat_id=query.chat_id,
                         text=_("Hello %s!\nUnfortunately you do not have access to information. Please contact the bot administrator.") % username)
         self.logger.info(_("Denied access for user: %s") % username)
 
@@ -105,9 +105,9 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def startCommand(self, update, context):
+    def startCommand(self, update: Update, context: CallbackContext):
         context.bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
-                                                                      {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
+                                                             {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
         self.logger.info("Start talking with user: %s"%update.message.from_user)
         return
 
@@ -174,6 +174,13 @@ class Command(BaseCommand):
             doubles = _("(doubles:%s) ")%b['doubles'] if b['doubles'] else ''
             response+='<b>%(title)s</b>\n%(author)s\n%(dbl)s/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
 
+        #fix for rare empty response
+        if not response:
+            response = self.BookPager(books, page_num -1, query)['message']
+            op.number = page_num - 1
+            op.next_page_number = op.number
+            op.num_pages = op.number
+
         buttons = [InlineKeyboardButton('1 <<', callback_data='%s%s%s'%(query,query_delimiter,1)),
                    InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.previous_page_number)),
                    InlineKeyboardButton('[ %s ]'%op.number , callback_data='%s%s%s'%(query,query_delimiter,'current')),
@@ -186,8 +193,8 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBooks(self, update, context):
-        query = update.message.text
+    def getBooks(self, update: Update, context: CallbackContext):
+        query=update.message.text
         self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
 
         if len(query) < 3:
@@ -219,7 +226,7 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBooksPage(self, update, context):
+    def getBooksPage(self, update: Update, context: CallbackContext):
         callback_query = update.callback_query
         query, page_num = callback_query.data.split(query_delimiter, maxsplit=1)
         if page_num == 'current':
@@ -236,7 +243,7 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def downloadBooks(self, update, context):
+    def downloadBooks(self, update: Update, context: CallbackContext):
         book_id_set=re.findall(r'\d+$',update.message.text)
         if len(book_id_set)==1:
             try:
@@ -273,7 +280,7 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def getBookFile(self, update, context):
+    def getBookFile(self, update: Update, context: CallbackContext):
         callback_query = update.callback_query
         query = callback_query.data
         book_id_set=re.findall(r'\d+$',query)
@@ -308,12 +315,12 @@ class Command(BaseCommand):
         if re.match(r'/getfileepub',query):
             document = dl.getFileDataEpub(book)
             #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "epub"}))]
-            filename = filename + '.epub'
+            filename = filename.replace('.fb2', '.epub')
 
         if re.match(r'/getfilemobi',query):
             document = dl.getFileDataMobi(book)
             #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "mobi"}))]
-            filename = filename + '.mobi'
+            filename = filename.replace('.fb2', '.mobi')
 
         if document:
             context.bot.send_document(chat_id=callback_query.message.chat_id,document=document,filename=filename)
@@ -329,7 +336,7 @@ class Command(BaseCommand):
 
     @cmdtrans
     @CheckAuthDecorator
-    def botCallback(self, update, context):
+    def botCallback(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
         if re.match(r'/getfile', query.data):
@@ -345,15 +352,16 @@ class Command(BaseCommand):
             updater = Updater(token=config.SOPDS_TELEBOT_API_TOKEN)
             start_command_handler = CommandHandler('start', self.startCommand)
             getBook_handler = MessageHandler(Filters.text, self.getBooks)
-            download_handler = MessageHandler(Filters.regex(r'^/download\d+$'),
-                                              self.downloadBooks)
+	    #fix deprecated RegexHandler See https://git.io/fxJuV for more info
+            download_handler = MessageHandler(Filters.regex('^/download\d+$'),self.downloadBooks)
 
             updater.dispatcher.add_handler(start_command_handler)
+	    #change order of handlers, to handle download(regexp) before common text(book name)
             updater.dispatcher.add_handler(download_handler)
             updater.dispatcher.add_handler(getBook_handler)
             updater.dispatcher.add_handler(CallbackQueryHandler(self.botCallback))
 
-            updater.start_polling(clean=True)
+            updater.start_polling(drop_pending_updates=True)
             updater.idle()
         except InvalidToken:
             self.stdout.write('Invalid telegram token.\nSet correct token for telegram API by command:\n python3 manage.py sopds_util setconf SOPDS_TELEBOT_API_TOKEN "<token>"')

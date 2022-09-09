@@ -241,7 +241,11 @@ def SearchBooksView(request):
         args['books']=items   
         args['current'] = 'search'
         args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
-        args['cache_t']=config.SOPDS_CACHE_TIME
+        # changes on bookshelf should be refreshed immediatelly
+        if searchtype == 'u':
+            args['cache_t'] = 0
+        else:
+            args['cache_t'] = config.SOPDS_CACHE_TIME
         
     return render(request,'sopds_books.html', args)
 
