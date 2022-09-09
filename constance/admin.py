@@ -8,7 +8,7 @@ import os
 from django import forms, VERSION
 from django.apps import apps
 from django.conf import settings as django_settings
-from django.conf.urls import url
+from django.urls import re_path
 from django.contrib import admin, messages
 from django.contrib.admin import widgets
 from django.contrib.admin.options import csrf_protect_m
@@ -17,11 +17,11 @@ from django.core.files.storage import default_storage
 from django.forms import fields
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils import six
+import six
 from django.utils.encoding import smart_bytes
 from django.utils.formats import localize
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from . import LazyConfig, settings
 from .checks import get_inconsistent_fieldnames
@@ -178,10 +178,10 @@ class ConstanceAdmin(admin.ModelAdmin):
     def get_urls(self):
         info = self.model._meta.app_label, self.model._meta.module_name
         return [
-            url(r'^$',
+            re_path(r'^$',
                 self.admin_site.admin_view(self.changelist_view),
                 name='%s_%s_changelist' % info),
-            url(r'^$',
+            re_path(r'^$',
                 self.admin_site.admin_view(self.changelist_view),
                 name='%s_%s_add' % info),
         ]

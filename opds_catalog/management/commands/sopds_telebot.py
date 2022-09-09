@@ -10,7 +10,7 @@ from django.utils.html import strip_tags
 from django.db.models import Q
 from django.db import transaction, connection, connections
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils import translation
 
 from opds_catalog.models import Book
@@ -197,7 +197,7 @@ class Command(BaseCommand):
         query=update.message.text
         self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
 
-        if len(query)<3:
+        if len(query) < 3:
             response = _("Too short for search, please try again.")
         else:
             response = _("I'm searching for the book: %s") % (query)
@@ -228,8 +228,8 @@ class Command(BaseCommand):
     @CheckAuthDecorator
     def getBooksPage(self, update: Update, context: CallbackContext):
         callback_query = update.callback_query
-        (query,page_num) = callback_query.data.split(query_delimiter, maxsplit=1)
-        if (page_num == 'current'):
+        query, page_num = callback_query.data.split(query_delimiter, maxsplit=1)
+        if page_num == 'current':
             return
         try:
             page_num = int(page_num)

@@ -1,7 +1,7 @@
-Django>=1.10,<2.2; python_version >= '3.4'
+Django>=1.10,<5.0; python_version >= '3.4'
 Pillow>=2.9.0
-apscheduler>=3.3.0
-#django-constance[database]>=2.1
+apscheduler==3.6.3
 django-picklefield
 lxml
-python-telegram-bot>=10
+python-telegram-bot==13.14
+six==1.16.0

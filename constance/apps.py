@@ -23,13 +23,13 @@ class ConstanceConfig(AppConfig):
         constance_dbs = getattr(settings, 'CONSTANCE_DBS', None)
         if constance_dbs is not None and using not in constance_dbs:
             return
-        if ContentType._meta.installed and Permission._meta.installed:
-            content_type, created = ContentType.objects.using(using).get_or_create(
-                app_label='constance',
-                model='config',
-            )
 
-            permission, created = Permission.objects.using(using).get_or_create(
-                content_type=content_type,
-                codename='change_config',
-                defaults={'name': 'Can change config'})
+        content_type, created = ContentType.objects.using(using).get_or_create(
+            app_label='constance',
+            model='config',
+        )
+
+        permission, created = Permission.objects.using(using).get_or_create(
+            content_type=content_type,
+            codename='change_config',
+            defaults={'name': 'Can change config'})
