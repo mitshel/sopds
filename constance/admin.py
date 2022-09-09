@@ -8,7 +8,7 @@ import os
 from django import forms, VERSION
 from django.apps import apps
 from django.conf import settings as django_settings
-from django.conf.urls import url
+from django.conf.urls import re_path
 from django.contrib import admin, messages
 from django.contrib.admin import widgets
 from django.contrib.admin.options import csrf_protect_m
@@ -178,10 +178,10 @@ class ConstanceAdmin(admin.ModelAdmin):
     def get_urls(self):
         info = self.model._meta.app_label, self.model._meta.module_name
         return [
-            url(r'^$',
+            re_path(r'^$',
                 self.admin_site.admin_view(self.changelist_view),
                 name='%s_%s_changelist' % info),
-            url(r'^$',
+            re_path(r'^$',
                 self.admin_site.admin_view(self.changelist_view),
                 name='%s_%s_add' % info),
         ]
