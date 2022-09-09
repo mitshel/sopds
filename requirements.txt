@@ -4,3 +4,4 @@ apscheduler==3.6.3
 django-picklefield
 lxml
 python-telegram-bot==13.14
+six==1.16.0
