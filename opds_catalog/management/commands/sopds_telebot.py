@@ -10,7 +10,7 @@ from django.utils.html import strip_tags
 from django.db.models import Q
 from django.db import transaction, connection, connections
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils import translation
 
 from opds_catalog.models import Book
