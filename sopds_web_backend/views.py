@@ -3,11 +3,14 @@ from random import randint
 from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
 from django.db.models import Count, Min
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth import authenticate, login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import user_passes_test
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.views.decorators.vary import vary_on_headers
+from django.urls import reverse, reverse_lazy
 from django.utils.html import strip_tags
+from django.db.models import Q
+from django.http import HttpResponseForbidden
 
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre, lang_menu
@@ -15,12 +18,13 @@ from opds_catalog import settings
 from constance import config
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
+
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from django.http import HttpResponse
 
 def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None):
     actual_decorator = user_passes_test(
-        lambda u: (u.is_authenticated() if config.SOPDS_AUTH else True),
+        lambda u: (u.is_authenticated if config.SOPDS_AUTH else True),
         login_url=reverse_lazy(url),
         redirect_field_name=redirect_field_name
     ) 
@@ -38,18 +42,19 @@ def sopds_processor(request):
     args['fb2tomobi'] = (config.SOPDS_FB2TOMOBI!="")
     args['fb2toepub'] = (config.SOPDS_FB2TOEPUB!="")
     args['nozip'] = settings.NOZIP_FORMATS
+    args['cache_t']=0
 
     if config.SOPDS_ALPHABET_MENU:
         args['lang_menu'] = lang_menu
     
     if config.SOPDS_AUTH:
         user=request.user
-        if user.is_authenticated():
+        if user.is_authenticated:
             result=[]
             for row in bookshelf.objects.filter(user=user).order_by('-readtime')[:8]:
                 book = Book.objects.get(id=row.book_id)
-                p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}       
-                result.append(p)    
+                p = {'id':row.id, 'readtime': row.readtime, 'book_id': row.book_id, 'title': book.title, 'authors':book.authors.values()}
+                result.append(p)
             args['bookshelf']=result
         
     books_count = Counter.objects.get_counter(models.counter_allbooks)
@@ -70,6 +75,7 @@ def sopds_processor(request):
     return args
 
 # Create your views here.
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SearchBooksView(request):
     #Read searchtype, searchterms, searchterms0, page from form
@@ -120,7 +126,8 @@ def SearchBooksView(request):
             except:
                 ser_id = 0
                 ser = ""
-            books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')    
+            #books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')
+            books = Book.objects.filter(series=ser_id).order_by('bseries__ser_no','search_title','-docdate')
             args['breadcrumbs'] = [_('Books'),_('Search by series'),ser]
             args['searchobject'] = 'series'
             
@@ -176,7 +183,13 @@ def SearchBooksView(request):
         # prefetch_related on sqlite on items >999 therow error "too many SQL variables"    
         #if len(books)>0:
         #    books = books.select_related('authors','genres','series')
-        
+
+        # Добавляем Left Join с таблицей BookShelfб чтобы вытащить дату прочтения книги из книжной полки
+        #books = books.filter(Q(bookshelf__isnull=True)|Q(bookshelf__user=request.user))
+        #books = books.prefetch_related('bookshelf_set')
+        #print(books.query)
+
+
         # Фильтруем дубликаты и формируем выдачу затребованной страницы
         books_count = books.count()
         op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_MAXITEMS, HALF_PAGES_LINKS)
@@ -194,8 +207,10 @@ def SearchBooksView(request):
         for row in books[start:finish+1]:
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}
+                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
+                  'authors': row.authors.values(), 'genres': row.genres.values(), 'series': row.series.values(),'ser_no': row.bseries_set.values('ser_no'),\
+                  'readtime':row.bookshelf_set.filter(user=request.user).values('readtime') if config.SOPDS_AUTH else None
+                 }
             if summary_DOUBLES_HIDE:
                 title = p['title']
                 authors_set = {a['id'] for a in p['authors']}         
@@ -225,10 +240,17 @@ def SearchBooksView(request):
         args['searchterms']=searchterms;
         args['searchtype']=searchtype;
         args['books']=items   
-        args['current'] = 'search'  
+        args['current'] = 'search'
+        args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
+        # changes on bookshelf should be refreshed immediatelly
+        if searchtype == 'u':
+            args['cache_t'] = 0
+        else:
+            args['cache_t'] = config.SOPDS_CACHE_TIME
         
     return render(request,'sopds_books.html', args)
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SearchSeriesView(request):
     #Read searchtype, searchterms, searchterms0, page from form
@@ -269,9 +291,12 @@ def SearchSeriesView(request):
         args['searchobject'] = 'series'
         args['current'] = 'search'        
         args['breadcrumbs'] = [_('Series'),_('Search'),searchterms]
-                                              
+        args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
+        args['cache_t']=config.SOPDS_CACHE_TIME
+
     return render(request,'sopds_series.html', args)
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SearchAuthorsView(request):
     #Read searchtype, searchterms, searchterms0, page from form    
@@ -308,9 +333,12 @@ def SearchAuthorsView(request):
         args['searchobject'] = 'author'
         args['current'] = 'search'       
         args['breadcrumbs'] = [_('Authors'),_('Search'),searchterms]
-                                    
+        args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
+        args['cache_t']=config.SOPDS_CACHE_TIME
+
     return render(request,'sopds_authors.html', args)
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def CatalogsView(request):   
     args = {}
@@ -348,8 +376,10 @@ def CatalogsView(request):
     for row in books_list[op.d2_first_pos:op.d2_last_pos+1]:
         p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
               'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-              'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-              'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
+              'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
+              'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no'),\
+              'readtime': row.bookshelf_set.filter(user=request.user).values('readtime') if config.SOPDS_AUTH else None
+             }
         items.append(p)
                     
     args['paginator'] = op.get_data_dict()
@@ -366,9 +396,12 @@ def CatalogsView(request):
     #breadcrumbs_list.insert(0, (_('Catalogs'),-1))    
     args['breadcrumbs_cat'] =  breadcrumbs_list  
     args['breadcrumbs'] =  [_('Catalogs')]
-      
+    args['cache_id'] = '%s:%s:%s' % (args['current'],cat_id, op.page_num)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
+
     return render(request,'sopds_catalogs.html', args)  
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BooksView(request):   
     args = {}
@@ -400,9 +433,12 @@ def BooksView(request):
     args['current'] = 'book'      
     args['lang_code'] = lang_code   
     args['breadcrumbs'] =  [_('Books'),_('Select'),lang_menu[lang_code],chars]
-      
+    args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
+
     return render(request,'sopds_selectbook.html', args)      
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def AuthorsView(request):   
     args = {}
@@ -434,9 +470,12 @@ def AuthorsView(request):
     args['current'] = 'author'      
     args['lang_code'] = lang_code   
     args['breadcrumbs'] =  [_('Authors'),_('Select'),lang_menu[lang_code],chars]
-      
-    return render(request,'sopds_selectauthor.html', args)    
+    args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
 
+    return render(request,'sopds_selectauthor.html', args)
+
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def SeriesView(request):   
     args = {}
@@ -468,9 +507,12 @@ def SeriesView(request):
     args['current'] = 'series'      
     args['lang_code'] = lang_code   
     args['breadcrumbs'] =  [_('Series'),_('Select'),lang_menu[lang_code],chars]
-      
+    args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
+
     return render(request,'sopds_selectseries.html', args)
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def GenresView(request):   
     args = {}
@@ -490,10 +532,13 @@ def GenresView(request):
           
     args['items']=items
     args['current'] = 'genre'  
-    args['parent_id'] = section_id     
+    args['parent_id'] = section_id
+    args['cache_id'] = '%s:%s' % (args['current'],section_id)
+    args['cache_t'] = config.SOPDS_CACHE_TIME
        
     return render(request,'sopds_selectgenres.html', args)
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BSDelView(request):
     if request.GET:
@@ -507,13 +552,14 @@ def BSDelView(request):
     
     return redirect("%s?searchtype=u"%reverse("web:searchbooks"))
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BSSetPos(request,book_id):
     if request.GET:
         pos = request.GET.get('pos', None)
     else:
         pos = None
-       
+
     pos = float(pos)
 
     bookshelf.objects.filter(user=request.user, book=book_id).update(position=pos)
@@ -523,6 +569,7 @@ def BSSetPos(request,book_id):
 
     return response
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BSGetPos(request,book_id):
     pos = bookshelf.objects.get(user=request.user, book=book_id).position
@@ -530,6 +577,7 @@ def BSGetPos(request,book_id):
     response.write(pos)
     return response
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BSClearView(request):
     bookshelf.objects.filter(user=request.user).delete()
@@ -548,7 +596,7 @@ def LoginView(request):
         username = request.POST['username']
         password = request.POST['password']
     except KeyError:
-        return render(request, 'sopds_login.html', args) 
+        return render(request, 'sopds_login.html', args)
     
     next_url = request.GET.get('next',reverse("web:main"))
 
@@ -559,13 +607,17 @@ def LoginView(request):
             return redirect(next_url)
         else:
             args['system_message']={'text':_('This account is not active!'),'type':'alert'}
-            return render(request, 'sopds_login.html', args)
+            return handler403(request,args)
+            #return render(request, 'sopds_login.html', args)
     else:
         args['system_message']={'text':_('User does not exist or the password is incorrect!'),'type':'alert'}
-        return render(request, 'sopds_login.html', args)
-    
-    return render(request, 'sopds_login.html', args)
+        return handler403(request,args)
+        #return render(request, 'sopds_login.html', args)
 
+    return handler403(request,args)
+    #return render(request, 'sopds_login.html', args)
+
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def LogoutView(request):
     logout(request)
@@ -573,9 +625,15 @@ def LogoutView(request):
     args['breadcrumbs'] = [_('Logout')]
     return redirect(reverse('web:main'))
 
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
-def BookReaderView(request,book_id):   
+def BookReaderView(request,book_id):
     args = {}
-    args['current'] = 'reader'      
-    args['book_id'] = book_id   
+    args['current'] = 'reader'
+    args['book_id'] = book_id
     return render(request, 'BookReader.html', args)
+
+def handler403(request,args):
+    response = render(request, 'sopds_login.html', args)
+    response.status_code = 403
+    return response

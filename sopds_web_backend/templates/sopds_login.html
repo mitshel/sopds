@@ -1,7 +1,7 @@
 {% extends "sopds_main.html" %}
 {% load i18n %}
 
-{% block body %}
+{% block ext-body %}
 <form method="post" sction='{% url "web:login" %}'>
 {% csrf_token %}
 <div class="row">

@@ -1,8 +1,8 @@
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
 from django.contrib.syndication.views import Feed
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render
 from django.db.models import Count, Min
 from django.utils.html import strip_tags
@@ -24,13 +24,13 @@ class AuthFeed(Feed):
     def __call__(self,request,*args,**kwargs):
         self.request = request
         if config.SOPDS_AUTH:
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 return super().__call__(request,*args,**kwargs)
         
         bau = BasicAuthMiddleware()
         result=bau.process_request(self.request)
         
-        if result!=None:
+        if (result != None) and (not hasattr(result, 'user')):
             return result
         
         return super().__call__(request,*args,**kwargs)
@@ -41,7 +41,8 @@ class opdsEnclosure(Enclosure):
         super(opdsEnclosure,self).__init__(url, 0, mime_type)
 
 class opdsFeed(Atom1Feed):
-    content_type = 'text/xml; charset=utf-8'
+    #content_type = 'text/xml; charset=utf-8'
+    content_type = 'application/atom+xml; charset=utf-8'
         
     def root_attributes(self):
         attrs = {}
@@ -172,7 +173,7 @@ class MainFeed(AuthFeed):
                     {"id":5, "title":_("By series"), "link":("opds_catalog:lang_series" if config.SOPDS_ALPHABET_MENU else "opds_catalog:nolang_series"),
                      "descr": _("Series: %(series)s."),"counters":{"series":Counter.objects.get_counter(models.counter_allseries)}},
         ]
-        if config.SOPDS_AUTH and self.request.user.is_authenticated():
+        if config.SOPDS_AUTH and self.request.user.is_authenticated:
             mainitems += [
                         {"id":6, "title":_("%(username)s Book shelf")%({"username":self.request.user.username}), "link":"opds_catalog:bookshelf",
                          "descr":_("%(username)s books readed: %(bookshelf)s."),"counters":{"bookshelf":bookshelf.objects.filter(user=self.request.user).count(),"username":self.request.user.username}},
@@ -238,7 +239,7 @@ class CatalogsFeed(AuthFeed):
             p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}         
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')}
             items.append(p)
             
         return items, cat, op.get_data_dict()            
@@ -318,12 +319,14 @@ class CatalogsFeed(AuthFeed):
             if item['authors']: s += _("<b>Authors: </b>%(authors)s<br/>")
             if item['genres']: s += _("<b>Genres: </b>%(genres)s<br/>")
             if item['series']: s += _("<b>Series: </b>%(series)s<br/>")
+            if item['ser_no']: s += _("<b>No in Series: </b>%(ser_no)s<br/>")
             s += _("<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>")
             s +="<p class='book'>%(annotation)s</p>"
             return s%{'title':item['title'],'filename':item['filename'], 'filesize':item['filesize'],'docdate':item['docdate'],'annotation':item['annotation'],
                       'authors':", ".join(a['full_name'] for a in item['authors']),
                       'genres':", ".join(g['subsection'] for g in item['genres']),
-                      'series':", ".join(s['ser'] for s in item['series']),                     
+                      'series':", ".join(s['ser'] for s in item['series']),
+                      'ser_no': ", ".join(str(s['ser_no']) for s in item['ser_no']),
                       }
                             
 def OpenSearch(request):
@@ -417,7 +420,8 @@ class SearchBooksFeed(AuthFeed):
                 ser_id = int(searchterms)
             except:
                 ser_id = 0
-            books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')    
+            #books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')
+            books = Book.objects.filter(series=ser_id).order_by('bseries__ser_no', 'search_title', '-docdate')
         # Поиск книг по автору и серии
         elif searchtype == "as":
             try:
@@ -426,7 +430,7 @@ class SearchBooksFeed(AuthFeed):
             except:
                 ser_id = 0
                 author_id = 0 
-            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None).order_by('search_title','-docdate')
+            books = Book.objects.filter(authors=author_id, series=ser_id if ser_id else None).order_by('bseries__ser_no', 'search_title', '-docdate')
         # Поиск книг по жанру
         elif searchtype == 'g':
             try:
@@ -468,7 +472,7 @@ class SearchBooksFeed(AuthFeed):
             p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
                   'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,
-                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values()}       
+                  'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no')}
             if summary_DOUBLES_HIDE:
                 title = p['title'] 
                 authors_set = {a['id'] for a in p['authors']}         
@@ -568,6 +572,7 @@ class SearchBooksFeed(AuthFeed):
         if item['authors']: s += _("<b>Authors: </b>%(authors)s<br/>")
         if item['genres']: s += _("<b>Genres: </b>%(genres)s<br/>")
         if item['series']: s += _("<b>Series: </b>%(series)s<br/>")
+        if item['ser_no']: s += _("<b>No in Series: </b>%(ser_no)s<br/>")
         s += _("<b>File: </b>%(filename)s<br/><b>File size: </b>%(filesize)s<br/><b>Changes date: </b>%(docdate)s<br/>")
         if item['doubles']: s += _("<b>Doubles count: </b>%(doubles)s<br/>")
         s +="<p class='book'>%(annotation)s</p>"
@@ -575,7 +580,8 @@ class SearchBooksFeed(AuthFeed):
                   'doubles':item['doubles'],'annotation':item['annotation'],
                   'authors':", ".join(a['full_name'] for a in item['authors']),
                   'genres':", ".join(g['subsection'] for g in item['genres']),
-                  'series':", ".join(s['ser'] for s in item['series']),                     
+                  'series':", ".join(s['ser'] for s in item['series']),
+                  'ser_no': ", ".join(str(s['ser_no']) for s in item['ser_no']),
                   }                        
 
 class SelectSeriesFeed(AuthFeed):
@@ -1052,4 +1058,3 @@ class GenresFeed(AuthFeed):
     def item_enclosures(self, item):
         return (opdsEnclosure(self.item_link(item),"application/atom+xml;profile=opds-catalog;kind=navigation", "subsection"),)
 
-        

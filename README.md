@@ -1,98 +1,114 @@
-#### Simple OPDS Catalog - Простой OPDS Каталог  
-#### Author: Dmitry V.Shelepnev  
-#### Версия 0.43
+#### SimpleOPDS Catalog
+#### Author: Dmitry V.Shelepnev
+#### Version 0.47-devel
 
-#### 1. Простая установка Simple OPDS (используем простую БД sqlite3)
+[Инструкция на русском языке: README_RUS.md](README_RUS.md)
 
-1.1 Установка проекта  
-Загрузить архив с проектом можно с сайта www.sopds.ru, 
-либо из github.com следующей командой:
+#### 1. Simple installation of SimpleOPDS (by using sqlite3 database)
+
+1.1 Installing the project
+You can download the archive with the project from www.sopds.ru,
+or from github.com with the following command:
 
 	git clone https://github.com/mitshel/sopds.git
 
-1.2 Зависимости.  
-- Требуется Python не ниже версии 3.3 (используется атрибут zlib.Decompressor.eof, введенный в версии 3.3)  
-- Django 1.9 (для Python 3.3 необходимо устанавливать Django 1.8: https://code.djangoproject.com/ticket/25868)
+1.2 Dependencies.
+- Requires Python at least version 3.4
+- Django 1.10
 - Pillow 2.9.0
 - apscheduler 3.3.0
-- django-constance[database] 1.3
+- django-picklefield
 - lxml
+- python-telegram-bot 10
 
-Для работы проекта необходимо установить указанные  зависимости: 
+The following dependencies should be established for the project:
 
-	yum install python3                            # команда установки для RedHad, Fedora, CentOS
-	python3 -m pip install -r requirements.txt
-   
-1.3 Производим инициализацию базы данных и заполнение начальными данными (жанры)
+    yum install python3                            # setup command for RHEL, Fedora, CentOS
+    python3 -m pip install -r requirements.txt
+
+1.3 We initialize the database and fill in the initial data (genres)
 
 	python3 manage.py migrate
 	python3 manage.py sopds_util clear
-	
-1.4 Cоздаем суперпользователя
+
+1.4 Creating a Superuser
 
 	python3 manage.py createsuperuser
-	
-1.5 Настраиваем путь к Вашему каталогу с книгами и при необходимости переключаем язык интерфейса на русский
 
-	python3 manage.py sopds_util setconf SOPDS_ROOT_LIB 'Путь к каталогу с книгами'
-	python3 manage.py sopds_util setconf SOPDS_LANGUAGE ru-RU
-		
-1.6 Запускаем SCANNER сервер (опционально, необходим для автоматизированного периодического пересканирования коллекции) 
-    Примите во внимание, что в  настройках по умолчанию задан периодический запуск сканирования 2 раза в день 12:00 и 0:00.
+1.5 We adjust the path to your catalog with books and, if necessary, switch the interface language to English
+
+	python3 manage.py sopds_util setconf SOPDS_ROOT_LIB 'Path to the directory with books'
+	python3 manage.py sopds_util setconf SOPDS_LANGUAGE en-EN
+
+1.6 Launch the SCANNER server (optional, required for automated periodic re-scanning of the collection)
+    Please note that the default settings specify a periodic scan start 2 times a day 12:00 and 0:00.
 
 	python3 manage.py sopds_scanner start --daemon
 
-1.7 Запускаем встроенный HTTP/OPDS сервер
+1.7 Starting the built-in HTTP / OPDS server
 
 	python3 manage.py sopds_server start --daemon
-	
-Однако наилучшим способом, все же является настройка в качестве HTTP/OPDS серверов Apache или Nginx 
-(точка входа ./sopds/wsgi.py)
-	
-1.8 Чтобы не дожидаться начала сканирования по расписанию, можно сообщить процессу sopds_scanner о необходимости
-    немедленного сканирования. Сделать это можно, установив конфигурационный параметр SOPDS_SCAN_START_DIRECTLY = True 
-    двумя способами:
 
-а) из консоли при помощи команды
+However, the best way is still to configure the HTTP / OPDS servers as Apache or Nginx
+(entry point ./sopds/wsgi.py)
+
+1.8 In order not to wait for the start of a scheduled scan, you can tell the sopds_scanner process about the need immediate scanning. You can do this by setting the configuration parameter SOPDS_SCAN_START_DIRECTLY = True two ways:
+
+a) from the console using the command
 
 	python3 manage.py sopds_util setconf SOPDS_SCAN_START_DIRECTLY True
-	
-б) При попомощи страницы администрирования Web-интерфейса http://<Ваш сервер>:8001/admin/ 
-   (Далее CONSTANCE -> Настройки -> 1. General Options -> SOPDS_SCAN_START_DIRECTLY)
-	
-1.9 Доступ к информации  
-Если все предыдущие шаги выполнены успешно, то к библиотеке можно получить доступ по следующим URL:  
 
->     OPDS-версия: http://<Ваш сервер>:8001/opds/  
->     HTTP-версия: http://<Ваш сервер>:8001/
+b) With the help of the Web-interface administration page http://<Your server>:8001/admin/
+   (FCONSTANCE -> Settings -> 1. General Options -> SOPDS_SCAN_START_DIRECTLY)
 
-Следует принять во внимание, что по умолчанию в проекте используется простая БД sqlite3, которая
-является одно-пользовательской. Поэтому пока не будет завершен процесс сканирования, запущенный 
-ранее попытки доступа к серверу могут завершаться ошибкой 
-"A server error occurred.  Please contact the administrator."  
-Для устранения указанной проблемы необходимо ипользовать многопользовательские БД, Например MYSQL.
-	
-#### 2. Настройка базы данных MySQL (опционально, но очень желательно для увеличения производительности).
-2.1 Для работы с большим количеством книг, очень желательно не использовать sqlite, а настроить для работы БД MySQL.
-MySQL по сравнению с sqlite работает гораздо быстрее. Кроме того SQLite - однопользователская БД, т.е. во время сканирования доступ
-к БД будет невозможен.
+1.9 Access to information
+If all previous steps were successful, then the library can be accessed by the following URLs:
 
- для работы с БД Mysql в разных системах может потребоваться установка дополнительных пакетов:   
-   
-    UBUNTU:    sudo apt-get install python3-mysqldb
-    СENTOS-7:  pip3 install mysqlclient
+>     OPDS-version: http://<Your server>:8001/opds/
+>     HTTP-version: http://<Your server>:8001/
 
-Далее необходимо сначала в БД MySQL создать базу данных "sopds" и пользователя с необходимыми правами,
-например следующим образом:
+It should be taken into account that by default the project uses a simple sqlite3 database, which
+is one-user. Therefore, until the scanning process is completed, the attempts to access the server may result in an error
+"A server error occurred." Please contact the administrator. "
+To eliminate this problem, you need to use multi-user databases, for example MYSQL.
 
-	mysql -uroot -proot_pass mysql  
-	mysql > create database if not exists sopds default charset=utf8;  
-	mysql > grant all on sopds.* to 'sopds'@'localhost' identified by 'sopds';  
-	mysql > commit;  
-	mysql > ^C  
-	
-2.2 Далее в конфигурационном файде нужно закомментировать строки подключения к БД sqlite и соответсвенно раскомментировать
-строки подключения к БД Mysql:
+1.10 If necessary, configure and run Telegram-bot
+
+The process of creating bots in telegrams is very simple, to create your bot in Telegram, you need to connect to
+channel [@BotFather] (https://telegram.me/botfather) and give the command to create a new bot **/newbot**. Then enter the name of the bot
+(for example: **myopds**), and then the user name for this bot, which necessarily ends with "bot" (for example: **myopds_bot**).
+As a result, you will be given API_TOKEN, which you need to use in the following commands that will start your personal
+telegram-bot, which will allow you, using the Telegram instant messenger to get quick access to your personal library.
+
+    python3 manage.py sopds_util setconf SOPDS_TELEBOT_API_TOKEN "<Telegram API Token>"
+    python3 manage.py sopds_util setconf SOPDS_TELEBOT_AUTH False
+    python3 manage.py sopds_telebot start --daemon
+    
+Team,
+
+    python3 manage.py sopds_util setconf SOPDS_TELEBOT_AUTH True
+    
+you can limit the use of your bot by Telegram users. In this case, your bot will serve only those
+users whose name in the telegram matches the existing user name in your Simple OPDS database.
+
+#### 2. Configuring the MySQL database (optional, but very desirable for increasing performance).
+2.1 To work with a large number of books, it is highly advisable not to use sqlite, but to configure MySQL databases to work. MySQL is much faster than sqlite. In addition, SQLite is a single-user database, i.e. during scanning access to a DB it will be impossible.
+
+ To work with the Mysql database on different systems, you may need to install additional packages:
+
+    UBUNTU: sudo apt-get install python3-mysqldb
+    CENTOS-7: pip3 install mysqlclient
+
+Next, you must first create a database "sopds" and a user with the necessary rights in the MySQL database,
+for example, as follows:
+
+	mysql -uroot -proot_pass mysql
+	mysql> create database if not exists sopds default charset = utf8;
+	mysql> grant all on sopds. * to 'sopds' @ 'localhost' identified by 'sopds';
+	mysql> commit;
+	mysql> ^ C
+
+2.2 Then, in the configuration file, you need to comment out the connection strings to the sqlite database and uncomment the connection string to the Mysql database:
 
 
 	DATABASES = {
@@ -114,15 +130,12 @@ MySQL по сравнению с sqlite работает гораздо быст
     #    'default': {
     #        'ENGINE': 'django.db.backends.sqlite3',
     #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    #    }         
-    #}  
+    #    }
+    #}
 
-2.4 Использование InnoDB вместо MyISAM.  
-Указанная выше конфигурация MySQL использует в качестве движка БД MyISAM, который работает на большинтсве версий MySQL или MariaDB.
-Однако, если вы используете относительно свежие версии БД Mysql (MariaDB>=10.2.2, Mysql>=5.7.9), то у вас есть возможность использовать более современный движок InnoDB. 
-Он несколько быстрее и поддерживает транзакции, что положительно скажется на целостности БД.   
-(На более старых версиях MySQL с ним возникают проблемы из-за ограничений на максимальную длину индексов.)  
-Таким образом, если у Вас современная версия MySQL (MariaDB>=10.2.2, Mysql>=5.7.9), то в настройках БД Mysql вместо указанных выше параметров OPTIONS просто используйте следующие:
+
+2.4 Using InnoDB instead of MyISAM.
+The above MySQL configuration uses MyISAM as the database engine, which works on most versions of MySQL or MariaDB. However, if you use a relatively new version of Mysql (MariaDB> = 10.2.2, Mysql> = 5.7.9), then you can use the more modern InnoDB engine. It is somewhat faster and supports transactions, which will positively affect the integrity of the database. (On older versions of MySQL, there are problems with it because of restrictions on the maximum length of indexes.) Thus, if you have a modern version of MySQL (MariaDB> = 10.2.2, Mysql> = 5.7.9), then in the Mysql database settings, simply use the following instead of the above OPTIONS parameters:
 
     'OPTIONS' : {
         'init_command': """SET default_storage_engine=INNODB; \
@@ -132,51 +145,49 @@ MySQL по сравнению с sqlite работает гораздо быст
                         """
     }
 
-2.5 Далее необходимо для инициализации и заполнения вновь созданной БД заново выполнить пункты 1.3 - 1.8 данной инструкции
-Однако, если Вы уже ранее запустили HTTP/OPDS сервер и SCANNER сервер, то потребуется сначала остановить их:
+2.5 Further it is necessary to re-execute points 1.3 - 1.8 of this instruction in order to initialize and fill the newly created database However, if you have already started the HTTP/OPDS server and the SCANNER server, you must first stop them:
 
 	python3 manage.py sopds_server stop
 	python3 manage.py sopds_scanner stop
-	
-#### 3. Настройка базы данных PostgreSQL (опционально, хороший вариант использования программы Simple OPDS).
-3.1 PostgreSQL - nявляется хорошим вариантом использования ПО Simple OPDS.  
-Для использования PostgreSQL этого неоюбходимо установить эту БД и настроить ее (подробное описание можно найти в Интернет, напримр здесь: http://alexxkn.ru/node/42 или здесь: http://www.fight.org.ua/database/install_posqgresql_ubuntu.html):
 
-    UBUNTU: 
+#### 3. Configuring the PostgreSQL database (optional, a good option for using the SimpleOPDS program).
+3.1 PostgreSQL is a good way to use SimpleOPDS.
+To use PostgreSQL, it is necessary to install this database and configure it (for a detailed description, see the Internet, for example: http://alexxkn.ru/node/42 or here: http://www.fight.org.ua/database/ install_posqgresql_ubuntu.html):
+
+
+    UBUNTU:
     	sudo apt-get install postgresql postgresql-client postgresql-contrib libpq-dev
     	sudo vi /etc/postgresql/9.5/main/pg_hba.conf
     	sudo /etc/init.d/postgresql restart
-    	
-    CENTOS: 
+
+    CENTOS:
       yum install postgresql postgresql-server
 	   /usr/bin/postgresql-setup initdb
       vi /var/lib/pgsql/data/pg_hba.conf
       systemctl enable postgresql
       systemctl start postgresql
-      
-редактируя файл hba.conf нужно исправить следующие строки:  
+
+editing the hba.conf file, you need to fix the following lines:
 
     - local   all             all                                     peer
     - host    all             all             127.0.0.1/32            ident
     + local   all             all                                     md5
     + host    all             all             127.0.0.1/32            md5
 
-    
-Для работы с БД PostgreSQL скорее всего потребуется установить дополнительный пакет psycopg2:   
-   
+
+To work with the PostgreSQL database, you probably need to install an additional package of psycopg2:
+
     pip3 install psycopg2
 
-Далее необходимо сначала в БД PostgreSQL создать базу данных "sopds" и пользователя с необходимыми правами,
-например следующим образом:
+Next, you must first create a database "sopds" and a user with the necessary rights in the PostgreSQL database, for example, as follows:
 
     psql -U postgres
 	 Password for user postgres: *****
 	 postgres=# create role sopds with password 'sopds' login;
 	 postgres=# create database sopds with owner sopds;
 	 postgres=# \q
-	
-3.2 Далее в конфигурационном файде нужно закомментировать строки подключения к БД sqlite и соответсвенно раскомментировать
-строки подключения к БД PostgreSQL:
+
+3.2 Next in the configuration file, you need to comment out the connection strings to the sqlite database and decompress it accordingly the connection string to the PostgreSQL database:
 
 	 DATABASES = {
 	    'default': {
@@ -194,186 +205,195 @@ MySQL по сравнению с sqlite работает гораздо быст
      #    'default': {
      #        'ENGINE': 'django.db.backends.sqlite3',
      #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-     #    }         
-     #}  
+     #    }
+     #}
 
-3.4 Далее необходимо для инициализации и заполнения вновь созданной БД заново выполнить пункты 1.3 - 1.8 данной инструкции
-Однако, если Вы уже ранее запустили HTTP/OPDS сервер и SCANNER сервер, то потребуется сначала остановить их:
+3.4 Next, it is necessary to re-execute points 1.3 - 1.8 of this instruction in order to initialize and fill the newly created database However, if you have already started the HTTP/OPDS server and the SCANNER server, you must first stop them:
 
 	 python3 manage.py sopds_server stop
 	 python3 manage.py sopds_scanner stop
-	
-#### 4. Настройка конвертации fb2 в EPUB или MOBI (опционально, можно не настраивать)  
 
-4.1 Конвертер fb2-to-epub http://code.google.com/p/fb2-to-epub-converter/
-- во первых необходимо скачать последнюю версию конвертера fb2toepub по ссылке выше (текущая уже находится в проекте)
-  к сожалению конвертер не совершенный и не все книги может конвертировать, но большинство все-таки конвертируется 
-- далее, необходимо скопировать архив в папку **./convert/fb2toepub** и разархивировать 
-- далее, компилируем проект командой make, в результате в папке  unix_dist появится исполняемый файл fb2toepub 
-- При помощи веб-интерфейса администратора или указанных ниже команд консоли задать путь к этому конвертеру:  
+#### 4. Setting the conversion of fb2 to EPUB or MOBI (optionally, you can not configure it)
+
+4.1 fb2-to-epub converter http://code.google.com/p/fb2-to-epub-converter/
+- First you need to download the latest version of the fb2toepub converter from the link above (the current one is already in the project) unfortunately the converter is not perfect and not all books can be converted, but most still converted
+- Further, you need to copy the archive to the folder **./convert/fb2toepub** and unzip
+- Next, we compile the project with the make command, as a result, the executable file fb2toepub appears in the unix_dist folder
+- Use the web interface of the administrator or the following console commands to specify the path to this converter:
 
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2toepub/unix_dist/fb2toepub"
 
-- В результате OPDS-клиенту будут предоставлятся ссылки на FB2-книгу в формате epub  
+- As a result, the OPDS client will be provided with links to the FB2-book in the epub format
 
-4.2 Конвертер fb2epub http://code.google.com/p/epub-tools/ (конвертер написан на Java, так что в вашей системе должнен быть установлен как минимум JDK 1.5)  
-- также сначала скачать последнюю версию по ссылке выше (текущая уже находится в проекте)  
-- скопировать jar-файл например в каталог **./convert/fb2epub** (Здесь уже лежит shell-скрипт для запуска jar-файла)  
-- При помощи веб-интерфейса администратора или указанных ниже команд консоли задать путь shell-скрипту fb2epub (или fb2epub.cmd для Windows) 
+4.2 fb2epub converter http://code.google.com/p/epub-tools/ (the converter is written in Java, so at least JDK 1.5 should be installed on your system)
+- also first download the latest version from the link above (the current one is already in the project)
+- copy the jar-file to the directory **./convert/fb2epub** (There is already a shell script to run the jar-file)
+- Set the path to the shell script fb2epub (or fb2epub.cmd for Windows) using the web administrator interface or the following console commands:
 
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2epub/fb2epub"
 
-4.3 Конвертер fb2conv (конвертация в epub и mobi) http://www.the-ebook.org/forum/viewtopic.php?t=28447  
-- Необходимо установить python 2.7 и пакеты lxml, cssutils:   
-  
-         yum install python  
-         yum install python-lxml  
-         yum install python-cssutils  
-  
-- скачать последнюю версию конвертера по ссылке выше (текущая уже находится в каталоге fb2conv проекта)  
-- скачать утилиту KindleGen с сайта Amazon http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 
-  (текущая версия утилиты уже находится в каталоге fb2conv проекта)  
-- скопировать архив проекта в **./convert/fb2conv** (Здесь уже подготовлены shell-скрипты для запуска конвертера) и разархивировать его  
-- Для конвертации в MOBI нужно архив с утилитой KindleGen положить в каталог с конвертером и разархивировать  
-- При помощи веб-интерфейса администратора или указанных ниже команд консоли задать пути к соответствующим скриптам:  
-   
+4.3 Converter fb2conv (converting to epub and mobi)   
+    http://www.the-ebook.org/forum/viewtopic.php?t=28447  
+    https://github.com/rupor-github/fb2mobi/releases  
+- It is necessary to install python 2.7 (however, for the latest version with GitHub, you do not need to do this, since it uses the same as SOPDS python3)
+  and the packages lxml, cssutils:
+
+         yum install python
+         yum install python-lxml
+         yum install python-cssutils
+
+- download the latest version of the converter from the link above (the current one is already in the fb2conv directory of the project)
+- download the KindleGen utility from the Amazon website http://www.amazon.com/gp/feature.html?ie=UTF8&docId=1000234621 (the current version of the utility is already in the fb2conv directory of the project)
+- copy the project archive to **./convert/fb2conv** (There are already shell scripts for starting the converter) and unzip it
+- To convert to MOBI you need to archive the KindleGen utility in the directory with the converter and unzip it
+- Use the web-based administrator interface or the following console commands to specify paths to the corresponding scripts:
+
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOEPUB "convert/fb2conv/fb2epub"
 >     python3 manage.py sopds_util setconf SOPDS_FB2TOMOBI "convert/fb2conv/fb2mobi"
 
-#### 5. Консольные команды Simple OPDS  
+#### 5. Console commands Simple OPDS
 
-Показать информацию о коллекции книг:  
+Show information about the book collection:
 
     python3 manage.py sopds_util info
-    
-Очистить базу данных с коллекцией книг, загрузить справочник жанров:
+
+Clear the database with a collection of books, download the genre directory:
 
     python3 manage.py sopds_util clear [--verbose]
-    
-Сохранить свой справочник жанров в файл opds_catalog/fixtures/mygenres.json:
+
+Keep your genre directory in the file opds_catalog / fixtures / mygenres.json:
 
     python3 manage.py sopds_util save_mygenres
-    
-Загрузить свой справочник жанров из файла opds_catalog/fixtures/mygenres.json:
 
-    python3 manage.py sopds_util load_mygenres   
-    
-Только при использовании PostgerSQL. Оптимизация таблицы opds_catalog_book (fillfactor = 50). После этого сканирование происходит значительно быстрее:
+Download your genre directory from the opds_catalog/fixtures/mygenres.json file:
 
-    python3 manage.py sopds_util pg_optimize  
-    
-Посмотреть все параметры конфигурации:
+    python3 manage.py sopds_util load_mygenres
 
-    python3 manage.py sopds_util getconf  
-    
-Посмотреть значение конкретного параметр конфигурации:
+Only when using PostgerSQL. Optimization of the table opds_catalog_book (fillfactor = 50). After that, scanning is much faster:
+
+    python3 manage.py sopds_util pg_optimize
+
+View all configuration options:
+
+    python3 manage.py sopds_util getconf
+
+View the value of a specific configuration parameter:
 
     python3 manage.py sopds_util getconf SOPDS_ROOT_LIB
-    
-Задать значение конкретного параметр конфигурации:
+
+Set the value of a specific configuration parameter:
 
     python3 manage.py sopds_util setconf SOPDS_ROOT_LIB '\home\files\books'
-                 
-Запустить однократное сканирование коллекции книг:
+
+Start a one-time scan of the book collection:
 
     python3 manage.py sopds_scanner scan [--verbose] [--daemon]
-    
-Запустить сканирование коллекции книг по расписанию:    
+
+Run the scan of the collection of books on a schedule:
 
     python3 manage.py sopds_scanner start [--verbose] [--daemon]
-   
-Запустить встроенный web-сервер:    
 
-    python3 manage.py sopds_server start [--host <IP address>] [--port <port N>] [--daemon]    
+Run the embedded web server:
 
-
-#### 6. Опции каталогизатора Simple OPDS (www.sopds.ru)
-Каталогизатор Simple OPDS имеет дополнительные настройки которые можно изменять при помощи интерфейса администратора http://<Ваш сервер>/admin/  
-
-**SOPDS_LANGUAGE** - изменение языка интерфейса. 
-
-**SOPDS_ROOT_LIB** - содержит путь к каталогу, в котором расположена ваша коллекция книг.  
-
-**SOPDS_BOOK_EXTENSIONS** - Список форматов книг, которые будут включаться в каталог.  
-(по умолчанию SOPDS_BOOK_EXTENSIONS = '.pdf .djvu .fb2 .epub')  
-	
-**SOPDS_DOUBLES_HIDE** - Скрывает, найденные дубликаты в выдачах книг.  
-(по умолчанию SOPDS_DOUBLES_HIDE = True)  
-	
-**SOPDS_FB2SAX** - Программа может извлекать метаданные из FB2 двумя парсерами 
-  - FB2sax - штатный парсер, используемый в SOPDS с версии 0.01, этот парсер более быстрый, и извлекает метаданные даже из невалидных файлов FB2
-  - FB2xpath - появился в версии 0.42, работает помеделеннее, не терпит невалидных FB2
-(по умолчанию SOPDS_FB2SAX = True)  
-	
-**SOPDS_COVER_SHOW** - способ показа обложек (False - не показывать, True - извлекать обложки на лету и показывать).  
-(по умолчанию SOPDS COVER_SHOW = True)  
-    
-**SOPDS_ZIPSCAN** - Настройка сканирования ZIP архивов.  
-(по умолчанию SOPDS_ZIPSCAN = True)  
-	
-**SOPDS_ZIPCODEPAGE** - Указываем какая кодировка для названий файлов используется в ZIP-архивах. Доступные кодировки: cp437, cp866, cp1251, utf-8. По умолчанию применяется кодировка cp437. Поскольку в самом ZIP архиве сведения о кодировке, в которой находятся имена файлов - отсутствуют, то автоматически определить правильную кодировку для имен файлов не представляется возможным, поэтому для того чтобы кириллические имена файлов не ваыглядели как крякозябры следует применять кодировку cp866.  
-(по умолчанию SOPDS_ZIPCODEPAGE = "cp866")  
-
-**SOPDS_INPX_ENABLE** - Если True, то при обнаружении INPX файла в каталоге, сканер не сканирует его содержимое вместе с подгаталогами, а загружает	данные из найденного INPX файла. Сканер считает что сами архивыс книгами расположены в этом же каталоге. Т.е. INPX-файл должен находится именно в папке с архивами книг. 
-Однако учтите, что использование данныз из INPX приведет к тому, что в библиотеке будет отсутствовать аннотация, т.к. в INPX аннотаций нет!!!  
-(по умолчанию SOPDS_INPX_ENABLE = True)  
-
-**SOPDS_INPX_SKIP_UNCHANGED** - Если True, то сканер пропускает повторное сканирование, если размер INPX не изменялся.  
-(по умолчанию SOPDS_INPX_SKIP_UNCHANGED = True)  
-
-**SOPDS_INPX_TEST_ZIP** - Если  True, то сканер пытается найти описанный в INPX архив. Если какой-то архив не обнаруживается, то сканер не будет добавлять вязанные с ним данные из INPX в базу данных соответсвенно, если SOPDS_INPX_TEST_ZIP = False, то никаких проверок сканер не производит, а просто добавляет данные из INPX в БД. Это гораздо быстрее.  
-(по умолчанию SOPDS_INPX_TEST_ZIP = False)  
+    python3 manage.py sopds_server start [--host <IP address>] [--port <port N>] [--daemon]
 
 
-**SOPDS_INPX_TEST_FILES** - Если  True, то сканер пытается найти описанный в INPX конкретный файл с книгой (уже внутри архивов). Если какой-то файл не обнаруживается, то сканер не будет добавлять эту книгу в базу данных соответсвенно, если INPX_TEST_FILES = False, то никаких проверок сканер не производит, а просто добавляет книгу из INPX в БД. Это гораздо быстрее.   
-(по умолчанию SOPDS_TEST_FILES = False)  
+#### 6. Options of the cataloger Simple OPDS (www.sopds.ru)  
+The Simple OPDS cataloger has additional settings that can be changed using the admin interface http://<Your server>/admin/  
 
-**SOPDS_DELETE_LOGICAL** - True приведет к тому, что при обнаружении сканером, что книга удалена, запись в БД об этой книге будет удалена логически (avail=0). Если значение False, то произойдет физическое удаление таких записей из базы данных. Пока работает только SOPDS_DELETE_LOGICAL = False.  
-(по умолчанию SOPDS_DELETE_LOGICAL = False)  
+**SOPDS_LANGUAGE** - change the interface language.  
 
-**SOPDS_SPLITITEMS** - Устанавливает при достижении какого числа элементов в группе - группа будет "раскрываться". Для выдач "By Title", "By Authors", "By Series".  
-(по умолчанию SOPDS_SPLITITEMS = 300)  
+**SOPDS_ROOT_LIB** - contains the path to the directory where your book collection is located.  
 
-**SOPDS_MAXITEMS** - Количество выдаваемых результатов на одну страницу.  
-(по умолчанию SOPDS_MAXITEMS = 60)  
+**SOPDS_BOOK_EXTENSIONS** - List of book formats that will be included in the catalog.  
+(by default SOPDS_BOOK_EXTENSIONS = '.pdf .djvu .fb2 .epub')  
 
-**SOPDS_FB2TOEPUB** и **SOPDS_FB2TOMOBI** задают пути к програмам - конвертерам из FB2 в EPUB и MOBI/  
-(по умолчанию SOPDS_FB2TOEPUB = "")  
-(по умолчанию SOPDS_FB2TOMOBI = "")  
+**SOPDS_DOUBLES_HIDE** - Hides found duplicates in book issues.  
+(by default SOPDS_DOUBLES_HIDE = True)  
 
-**SOPDS_TEMP_DIR** задает путь к временному каталогу, который используется для копирования оригинала и результата конвертации.  
-(по умолчанию SOPDS_TEMP_DIR = os.path.join(BASE_DIR,'tmp'))  
+**SOPDS_FB2SAX** - The program can extract metadata from FB2 by two parsers
+  - FB2sax is the regular parser used in SOPDS from version 0.01, this parser is faster, and retrieves metadata even from invalid FB2 files  
+  - FB2xpath - appeared in version 0.42, works less often, does not tolerate invalid FB2  
+(by default SOPDS_FB2SAX = True)  
 
-**SOPDS_TITLE_AS_FILENAME** - Если True, то при скачивании вместо оригинального имени файла книги выдает транслитерацию названия книги.  
-(по умолчанию SOPDS_TITLE_AS_FILENAME = True)  
+**SOPDS_COVER_SHOW** - a way to show skins (False - do not show, True - extract covers on the fly and show).  
+(by default SOPDS COVER_SHOW = True)  
 
-**SOPDS_ALPHABET_MENU** - Включение дополнительного меню выбора алфавита.  
-(по умолчанию SOPDS_ALPHABET_MENU = True)  
+**SOPDS_ZIPSCAN** - Configures the scanning of ZIP archives.  
+(by default SOPDS_ZIPSCAN = True)  
 
-**SOPDS_NOCOVER_PATH** - Файл обложки, которая будет демонстрироваться для книг без обложек.  
-(по умолчанию SOPDS_NOCOVER_PATH = os.path.join(BASE_DIR,'static/images/nocover.jpg'))
+**SOPDS_ZIPCODEPAGE** - Specify which encoding for file names is used in ZIP archives. Available encodings: cp437, cp866, cp1251, utf-8. The default encoding is cp437. Since there is no information about the encoding in which the file names are located in the ZIP archive, it is not possible to automatically determine the correct encoding for filenames, so cyrillic encodings should use cp866 encoding in order for Cyrillic file names to not look like croaks.  
+(default is SOPDS_ZIPCODEPAGE = "cp866")  
 
-**SOPDS_AUTH** - Включение BASIC - авторизации.  
-(по умолчанию SOPDS_AUTH = True)  
+**SOPDS_INPX_ENABLE** - If True, if an INPX file is found in the directory, the scanner does not scan its contents with the sub-htag, but loads the data from the found INPX file. The scanner believes that the archives of books themselves are located in the same directory. Those. INPX-file should be located in the folder with the archives of books.
+However, please note that using data from INPX will result in the absence of annotation in the library. INPX annotations are not present !!!  
+(by default SOPDS_INPX_ENABLE = True)  
 
-**SOPDS_SERVER_LOG** и **SOPDS_SCANNER_LOG** задают размещение LOG файлов этих процессов.  
-(по умолчанию SOPDS_SERVER_LOG = os.path.join(BASE_DIR,'opds_catalog/log/sopds_server.log'))  
-(по умолчанию SOPDS_SCANNER_LOG = os.path.join(BASE_DIR,'opds_catalog/log/sopds_scanner.log'))  
+**SOPDS_INPX_SKIP_UNCHANGED** - If True, the scanner skips re-scanning if the size of INPX has not changed.  
+(by default SOPDS_INPX_SKIP_UNCHANGED = True)  
 
-**SOPDS_SERVER_PID** и **SOPDS_SCANNER_PID** задают размещение PID файлов этих процессов при демонизации.  
-(по умолчанию SOPDS_SERVER_PID = os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_server.pid'))  
-(по умолчанию SOPDS_SCANNER_PID = os.path.join(BASE_DIR,'opds_catalog/tmp/sopds_scanner.pid'))  
+**SOPDS_INPX_TEST_ZIP** - If True, the scanner tries to find the archive described in the INPX. If an archive is not found, the scanner will not add the data from INPX connected to it to the database, if SOPDS_INPX_TEST_ZIP = False, then the scanner does not perform any checks, but simply adds data from INPX to the database. It's much faster.  
+(by default SOPDS_INPX_TEST_ZIP = False)  
 
-Параметры **SOPDS_SCAN_SHED_XXX** устанавливают значения шедулера, для периодического сканирования коллекции книг при помощи **manage.py sopds_scanner start**.  Возможные значения можно найти на следующей странице: # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#module-apscheduler.triggers.cron  
-Изменения указанных ниже параметров через Web-интерфейс или командную строку проверяется процессом sopds_scanner каждые 10 минут. 
-В случае обнаружения изменений sopds_scanner автоматически вносит соответсвующие изменения в планировщик.
+**SOPDS_INPX_TEST_FILES** - If True, the scanner tries to find the specific file with the book described in INPX (already inside the archives). If a file is not found, the scanner will not add this book to the database, if INPX_TEST_FILES = False, then the scanner does not perform any checks, but simply adds a book from INPX to the database. It's much faster.  
+(by default SOPDS_TEST_FILES = False)  
 
-(по умолчанию SOPDS_SCAN_SHED_MIN = '0')  
-(по умолчанию SOPDS_SCAN_SHED_HOUR = '0,12')  
-(по умолчанию SOPDS_SCAN_SHED_DAY = '*')  
-(по умолчанию SOPDS_SCAN_SHED_DOW = '*')  
+**SOPDS_DELETE_LOGICAL** - True will result in the fact that if the scanner detects that the book has been deleted, the entry in the database about this book will be deleted logically (avail = 0). If the value is False, then there will be a physical deletion of such records from the database. So far only SOPDS_DELETE_LOGICAL = False.  
+(by default SOPDS_DELETE_LOGICAL = False)  
 
-**SOPDS_SCAN_START_DIRECTLY** - установка для этого параметра значения True, приведет к тому, что при очередной проверке процессом sopds_scanner этого флага (каждые 10 минут)
-запустится внеочередное сканированеи коллекции, а указаный флаг вновь сброситься в False.
+**SOPDS_SPLITITEMS** - Sets when the number of elements in the group is reached - the group will "expand". For issuing "By Title", "By Authors", "By Series".  
+(the default is SOPDS_SPLITITEMS = 300)  
 
+**SOPDS_MAXITEMS** - The number of results to be displayed per page.  
+(the default is SOPDS_MAXITEMS = 60)  
 
+**SOPDS_FB2TOEPUB** and **SOPDS_FB2TOMOBI** set the paths to the programs - converters from FB2 to EPUB and MOBI.  
+(by default SOPDS_FB2TOEPUB = "")  
+(by default SOPDS_FB2TOMOBI = "")  
+
+**SOPDS_TEMP_DIR** specifies the path to the temporary directory, which is used to copy the original and the conversion result.  
+(by default SOPDS_TEMP_DIR = os.path.join (BASE_DIR, 'tmp'))  
+
+**SOPDS_TITLE_AS_FILENAME** - If True, when downloading instead of the original file name, the book will produce a transliteration of the title of the book.  
+(by default SOPDS_TITLE_AS_FILENAME = True)  
+
+**SOPDS_ALPHABET_MENU** - Includes an additional menu for selecting the alphabet.  
+(by default SOPDS_ALPHABET_MENU = True)  
+
+**SOPDS_NOCOVER_PATH** - A cover file that will be displayed for books without covers.  
+(by default SOPDS_NOCOVER_PATH = os.path.join (BASE_DIR, 'static/images/nocover.jpg'))  
+
+**SOPDS_AUTH** - Enable BASIC - authorization.  
+(by default SOPDS_AUTH = True)  
+
+**SOPDS_SERVER_LOG** and **SOPDS_SCANNER_LOG** specify the location of LOG files of these processes.  
+(by default SOPDS_SERVER_LOG = os.path.join (BASE_DIR, 'opds_catalog/log/sopds_server.log'))  
+(by default SOPDS_SCANNER_LOG = os.path.join (BASE_DIR, 'opds_catalog/log/sopds_scanner.log'))  
+
+**SOPDS_SERVER_PID** and **SOPDS_SCANNER_PID** specify the location of the PID files of these processes during demonization.  
+(by default SOPDS_SERVER_PID = os.path.join (BASE_DIR, 'opds_catalog/tmp/sopds_server.pid'))  
+(by default SOPDS_SCANNER_PID = os.path.join (BASE_DIR, 'opds_catalog/tmp/ sopds_scanner.pid'))  
+
+Parameters **SOPDS_SCAN_SHED_XXX** set the values ​​of the template, to periodically scan the collection of books using ** manage.py sopds_scanner start **. Possible values ​​can be found on the following page: # https://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html#module-apscheduler.triggers.cron  
+Changes to the following parameters via the Web interface or the command line are checked by the sopds_scanner process every 10 minutes.  
+In case of detection of changes, sopds_scanner automatically makes the appropriate changes to the scheduler.  
+
+(default is SOPDS_SCAN_SHED_MIN = '0')  
+(the default is SOPDS_SCAN_SHED_HOUR = '0,12')  
+(default is SOPDS_SCAN_SHED_DAY = '*')  
+(default is SOPDS_SCAN_SHED_DOW = '*')  
+
+**SOPDS_SCAN_START_DIRECTLY** - setting this parameter to True will cause the next check of the sopds_scanner flag (every 10 minutes)  
+an extraordinary scan of the collection will be launched, and the specified flag will again be reset to False.  
+
+**SOPDS_CACHE_TIME** - Pages cache time
+(default is SOPDS_CACHE_TIME = 1200)
+
+**SOPDS_TELEBOT_API_TOKEN** - API TOKEN for Telegram Bot
+
+**SOPDS_TELEBOT_AUTH** - If True, the Bot will grant access to the library, only to users whose name in the Telegram matches the name
+existing user in the Simple OPDS database.
+(by default SOPDS_TELEBOT_AUTH = True)
+
+**SOPDS_TELEBOT_MAXITEMS** - The maximum number of simultaneously displayed items in the Telegram message
+(by default SOPDS_TELEBOT_MAXITEMS = 10)

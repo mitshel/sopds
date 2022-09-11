@@ -1,12 +1,10 @@
 import base64
-
 from django.http import HttpResponse
 from django.contrib import auth
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import resolve
 from django.utils import translation
+from django.middleware.cache import FetchFromCacheMiddleware as DjangoFetchFromCacheMiddleware
+from django.utils.deprecation import MiddlewareMixin
 
-#from opds_catalog import settings
 from constance import config
 
 
@@ -37,7 +35,11 @@ class BasicAuthMiddleware(object):
         except KeyError:
             return self.unauthed()  
                     
-        (auth_meth, auth_data) = authentication.split(' ',1)
+        try:
+            (auth_meth, auth_data) = authentication.split(' ',1)
+        except ValueError:
+            return self.unauthed()  
+
         if 'basic' != auth_meth.lower():
             return self.unauthed()
         auth_data = base64.b64decode(auth_data.strip()).decode('utf-8')
@@ -47,13 +49,22 @@ class BasicAuthMiddleware(object):
         if user and user.is_active:
             request.user = user
             auth.login(request, user)
-            return None
+            return request
 
         return self.unauthed()
 
-class SOPDSLocaleMiddleware:
+
+class SOPDSLocaleMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
             request.LANG = config.SOPDS_LANGUAGE
             translation.activate(request.LANG)
             request.LANGUAGE_CODE = request.LANG
+
+class FetchFromCacheMiddleware(DjangoFetchFromCacheMiddleware):
+
+    def process_request(self, request):
+        if not request.user.is_authenticated:
+            return None
+        else:
+            return super(FetchFromCacheMiddleware, self).process_request(request)

@@ -4,7 +4,7 @@ import os
 import re
 
 from django.db.models import Q
-from django.utils.translation import ugettext as _ , ugettext_noop as _noop
+from django.utils.translation import gettext as _ , gettext_noop as _noop
 from django.db import transaction, connection
 
 from opds_catalog.models import Book, Catalog, Author, Genre, Series, bseries, bauthor, bgenre, bookshelf, Counter, LangCodes
@@ -59,12 +59,12 @@ def clear_all(verbose=False):
     cursor.execute('delete from opds_catalog_bseries')
     cursor.execute('delete from opds_catalog_bauthor')
     cursor.execute('delete from opds_catalog_bgenre')
+    cursor.execute('delete from opds_catalog_bookshelf')
     cursor.execute('delete from opds_catalog_book')
     cursor.execute('delete from opds_catalog_catalog')
     cursor.execute('delete from opds_catalog_author')
     cursor.execute('delete from opds_catalog_genre')
     cursor.execute('delete from opds_catalog_series')
-    cursor.execute('delete from opds_catalog_bookshelf')
     cursor.execute('delete from opds_catalog_counter')
     
 def clear_genres(verbose=False):
@@ -137,7 +137,7 @@ def arc_skip(arcpath,arcsize):
     return 0
     
 
-def inpx_skip(arcpath,arcsize):
+def inp_skip(arcpath,arcsize):
     """
        Выясняем изменялся ли INPX-файл)
        если нет, то пытаемся пропустить сканирование, устанавливая для всех книг из
@@ -162,6 +162,34 @@ def inpx_skip(arcpath,arcsize):
     
     # Здесь мы оказываемся если размеры INPX в БД и в наличии разные, поэтому считаем что изменения в архиве есть 
     # и пропуск сканирования невозможен        
+    return 0
+
+
+def inpx_skip(arcpath, arcsize):
+    """
+       Выясняем изменялся ли INPX-файл)
+       если нет, то пытаемся пропустить сканирование, устанавливая для всех книг из
+       INPX avail=2
+       Если не одной такой книги не нашлось, то считаем что пропуск сканирования не удался
+       и возвращаем 0
+       Если книги из искомого INPX имелись и для них установлен avail=2, то пропуск возможен
+       и возвращаем 1 (или row_count)
+    """
+    catalog = findcat(arcpath)
+
+    # Если такого INPX еще нет в БД, то значит считаем что INPX изменен и пропуск невозможен
+    if catalog == None:
+        return 0
+
+    # Если INPX в БД найден и его размер совпадает с текущим, то считаем что файл INPX не менялся
+    # Поэтому делаем update всех книг из этого INPX, однако если ни одного изменения не произошло, то
+    # таких книг нет, поэтому видимо нужно пересканировать архив
+    if arcsize == catalog.cat_size:
+        row_count = Book.objects.filter(catalog__parent__parent=catalog).update(avail=2)
+        return row_count
+
+        # Здесь мы оказываемся если размеры INPX в БД и в наличии разные, поэтому считаем что изменения в архиве есть
+    # и пропуск сканирования невозможен
     return 0
 
 def findcat(cat_name):

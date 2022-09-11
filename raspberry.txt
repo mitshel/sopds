@@ -1,0 +1,76 @@
+##
+## Установка на RaspberryPI
+## БД SQLITE
+##
+sudo apt-get update
+sudo apt-get install git
+sudo apt-get install python3-pip
+sudo apt-get install python3-lxml
+sudo apt-get install libopenjp2-7-dev
+sudo apt-get install libtiff5
+cd /home
+sudo git clone https://github.com/mitshel/sopds.git
+cd /home/sopds
+sudo python3 -m pip install -r requirements.txt
+sudo python3 manage.py migrate
+sudo python3 manage.py sopds_util clear
+sudo python3 manage.py createsuperuser
+sudo python3 manage.py sopds_util setconf SOPDS_ROOT_LIB /home/sopds/opds_catalog/tests/data
+sudo python3 manage.py sopds_util setconf SOPDS_LANGUAGE ru-RU
+sudo python3 manage.py sopds_util setconf SOPDS_SCAN_START_DIRECTLY True
+sudo python3 manage.py sopds_scanner start --daemon
+sudo python3 manage.py sopds_server start --daemon
+
+##
+## Настраиваем MYSQL
+##
+##
+sudo apt-get install mysql-server
+sudo apt-get install python3-mysqldb
+sudo mysql mysql  
+mysql > create database if not exists sopds default charset=utf8;  
+mysql > grant all on sopds.* to 'sopds'@'localhost' identified by 'sopds';  
+mysql > commit;  
+mysql > ^C
+cd /home/sopds
+sudo vi sopds/settings.py
+
+# Убираем комментарии в настройке БД Mysql
+DATABASES = {   
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sopds',
+        'HOST': 'localhost',
+        'USER': 'sopds',
+        'PASSWORD' : 'sopds',
+        'OPTIONS' : {^M
+            'init_command': "SET default_storage_engine=MyISAM;\
+                             SET sql_mode='';"
+        }
+    }             
+}
+
+
+# Комментируем настройку БД SQLITE
+#
+#
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }        
+#}
+
+##
+## Дальше все как обычно
+## при миграции струкутуры появится желтый Warning - ничего страшного
+##
+##
+sudo python3 manage.py migrate
+sudo python3 manage.py sopds_util clear
+sudo python3 manage.py createsuperuser
+sudo python3 manage.py sopds_util setconf SOPDS_ROOT_LIB /home/sopds/opds_catalog/tests/data
+sudo python3 manage.py sopds_util setconf SOPDS_LANGUAGE ru-RU
+sudo python3 manage.py sopds_util setconf SOPDS_SCAN_START_DIRECTLY True
+sudo python3 manage.py sopds_scanner start --daemon
+sudo python3 manage.py sopds_server start --daemon
