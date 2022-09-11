@@ -425,7 +425,7 @@ def ReadFB2(request, book_id):
     """ Загрузка книги """
     book = Book.objects.get(id=book_id)
 
-    if config.SOPDS_AUTH and request.user.is_authenticated():
+    if config.SOPDS_AUTH and request.user.is_authenticated:
         bookshelf.objects.get_or_create(user=request.user, book=book)
 
     full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
