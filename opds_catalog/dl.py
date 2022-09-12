@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-
 import os
 import codecs
 import base64
 import io
 import subprocess
+import lxml.etree as ET
+from re import search
 
 from django.http import HttpResponse, Http404
 from django.views.decorators.cache import cache_page
@@ -418,5 +419,70 @@ def ConvertFB2(request, book_id, convert_type):
         os.remove(tmp_conv_path)
     except: 
         pass
+
+    return response
+
+def ReadFB2(request, book_id):
+    """ Загрузка книги """
+    book = Book.objects.get(id=book_id)
+
+    if config.SOPDS_AUTH and request.user.is_authenticated:
+        bookshelf.objects.get_or_create(user=request.user, book=book)
+
+    full_path = os.path.join(config.SOPDS_ROOT_LIB, book.path)
+
+    if book.cat_type == opdsdb.CAT_INP:
+        # Убираем из пути INPX файл
+        inpx_path, zip_name = os.path.split(full_path)
+        path, inpx_file = os.path.split(inpx_path)
+        if search(r'.*\.inpx$', path):
+            path, _ = os.path.split(path)
+        full_path = os.path.join(path, zip_name)
+
+    if config.SOPDS_TITLE_AS_FILENAME:
+        transname=utils.translit(book.title+'.'+book.format)
+    else:
+        transname=utils.translit(book.filename)
+        
+    transname = utils.to_ascii(transname)
+
+    dlfilename=transname
+    content_type = mime_detector.fmt(book.format)
+
+    response = HttpResponse()
+    response["Content-Type"]='text/html; charset=utf-8'
+
+    z = None
+    fz = None
+    s = None
+    book_size = book.filesize
+    if book.cat_type==opdsdb.CAT_NORMAL:
+        file_path=os.path.join(full_path, book.filename)
+        book_size=os.path.getsize(file_path)
+        try:
+            fo=codecs.open(file_path, "rb")
+        except FileNotFoundError:
+            raise Http404
+        s=fo.read()
+    elif book.cat_type in [opdsdb.CAT_ZIP, opdsdb.CAT_INP]:
+        try:
+            fz=codecs.open(full_path, "rb")
+        except FileNotFoundError:
+            raise Http404
+        z = zipfile.ZipFile(fz, 'r', allowZip64=True)
+        book_size=z.getinfo(book.filename).file_size
+        fo= z.open(book.filename)
+
+    dom = ET.parse(fo)
+    xslt = ET.parse('%s/FB2_22_xhtml.xsl' % os.path.dirname(os.path.realpath(__file__)))
+    transform = ET.XSLT(xslt)
+    newdom = transform(dom)
+    book_content = ET.tostring(newdom, pretty_print=True)
+
+    response.write(book_content)
+
+    fo.close()
+    if z: z.close()
+    if fz: fz.close()
 
     return response

@@ -35,6 +35,7 @@ LangCodes = {1:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮ
              3:'0123456789'}
 lang_menu = {1:_lazy('Cyrillic'), 2:_lazy('Latin'), 3:_lazy('Digits'), 9:_lazy('Other symbols'), 0:_lazy('Show all')}
 
+
 class Book(models.Model):
     filename = models.CharField(max_length=SIZE_BOOK_FILENAME,db_index=True)
     path = models.CharField(max_length=SIZE_BOOK_PATH,db_index=True)
@@ -55,12 +56,14 @@ class Book(models.Model):
     genres = models.ManyToManyField('Genre', through='bgenre')
     series = models.ManyToManyField('Series', through='bseries')  
 
+
 class Catalog(models.Model):
     parent = models.ForeignKey('self', null=True, db_index=True, on_delete=models.CASCADE)
     cat_name = models.CharField(max_length=SIZE_CAT_CATNAME, db_index=True)
     path = models.CharField(max_length=SIZE_CAT_PATH, db_index=True)
     cat_type = models.IntegerField(null=False, default=0)
     cat_size = models.BigIntegerField(null=True, default=0)
+
 
 class Author(models.Model):
     full_name = models.CharField(max_length=SIZE_AUTHOR_NAME, default=None, db_index=True)
@@ -76,6 +79,7 @@ class bauthor(models.Model):
 #            ["book", "author"],
 #        ]
 
+
 class Genre(models.Model):
     genre = models.CharField(max_length=SIZE_GENRE, db_index=True)
     section = models.CharField(max_length=SIZE_GENRE_SECTION, db_index=True)
@@ -85,10 +89,12 @@ class bgenre(models.Model):
     book = models.ForeignKey('Book', db_index=True, on_delete=models.CASCADE)
     genre = models.ForeignKey('Genre', db_index=True, on_delete=models.CASCADE)
 
+
 class Series(models.Model):
     ser = models.CharField(max_length=SIZE_SERIES, db_index=True)
     search_ser = models.CharField(max_length=SIZE_SERIES, default=None, db_index=True)
     lang_code = models.IntegerField(null=False, default=9,db_index=True)
+
 
 class bseries(models.Model):
     book = models.ForeignKey('Book', db_index=True, on_delete=models.CASCADE)
@@ -99,10 +105,17 @@ class bseries(models.Model):
 #            ["book", "ser"],
 #        ]
 
+
+class Theme(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    theme_css = models.CharField(max_length=64, default='css/sopds.css')
+
+
 class bookshelf(models.Model):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, db_index=True, on_delete=models.CASCADE)
     readtime = models.DateTimeField(null=False, default=timezone.now, db_index=True)
+    position = models.FloatField(null=True,default=None)
 
 
 class CounterManager(models.Manager):
@@ -115,6 +128,7 @@ class CounterManager(models.Manager):
         self.update(counter_allauthors, Author.objects.all().count())
         self.update(counter_allgenres, Genre.objects.all().count())
         self.update(counter_allseries, Series.objects.all().count())
+
 
     def get_counter(self, counter_name):
         try:
@@ -132,11 +146,10 @@ class CounterManager(models.Manager):
 
         return lastscan
 
+
 class Counter(models.Model):
     name = models.CharField(primary_key=True, null=False, blank=False, max_length=16)
     value = models.IntegerField(null=False, default=0)
     update_time = models.DateTimeField(null=False, default=timezone.now)
     obj = models.Manager()
     objects = CounterManager()
-    
-

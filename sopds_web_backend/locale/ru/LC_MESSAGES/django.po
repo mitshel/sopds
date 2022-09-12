@@ -91,6 +91,11 @@ msgstr "Очистить книжную полку"
 msgid "Download:"
 msgstr "Скачать:"
 
+#: sopds_web_backend/templates/sopds_books.html:60
+msgid "Read"
+msgstr "Читать"
+
+#: sopds_web_backend/templates/sopds_books.html:62
 #: .\sopds_web_backend\templates\sopds_books.html:61
 msgid "Delete from bookshelf"
 msgstr "Удалить с книжной полки"
@@ -310,6 +315,10 @@ msgid "Total: %(s_book_count)s books."
 msgstr "Всего: %(s_book_count)s книг."
 
 #: .\sopds_web_backend\templates\sopds_top.html:19
+msgid "Theme"
+msgstr "Тема"
+
+#: .\sopds_web_backend\templates\sopds_top.html:20
 #: .\sopds_web_backend\views.py:595
 msgid "Logout"
 msgstr "Выход"

@@ -57,6 +57,7 @@
 			{% if b.format == 'fb2' and fb2tomobi %}
 			   <i><a href="{% url 'opds_catalog:convert' b.id 'mobi' %}"><span class="label small">mobi</span></a></i>&nbsp;
 			{% endif %}			
+            <i><a href="{% url 'web:read' b.id %}"><span class="label small">{% trans "Read" %}</span></a></i>&nbsp;
 			{% if isbookshelf %}
 			&nbsp;&nbsp;<i><a href="#" onclick="del_bsbook({{ b.id }},'{{b.title}}');"><span class="secondary label small">&nbsp;{% trans "Delete from bookshelf" %}&nbsp;</span></a></i>
 		    {% endif %}
