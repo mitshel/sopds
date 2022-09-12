@@ -10,7 +10,7 @@ from django.views.decorators.vary import vary_on_headers
 from django.urls import reverse, reverse_lazy
 from django.utils.html import strip_tags
 from django.db.models import Q
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseRedirect
 
 
 from opds_catalog import models
@@ -253,6 +253,19 @@ def SearchBooksView(request):
         args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
 
     return render(request,'sopds_books.html', args)
+
+
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
+@sopds_login(url='web:login')
+def ThemeView(request):
+    if Theme.objects.filter(user=request.user).exists():
+        if Theme.objects.get(user=request.user).theme_css == "css/sopds.css":
+            Theme.objects.filter(user=request.user).update(theme_css="css/sopds-dark.css")
+        else:
+            Theme.objects.filter(user=request.user).update(theme_css="css/sopds.css")
+    else:
+        Theme.objects.create(user=request.user, theme_css="css/sopds-dark.css")
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @vary_on_headers("HTTP_ACCEPT_LANGUAGE")
@@ -612,12 +625,18 @@ def BSClearView(request):
 def hello(request):
     args = {}
     args['breadcrumbs'] = [_('HOME')]
+    if request.user.is_authenticated:
+        args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(
+            user=request.user).exists() else "css/sopds.css"
+    else:
+        args['css_file'] = "css/sopds.css"
     return render(request, 'sopds_hello.html', args)
 
 
 def LoginView(request):
     args = {}
     args['breadcrumbs'] = [_('Login')]
+    args['css_file'] = "css/sopds.css"
     args.update(csrf(request))
     try:
         username = request.POST['username']

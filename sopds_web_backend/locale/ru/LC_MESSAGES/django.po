@@ -315,6 +315,10 @@ msgid "Total: %(s_book_count)s books."
 msgstr "Всего: %(s_book_count)s книг."
 
 #: .\sopds_web_backend\templates\sopds_top.html:19
+msgid "Theme"
+msgstr "Тема"
+
+#: .\sopds_web_backend\templates\sopds_top.html:20
 #: .\sopds_web_backend\views.py:595
 msgid "Logout"
 msgstr "Выход"

@@ -445,7 +445,7 @@ def ReadFB2(request, book_id):
         transname=utils.translit(book.filename)
         
     transname = utils.to_ascii(transname)
-        
+
     dlfilename=transname
     content_type = mime_detector.fmt(book.format)
 
