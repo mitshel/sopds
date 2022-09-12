@@ -5,8 +5,8 @@
 .form-row {
     overflow: hidden;
     padding: 10px;
-    font-size: 13px;
-    border-bottom: 1px solid #eee;
+    font-size: 0.8125rem;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .form-row img, .form-row input {
@@ -22,35 +22,34 @@ form .form-row p {
     padding-left: 0;
 }
 
-.hidden {
-    display: none;
-}
-
 /* FORM LABELS */
 
 label {
     font-weight: normal;
-    color: #666;
-    font-size: 13px;
+    color: var(--body-quiet-color);
+    font-size: 0.8125rem;
 }
 
 .required label, label.required {
     font-weight: bold;
-    color: #333;
+    color: var(--body-fg);
 }
 
 /* RADIO BUTTONS */
 
-form ul.radiolist li {
-    list-style-type: none;
+form div.radiolist div {
+    padding-right: 7px;
 }
 
-form ul.radiolist label {
-    float: none;
-    display: inline;
+form div.radiolist.inline div {
+    display: inline-block;
 }
 
-form ul.radiolist input[type="radio"] {
+form div.radiolist label {
+    width: auto;
+}
+
+form div.radiolist input[type="radio"] {
     margin: -2px 4px 0 0;
     padding: 0;
 }
@@ -83,11 +82,12 @@ form ul.inline li {
     height: 26px;
 }
 
-.aligned label + p {
+.aligned label + p, .aligned label + div.help, .aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 170px;
+    overflow-wrap: break-word;
 }
 
 .aligned ul label {
@@ -109,32 +109,38 @@ form .aligned ul {
     padding-left: 10px;
 }
 
-form .aligned ul.radiolist {
+form .aligned div.radiolist {
     display: inline-block;
     margin: 0;
     padding: 0;
 }
 
-form .aligned p.help {
+form .aligned p.help,
+form .aligned div.help {
     clear: left;
     margin-top: 0;
     margin-left: 160px;
     padding-left: 10px;
 }
 
-form .aligned label + p.help {
+form .aligned label + p.help,
+form .aligned label + div.help {
     margin-left: 0;
     padding-left: 0;
 }
 
-form .aligned p.help:last-child {
+form .aligned p.help:last-child,
+form .aligned div.help:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
 }
 
 form .aligned input + p.help,
 form .aligned textarea + p.help,
-form .aligned select + p.help {
+form .aligned select + p.help,
+form .aligned input + div.help,
+form .aligned textarea + div.help,
+form .aligned select + div.help {
     margin-left: 160px;
     padding-left: 10px;
 }
@@ -156,7 +162,8 @@ form .aligned table p {
     padding: 0 0 5px 5px;
 }
 
-.aligned .vCheckboxLabel + p.help {
+.aligned .vCheckboxLabel + p.help,
+.aligned .vCheckboxLabel + div.help {
     margin-top: -4px;
 }
 
@@ -164,12 +171,13 @@ form .aligned table p {
     width: 610px;
 }
 
-.checkbox-row p.help {
+.checkbox-row p.help,
+.checkbox-row div.help {
     margin-left: 0;
     padding-left: 0;
 }
 
-fieldset .field-box {
+fieldset .fieldBox {
     float: left;
     margin-right: 20px;
 }
@@ -180,12 +188,20 @@ fieldset .field-box {
     width: 200px;
 }
 
-form .wide p, form .wide input + p.help {
+form .wide p,
+form .wide input + p.help,
+form .wide input + div.help {
     margin-left: 200px;
 }
 
-form .wide p.help {
+form .wide p.help,
+form .wide div.help {
     padding-left: 38px;
+}
+
+form div.help ul {
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {
@@ -203,24 +219,24 @@ fieldset.collapsed h2, fieldset.collapsed {
 }
 
 fieldset.collapsed {
-    border: 1px solid #eee;
+    border: 1px solid var(--hairline-color);
     border-radius: 4px;
     overflow: hidden;
 }
 
 fieldset.collapsed h2 {
-    background: #f8f8f8;
-    color: #666;
+    background: var(--darkened-bg);
+    color: var(--body-quiet-color);
 }
 
 fieldset .collapse-toggle {
-    color: #fff;
+    color: var(--header-link-color);
 }
 
 fieldset.collapsed .collapse-toggle {
     background: transparent;
     display: inline;
-    color: #a8380f; /* #447e9b; */
+    color: var(--link-fg);
 }
 
 /* MONOSPACE TEXTAREAS */
@@ -232,10 +248,10 @@ fieldset.monospace textarea {
 /* SUBMIT ROW */
 
 .submit-row {
-    padding: 12px 14px;
+    padding: 12px 14px 7px;
     margin: 0 0 20px;
-    background: #f8f8f8;
-    border: 1px solid #eee;
+    background: var(--darkened-bg);
+    border: 1px solid var(--hairline-color);
     border-radius: 4px;
     text-align: right;
     overflow: hidden;
@@ -248,11 +264,11 @@ body.popup .submit-row {
 .submit-row input {
     height: 35px;
     line-height: 15px;
-    margin: 0 0 0 5px;
+    margin: 0 0 5px 5px;
 }
 
 .submit-row input.default {
-    margin: 0 0 0 8px;
+    margin: 0 0 5px 8px;
     text-transform: uppercase;
 }
 
@@ -267,18 +283,36 @@ body.popup .submit-row {
 
 .submit-row a.deletelink {
     display: block;
-    background: #ba2121;
+    background: var(--delete-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
     height: 15px;
     line-height: 15px;
-    color: #fff;
+    margin-bottom: 5px;
+    color: var(--button-fg);
+}
+
+.submit-row a.closelink {
+    display: inline-block;
+    background: var(--close-button-bg);
+    border-radius: 4px;
+    padding: 10px 15px;
+    height: 15px;
+    line-height: 15px;
+    margin: 0 0 0 5px;
+    color: var(--button-fg);
 }
 
 .submit-row a.deletelink:focus,
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
-    background: #a41515;
+    background: var(--delete-button-hover-bg);
+}
+
+.submit-row a.closelink:focus,
+.submit-row a.closelink:hover,
+.submit-row a.closelink:active {
+    background: var(--close-button-hover-bg);
 }
 
 /* CUSTOM FORM FIELDS */
@@ -320,10 +354,6 @@ body.popup .submit-row {
     width: 2.2em;
 }
 
-.vTextField {
-    width: 20em;
-}
-
 .vIntegerField {
     width: 5em;
 }
@@ -334,6 +364,10 @@ body.popup .submit-row {
 
 .vForeignKeyRawIdAdminField {
     width: 5em;
+}
+
+.vTextField, .vUUIDField {
+    width: 20em;
 }
 
 /* INLINES */
@@ -357,12 +391,12 @@ body.popup .submit-row {
 
 .inline-related h3 {
     margin: 0;
-    color: #666;
+    color: var(--body-quiet-color);
     padding: 5px;
-    font-size: 13px;
-    background: #f8f8f8;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
+    font-size: 0.8125rem;
+    background: var(--darkened-bg);
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .inline-related h3 span.delete {
@@ -371,12 +405,12 @@ body.popup .submit-row {
 
 .inline-related h3 span.delete label {
     margin-left: 2px;
-    font-size: 11px;
+    font-size: 0.6875rem;
 }
 
 .inline-related fieldset {
     margin: 0;
-    background: #fff;
+    background: var(--body-bg);
     border: none;
     width: 100%;
 }
@@ -384,11 +418,11 @@ body.popup .submit-row {
 .inline-related fieldset.module h3 {
     margin: 0;
     padding: 2px 5px 3px 5px;
-    font-size: 11px;
+    font-size: 0.6875rem;
     text-align: left;
     font-weight: bold;
     background: #bcd;
-    color: #fff;
+    color: var(--body-bg);
 }
 
 .inline-group .tabular fieldset.module {
@@ -397,6 +431,7 @@ body.popup .submit-row {
 
 .inline-related.tabular fieldset.module table {
     width: 100%;
+    overflow-x: scroll;
 }
 
 .last-related fieldset {
@@ -424,9 +459,9 @@ body.popup .submit-row {
     height: 1.1em;
     padding: 2px 9px;
     overflow: hidden;
-    font-size: 9px;
+    font-size: 0.5625rem;
     font-weight: bold;
-    color: #666;
+    color: var(--body-quiet-color);
     _width: 700px;
 }
 
@@ -443,15 +478,15 @@ body.popup .submit-row {
 
 .inline-group div.add-row,
 .inline-group .tabular tr.add-row td {
-    color: #666;
-    background: #f8f8f8;
+    color: var(--body-quiet-color);
+    background: var(--darkened-bg);
     padding: 8px 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .inline-group .tabular tr.add-row td {
     padding: 8px 10px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 .inline-group ul.tools a.add,
@@ -459,7 +494,7 @@ body.popup .submit-row {
 .inline-group .tabular tr.add-row td a {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
     padding-left: 16px;
-    font-size: 12px;
+    font-size: 0.75rem;
 }
 
 .empty-form {
@@ -468,18 +503,12 @@ body.popup .submit-row {
 
 /* RELATED FIELD ADD ONE / LOOKUP */
 
-.add-another, .related-lookup {
+.related-lookup {
     margin-left: 5px;
     display: inline-block;
     vertical-align: middle;
     background-repeat: no-repeat;
     background-size: 14px;
-}
-
-.add-another {
-    width: 16px;
-    height: 16px;
-    background-image: url(../img/icon-addlink.svg);
 }
 
 .related-lookup {

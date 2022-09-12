@@ -5,6 +5,7 @@ import base64
 import io
 import subprocess
 import lxml.etree as ET
+from re import search
 
 from django.http import HttpResponse, Http404
 from django.views.decorators.cache import cache_page
@@ -428,14 +429,16 @@ def ReadFB2(request, book_id):
     if config.SOPDS_AUTH and request.user.is_authenticated:
         bookshelf.objects.get_or_create(user=request.user, book=book)
 
-    full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
-    
-    if book.cat_type==opdsdb.CAT_INP:
+    full_path = os.path.join(config.SOPDS_ROOT_LIB, book.path)
+
+    if book.cat_type == opdsdb.CAT_INP:
         # Убираем из пути INPX файл
         inpx_path, zip_name = os.path.split(full_path)
         path, inpx_file = os.path.split(inpx_path)
-        full_path = os.path.join(path,zip_name)
-        
+        if search(r'.*\.inpx$', path):
+            path, _ = os.path.split(path)
+        full_path = os.path.join(path, zip_name)
+
     if config.SOPDS_TITLE_AS_FILENAME:
         transname=utils.translit(book.title+'.'+book.format)
     else:
