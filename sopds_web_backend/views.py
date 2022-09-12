@@ -14,7 +14,7 @@ from django.http import HttpResponseForbidden
 
 
 from opds_catalog import models
-from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre, lang_menu
+from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre, lang_menu, Theme
 from opds_catalog import settings
 from constance import config
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
@@ -250,7 +250,8 @@ def SearchBooksView(request):
             args['cache_t'] = 0
         else:
             args['cache_t'] = config.SOPDS_CACHE_TIME
-        
+        args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
+
     return render(request,'sopds_books.html', args)
 
 
@@ -297,6 +298,7 @@ def SearchSeriesView(request):
         args['breadcrumbs'] = [_('Series'),_('Search'),searchterms]
         args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
         args['cache_t']=config.SOPDS_CACHE_TIME
+        args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
 
     return render(request, 'sopds_series.html', args)
 
@@ -340,6 +342,7 @@ def SearchAuthorsView(request):
         args['breadcrumbs'] = [_('Authors'), _('Search'),searchterms]
         args['cache_id'] = '%s:%s:%s' % (searchterms, searchtype, op.page_num)
         args['cache_t'] = config.SOPDS_CACHE_TIME
+        args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
 
     return render(request, 'sopds_authors.html', args)
 
@@ -404,6 +407,7 @@ def CatalogsView(request):
     args['breadcrumbs'] =  [_('Catalogs')]
     args['cache_id'] = '%s:%s:%s' % (args['current'],cat_id, op.page_num)
     args['cache_t'] = config.SOPDS_CACHE_TIME
+    args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
 
     return render(request,'sopds_catalogs.html', args)  
 
@@ -442,8 +446,9 @@ def BooksView(request):
     args['breadcrumbs'] =  [_('Books'),_('Select'),lang_menu[lang_code],chars]
     args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
     args['cache_t'] = config.SOPDS_CACHE_TIME
+    args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
 
-    return render(request,'sopds_selectbook.html', args)      
+    return render(request, 'sopds_selectbook.html', args)
 
 
 @vary_on_headers("HTTP_ACCEPT_LANGUAGE")
@@ -480,6 +485,8 @@ def AuthorsView(request):
     args['breadcrumbs'] =  [_('Authors'),_('Select'),lang_menu[lang_code],chars]
     args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
     args['cache_t'] = config.SOPDS_CACHE_TIME
+    args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(
+        user=request.user).exists() else "css/sopds.css"
 
     return render(request, 'sopds_selectauthor.html', args)
 
@@ -518,6 +525,8 @@ def SeriesView(request):
     args['breadcrumbs'] =  [_('Series'),_('Select'),lang_menu[lang_code],chars]
     args['cache_id'] = '%s:%s:%s' % (args['current'],lang_code, chars)
     args['cache_t'] = config.SOPDS_CACHE_TIME
+    args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(
+        user=request.user).exists() else "css/sopds.css"
 
     return render(request,'sopds_selectseries.html', args)
 
@@ -545,7 +554,9 @@ def GenresView(request):
     args['parent_id'] = section_id
     args['cache_id'] = '%s:%s' % (args['current'],section_id)
     args['cache_t'] = config.SOPDS_CACHE_TIME
-       
+    args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(
+        user=request.user).exists() else "css/sopds.css"
+
     return render(request,'sopds_selectgenres.html', args)
 
 
@@ -649,6 +660,8 @@ def BookReaderView(request, book_id):
     args = {}
     args['current'] = 'reader'
     args['book_id'] = book_id
+    args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(
+        user=request.user).exists() else "css/sopds.css"
     return render(request, 'BookReader.html', args)
 
 
