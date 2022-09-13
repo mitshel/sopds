@@ -101,9 +101,7 @@ def getFileDataConv(book, convert_type):
     if not fo:
         return None
 
-    transname = getFileName(book)
-
-    (n, e) = os.path.splitext(transname)
+    (n, e) = os.path.splitext(book.filename)
     dlfilename = "%s.%s" % (n, convert_type)
 
     if convert_type == 'epub':
@@ -127,7 +125,7 @@ def getFileDataConv(book, convert_type):
     fw.close()
     fo.close()
 
-    popen_args = ("%s \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, tmp_conv_path))
+    popen_args = ("%s \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, config.SOPDS_TEMP_DIR))
     logger.info(str(popen_args))
     proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # У следующий строки 2 функции 1-получение информации по конвертации и 2- ожидание конца конвертации
