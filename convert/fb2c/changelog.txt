@@ -1,0 +1,542 @@
+
+1.64.5 / 2022-07-29
+===================
+
+  * Fixing notes formating again. This time inline - regression from 1.59.0
+
+v1.64.4 / 2022-07-10
+====================
+
+  * Notes formatting in "float" modes - added "keep_new_line" configuration
+  * All guilde items should have title
+
+v1.64.3 / 2022-07-07
+====================
+
+  * Close underlying file after "fixing" epub zip format - closing writer stream is not enough. Do not allow page anchors in the xml elements "tail" to prevent latest epubcheck complains.
+
+v1.64.2 / 2022-07-04
+====================
+
+  * Do not (un)indent fb2 xml - in some obscure cases it removes spaces between tags.
+
+v1.64.1 / 2022-06-22
+====================
+
+  * Bumping version
+  * Store conversion result in debug archive
+  * Update README.md
+
+v1.64.0 / 2022-06-20
+====================
+
+  * Documentation
+  * Changing debug behavior
+
+v1.63.0 / 2022-06-11
+====================
+
+  * Linting: replacing deprecated strings.Title() for proper Unicode handling
+  * go 1.18 with updated dependencies and better command line handling
+
+v1.62.0 / 2022-05-01
+====================
+
+  * Correcting documentation
+  * Correcting documentation
+  * Amazon backend now directly supports EPUB conversion and MOBI is being deprecated
+
+v1.61.2 / 2022-04-26
+====================
+
+  * Bump version
+  * Merge pull request #11 from shemanaev/patch-2
+  * Restored flags aliases lost during cli migration
+
+v1.61.1 / 2022-04-24
+====================
+
+  * Merge branch 'master' of github.com:rupor-github/fb2converter
+  * Bump version
+  * Switching to urfave/cli/v2 - 2
+  * Switching to urfave/cli/v2
+  * Update README.md
+  * Update README.md
+  * Documentation
+
+v1.61.0 / 2022-04-23
+====================
+
+  * Typos
+  * Documentation update
+  * Cleanup
+  * Linting
+  * Updating readme
+  * Moving to go1.17.9 Updating all dependencies Forking go-micro Up to date error processing
+
+v1.60.2 / 2021-12-18
+====================
+
+  * Disabling CGO
+  * Update README.md
+
+v1.60.1 / 2021-12-11
+====================
+
+  * Separating Apple Silicon builds for macOS
+  * Clarifying wording for MyHomeLib support.
+
+v1.60.0 / 2021-11-16
+====================
+
+  * If log file requested but cannot be created - use temporary directory
+  * Adding notes for write protected MyHomeLib installation directory
+
+v1.59.0 / 2021-10-10
+====================
+
+  * Processing more tags in inline and floating notes
+  * Proper secrets
+
+v1.58.1 / 2021-03-20
+====================
+
+  * Cleaning up build
+  * Fixing typo
+
+v1.58.0 / 2021-03-06
+====================
+
+  * Fixing tag name in changelog
+  * Updating README
+  * Comppressing static assets to reduce resulting program size
+  * Cleaning cmake and removing ioutil
+  * Signing build
+  * Switching to go1.16 and removing go-bindata
+
+1.57 / 2020-12-03
+=================
+
+  * Less restrictive handling of url definitions in stylesheets
+  * Cleanup
+
+1.56 / 2020-11-28
+=================
+
+  * Fixing tail processing - better whitespace handling.
+
+1.55 / 2020-11-10
+=================
+
+  * Do not remove extra chardata on identation
+
+1.54 / 2020-10-15
+=================
+
+  * Fixing namespace generation for XHTML
+
+1.53 / 2020-10-15
+=================
+
+  * 1. Do not format output XHTML file when using float-new mode 2. Do not skip anchor text in bodies of the notes
+
+1.52 / 2020-07-25
+=================
+
+  * Fixing cover stamping for non-kindle formats
+
+1.51 / 2020-07-11
+=================
+
+  * Do not generate multiple consecutive chapter_end divs
+
+1.50 / 2020-07-06
+=================
+
+  * Adding debug level logging of files skipped during convertion
+
+1.49 / 2020-07-03
+=================
+
+  * Correcting version
+  * Regenerating built-ins
+  * Merge branch 'master' of github.com:rupor-github/fb2converter
+  * "command" exit errors are now processed (and logged) the same way as other errors.
+
+1.48 / 2020-06-20
+=================
+
+  * Fixing typos - kaznelson
+  * Correcting title_format processing
+
+1.47 / 2020-06-19
+=================
+
+  * Correcting names of static resources
+  * Added file name substitutions in title_format
+
+1.46 / 2020-04-15
+=================
+
+  * Set cover convertion flag for kindle devices properly.
+  * Rewritten base64 decoding for better image handling resiliency
+
+1.45 / 2020-03-18
+=================
+
+  * Fixing cover image overwrite
+
+1.44 / 2020-03-17
+=================
+
+  * for force-cp decode only part of the path inside archive
+  * Update README.md
+
+1.43 / 2020-01-11
+=================
+
+  * Support renaming/renumbering of footnotes in floating modes
+
+1.42 / 2020-01-06
+=================
+
+  * Fixing panic in "transfer" - (https://github.com/shemanaev)
+
+1.41 / 2020-01-02
+=================
+
+  * Fixing xhtml genration for image tags
+
+1.40 / 2019-12-26
+=================
+
+  * "float" and "float-old" are the same now, "float-new" uses HTML5 method instead.
+
+1.39 / 2019-12-26
+=================
+
+  * Ignore panics during thumbnail extraction
+
+1.38 / 2019-12-19
+=================
+
+  * Prevent additional file splitting when chapter_per_file is false
+
+1.37 / 2019-12-14
+=================
+
+  * Added support for multiple configuration sources on command line * Added meta overwrite for ASIN in kindle formats
+
+1.36 / 2019-12-03
+=================
+
+  * More cover image processing
+
+1.35 / 2019-12-01
+=================
+
+  * Fixing resizing
+  * Renaming new parameter
+  * Fixed kindlegen intermediate file detection. Added cover resizing for non-kindle formats. Added pagemap processing for epub transfer. Fixed pagemap parsing in modi/azw3 - unexpected header length.
+
+1.34 / 2019-11-28
+=================
+
+  * Added "chapter_subtitle_dividers" to help slow readers
+  * Full linting
+  * Prevent dot duplication in note titles
+
+1.33 / 2019-10-27
+=================
+
+  * Sometimes kidlegen returns wrong error code - always check that it actually created mobi
+  * Overloading "open_from_cover" - for kindle content if annotation is available, open on it. "
+
+1.32 / 2019-10-09
+=================
+
+  * Bumping version
+  * Replacing mac kindlegen with 64 bits version
+
+1.31 / 2019-09-30
+=================
+
+  * Fixing text extraction from XML fragment
+
+1.30 / 2019-09-05
+=================
+
+  * Changed notes link and series abbreviation algo
+
+1.29 / 2019-09-01
+=================
+
+  * Changing dropcaps processing
+
+1.28 / 2019-08-31
+=================
+
+  * Be more careful with page breaks
+
+1.27 / 2019-08-21
+=================
+
+  * Fixed how page markers are set properly counting runes when multiple sentences are present. Added parameter to split xhtml files on number of pages
+
+1.26 / 2019-08-04
+=================
+
+  * Adding warning for unrecognized font file formats
+
+1.25 / 2019-07-14
+=================
+
+  * Return "default" notes processing method to original state (almost) and add "fload-old" method instead for bi-directional links
+
+1.24 / 2019-07-13
+=================
+
+  * Making sure default notes titles are back-linked
+
+1.23 / 2019-07-10
+=================
+
+  * Fixing embedded resources
+  * Adding force-zip-cp conversion parameter
+
+1.22 / 2019-07-10
+=================
+
+  * Hyphenator fixes - exceptions processing
+  * Compress debug dump file
+
+1.21 / 2019-07-06
+=================
+
+  * Vendoring
+  * Fixing script alignment
+  * Switching "floating" notes to recommended HTML5 format to assist proper KFX conversions. When debugging dump Book internal info.
+  * Typo
+
+1.20 / 2019-06-08
+=================
+
+  * Cleaning history generation
+  * Adding godoc
+  * Fixes for godoc
+  * Switching import paths
+  * Do not indent XML inside paragraps on output. Do not cleam dot symbol from output filenames (except ileft ones on Linux/MAC)
+
+1.19 / 2019-05-13
+=================
+
+  * Changing when log is initialized to avoid logging help prints
+
+1.18 / 2019-05-10
+=================
+
+  * Bumping version
+  * Adding linux i386 target to distribution
+
+1.17 / 2019-03-19
+=================
+
+  * Adding ability to format authors names differently in different places
+
+1.16 / 2019-03-16
+=================
+
+  * Starting changelog.txt distribution
+  * Update README.md
+  * Correcting documentation
+  * Allow file_name_format create directories
+  * Syncing doc
+  * Adding force_asin_on_azw3 option
+  * "synccovers" command now supports thumbnail creation for a single file
+  * Adding "book_title_from_meta" - when creating TOC page use metainfo instead of first title
+  * Bump version
+  * Clean resulting file name always, not only when slug is requested
+  * Improve text extraction from XML fragment
+  * Added comment about UTF-8
+  * Allow book annotation to be part of TOC - "add_to_toc" configuration
+  * Fixing notes processing
+  * Changing configuration default
+  * If not specified otherwise - produce zip files without data descriptors for compatibility with CR
+  * Save book sequence data in calibre tags - just in case
+  * Finishing proper conversion to go mod
+  * Updating dependencies
+
+1.15 / 2019-03-15
+=================
+
+  * Adding force_asin_on_azw3 option
+
+1.14 / 2019-03-14
+=================
+
+  * synccovers icommand now supports thumbnail creation for a single file
+
+1.13 / 2019-03-11
+=================
+
+  * Adding "book_title_from_meta" - when creating TOC page use metainfo instead of first title
+
+1.12 / 2019-03-10
+=================
+
+  * Bump version
+  * Clean resulting file name always, not only when slug is requested
+
+1.11 / 2019-03-09
+=================
+
+  * Improve text extraction from XML fragment
+  * Added comment about UTF-8
+
+1.10 / 2019-03-05
+=================
+
+  * Allow book annotation to be part of TOC - "add_to_toc" configuration
+
+1.9 / 2019-03-03
+================
+
+  * Fixing notes processing
+  * Changing configuration default
+
+1.8 / 2019-03-02
+================
+
+  * If not specified otherwize - produce zip files without data descriptors for compatibility with CR
+
+1.7 / 2019-02-28
+================
+
+  * Save book sequence data in calibre tags - just in case
+  * Finishing proper conversion to go mod
+  * Updating dependeencies
+  * Cleanup
+
+1.6 / 2019-02-26
+================
+
+  * Adding "include_chapters_without_title" - if section with text has no title still include it into TOC
+
+1.5 / 2019-02-25
+================
+
+  * Fixing Kobo div's
+
+1.4 / 2019-02-25
+================
+
+  * Fix configuration typo
+  * Fix configuration typo
+  * Fix configuration typo
+
+1.3 / 2019-02-23
+================
+
+  * Merge branch 'master' of github.com:rupor-github/fb2converter
+  * Built in configuration.toml is in sync with default settings now. Changed dropcap processing to produce similar outcome for epub and kepub generation. Fixed "index out of bounds" when processing text in kepub mode. Added panic recovery and logging in processBook. Removed ellipses from example of speech transformation. Relaxed series number checking. When processing anchor always convert path to proper slashes before parsing.
+  * Built in configuration.toml is in sync with default settings now. Changed dropcap processing to produce similar outcome for epub and kepub generation. Fixed "index out of bounds" when processing text in kepub mode. Added panic recovery and logging in processBook. Removed ellipses from example of speech transformation.
+  * Update README.md
+
+1.2 / 2019-02-17
+================
+
+  * Adding "ignore_nonbreakable_space"" - to help with bad hyphenation engines
+
+1.1 / 2019-02-17
+================
+
+  * Fixing text escaping in formatText and dropcaps processing
+
+1.0 / 2019-02-16
+================
+
+  * Only generate page markers inside paragraphs - epubcheck is right
+  * README
+  * Initial supprot for kepub completed. Output file name could be sluggified
+  * WIP: kepub
+  * Fix etree indent
+  * Switching build to make
+  * Cleaning up comments and switching generator to make files
+
+0.99 / 2019-02-10
+=================
+
+  * Make sure epub passes epubcheck for epub 2.0.1
+
+0.98 / 2019-02-09
+=================
+
+  * Merge branch 'master' of github.com:rupor-github/fb2converter
+  * Fixing epub container generation
+  * Update README.md
+
+0.97 / 2019-02-04
+=================
+
+  * Adding ABBRseries
+  * Use ninja build by default
+  * Cleaning build message
+  * Correcting dependencies
+  * Making CMakeList.txt Ninja compatible and switching default generator
+  * Print cmake generator used
+
+0.96 / 2019-01-23
+=================
+
+  * Sync up output node during section transfer
+
+0.95 / 2019-01-22
+=================
+
+  * Read utf-8 BOM and try to drop garbage in base64 strings
+  * A bit of documentation
+  * Update README.md
+  * Update README.md
+
+0.94 / 2019-01-15
+=================
+
+  * Multiple fixes: font embedding, keyword expansion, proper archive directory processing.
+  * readme changes
+  * readme changes
+  * readme changes
+  * readme changes
+  * readme changes
+  * readme changes
+  * readme changes
+  * readme changes
+  * 0.93 - fixes
+
+0.93 / 2019-01-12
+=================
+
+  * Fixing synccovers directory search
+
+0.92 / 2019-01-12
+=================
+
+  * Update README.md
+  * Additional font checking
+  * Added transfer command to simplify epub handling
+  * Update README.md
+
+0.91 / 2019-01-11
+=================
+
+  * Added configuration section for meta information overwrite
+  * Implemented synccovers
+  * Typos...
+  * My PR with modifications to etree was declined, moving modified etree code into the project
+  * Added "--ow" parameter to convert - overwrite existing files
+  * Cleaning up some comments
+
+0.9 / 2019-01-08
+================
+
+  * Initial drop
+  * Initial commit
