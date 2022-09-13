@@ -128,6 +128,7 @@ def getFileDataConv(book, convert_type):
     # У следующий строки 2 функции 1-получение информации по конвертации и 2- ожидание конца конвертации
     # В силу 2й функции ее удаление приведет к ошибке выдачи сконвертированного файла
     out = proc.stdout.readlines()
+    print(out)
 
     if os.path.isfile(tmp_conv_path):
         fo = codecs.open(tmp_conv_path, "rb")
