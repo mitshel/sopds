@@ -5,3 +5,6 @@ django-picklefield
 lxml
 python-telegram-bot==13.14
 six==1.16.0
+psycopg2-binary==2.9.3
+uwsgi==2.0.19.1
+raven==6.10.0

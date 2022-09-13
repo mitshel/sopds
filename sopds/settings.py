@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',     
     'constance.backends.database',
     'constance',
+    'raven.contrib.django.raven_compat',
 ]
 
 MIDDLEWARE = [
