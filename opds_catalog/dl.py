@@ -6,6 +6,7 @@ import io
 import subprocess
 import lxml.etree as ET
 from re import search
+import logging
 
 from django.http import HttpResponse, Http404
 from django.views.decorators.cache import cache_page
