@@ -27,6 +27,7 @@ from opds_catalog.middleware import BasicAuthMiddleware
 logger = logging.getLogger('')
 logger.setLevel(logging.DEBUG)
 
+
 def getFileName(book):
     if config.SOPDS_TITLE_AS_FILENAME:
         transname = utils.translit(book.title + '.' + book.format)
@@ -126,19 +127,15 @@ def getFileDataConv(book, convert_type):
     fo.close()
 
     popen_args = ("%s \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, config.SOPDS_TEMP_DIR))
-    logger.info(str(popen_args))
     proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # У следующий строки 2 функции 1-получение информации по конвертации и 2- ожидание конца конвертации
     # В силу 2й функции ее удаление приведет к ошибке выдачи сконвертированного файла
     out = proc.stdout.readlines()
-    logger.info(str(out))
 
     if os.path.isfile(tmp_conv_path):
         fo = codecs.open(tmp_conv_path, "rb")
     else:
         return None
-
-    logger.info('to dio')
 
     dio = io.BytesIO()
     dio.write(fo.read())
@@ -240,6 +237,7 @@ def Download(request, book_id, zip_flag):
 
     return response
 
+
 # Новая версия (0.42) процедуры извлечения обложек из файлов книг fb2, epub, mobi
 @cache_page(config.SOPDS_CACHE_TIME)
 def Cover(request, book_id, thumbnail=False):
@@ -296,6 +294,7 @@ def Cover(request, book_id, thumbnail=False):
             raise Http404
 
     return response
+
 
 # Старая версия (до 0.41) процедуры извлечения обложек из файлов книг только fb2
 def Cover0(request, book_id, thumbnail = False):
@@ -355,6 +354,7 @@ def Cover0(request, book_id, thumbnail = False):
             raise Http404
 
     return response
+
 
 def Thumbnail(request, book_id):
     return Cover(request, book_id, True)
@@ -438,6 +438,7 @@ def ConvertFB2(request, book_id, convert_type):
         pass
 
     return response
+
 
 def ReadFB2(request, book_id):
     """ Загрузка книги """
