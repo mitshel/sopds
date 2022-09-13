@@ -113,9 +113,10 @@ def getFileDataConv(book, convert_type):
     tmp_conv_path = os.path.join(config.SOPDS_TEMP_DIR, dlfilename)
 
     try:
-        fw = open(tmp_fb2_path,'wb')
+        fw = open(tmp_fb2_path, 'wb')
     except FileNotFoundError:
         os.mkdir(config.SOPDS_TEMP_DIR)
+        fw = open(tmp_fb2_path, 'wb')
 
     fw.write(fo.read())
     fw.close()
