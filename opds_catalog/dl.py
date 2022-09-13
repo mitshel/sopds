@@ -122,7 +122,7 @@ def getFileDataConv(book, convert_type):
     fw.close()
     fo.close()
 
-    popen_args = ("\"%s\" \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, tmp_conv_path))
+    popen_args = ("%s \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, tmp_conv_path))
     proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE)
     # У следующий строки 2 функции 1-получение информации по конвертации и 2- ожидание конца конвертации
     # В силу 2й функции ее удаление приведет к ошибке выдачи сконвертированного файла
@@ -143,11 +143,14 @@ def getFileDataConv(book, convert_type):
 
     return dio
 
+
 def getFileDataEpub(book):
     return getFileDataConv(book,'epub')
 
+
 def getFileDataMobi(book):
     return getFileDataConv(book,'mobi')
+
 
 def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """
