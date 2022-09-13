@@ -74,6 +74,7 @@ def getFileData(book):
 
     return dio
 
+
 def getFileDataZip(book):
     transname = getFileName(book)
     fo = getFileData(book)
@@ -85,8 +86,8 @@ def getFileDataZip(book):
 
     return dio
 
-def getFileDataConv(book, convert_type):
 
+def getFileDataConv(book, convert_type):
     if book.format != 'fb2':
        return None
 
@@ -110,7 +111,12 @@ def getFileDataConv(book, convert_type):
 
     tmp_fb2_path = os.path.join(config.SOPDS_TEMP_DIR, book.filename)
     tmp_conv_path = os.path.join(config.SOPDS_TEMP_DIR, dlfilename)
-    fw = open(tmp_fb2_path,'wb')
+
+    try:
+        fw = open(tmp_fb2_path,'wb')
+    except FileNotFoundError:
+        os.mkdir(config.SOPDS_TEMP_DIR)
+
     fw.write(fo.read())
     fw.close()
     fo.close()
