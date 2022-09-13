@@ -123,7 +123,8 @@ def getFileDataConv(book, convert_type):
     fo.close()
 
     popen_args = ("%s \"%s\" \"%s\"" % (converter_path, tmp_fb2_path, tmp_conv_path))
-    proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE)
+    print(popen_args)
+    proc = subprocess.Popen(popen_args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # У следующий строки 2 функции 1-получение информации по конвертации и 2- ожидание конца конвертации
     # В силу 2й функции ее удаление приведет к ошибке выдачи сконвертированного файла
     out = proc.stdout.readlines()
