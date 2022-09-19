@@ -7,7 +7,7 @@ from constance import config
 loglevels={'debug':logging.DEBUG,'info':logging.INFO,'warning':logging.WARNING,'error':logging.ERROR,'critical':logging.CRITICAL,'none':logging.NOTSET}
 NOZIP_FORMATS = ['epub', 'mobi']
 
-VERSION = "0.48"
+VERSION = "0.49"
 TITLE = getattr(settings, "SOPDS_TITLE", "SimpleOPDS")
 SUBTITLE = getattr(settings, "SOPDS_SUBTITLE", "SimpleOPDS Catalog by www.sopds.ru. Version %s."%VERSION)
 ICON = getattr(settings, "SOPDS_ICON", "/static/images/favicon.ico")
@@ -15,9 +15,9 @@ THUMB_SIZE = 100
 
 loglevel = getattr(settings, "SOPDS_LOGLEVEL", "info")
 if loglevel.lower() in loglevels:
-    LOGLEVEL=loglevels[loglevel.lower()]
+    LOGLEVEL = loglevels[loglevel.lower()]
 else:
-    LOGLEVEL=logging.NOTSET
+    LOGLEVEL = logging.NOTSET
     
 from django.dispatch import receiver
 #from constance.signals import config_updated
