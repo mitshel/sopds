@@ -2,7 +2,7 @@
 from django.urls import re_path
 from sopds_web_backend import views
 
-app_name='opds_web_backend'
+app_name = 'opds_web_backend'
 
 urlpatterns = [
     re_path(r'^search/books/$',views.SearchBooksView, name='searchbooks'),
@@ -17,6 +17,7 @@ urlpatterns = [
     re_path(r'^theme/$',views.ThemeView, name='theme'),
     re_path(r'^login/$',views.LoginView, name='login'),
     re_path(r'^logout/$',views.LogoutView, name='logout'),
+    re_path(r'^bs/add/$',views.BSAddView, name='bsadd'),
     re_path(r'^bs/delete/$',views.BSDelView, name='bsdel'),
     re_path(r'^bs/clear/$', views.BSClearView, name='bsclear'),
     re_path(r'^bs/setpos/(?P<book_id>[0-9]+)/$', views.BSSetPos, name='setpos'),

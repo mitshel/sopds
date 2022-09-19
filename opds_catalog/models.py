@@ -115,8 +115,10 @@ class bookshelf(models.Model):
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, db_index=True, on_delete=models.CASCADE)
     readtime = models.DateTimeField(null=False, default=timezone.now, db_index=True)
-    position = models.FloatField(null=True,default=None)
+    position = models.FloatField(null=True, default=None)
 
+    class Meta:
+        unique_together = ['user', 'book']
 
 class CounterManager(models.Manager):
     def update(self, counter_name, counter_value):

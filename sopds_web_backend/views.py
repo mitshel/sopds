@@ -42,8 +42,8 @@ def sopds_processor(request):
     args['sopds_version'] = settings.VERSION
     args['alphabet'] = config.SOPDS_ALPHABET_MENU
     args['splititems'] = config.SOPDS_SPLITITEMS
-    args['fb2tomobi'] = (config.SOPDS_FB2TOMOBI!="")
-    args['fb2toepub'] = (config.SOPDS_FB2TOEPUB!="")
+    args['fb2tomobi'] = (config.SOPDS_FB2TOMOBI != "")
+    args['fb2toepub'] = (config.SOPDS_FB2TOEPUB != "")
     args['nozip'] = settings.NOZIP_FORMATS
     args['cache_t'] = 0
 
@@ -155,7 +155,7 @@ def SearchBooksView(request):
                 args['breadcrumbs'] = [_('Books'),_('Bookshelf'),request.user.username]
                 #books = bookshelf.objects.filter(user=request.user).select_related('book')              
             else:
-                books=Book.objects.filter(id=0)     
+                books = Book.objects.filter(id=0)
                 args['breadcrumbs'] = [_('Books'), _('Bookshelf')] 
             args['searchobject'] = 'title'
             args['isbookshelf'] = 1
@@ -201,50 +201,65 @@ def SearchBooksView(request):
         prev_title = ''
         prev_authors_set = set()
         
-        # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
+        # Начаинам анализ с последнего элемента на предыдущей странице, чторбы он "вытянул" с этой страницы
         # свои дубликаты если они есть
-        summary_DOUBLES_HIDE =  config.SOPDS_DOUBLES_HIDE and (searchtype != 'd')
-        start = op.d1_first_pos if ((op.d1_first_pos==0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos-1
+        summary_DOUBLES_HIDE = config.SOPDS_DOUBLES_HIDE and (searchtype != 'd')
+        start = op.d1_first_pos if ((op.d1_first_pos == 0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos-1
         finish = op.d1_last_pos
         
         for row in books[start:finish+1]:
-            p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
-                  'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
-                  'authors': row.authors.values(), 'genres': row.genres.values(), 'series': row.series.values(),'ser_no': row.bseries_set.values('ser_no'),\
-                  'readtime':row.bookshelf_set.filter(user=request.user).values('readtime') if config.SOPDS_AUTH else None
+            p = {'doubles': 0,
+                 'lang_code': row.lang_code,
+                 'filename': row.filename,
+                 'path': row.path,
+                 'registerdate': row.registerdate,
+                 'id': row.id,
+                 'annotation': strip_tags(row.annotation),
+                 'docdate': row.docdate,
+                 'format': row.format,
+                 'title': row.title,
+                 'filesize': row.filesize // 1000,
+                 'authors': row.authors.values(),
+                 'genres': row.genres.values(),
+                 'series': row.series.values(),
+                 'ser_no': row.bseries_set.values('ser_no'),
+                 'bookshelf': row.bookshelf_set.filter(user=request.user).exists() if config.SOPDS_AUTH else False,
+                 'readtime': row.bookshelf_set.filter(user=request.user).values('readtime') if config.SOPDS_AUTH else None
                  }
+
             if summary_DOUBLES_HIDE:
                 title = p['title']
                 authors_set = {a['id'] for a in p['authors']}         
-                if title.upper()==prev_title.upper() and authors_set==prev_authors_set:
-                    items[-1]['doubles']+=1
+                if title.upper() == prev_title.upper() and authors_set == prev_authors_set:
+                    items[-1]['doubles'] += 1
+                    if p['bookshelf']:
+                        items[-1]['bookshelf'] = True
                 else:
                     items.append(p)                   
                 prev_title = title
                 prev_authors_set = authors_set
             else:
                 items.append(p)
-                
         # "вытягиваем" дубликаты книг со следующей страницы и удаляем первый элемент который с предыдущей страницы и "вытягивал" дубликаты с текущей
         if summary_DOUBLES_HIDE:
             double_flag = True
             while ((finish+1)<books_count) and double_flag:
                 finish += 1  
-                if books[finish].title.upper()==prev_title.upper() and {a['id'] for a in books[finish].authors.values()}==prev_authors_set:
-                    items[-1]['doubles']+=1
+                if books[finish].title.upper() == prev_title.upper() and {a['id'] for a in books[finish].authors.values()} == prev_authors_set:
+                    items[-1]['doubles'] += 1
                 else:
                     double_flag = False   
             
-            if op.d1_first_pos!=0:     
+            if op.d1_first_pos != 0:
                 items.pop(0)                                   
-              
+
+
         args['paginator'] = op.get_data_dict()
-        args['searchterms']=searchterms;
-        args['searchtype']=searchtype;
-        args['books']=items   
+        args['searchterms'] = searchterms
+        args['searchtype'] = searchtype
+        args['books'] = items
         args['current'] = 'search'
-        args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
+        args['cache_id'] = '%s:%s:%s' % (searchterms, searchtype, op.page_num)
         # changes on bookshelf should be refreshed immediatelly
         if searchtype == 'u':
             args['cache_t'] = 0
@@ -252,7 +267,12 @@ def SearchBooksView(request):
             args['cache_t'] = config.SOPDS_CACHE_TIME
         args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
 
-    return render(request,'sopds_books.html', args)
+
+    from pprint import pprint
+    pprint(args)
+
+
+    return render(request, 'sopds_books.html', args)
 
 
 @vary_on_headers("HTTP_ACCEPT_LANGUAGE")
@@ -422,7 +442,7 @@ def CatalogsView(request):
     args['cache_t'] = config.SOPDS_CACHE_TIME
     args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(user=request.user).exists() else "css/sopds.css"
 
-    return render(request,'sopds_catalogs.html', args)  
+    return render(request, 'sopds_catalogs.html', args)
 
 
 @vary_on_headers("HTTP_ACCEPT_LANGUAGE")
@@ -570,27 +590,33 @@ def GenresView(request):
     args['css_file'] = Theme.objects.get(user=request.user).theme_css if Theme.objects.filter(
         user=request.user).exists() else "css/sopds.css"
 
-    return render(request,'sopds_selectgenres.html', args)
+    return render(request, 'sopds_selectgenres.html', args)
+
+
+@vary_on_headers("HTTP_ACCEPT_LANGUAGE")
+@sopds_login(url='web:login')
+def BSAddView(request):
+    if request.GET and request.GET.get('book', None):
+        book = int(request.GET['book'])
+        bookshelf.objects.get_or_create(user=request.user,
+                                        book_id=book)
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER').split('#')[0] + '#' + request.GET['book'])
 
 
 @vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
 def BSDelView(request):
-    if request.GET:
+    if request.GET and request.GET.get('book', None):
         book = request.GET.get('book', None)
-    else:
-        book = None
-       
-    book = int(book)
-       
-    bookshelf.objects.filter(user=request.user, book=book).delete()
-    
-    return redirect("%s?searchtype=u"%reverse("web:searchbooks"))
+        bookshelf.objects.filter(user=request.user, book=int(book)).delete()
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @vary_on_headers("HTTP_ACCEPT_LANGUAGE")
 @sopds_login(url='web:login')
-def BSSetPos(request,book_id):
+def BSSetPos(request, book_id):
     if request.GET:
         pos = request.GET.get('pos', None)
     else:

@@ -4,10 +4,17 @@
 {% block body %}
 <script>
        function del_bsbook(b_id, b_t) {
-           $('#DeleteBook_btnYes').attr("href","{% url "web:bsdel" %}?book="+b_id);
-           $('#DeleteBook_image').attr("src","{% url "opds:covertmpl" %}"+b_id+"/");
+           $('#DeleteBook_btnYes').attr("href", "{% url "web:bsdel" %}?book="+b_id);
+           $('#DeleteBook_image').attr("src", "{% url "opds:covertmpl" %}"+b_id+"/");
            $('#DeleteBook_title').text(b_t);
            $('#DeleteBookModal').foundation('open');
+       }
+
+       function add_bsbook(b_id) {
+          $.get("{% url "web:bsadd" %}?book="+b_id,
+              function(data, status){
+                 alert("Data: " + data + "\nStatus: " + status);
+              });
        }
 </script>
            
@@ -45,7 +52,7 @@
 
 {%  for b in books %}
 		<div class="large-12 column">
-			<b>{{ b.title }}</b>
+			<b id="{{ b.id }}">{{ b.title }}</b>
 			<i style="font-size:80%;">{% trans "Download:" %} </i>
 			<i><a href="{% url 'opds_catalog:download' b.id 0 %}"><span class="label small">{{b.format}}</span></a></i>&nbsp;
             {% if not b.format in nozip %}
@@ -58,8 +65,10 @@
 			   <i><a href="{% url 'opds_catalog:convert' b.id 'mobi' %}"><span class="label small">mobi</span></a></i>&nbsp;
 			{% endif %}			
             <i><a href="{% url 'web:read' b.id %}"><span class="label small">{% trans "Read" %}</span></a></i>&nbsp;
-			{% if isbookshelf %}
+			{% if b.bookshelf %}
 			&nbsp;&nbsp;<i><a href="#" onclick="del_bsbook({{ b.id }},'{{b.title}}');"><span class="secondary label small">&nbsp;{% trans "Delete from bookshelf" %}&nbsp;</span></a></i>
+            {% else %}
+			&nbsp;&nbsp;<i><a href="{% url "web:bsadd" %}?book={{ b.id }}"><span class="secondary label small">&nbsp;{% trans "Add to bookshelf" %}&nbsp;</span></a></i>
 		    {% endif %}
 		</div>
 		

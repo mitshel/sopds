@@ -91,14 +91,17 @@ msgstr "Очистить книжную полку"
 msgid "Download:"
 msgstr "Скачать:"
 
-#: sopds_web_backend/templates/sopds_books.html:60
+#: .\sopds_web_backend\templates\sopds_books.html:60
 msgid "Read"
 msgstr "Читать"
 
-#: sopds_web_backend/templates/sopds_books.html:62
-#: .\sopds_web_backend\templates\sopds_books.html:61
+#: .\sopds_web_backend\templates\sopds_books.html:62
 msgid "Delete from bookshelf"
 msgstr "Удалить с книжной полки"
+
+#: .\sopds_web_backend\templates\sopds_books.html:64
+msgid "Add to bookshelf"
+msgstr "Добавить на книжную полку"
 
 #: .\sopds_web_backend\templates\sopds_books.html:71
 msgid "Book title:"
