@@ -14,4 +14,4 @@ Pillow = ">=2.9.0"
 APScheduler = ">=3.3.0"
 
 [requires]
-python_version = "3.7"
+python_version = "3.11"

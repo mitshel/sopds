@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.feedgenerator import Atom1Feed, Enclosure, rfc3339_date
 from django.contrib.syndication.views import Feed
 from django.urls import reverse
