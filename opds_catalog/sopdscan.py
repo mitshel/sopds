@@ -10,7 +10,7 @@ from book_tools.format import create_bookfile
 from book_tools.format.util import strip_symbols
 
 from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from opds_catalog import fb2parse, opdsdb
 from opds_catalog import inpx_parser
