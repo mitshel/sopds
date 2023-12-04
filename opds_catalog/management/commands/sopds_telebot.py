@@ -169,7 +169,8 @@ class Command(BaseCommand):
         return books
 
     def BookPager(self, books, page_num, query):
-        books_count = books.count()
+        # as I can understand, len de-facto reads all items in memory or QuerySet cache
+        books_count = len(books)
         op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_TELEBOT_MAXITEMS, HALF_PAGES_LINKS)
         items = []
 
@@ -255,7 +256,9 @@ class Command(BaseCommand):
             return
 
         books = self.BookFilter(query)
-        books_count = books.count()
+        #books_count = books.count()
+        # as I can understand, len de-facto reads all items in memory or QuerySet cache
+        books_count = len(books)
 
         if books_count == 0:
             response = _("No results were found for your query, please try again.")
