@@ -4,6 +4,9 @@ import sys
 import logging
 import re
 
+from collections import OrderedDict
+from datetime import datetime, timedelta
+
 from django.core.management.base import BaseCommand
 from django.conf import settings as main_settings
 from django.utils.html import strip_tags
@@ -57,8 +60,39 @@ def CheckAuthDecorator(func):
 
     return wrapper
 
+
+class TimeBoundedQueries:
+    "LRU Query cache that invalidates and refreshes old entries."
+
+    def __init__(self, max_size=10, max_age_in_days=2):
+        self.cache = OrderedDict()      # { args : (timestamp, result)}
+        self.max_size = max_size
+        self.max_age_in_days = timedelta(days = max_age_in_days)
+
+    def __call__(self, *query):
+        if query in self.cache:
+            self.cache.move_to_end(query)
+            timestamp, result = self.cache[query]
+            if datetime.now() - timestamp <= self.maxage:
+                return result
+        q_objects = Q()
+        q_objects.add(Q(search_title__contains=query.upper()), Q.OR)
+        q_objects.add( Q(authors__search_full_name__contains=query.upper()), Q.OR)
+        result = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
+        self.cache[args] = datetime.now(), result
+        if len(self.cache) > self.maxsize:
+            self.cache.popitem(0)
+        return result
+
+
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
+
+    # The above code is creating a variable named "query_cache".
+    query_cache = OrderedDict()
+    query_cache_max_size = 10
+    query_cache_max_age = timedelta(days = 2)
+
     can_import_settings = True
     leave_locale_alone = True
 
@@ -66,10 +100,10 @@ class Command(BaseCommand):
         parser.add_argument('command', help='Use [ start | stop | restart ]')
         parser.add_argument('--verbose',action='store_true', dest='verbose', default=False, help='Set verbosity level for SimpleOPDS telebot.')
         parser.add_argument('--daemon',action='store_true', dest='daemonize', default=False, help='Daemonize server')
-        
+
     def handle(self, *args, **options):
         self.pidfile = os.path.join(main_settings.BASE_DIR, config.SOPDS_TELEBOT_PID)
-        action = options['command']            
+        action = options['command']
         self.logger = logging.getLogger('')
         self.logger.setLevel(logging.DEBUG)
         formatter=logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
@@ -87,12 +121,12 @@ class Command(BaseCommand):
             ch.setLevel(logging.DEBUG)
             ch.setFormatter(formatter)
             self.logger.addHandler(ch)
-            
+
         if (options["daemonize"] and (action in ["start"])):
             if sys.platform == "win32":
                 self.stdout.write("On Windows platform Daemonize not working.")
-            else:         
-                daemonize()            
+            else:
+                daemonize()
 
         if action == "start":
             self.start()
@@ -114,11 +148,23 @@ class Command(BaseCommand):
     def BookFilter(self, query):
         if connection.connection and not connection.is_usable():
             del(connections._connections.default)
-
+        if query in self.query_cache:
+            self.query_cache.move_to_end(query)
+            timestamp, books = self.query_cache[query]
+            if datetime.now() - timestamp <= self.query_cache_max_age:
+                self.logger.info("Query '%s' is found in query cache."%query)
+                return books
+            else:
+                self.logger.info("Query '%s' is too old in query cache."%query)
         q_objects = Q()
         q_objects.add(Q(search_title__contains=query.upper()), Q.OR)
         q_objects.add( Q(authors__search_full_name__contains=query.upper()), Q.OR)
         books = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
+        self.query_cache[query] = datetime.now(), books
+        self.logger.info("Query '%s' is added to query cache."%query)
+        if len(self.query_cache) > self.query_cache_max_size:
+            query_old, books_old = self.query_cache.popitem(0)
+            self.logger.info("Query cache is overloaded. Query '%s' is removed from query cache."%query_old)
 
         return books
 
@@ -368,14 +414,14 @@ class Command(BaseCommand):
             self.logger.error('Invalid telegram token.')
 
         except (KeyboardInterrupt, SystemExit):
-            pass            
-    
+            pass
+
     def stop(self, pid):
         try:
             os.kill(int(pid), signal.SIGTERM)
         except OSError as e:
             self.stdout.write("Error stopping sopds_telebot: %s"%str(e))
-    
+
     def restart(self, pid):
         self.stop(pid)
         self.start()
@@ -387,7 +433,7 @@ def writepid(pid_file):
     fp = open(pid_file, "w")
     fp.write(str(os.getpid()))
     fp.close()
-    
+
 def daemonize():
     """
     Detach from the terminal and continue as a daemon.
@@ -405,14 +451,14 @@ def daemonize():
     std_out = open(config.SOPDS_TELEBOT_LOG, 'a+')
     os.dup2(std_in.fileno(), sys.stdin.fileno())
     os.dup2(std_out.fileno(), sys.stdout.fileno())
-    os.dup2(std_out.fileno(), sys.stderr.fileno())    
-    
+    os.dup2(std_out.fileno(), sys.stderr.fileno())
+
     os.close(std_in.fileno())
     os.close(std_out.fileno())
 
 
-    
 
-        
- 
+
+
+
 
