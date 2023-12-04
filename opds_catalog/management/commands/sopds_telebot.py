@@ -60,31 +60,6 @@ def CheckAuthDecorator(func):
 
     return wrapper
 
-
-class TimeBoundedQueries:
-    "LRU Query cache that invalidates and refreshes old entries."
-
-    def __init__(self, max_size=10, max_age_in_days=2):
-        self.cache = OrderedDict()      # { args : (timestamp, result)}
-        self.max_size = max_size
-        self.max_age_in_days = timedelta(days = max_age_in_days)
-
-    def __call__(self, *query):
-        if query in self.cache:
-            self.cache.move_to_end(query)
-            timestamp, result = self.cache[query]
-            if datetime.now() - timestamp <= self.maxage:
-                return result
-        q_objects = Q()
-        q_objects.add(Q(search_title__contains=query.upper()), Q.OR)
-        q_objects.add( Q(authors__search_full_name__contains=query.upper()), Q.OR)
-        result = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
-        self.cache[args] = datetime.now(), result
-        if len(self.cache) > self.maxsize:
-            self.cache.popitem(0)
-        return result
-
-
 class Command(BaseCommand):
     help = 'SimpleOPDS Telegram Bot engine.'
 
