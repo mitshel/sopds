@@ -120,14 +120,14 @@ class Command(BaseCommand):
         self.logger.info("Start talking with user: %s"%update.message.from_user)
         return
 
-    def BookFilter(self, query):
+    def bookFilter(self, query):
         if connection.connection and not connection.is_usable():
             del(connections._connections.default)
         if query in self.query_cache:
             self.query_cache.move_to_end(query)
             timestamp, books = self.query_cache[query]
             if datetime.now() - timestamp <= self.query_cache_max_age:
-                self.logger.info("Query '%s' is found in query cache."%query)
+                #self.logger.info("Query '%s' is found in query cache."%query)
                 return books
             else:
                 self.logger.info("Query '%s' is too old in query cache."%query)
@@ -136,14 +136,14 @@ class Command(BaseCommand):
         q_objects.add( Q(authors__search_full_name__contains=query.upper()), Q.OR)
         books = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
         self.query_cache[query] = datetime.now(), books
-        self.logger.info("Query '%s' is added to query cache."%query)
+        #self.logger.info("Query '%s' is added to query cache."%query)
         if len(self.query_cache) > self.query_cache_max_size:
-            query_old, books_old = self.query_cache.popitem(0)
+            query_old, _books_old = self.query_cache.popitem(0)
             self.logger.info("Query cache is overloaded. Query '%s' is removed from query cache."%query_old)
 
         return books
 
-    def BookPager(self, books, page_num, query):
+    def bookPager(self, books, page_num, query):
         # as I can understand, len de-facto reads all items in memory or QuerySet cache
         books_count = len(books)
         op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_TELEBOT_MAXITEMS, HALF_PAGES_LINKS)
@@ -152,7 +152,7 @@ class Command(BaseCommand):
         prev_title = ''
         prev_authors_set = set()
 
-        # Начаинам анализ с последнего элемента на предидущей странице, чторбы он "вытянул" с этой страницы
+        # Начинаем анализ с последнего элемента на предыдущей странице, чтобы он "вытянул" с этой страницы
         # свои дубликаты если они есть
         summary_DOUBLES_HIDE = config.SOPDS_DOUBLES_HIDE
         start = op.d1_first_pos if ((op.d1_first_pos == 0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos - 1
@@ -198,7 +198,7 @@ class Command(BaseCommand):
 
         #fix for rare empty response
         if not response:
-            response = self.BookPager(books, page_num -1, query)['message']
+            response = self.bookPager(books, page_num -1, query)['message']
             op.number = page_num - 1
             op.next_page_number = op.number
             op.num_pages = op.number
@@ -230,7 +230,7 @@ class Command(BaseCommand):
         if len(query) < 3:
             return
 
-        books = self.BookFilter(query)
+        books = self.bookFilter(query)
         #books_count = books.count()
         # as I can understand, len de-facto reads all items in memory or QuerySet cache
         books_count = len(books)
@@ -245,7 +245,7 @@ class Command(BaseCommand):
         context.bot.send_message(chat_id=update.message.chat_id, text=response)
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username, response))
 
-        response = self.BookPager(books, 1, query)
+        response = self.bookPager(books, 1, query)
         context.bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
 
     @cmdtrans
@@ -260,8 +260,8 @@ class Command(BaseCommand):
         except:
             page_num = 1
 
-        books = self.BookFilter(query)
-        response = self.BookPager(books, page_num, query)
+        books = self.bookFilter(query)
+        response = self.bookPager(books, page_num, query)
         context.bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
         return
 
