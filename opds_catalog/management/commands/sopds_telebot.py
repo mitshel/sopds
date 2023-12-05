@@ -4,26 +4,30 @@ import sys
 import logging
 import re
 
+import json
+
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
 from django.conf import settings as main_settings
 from django.utils.html import strip_tags
-from django.db.models import Q
+from django.db.models import Q, Count, Max
 from django.db import transaction, connection, connections
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.utils import translation
+
+from django.contrib.postgres.aggregates import StringAgg
 
 from opds_catalog.models import Book
 from opds_catalog import settings, dl
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 from sopds_web_backend.settings import HALF_PAGES_LINKS
 from constance import config
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.error import InvalidToken
+from telegram.error import InvalidToken, BadRequest
 
 query_delimiter = "####"
 
@@ -37,7 +41,7 @@ def cmdtrans(func):
     return wrapper
 
 
-def CheckAuthDecorator(func):
+def check_auth_decorator(func):
     def wrapper(self, update: Update, context: CallbackContext):
         if not config.SOPDS_TELEBOT_AUTH:
             return func(self, update, context)
@@ -56,7 +60,7 @@ def CheckAuthDecorator(func):
                         text=_("Hello %s!\nUnfortunately you do not have access to information. Please contact the bot administrator.") % username)
         self.logger.info(_("Denied access for user: %s") % username)
 
-        return
+        return None
 
     return wrapper
 
@@ -75,6 +79,7 @@ class Command(BaseCommand):
         parser.add_argument('command', help='Use [ start | stop | restart ]')
         parser.add_argument('--verbose',action='store_true', dest='verbose', default=False, help='Set verbosity level for SimpleOPDS telebot.')
         parser.add_argument('--daemon',action='store_true', dest='daemonize', default=False, help='Daemonize server')
+        return None
 
     def handle(self, *args, **options):
         self.pidfile = os.path.join(main_settings.BASE_DIR, config.SOPDS_TELEBOT_PID)
@@ -111,14 +116,15 @@ class Command(BaseCommand):
         elif action == "restart":
             pid = open(self.pidfile, "r").read()
             self.restart(pid)
+        return None
 
     @cmdtrans
-    @CheckAuthDecorator
+    @check_auth_decorator
     def startCommand(self, update: Update, context: CallbackContext):
         context.bot.sendMessage(chat_id=update.message.chat_id, text=_("%(subtitle)s\nHello %(username)s! To search for a book, enter part of her title or author:")%
                                                              {'subtitle':settings.SUBTITLE,'username':update.message.from_user.username})
         self.logger.info("Start talking with user: %s"%update.message.from_user)
-        return
+        return None
 
     def bookFilter(self, query):
         if connection.connection and not connection.is_usable():
@@ -127,14 +133,17 @@ class Command(BaseCommand):
             self.query_cache.move_to_end(query)
             timestamp, books = self.query_cache[query]
             if datetime.now() - timestamp <= self.query_cache_max_age:
-                #self.logger.info("Query '%s' is found in query cache."%query)
                 return books
             else:
                 self.logger.info("Query '%s' is too old in query cache."%query)
         q_objects = Q()
         q_objects.add(Q(search_title__contains=query.upper()), Q.OR)
         q_objects.add( Q(authors__search_full_name__contains=query.upper()), Q.OR)
-        books = Book.objects.filter(q_objects).order_by('search_title', '-docdate').distinct()
+        books = Book.objects.filter(q_objects).annotate(authors_set=StringAgg("authors__full_name", delimiter=", "))
+        if config.SOPDS_DOUBLES_HIDE:
+            books = books.values("title", "search_title", "authors_set").annotate(doubles=Count("filename"), id=Max("id")).order_by("search_title").distinct()
+        else:
+            books = books.values("title", "search_title", "authors_set", "id", "docdate").order_by('search_title', '-docdate').distinct()
         self.query_cache[query] = datetime.now(), books
         #self.logger.info("Query '%s' is added to query cache."%query)
         if len(self.query_cache) > self.query_cache_max_size:
@@ -147,74 +156,30 @@ class Command(BaseCommand):
         # as I can understand, len de-facto reads all items in memory or QuerySet cache
         books_count = len(books)
         op = OPDS_Paginator(books_count, 0, page_num, config.SOPDS_TELEBOT_MAXITEMS, HALF_PAGES_LINKS)
-        items = []
+        summary_doubles = config.SOPDS_DOUBLES_HIDE
 
-        prev_title = ''
-        prev_authors_set = set()
-
-        # Начинаем анализ с последнего элемента на предыдущей странице, чтобы он "вытянул" с этой страницы
-        # свои дубликаты если они есть
-        summary_DOUBLES_HIDE = config.SOPDS_DOUBLES_HIDE
-        start = op.d1_first_pos if ((op.d1_first_pos == 0) or (not summary_DOUBLES_HIDE)) else op.d1_first_pos - 1
+        start = op.d1_first_pos if (op.d1_first_pos == 0) else op.d1_first_pos - 1
         finish = op.d1_last_pos
 
-        for row in books[start:finish + 1]:
-            p = {'doubles': 0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
-                 'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-                 'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize // 1000, \
-                 'authors': row.authors.values(), 'genres': row.genres.values(), 'series': row.series.values(),
-                 'ser_no': row.bseries_set.values('ser_no')
-                 }
-            if summary_DOUBLES_HIDE:
-                title = p['title']
-                authors_set = {a['id'] for a in p['authors']}
-                if title.upper() == prev_title.upper() and authors_set == prev_authors_set:
-                    items[-1]['doubles'] += 1
-                else:
-                    items.append(p)
-                prev_title = title
-                prev_authors_set = authors_set
-            else:
-                items.append(p)
-
-        # "вытягиваем" дубликаты книг со следующей страницы и удаляем первый элемент который с предыдущей страницы и "вытягивал" дубликаты с текущей
-        if summary_DOUBLES_HIDE:
-            double_flag = True
-            while ((finish + 1) < books_count) and double_flag:
-                finish += 1
-                if books[finish].title.upper() == prev_title.upper() and {a['id'] for a in books[finish].authors.values()} == prev_authors_set:
-                    items[-1]['doubles'] += 1
-                else:
-                    double_flag = False
-
-            if op.d1_first_pos != 0:
-                items.pop(0)
-
         response = ''
-        for b in items:
-            authors = ', '.join([a['full_name'] for a in b['authors']])
-            doubles = _("(doubles:%s) ")%b['doubles'] if b['doubles'] else ''
-            response+='<b>%(title)s</b>\n%(author)s\n%(dbl)s/download%(link)s\n\n'%{'title':b['title'], 'author':authors,'link':b['id'], 'dbl':doubles}
+        for b in books[start:finish + 1]:
+            doubles = _("(doubles:%s) ")%b['doubles'] if summary_doubles and b['doubles'] else ''
+            response+='<b>%(title)s</b>\n%(author)s\n%(dbl)s/download%(link)s\n\n'%{'title':b['title'], 'author':b['authors_set'],'link':b['id'], 'dbl':doubles}
 
         #fix for rare empty response
-        if not response:
-            response = self.bookPager(books, page_num -1, query)['message']
-            op.number = page_num - 1
-            op.next_page_number = op.number
-            op.num_pages = op.number
-
-        buttons = [InlineKeyboardButton('1 <<', callback_data='%s%s%s'%(query,query_delimiter,1)),
-                   InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.previous_page_number)),
-                   InlineKeyboardButton('[ %s ]'%op.number , callback_data='%s%s%s'%(query,query_delimiter,'current')),
-                   InlineKeyboardButton('> %s'%op.next_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.next_page_number)),
-                   InlineKeyboardButton('>> %s'%op.num_pages, callback_data='%s%s%s'%(query,query_delimiter,op.num_pages))]
-
-        markup = InlineKeyboardMarkup([buttons]) if op.num_pages>1 else None
-
-        return {'message':response, 'buttons':markup}
+        if response:
+            buttons = [InlineKeyboardButton('1 <<', callback_data='%s%s%s'%(query,query_delimiter,1)),
+                    InlineKeyboardButton('%s <'%op.previous_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.previous_page_number)),
+                    InlineKeyboardButton('[ %s ]'%op.number , callback_data='%s%s%s'%(query,query_delimiter,'current')),
+                    InlineKeyboardButton('> %s'%op.next_page_number , callback_data='%s%s%s'%(query,query_delimiter,op.next_page_number)),
+                    InlineKeyboardButton('>> %s'%op.num_pages, callback_data='%s%s%s'%(query,query_delimiter,op.num_pages))]
+            markup = InlineKeyboardMarkup([buttons]) if op.num_pages>1 else None
+            return {'message':response, 'buttons':markup}
+        else:
+            return self.bookPager(books, page_num - 1, query)
 
     @cmdtrans
-    @CheckAuthDecorator
+    @check_auth_decorator
     def getBooks(self, update: Update, context: CallbackContext):
         query=update.message.text
         self.logger.info("Got message from user %s: %s" % (update.message.from_user.username, query))
@@ -228,7 +193,7 @@ class Command(BaseCommand):
         self.logger.info("Send message to user %s: %s" % (update.message.from_user.username,response))
 
         if len(query) < 3:
-            return
+            return None
 
         books = self.bookFilter(query)
         #books_count = books.count()
@@ -247,9 +212,10 @@ class Command(BaseCommand):
 
         response = self.bookPager(books, 1, query)
         context.bot.send_message(chat_id=update.message.chat_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+        return None
 
     @cmdtrans
-    @CheckAuthDecorator
+    @check_auth_decorator
     def getBooksPage(self, update: Update, context: CallbackContext):
         callback_query = update.callback_query
         (query,page_num) = callback_query.data.split(query_delimiter, maxsplit=1)
@@ -262,11 +228,14 @@ class Command(BaseCommand):
 
         books = self.bookFilter(query)
         response = self.bookPager(books, page_num, query)
-        context.bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
-        return
+        try:
+            context.bot.edit_message_text(chat_id=callback_query.message.chat_id, message_id=callback_query.message.message_id, text=response['message'], parse_mode='HTML', reply_markup=response['buttons'])
+        except BadRequest:
+            pass
+        return None
 
     @cmdtrans
-    @CheckAuthDecorator
+    @check_auth_decorator
     def downloadBooks(self, update: Update, context: CallbackContext):
         book_id_set=re.findall(r'\d+$',update.message.text)
         if len(book_id_set)==1:
@@ -290,7 +259,7 @@ class Command(BaseCommand):
         response = ('<b>%(title)s</b>\n%(author)s\n<b>'+_("Annotation:")+'</b>%(annotation)s\n') % {'title': book.title, 'author': authors, 'annotation':book.annotation}
 
         buttons = [InlineKeyboardButton(book.format.upper(), callback_data='/getfileorig%s'%book_id)]
-        if not book.format in settings.NOZIP_FORMATS:
+        if book.format not in settings.NOZIP_FORMATS:
             buttons += [InlineKeyboardButton(book.format.upper()+'.ZIP', callback_data='/getfilezip%s'%book_id)]
         if (config.SOPDS_FB2TOEPUB != "") and (book.format == 'fb2'):
             buttons += [InlineKeyboardButton('EPUB', callback_data='/getfileepub%s'%book_id)]
@@ -300,10 +269,10 @@ class Command(BaseCommand):
         markup = InlineKeyboardMarkup([buttons])
         context.bot.sendMessage(chat_id=update.message.chat_id, text=response, parse_mode='HTML', reply_markup=markup)
         self.logger.info("Send download buttons.")
-        return
+        return None
 
     @cmdtrans
-    @CheckAuthDecorator
+    @check_auth_decorator
     def getBookFile(self, update: Update, context: CallbackContext):
         callback_query = update.callback_query
         query = callback_query.data
@@ -329,21 +298,17 @@ class Command(BaseCommand):
 
         if re.match(r'/getfileorig',query):
             document = dl.getFileData(book)
-            #document = config.SOPDS_SITE_ROOT + reverse("opds_catalog:download",kwargs={"book_id": book.id, "zip_flag": 0})
 
         if re.match(r'/getfilezip',query):
             document = dl.getFileDataZip(book)
-            #document = config.SOPDS_SITE_ROOT + reverse("opds_catalog:download", kwargs={"book_id": book.id, "zip_flag": 1})
             filename = filename + '.zip'
 
         if re.match(r'/getfileepub',query):
             document = dl.getFileDataEpub(book)
-            #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "epub"}))]
             filename = filename.replace('.fb2', '.epub')
 
         if re.match(r'/getfilemobi',query):
             document = dl.getFileDataMobi(book)
-            #document = config.SOPDS_SITE_ROOT+reverse("opds_catalog:convert",kwargs={"book_id": book.id, "convert_type": "mobi"}))]
             filename = filename.replace('.fb2', '.mobi')
 
         if document:
@@ -354,12 +319,11 @@ class Command(BaseCommand):
             response = _("There was a technical error, please contact the Bot administrator.")
             context.bot.sendMessage(chat_id=callback_query.message.chat_id, text=response, parse_mode='HTML')
             self.logger.info("Book get error: %s" % response)
-            return
 
-        return
+        return None
 
     @cmdtrans
-    @CheckAuthDecorator
+    @check_auth_decorator
     def botCallback(self, update: Update, context: CallbackContext):
         query = update.callback_query
 
@@ -375,14 +339,14 @@ class Command(BaseCommand):
         try:
             updater = Updater(token=config.SOPDS_TELEBOT_API_TOKEN)
             start_command_handler = CommandHandler('start', self.startCommand)
-            getBook_handler = MessageHandler(Filters.text, self.getBooks)
+            get_book_handler = MessageHandler(Filters.text, self.getBooks)
 	    #fix deprecated RegexHandler See https://git.io/fxJuV for more info
             download_handler = MessageHandler(Filters.regex('^/download\d+$'),self.downloadBooks)
 
             updater.dispatcher.add_handler(start_command_handler)
 	    #change order of handlers, to handle download(regexp) before common text(book name)
             updater.dispatcher.add_handler(download_handler)
-            updater.dispatcher.add_handler(getBook_handler)
+            updater.dispatcher.add_handler(get_book_handler)
             updater.dispatcher.add_handler(CallbackQueryHandler(self.botCallback))
 
             updater.start_polling(drop_pending_updates=True)
@@ -394,15 +358,19 @@ class Command(BaseCommand):
         except (KeyboardInterrupt, SystemExit):
             pass
 
+        return None
+
     def stop(self, pid):
         try:
             os.kill(int(pid), signal.SIGTERM)
         except OSError as e:
             self.stdout.write("Error stopping sopds_telebot: %s"%str(e))
+        return None
 
     def restart(self, pid):
         self.stop(pid)
         self.start()
+        return None
 
 def writepid(pid_file):
     """
@@ -433,7 +401,7 @@ def daemonize():
 
     os.close(std_in.fileno())
     os.close(std_out.fileno())
-
+    return None
 
 
 
