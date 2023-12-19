@@ -254,7 +254,7 @@ def Cover(request, book_id, thumbnail=False):
         response["Content-Type"] = 'image/jpeg'
         if thumbnail:
             thumb = Image.open(io.BytesIO(image)).convert('RGB')
-            thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.ANTIALIAS)
+            thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.LANCZOS)
             tfile = io.BytesIO()
             thumb.save(tfile, 'JPEG')
             image = tfile.getvalue()
@@ -308,7 +308,7 @@ def Cover0(request, book_id, thumbnail = False):
                 if thumbnail:
                     response["Content-Type"] = 'image/jpeg'
                     thumb = Image.open(io.BytesIO(dstr)).convert('RGB')
-                    thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.ANTIALIAS)
+                    thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.LANCZOS)
                     tfile = io.BytesIO()
                     thumb.save(tfile, 'JPEG')
                     dstr = tfile.getvalue()
