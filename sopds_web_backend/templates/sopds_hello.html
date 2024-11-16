@@ -1,13 +1,13 @@
 {% extends "sopds_main.html" %}
 {% load i18n %}
 
-{% block ext-body %}
+{% block body %}
 <div class="row">
 <div class="small-12 medium-8 large-8 small-centered columns">
-<h3 style="text-align:center;">{% trans "Hello" %} {% if user.is_authenticated %}{{ user.username }}{% endif %}{% if not user.is_authenticated %}{% trans "Guest" %}{% endif %} !</h3>
-<p style="text-align:justify;">
+<h3 style="text-align:center;">{% trans "Hello" %} {% if user.is_authenticated %}{{ user.username }}! <img src="/static/images/homelib.jpg"> {% endif %}{% if not user.is_authenticated %}{% trans "Guest" %}! <img src="/static/images/gastlib.jpg"> {% endif %} </h3>
+{% if not user.is_authenticated %} <p style="text-align:justify;">
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{% trans "Simple OPDS Catalog - is a free program for Linux and Windows, which allows for the rapid creation of electronic OPDS-catalog books. OPDS (Open Publication Distribution System) directory allows you to access your library through the Internet with many devices for reading electronic books, tablets, smartphones, etc. More about the program can be found on the project website:" %} <a href="http://www.sopds.ru/"> www.sopds.ru</a>.
-</p>
+</p>{% endif %}
 </div>
 </div>
 {% endblock %}  {# body #}

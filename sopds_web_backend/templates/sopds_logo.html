@@ -1,14 +1,19 @@
 {% load static %}
 {% load i18n %}
 
-  <div class="show-for-medium medium-4 large-3 column" style="padding:0;"><img src="{% static "images/sopds_logo.gif" %}"></div>
-
-  <div class="small-12 medium-8 large-9 column" style="padding:0;">
+  <div class="show-for-medium medium-4 large-2 column" style="padding:0;"> <a id="HomeLink" href="https://{{ request.META.HTTP_HOST }}"><img src="{% static "images/Mejnkun.jpeg" %}"></div></a>
+       <script>
+            var findlink = document.getElementById("HomeLink");
+            if (window.location.protocol != "https:") {
+                    findlink.href = "http://{{ request.META.HTTP_HOST }}";
+            }
+       </script>
+  <div class="small-12 medium-8 large-10 column" style="padding:0;">
   <form method="get" action="{% url "web:searchbooks" %}" id="searchform" data-abide>
   {% csrf_token %}
  
     <div class="input-group">  
-		<input class="input-group-field" type="search" name="searchterms" placeholder="Search" id="main_searchbox" data-validator="check_search" required>
+		<input class="input-group-field" type="search" name="searchterms" placeholder="" id="main_searchbox" data-validator="check_search" required>
 
 		<div class="input-group-button">
 		      <button class="button" type="submit" data-close="search-dropdown" name="submit">{% trans "Search" %}</button>	   
@@ -35,14 +40,26 @@
   
   </div>
 
+       <div class="show-for-medium" align="center">{% trans "Life should be filled with books that are filled with life." %} </div>
+      
   <script>    	
+
 	function SetSearch() {
-	         var searchtype = $("input[name='searchtype']:radio:checked").attr("id");
-	         $('#main_searchbox').attr( "placeholder","Search by "+ searchtype);
-	         if (searchtype == "title") $('#searchform').attr( "action","{% url "web:searchbooks" %}");
-	         if (searchtype == "author") $('#searchform').attr( "action","{% url "web:searchauthors" %}");
-	         if (searchtype == "series") $('#searchform').attr( "action","{% url "web:searchseries" %}");	
-	         $('#search-dropdown').foundation('close');         
+	        var searchtype = $("input[name='searchtype']:radio:checked").attr("id");
+			document.getElementsByName('searchterms')[0].placeholder = "Выберите тип поиска рядом с кнопкой 'Найти'";
+			if (searchtype == "title") {
+			    document.getElementsByName('searchterms')[0].placeholder = "Поиск по названию книги";
+				$('#searchform').attr( "action","{% url "web:searchbooks" %}");
+				}
+			if (searchtype == "author") {
+			    document.getElementsByName('searchterms')[0].placeholder = "Поиск по Ф.И.О. автора";
+				$('#searchform').attr( "action","{% url "web:searchauthors" %}");
+				}
+			if (searchtype == "series") {
+			    document.getElementsByName('searchterms')[0].placeholder = "Поиск по серии";
+				$('#searchform').attr( "action","{% url "web:searchseries" %}");
+			    }
+	        $('#search-dropdown').foundation('close');         
 	}	   
+
   </script>
-  

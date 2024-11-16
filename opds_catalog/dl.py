@@ -19,6 +19,8 @@ from book_tools.format.mimetype import Mimetype
 from constance import config
 from PIL import Image
 
+from opds_catalog.middleware import BasicAuthMiddleware
+
 def getFileName(book):
     if config.SOPDS_TITLE_AS_FILENAME:
         transname = utils.translit(book.title + '.' + book.format)
@@ -143,9 +145,15 @@ def Download(request, book_id, zip_flag):
     """ Загрузка файла книги """
     book = Book.objects.get(id=book_id)
 
-    if config.SOPDS_AUTH and request.user.is_authenticated:
-        bookshelf.objects.get_or_create(user=request.user, book=book)
-
+    if config.SOPDS_AUTH:
+        if not request.user.is_authenticated:
+            bau = BasicAuthMiddleware()
+            request = bau.process_request(request)
+            if not hasattr(request, 'user'):
+                return request
+        if request.user.is_authenticated:
+            bookshelf.objects.get_or_create(user=request.user, book=book)
+            
     full_path=os.path.join(config.SOPDS_ROOT_LIB,book.path)
     
     if book.cat_type==opdsdb.CAT_INP:
@@ -254,7 +262,7 @@ def Cover(request, book_id, thumbnail=False):
         response["Content-Type"] = 'image/jpeg'
         if thumbnail:
             thumb = Image.open(io.BytesIO(image)).convert('RGB')
-            thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.ANTIALIAS)
+            thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.LANCZOS)
             tfile = io.BytesIO()
             thumb.save(tfile, 'JPEG')
             image = tfile.getvalue()
@@ -308,7 +316,7 @@ def Cover0(request, book_id, thumbnail = False):
                 if thumbnail:
                     response["Content-Type"] = 'image/jpeg'
                     thumb = Image.open(io.BytesIO(dstr)).convert('RGB')
-                    thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.ANTIALIAS)
+                    thumb.thumbnail((settings.THUMB_SIZE, settings.THUMB_SIZE), Image.LANCZOS)
                     tfile = io.BytesIO()
                     thumb.save(tfile, 'JPEG')
                     dstr = tfile.getvalue()
@@ -353,7 +361,7 @@ def ConvertFB2(request, book_id, convert_type):
         full_path = os.path.join(path,zip_name)
             
     if config.SOPDS_TITLE_AS_FILENAME:
-        transname=utils.translit(book.title+'.'+book.format)
+        transname=utils.translit(book.title+'.'+book.format).replace("/","_")
     else:
         transname=utils.translit(book.filename)      
         

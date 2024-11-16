@@ -5,6 +5,7 @@ import time
 import datetime
 import logging
 import re
+import json
 
 from book_tools.format import create_bookfile
 from book_tools.format.util import strip_symbols
@@ -22,6 +23,23 @@ class opdsScanner:
     def __init__(self, logger=None):
         self.fb2parser=None
         self.init_parser()
+        
+        self.fullang = None
+        try:
+            # open file with language dictionary. Missing languages cann be add manualy
+            with open(config.SOPDS_ROOT_LIB+"/Languages.txt","r") as f:
+                data = f.read()
+            self.fullang = json.loads(data)
+        except FileNotFoundError as e:
+            # standard set of languages, some may be missing.
+            self.fullang = {"AZ":"Азербайджанский","SQ":"Албанский","EN-US":"Амер. английский","EN":"Английский","HYE":"Армянский","HY":"Армянский","BA":"Башкирский",
+                            "BE":"Белорусский","BG":"Болгарский","HU":"Венгерский","VI":"Вьетнамский","EL":"Греческий","KA":"Грузинский","DA":"Датский","HE":"Иврит",
+                            "IO":"Идо","ID":"Индонезийский","GA":"Ирландский","IS":"Исландский","ES":"Испанский","IT":"Итальянский","KK":"Казахский","CA":"Каталанский",
+                            "ZH":"Китайский","KO":"Корейский","LV":"Латвийский","LA":"Латинский","LT":"Литовский","MK":"Македонский","DE":"Немецкий","NE":"Непальский",
+                            "NL":"Нидерландский","NO":"Норвежский","IE":"Окциденталь","PL":"Польский","PT":"Португальский","RO":"Румынский","RU":"Русский","RU~":"Русский",
+                            "SR":"Сербский","SK":"Словацкий","TG":"Таджикский","TT":"Татарский","TR":"Турецкий","UZ":"Узбекский","UK":"Украинский","FI":"Финский",
+                            "FR":"Французский","HR":"Хорватский","CU":"Церк. Славянский","CS":"Чешский","CV":"Чувашский","SV":"Шведский","EO":"Эсперанто",
+                            "ET":"Эстонский","SAH":"Якутский","JA":"Японский"}
 
         if logger:
             self.logger = logger
@@ -132,11 +150,23 @@ class opdsScanner:
     def inpx_callback(self, inpx, inp, meta_data):          
                  
         name = "%s.%s"%(meta_data[inpx_parser.sFile],meta_data[inpx_parser.sExt])
-        
+       
+        annotation='NotYet'
         lang=meta_data[inpx_parser.sLang].strip(strip_symbols)
+        # get the language fullname, otherwise ISO-639-1 shortname
+        lang = self.fullang.get(lang.upper(),lang)
         title=meta_data[inpx_parser.sTitle].strip(strip_symbols)
-        annotation=''
         docdate=meta_data[inpx_parser.sDate].strip(strip_symbols)
+        # Find out series number 
+        if meta_data[inpx_parser.sSerNo]:
+            serno = meta_data[inpx_parser.sSerNo]
+            try:
+        	    serno=int(re.sub(' ','',serno))
+            except Exception as err:
+        	    serno = 0
+        	    self.logger.warning(name + ' Seriennumber parse error. (Error: %s)'%err)
+        else:
+            serno = 0
 
         rel_path_current = os.path.join(self.rel_path,meta_data[inpx_parser.sFolder])
 
@@ -156,7 +186,7 @@ class opdsScanner:
 
             for s in meta_data[inpx_parser.sSeries]:
                 ser=opdsdb.addseries(s.strip())
-                opdsdb.addbseries(book,ser,0)
+                opdsdb.addbseries(book,ser,serno)
                    
     def processinpx(self,name,full_path,file):
         rel_file=os.path.relpath(file,config.SOPDS_ROOT_LIB)
@@ -219,9 +249,13 @@ class opdsScanner:
 
                     if book_data:
                         lang = book_data.language_code.strip(strip_symbols) if book_data.language_code else ''
+                        # If the Languages.txt file exists
+                        if self.fullang:
+                            # get the language fullname, otherwise ISO-639-1 shortname
+                            lang = self.fullang.get(lang.upper(),lang)
                         title = book_data.title.strip(strip_symbols) if book_data.title else n
                         annotation = book_data.description if book_data.description else ''
-                        annotation = annotation.strip(strip_symbols) if isinstance(annotation, str) else annotation.decode('utf8').strip(strip_symbols)
+                        annotation = annotation.strip(' \'\&\n-.#\\\`') if isinstance(annotation, str) else annotation.decode('utf8').strip(' \'\&\n-.#\\\`')
                         docdate = book_data.docdate if book_data.docdate else ''
 
                         book=opdsdb.addbook(name,rel_path,cat,e[1:],title,annotation,docdate,lang,file_size,archive)
@@ -255,4 +289,3 @@ class opdsScanner:
             except UnicodeEncodeError as err:
                 self.logger.warning(rel_path + ' - ' + name + ' Book UnicodeEncodeError error, skipping... (Error: %s)' % err)
                 self.bad_books += 1
-

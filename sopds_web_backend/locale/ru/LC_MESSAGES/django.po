@@ -49,14 +49,14 @@ msgid "Total: %(a_book_count)s books."
 msgstr "Всего: %(a_book_count)s книг."
 
 #: .\sopds_web_backend\templates\sopds_authors.html:17
-#: .\sopds_web_backend\templates\sopds_books.html:106
+#: .\sopds_web_backend\templates\sopds_books.html:107
 #: .\sopds_web_backend\templates\sopds_catalogs.html:42
 #: .\sopds_web_backend\templates\sopds_series.html:17
 msgid "Previous page"
 msgstr "Назад"
 
 #: .\sopds_web_backend\templates\sopds_authors.html:32
-#: .\sopds_web_backend\templates\sopds_books.html:121
+#: .\sopds_web_backend\templates\sopds_books.html:124
 #: .\sopds_web_backend\templates\sopds_catalogs.html:57
 #: .\sopds_web_backend\templates\sopds_series.html:32
 msgid "Next page"
@@ -87,53 +87,61 @@ msgstr "Очистить"
 msgid "Clear bookshelf"
 msgstr "Очистить книжную полку"
 
-#: .\sopds_web_backend\templates\sopds_books.html:49
-msgid "Download:"
-msgstr "Скачать:"
-
-#: .\sopds_web_backend\templates\sopds_books.html:61
+#: .\sopds_web_backend\templates\sopds_books.html:50
 msgid "Delete from bookshelf"
 msgstr "Удалить с книжной полки"
 
-#: .\sopds_web_backend\templates\sopds_books.html:71
+#: .\sopds_web_backend\templates\sopds_books.html:61
 msgid "Book title:"
 msgstr "Название книги:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:73
+#: .\sopds_web_backend\templates\sopds_books.html:63
 msgid "Authors:"
 msgstr "Авторы:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:76
+#: .\sopds_web_backend\templates\sopds_books.html:66
 msgid "Genres:"
 msgstr "Жанры:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:79
+#: .\sopds_web_backend\templates\sopds_books.html:69
 msgid "Series:"
 msgstr "Серии:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:80
+#: .\sopds_web_backend\templates\sopds_books.html:70
 msgid "No in Series:"
 msgstr "No в серии:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:82
+#: .\sopds_web_backend\templates\sopds_books.html:72
 msgid "File:"
 msgstr "Файл:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:83
+#: .\sopds_web_backend\templates\sopds_books.html:73
 msgid "File size:"
 msgstr "Размер файла:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:84
-msgid "Changes date:"
-msgstr "Дата правки:"
+#: .\sopds_web_backend\templates\sopds_books.html:73
+msgid "Kbyte"
+msgstr "Кбайт"
 
-#: .\sopds_web_backend\templates\sopds_books.html:86
+#: .\sopds_web_backend\templates\sopds_books.html:74
+msgid "Language:"
+msgstr "Язык:"
+
+#: .\sopds_web_backend\templates\sopds_books.html:76
 msgid "Doubles for book:"
 msgstr "Дубликаты книги:"
 
-#: .\sopds_web_backend\templates\sopds_books.html:89
-msgid "Read date:"
-msgstr "Дата прочтения:"
+#: .\sopds_web_backend\templates\sopds_books.html:76
+msgid "itm."
+msgstr "шт."
+
+#: .\sopds_web_backend\templates\sopds_books.html:79
+msgid "Read online"
+msgstr "Читать онлайн"
+
+#: .\sopds_web_backend\templates\sopds_books.html:82
+msgid "Download:"
+msgstr "Скачать:"
 
 #: .\sopds_web_backend\templates\sopds_breadcrumbs.html:3
 msgid "You are here:"
@@ -254,6 +262,10 @@ msgstr "Автор"
 #: .\sopds_web_backend\views.py:288 .\sopds_web_backend\views.py:504
 msgid "Series"
 msgstr "Серии"
+
+#: .\sopds_web_backend\templates\sopds_logo.html:38
+msgid "Life should be filled with books that are filled with life."
+msgstr "Жизнь должна быть наполнена книгами, которые наполнены жизнью."
 
 #: .\sopds_web_backend\templates\sopds_menu.html:6
 #: .\sopds_web_backend\templates\sopds_menu.html:16

@@ -30,7 +30,7 @@ class AuthFeed(Feed):
         bau = BasicAuthMiddleware()
         result=bau.process_request(self.request)
         
-        if result!=None:
+        if (result != None) and (not hasattr(result, 'user')):
             return result
         
         return super().__call__(request,*args,**kwargs)

@@ -1,3 +1,6 @@
+import os
+import codecs
+
 from random import randint
 
 from django.shortcuts import render, redirect
@@ -12,14 +15,31 @@ from django.utils.html import strip_tags
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 
+from book_tools.format import create_bookfile
+import opds_catalog.zipf as zipfile
 from opds_catalog import models
 from opds_catalog.models import Book, Author, Series, bookshelf, Counter, Catalog, Genre, lang_menu
 from opds_catalog import settings
 from constance import config
 from opds_catalog.opds_paginator import Paginator as OPDS_Paginator
 
-
 from sopds_web_backend.settings import HALF_PAGES_LINKS
+
+def get_annotation(mybook):
+    full_path = os.path.join(config.SOPDS_ROOT_LIB, mybook.path)
+    # Убираем из пути INPX и INP файл
+    inp_path, zip_name = os.path.split(full_path)
+    inpx_path, inp_name = os.path.split(inp_path)
+    path, inpx_name = os.path.split(inpx_path)
+    full_path = os.path.join(path,zip_name)
+    fz = codecs.open(full_path, "rb")
+    z = zipfile.ZipFile(fz, 'r', allowZip64=True)
+    fo = z.open(mybook.filename)
+    book_data = create_bookfile(fo, mybook.filename)
+    annotation = book_data.description if book_data.description else ''
+    annotation = annotation.strip(' \'\&\n-.#\\\`') if isinstance(annotation, str) else annotation.decode('utf8').strip(' \'\&\n-.#\\\`')
+    return annotation
+
 
 def sopds_login(function=None, redirect_field_name=REDIRECT_FIELD_NAME, url=None):
     actual_decorator = user_passes_test(
@@ -64,8 +84,11 @@ def sopds_processor(request):
         except Book.DoesNotExist:
             random_book= None
     else:
-        random_book= None        
-                   
+        random_book= None
+    # Get annotation if note done yet
+    if random_book and random_book.annotation == 'NotYet':
+        random_book.annotation = get_annotation(random_book)
+        random_book.save()
     args['random_book'] = random_book
     stats = { d['name']:d['value'] for d in Counter.obj.all().values() }
     stats['lastscan_date']=Counter.objects.get_lastscan()
@@ -95,13 +118,13 @@ def SearchBooksView(request):
         if searchtype == 'm':
             #books = Book.objects.extra(where=["upper(title) like %s"], params=["%%%s%%"%searchterms.upper()]).order_by('title','-docdate')
             books = Book.objects.filter(search_title__contains=searchterms.upper()).order_by('search_title','-docdate')
-            args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]
+            args['breadcrumbs'] = [_('Books'),_('Поиск по названию'),searchterms]
             args['searchobject'] = 'title'
             
         if searchtype == 'b':
             #books = Book.objects.extra(where=["upper(title) like %s"], params=["%s%%"%searchterms.upper()]).order_by('title','-docdate')
             books = Book.objects.filter(search_title__startswith=searchterms.upper()).order_by('search_title','-docdate')
-            args['breadcrumbs'] = [_('Books'),_('Search by title'),searchterms]   
+            args['breadcrumbs'] = [_('Books'),_('Поиск по названию'),searchterms]   
             args['searchobject'] = 'title'         
             
         elif searchtype == 'a':
@@ -114,7 +137,7 @@ def SearchBooksView(request):
                 author_id = 0
                 aname = ""                  
             books = Book.objects.filter(authors=author_id).order_by('search_title','-docdate')  
-            args['breadcrumbs'] = [_('Books'),_('Search by author'),aname]   
+            args['breadcrumbs'] = [_('Books'),_('Поиск по автору'),aname]   
             args['searchobject'] = 'author' 
             
         # Поиск книг по серии
@@ -127,7 +150,7 @@ def SearchBooksView(request):
                 ser = ""
             #books = Book.objects.filter(series=ser_id).order_by('search_title','-docdate')
             books = Book.objects.filter(series=ser_id).order_by('bseries__ser_no','search_title','-docdate')
-            args['breadcrumbs'] = [_('Books'),_('Search by series'),ser]
+            args['breadcrumbs'] = [_('Books'),_('Поиск по серии'),ser]
             args['searchobject'] = 'series'
             
         # Поиск книг по жанру
@@ -136,10 +159,10 @@ def SearchBooksView(request):
                 genre_id = int(searchterms)
                 section = Genre.objects.get(id=genre_id).section
                 subsection = Genre.objects.get(id=genre_id).subsection
-                args['breadcrumbs'] = [_('Books'),_('Search by genre'),section,subsection]
+                args['breadcrumbs'] = [_('Books'),_('Поиск по жанру'),section,subsection]
             except:
                 genre_id = 0
-                args['breadcrumbs'] = [_('Books'),_('Search by genre')]
+                args['breadcrumbs'] = [_('Books'),_('Поиск по жанру')]
                 
             books = Book.objects.filter(genres=genre_id).order_by('search_title','-docdate') 
             args['searchobject'] = 'genre'
@@ -204,9 +227,14 @@ def SearchBooksView(request):
         finish = op.d1_last_pos
         
         for row in books[start:finish+1]:
-            p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
+            shortpath = row.path[row.path.rfind('/')+1:]
+            # Get annotation if note done yet
+            if row.annotation == 'NotYet':
+                row.annotation = get_annotation(row)
+                row.save()
+            p = {'doubles':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, 'shortpath': shortpath, \
                   'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-                  'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
+                  'docdate': row.docdate, 'lang': row.lang, 'format': row.format, 'title': row.title, 'filesize': row.filesize,\
                   'authors': row.authors.values(), 'genres': row.genres.values(), 'series': row.series.values(),'ser_no': row.bseries_set.values('ser_no'),\
                   'readtime':row.bookshelf_set.filter(user=request.user).values('readtime') if config.SOPDS_AUTH else None
                  }
@@ -241,7 +269,11 @@ def SearchBooksView(request):
         args['books']=items   
         args['current'] = 'search'
         args['cache_id']='%s:%s:%s'%(searchterms,searchtype,op.page_num)
-        args['cache_t']=config.SOPDS_CACHE_TIME
+        # changes on bookshelf should be refreshed immediatelly
+        if searchtype == 'u':
+            args['cache_t'] = 0
+        else:
+            args['cache_t'] = config.SOPDS_CACHE_TIME
         
     return render(request,'sopds_books.html', args)
 
@@ -369,9 +401,10 @@ def CatalogsView(request):
         items.append(p)
           
     for row in books_list[op.d2_first_pos:op.d2_last_pos+1]:
-        p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, \
+        shortpath = row.path[row.path.rfind('/')+1:]
+        p = {'is_catalog':0, 'lang_code': row.lang_code, 'filename': row.filename, 'path': row.path, 'shortpath': shortpath, \
               'registerdate': row.registerdate, 'id': row.id, 'annotation': strip_tags(row.annotation), \
-              'docdate': row.docdate, 'format': row.format, 'title': row.title, 'filesize': row.filesize//1000,\
+              'docdate': row.docdate, 'lang': row.lang, 'format': row.format, 'title': row.title, 'filesize': row.filesize, \
               'authors':row.authors.values(), 'genres':row.genres.values(), 'series':row.series.values(), 'ser_no':row.bseries_set.values('ser_no'),\
               'readtime': row.bookshelf_set.filter(user=request.user).values('readtime') if config.SOPDS_AUTH else None
              }

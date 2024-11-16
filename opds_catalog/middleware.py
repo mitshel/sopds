@@ -35,7 +35,11 @@ class BasicAuthMiddleware(object):
         except KeyError:
             return self.unauthed()  
                     
-        (auth_meth, auth_data) = authentication.split(' ',1)
+        try:
+            (auth_meth, auth_data) = authentication.split(' ',1)
+        except ValueError:
+            return self.unauthed()
+            
         if 'basic' != auth_meth.lower():
             return self.unauthed()
         auth_data = base64.b64decode(auth_data.strip()).decode('utf-8')
@@ -45,7 +49,7 @@ class BasicAuthMiddleware(object):
         if user and user.is_active:
             request.user = user
             auth.login(request, user)
-            return None
+            return request
 
         return self.unauthed()
 

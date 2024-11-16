@@ -5,3 +5,4 @@ django-constance[database]>=2.9
 django-picklefield
 lxml
 python-telegram-bot>=20
+tzlocal==2.1
