@@ -14,7 +14,7 @@ or from github.com with the following command:
 
 1.2 Dependencies.
 - Requires Python at least version 3.4
-- Django 1.10
+- Django 2.2
 - Pillow 2.9.0
 - apscheduler 3.3.0
 - django-picklefield

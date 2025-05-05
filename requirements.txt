@@ -1,4 +1,4 @@
-Django>=1.10,<2.2; python_version >= '3.4'
+Django>=2.2,<2.3; python_version >= '3.4'
 Pillow>=2.9.0
 apscheduler>=3.3.0
 #django-constance[database]>=2.1
